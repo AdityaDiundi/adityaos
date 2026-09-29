@@ -15,6 +15,7 @@ import {
   ArrowRight,
   Bookmark,
   Layers,
+  Brain,
 } from "lucide-react";
 import { useThemeStore } from "@/store/themeStore";
 import { useOSStore } from "@/store/osStore";
@@ -27,7 +28,7 @@ interface Dispatch {
   coordinates: string;
   date: string;
   title: string;
-  category: "Youth Leadership" | "Water Commons" | "Self Discovery" | "Grassroots Art";
+  category: "Education Diagnostics" | "Youth Leadership" | "Water Commons" | "Self Discovery" | "Grassroots Art";
   summary: string;
   excerpt: string;
   essayLink: string;
@@ -37,6 +38,27 @@ interface Dispatch {
 }
 
 const DISPATCHES: Dispatch[] = [
+  {
+    id: "aarohi-learnability",
+    location: "Kabhra, Peora",
+    region: "Kumaon Himalayas, Uttarakhand",
+    coordinates: "29.4975° N, 79.5768° E",
+    date: "School Diagnostic Study",
+    title: "Learnability at Aarohi: Inquiry & The Curiosity Cliff",
+    category: "Education Diagnostics",
+    summary:
+      "Conducting an empirical diagnostic at Aarohi Bal Sansar across Grades 8–10. Mapping student learning preferences (50% hands-on) against institutional chalk-and-talk, and uncovering the 82% drop in curiosity under board exam conditioning.",
+    excerpt:
+      "While students showed 100% resilience in persisting through confusion, question-asking plummeted from 70% in Grade 9 to just 12.5% in Grade 10. The study led to our systemic framework of zero-cost daily inquiry huddles and hands-on experimentation in rural mountain schools.",
+    essayLink: "Learnability_Aarohi_Bal_Sansar.md",
+    stats: [
+      { label: "Cohort Surveyed", value: "36 Students" },
+      { label: "Hands-on Demand", value: "50.0%" },
+      { label: "Grade 10 Resilience", value: "100%" },
+    ],
+    audioLabel: "Pine Forest Breeze / Mountain Bell Chimes",
+    tags: ["Rural Education", "Learnability Diagnostic", "Himalayan Fieldwork"],
+  },
   {
     id: "youth-clubs",
     location: "Bhilwara",
@@ -128,7 +150,7 @@ export const FieldJournal: React.FC = () => {
   const { restoreWindow, focusWindow } = useOSStore();
   const { playScrollNote, playClickChime } = useSoundStore();
 
-  const [activeDispatchId, setActiveDispatchId] = useState<string>("youth-clubs");
+  const [activeDispatchId, setActiveDispatchId] = useState<string>("aarohi-learnability");
   const [isPlayingAudio, setIsPlayingAudio] = useState<boolean>(false);
 
   const activeDispatch = DISPATCHES.find((d) => d.id === activeDispatchId) || DISPATCHES[0];
@@ -137,6 +159,12 @@ export const FieldJournal: React.FC = () => {
     playClickChime(640);
     restoreWindow("archiveReader");
     focusWindow("archiveReader");
+  };
+
+  const handleOpenLearnabilityLab = () => {
+    playClickChime(720);
+    restoreWindow("learnabilityLab");
+    focusWindow("learnabilityLab");
   };
 
   const toggleFieldAudio = () => {
@@ -364,24 +392,40 @@ export const FieldJournal: React.FC = () => {
             </div>
           )}
 
-          {/* Action Footer: Read Full Markdown in Archive */}
-          <div className="pt-2 flex items-center justify-between">
-            <button
-              type="button"
-              onClick={() => handleOpenEssayInArchive(activeDispatch.essayLink)}
-              style={{
-                backgroundColor: activeTheme.accent,
-                color: activeTheme.isDark ? "#000" : "#fff",
-              }}
-              className="px-3 py-1.5 rounded font-bold text-xs flex items-center gap-1.5 shadow-md hover:scale-[1.02] active:scale-95 transition-all"
-            >
-              <BookOpen className="w-3.5 h-3.5" />
-              <span>Read Full Essay in ArchiveReader</span>
-              <ArrowRight className="w-3.5 h-3.5" />
-            </button>
+          {/* Action Footer: Read Full Markdown in Archive or Open Diagnostics Lab */}
+          <div className="pt-2 flex items-center justify-between gap-2 flex-wrap">
+            {activeDispatch.id === "aarohi-learnability" ? (
+              <button
+                type="button"
+                onClick={handleOpenLearnabilityLab}
+                style={{
+                  backgroundColor: activeTheme.accent,
+                  color: activeTheme.isDark ? "#000" : "#fff",
+                }}
+                className="px-3 py-1.5 rounded font-bold text-xs flex items-center gap-1.5 shadow-md hover:scale-[1.02] active:scale-95 transition-all"
+              >
+                <Brain className="w-3.5 h-3.5" />
+                <span>Launch Interactive Learnability Lab</span>
+                <ArrowRight className="w-3.5 h-3.5" />
+              </button>
+            ) : (
+              <button
+                type="button"
+                onClick={() => handleOpenEssayInArchive(activeDispatch.essayLink)}
+                style={{
+                  backgroundColor: activeTheme.accent,
+                  color: activeTheme.isDark ? "#000" : "#fff",
+                }}
+                className="px-3 py-1.5 rounded font-bold text-xs flex items-center gap-1.5 shadow-md hover:scale-[1.02] active:scale-95 transition-all"
+              >
+                <BookOpen className="w-3.5 h-3.5" />
+                <span>Read Full Essay in ArchiveReader</span>
+                <ArrowRight className="w-3.5 h-3.5" />
+              </button>
+            )}
 
             <span className="text-[10px] opacity-50 hidden sm:inline">
-              Source: India Fellow Grassroots Archives
+              Source: Aarohi & India Fellow Field Telemetry
             </span>
           </div>
         </div>

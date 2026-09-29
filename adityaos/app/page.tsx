@@ -10,7 +10,7 @@ import { TerminalDesktop } from "@/components/Modules/TerminalDesktop";
 import { ResumeViewer } from "@/components/Modules/ResumeViewer";
 import { GalleryViewer } from "@/components/Modules/GalleryViewer";
 import { FieldJournal } from "@/components/Modules/FieldJournal";
-import { LogicLab } from "@/components/Modules/LogicLab";
+import { LearnabilityLab } from "@/components/Modules/LearnabilityLab";
 import { useOSStore } from "@/store/osStore";
 import { useThemeStore, OS_THEMES, OSThemeId } from "@/store/themeStore";
 import { useSoundStore } from "@/store/soundStore";
@@ -35,7 +35,7 @@ import {
   Grid,
   Image as ImageIcon,
   Compass,
-  Zap,
+  Brain,
 } from "lucide-react";
 
 export default function Home() {
@@ -249,22 +249,22 @@ export default function Home() {
               [7:FIELD]
             </button>
 
-            {/* [8:LOGIC] -> logicLab */}
+            {/* [8:DIAGNOSTICS] -> learnabilityLab */}
             <button
               type="button"
-              onClick={() => openAndFocus("logicLab")}
+              onClick={() => openAndFocus("learnabilityLab")}
               style={{
                 backgroundColor:
-                  activeWindow === "logicLab" ? activeTheme.cardBg : "transparent",
+                  activeWindow === "learnabilityLab" ? activeTheme.cardBg : "transparent",
                 borderColor:
-                  activeWindow === "logicLab" ? activeTheme.accent : "transparent",
+                  activeWindow === "learnabilityLab" ? activeTheme.accent : "transparent",
                 color:
-                  activeWindow === "logicLab" ? activeTheme.accent : activeTheme.textMuted,
+                  activeWindow === "learnabilityLab" ? activeTheme.accent : activeTheme.textMuted,
               }}
               className="px-1.5 py-0.2 rounded border font-semibold hover:opacity-100 transition-all cursor-pointer hidden lg:inline-block"
-              title="Workspace 8: IIIT Delhi ECE LogicLab"
+              title="Workspace 8: Aarohi Bal Sansar Learnability Lab"
             >
-              [8:LOGIC]
+              [8:DIAGNOSTICS]
             </button>
           </div>
         </div>
@@ -733,10 +733,10 @@ export default function Home() {
               </div>
             </button>
 
-            {/* Shortcut 9: LogicLab */}
+            {/* Shortcut 9: LearnabilityLab */}
             <button
               type="button"
-              onClick={() => openAndFocus("logicLab")}
+              onClick={() => openAndFocus("learnabilityLab")}
               style={{
                 backgroundColor: `${activeTheme.cardBg}cc`,
                 borderColor: activeTheme.cardBorder,
@@ -745,11 +745,11 @@ export default function Home() {
               className="p-3 rounded-lg border backdrop-blur-sm flex flex-col items-center gap-2 text-center group hover:scale-[1.03] hover:border-cyan-400/60 transition-all shadow-sm"
             >
               <div className="w-10 h-10 rounded-md bg-cyan-500/20 flex items-center justify-center group-hover:bg-cyan-500/30 transition-colors">
-                <Zap className="w-5 h-5 text-cyan-400" />
+                <Brain className="w-5 h-5 text-cyan-400" />
               </div>
               <div className="space-y-0.5">
-                <div className="font-bold text-xs">LogicLab</div>
-                <div className="text-[10px] opacity-60">IIIT Delhi ECE</div>
+                <div className="font-bold text-xs">Learnability</div>
+                <div className="text-[10px] opacity-60">Aarohi Diagnostics</div>
               </div>
             </button>
           </div>
@@ -881,16 +881,16 @@ export default function Home() {
           <FieldJournal />
         </WindowFrame>
 
-        {/* Module 8: LogicLab Window */}
+        {/* Module 8: LearnabilityLab Window */}
         <WindowFrame
-          id="logicLab"
-          title="silicon // LogicLab.tsx"
-          icon={<Zap className="w-3.5 h-3.5 text-cyan-400" />}
+          id="learnabilityLab"
+          title="diagnostics // LearnabilityLab.tsx"
+          icon={<Brain className="w-3.5 h-3.5 text-cyan-400" />}
           defaultPosition={{ x: 220, y: 60 }}
-          defaultSize={{ width: 740, height: 510 }}
+          defaultSize={{ width: 780, height: 530 }}
           dragConstraintsRef={desktopContainerRef}
         >
-          <LogicLab />
+          <LearnabilityLab />
         </WindowFrame>
       </div>
 

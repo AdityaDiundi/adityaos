@@ -124,17 +124,17 @@ export const TerminalDesktop: React.FC = () => {
         </span>
       );
     } else if (
-      trimmed === "./logic_lab" ||
-      trimmed === "logic" ||
-      trimmed === "ece" ||
-      trimmed === "breadboard" ||
-      trimmed === "silicon"
+      trimmed === "./learnability" ||
+      trimmed === "learn" ||
+      trimmed === "aarohi" ||
+      trimmed === "diagnostics" ||
+      trimmed === "fieldlab"
     ) {
-      restoreWindow("logicLab");
-      focusWindow("logicLab");
+      restoreWindow("learnabilityLab");
+      focusWindow("learnabilityLab");
       output = (
         <span className="text-cyan-400">
-          [OK] Powering up IIIT Delhi ECE Logic Workbench (TTL gates & DSO active).
+          [OK] Mounting Aarohi Bal Sansar Learnability Lab (Rural school inquiry diagnostics & curiosity cliff analysis).
         </span>
       );
     } else if (
@@ -221,8 +221,8 @@ export const TerminalDesktop: React.FC = () => {
           <div>Available commands:</div>
           <div>  <span className="text-onedark-yellow">./pixel_engine</span>      - Open PixelEngine (2D/3D Voxel Canvas)</div>
           <div>  <span className="text-onedark-yellow">snake | life | sand</span> - Launch Pixel Mini-Games (Snake, Conway Life, Sand)</div>
-          <div>  <span className="text-onedark-yellow">field | journal</span>     - Open Rajasthan Field Journal (India Fellow)</div>
-          <div>  <span className="text-onedark-yellow">logic | ece</span>         - Open IIIT Delhi ECE Logic Workbench</div>
+          <div>  <span className="text-onedark-yellow">field | journal</span>     - Open Rural Field Journal (Aarohi & India Fellow)</div>
+          <div>  <span className="text-onedark-yellow">learn | aarohi</span>      - Open Learnability Lab (School inquiry diagnostics)</div>
           <div>  <span className="text-onedark-yellow">cat resume.pdf</span>      - Open ResumeViewer (CV & Experience)</div>
           <div>  <span className="text-onedark-yellow">feh</span>                   - Open Feh/Nsxiv Image Gallery (public/gallery/)</div>
           <div>  <span className="text-onedark-yellow">theme &lt;name&gt;</span>        - Switch OS theme (noctalia, caelestia, tokyo-night, catppuccin, matrix, onedark, light)</div>

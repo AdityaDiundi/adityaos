@@ -309,16 +309,18 @@ export const GalleryViewer: React.FC = () => {
             );
           })}
 
-          {/* GitHub Workflow Helper Tip */}
+          {/* Curation Note Footer */}
           <div
-            style={{ borderColor: activeTheme.cardBorder }}
-            className="hidden md:block mt-auto p-2 rounded border border-dashed text-[10px] opacity-70 leading-relaxed"
+            style={{ 
+              borderColor: activeTheme.cardBorder,
+              color: activeTheme.textMuted 
+            }}
+            className="hidden md:block mt-auto p-2 rounded border border-white/5 text-[10px] leading-relaxed opacity-75"
           >
-            <div className="font-bold text-amber-400 flex items-center gap-1 mb-1">
-              <FolderOpen className="w-3 h-3" />
-              <span>Add Images via GitHub</span>
+            <div className="font-semibold text-[11px] mb-0.5" style={{ color: activeTheme.textPrimary }}>
+              Visual Archives
             </div>
-            Drop any image into <code className="text-cyan-400">public/gallery/</code> and push to Git. It will automatically show up here on Vercel!
+            Interface artifacts, generative voxels, and field photography captured across projects.
           </div>
         </div>
       </div>
