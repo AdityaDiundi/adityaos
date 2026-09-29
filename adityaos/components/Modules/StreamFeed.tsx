@@ -86,7 +86,7 @@ export const StreamFeed: React.FC = () => {
   const [playedFraction, setPlayedFraction] = useState(0);
   const [playedSeconds, setPlayedSeconds] = useState(0);
 
-  const playerRef = useRef<{ seekTo: (fraction: number) => void } | null>(null);
+  const playerRef = useRef<any>(null);
 
   useEffect(() => {
     setMounted(true);
@@ -106,7 +106,15 @@ export const StreamFeed: React.FC = () => {
     const newFraction = Math.max(0, Math.min(1, clickX / rect.width));
     setPlayedFraction(newFraction);
     if (playerRef.current && typeof playerRef.current.seekTo === "function") {
-      playerRef.current.seekTo(newFraction);
+      // react-player requires 'fraction' as second param for 0..1 ratio
+      playerRef.current.seekTo(newFraction, "fraction");
+    }
+  };
+
+  const seekRelative = (secondsOffset: number) => {
+    const target = Math.max(0, playedSeconds + secondsOffset);
+    if (playerRef.current && typeof playerRef.current.seekTo === "function") {
+      playerRef.current.seekTo(target, "seconds");
     }
   };
 
@@ -246,6 +254,40 @@ export const StreamFeed: React.FC = () => {
               className="p-1.5 rounded border hover:opacity-80 transition-colors"
             >
               {muted ? <VolumeX className="w-3.5 h-3.5 text-onedark-red" /> : <Volume2 className="w-3.5 h-3.5" />}
+            </button>
+
+            {/* Quick Seek Buttons */}
+            <button
+              type="button"
+              onClick={() => {
+                seekRelative(-10);
+                playClickChime(420);
+              }}
+              style={{
+                backgroundColor: activeTheme.cardBg,
+                borderColor: activeTheme.cardBorder,
+                color: activeTheme.textPrimary,
+              }}
+              className="px-1.5 py-1 rounded border text-[10px] hover:opacity-80 transition-colors font-mono"
+              title="Seek backwards 10 seconds"
+            >
+              -10s
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                seekRelative(10);
+                playClickChime(620);
+              }}
+              style={{
+                backgroundColor: activeTheme.cardBg,
+                borderColor: activeTheme.cardBorder,
+                color: activeTheme.textPrimary,
+              }}
+              className="px-1.5 py-1 rounded border text-[10px] hover:opacity-80 transition-colors font-mono"
+              title="Seek forwards 10 seconds"
+            >
+              +10s
             </button>
 
             {/* Telemetry Timestamp */}

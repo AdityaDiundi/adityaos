@@ -134,7 +134,7 @@ export default function Home() {
               className="px-1.5 py-0.2 rounded border font-semibold hover:opacity-100 transition-all cursor-pointer"
               title="Workspace 1: Identity & Core Intro"
             >
-              [1:SYS]
+              [1:CORE]
             </button>
 
             {/* [2:ARCHIVE] -> archiveReader */}
@@ -526,7 +526,7 @@ export default function Home() {
       {/* TWM Window Workspace Canvas */}
       <div className="relative flex-1 w-full h-[calc(100vh-72px)] overflow-hidden">
         {/* Desktop Background Shortcuts & Widgets (Visible on empty canvas) */}
-        <div className="absolute inset-0 p-6 pointer-events-none flex flex-col justify-between z-0">
+        <div className="absolute inset-0 p-6 pb-16 pointer-events-none flex flex-col justify-between z-0">
           {/* Top-Left Desktop App Icons Grid */}
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-7 gap-3 max-w-5xl pointer-events-auto">
             {/* Shortcut 1: Pixel Engine */}

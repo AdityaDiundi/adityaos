@@ -28,6 +28,7 @@ import {
   Play,
   Sliders,
   Globe,
+  Gamepad2,
 } from "lucide-react";
 import { useThemeStore } from "@/store/themeStore";
 import { useSoundStore } from "@/store/soundStore";
@@ -139,8 +140,16 @@ export const PixelEngine: React.FC = () => {
   const historyRef = useRef<Map<string, string>[]>([new Map()]);
   const historyIndexRef = useRef<number>(0);
   const isDrawingRef = useRef<boolean>(false);
+  const lastCoordRef = useRef<{ col: number; row: number } | null>(null);
   const gravityPixelsRef = useRef<any[]>([]);
   const isGravityActiveRef = useRef<boolean>(false);
+
+  // Arcade Collectibles Mini-Game State
+  const [isArcadeMode, setIsArcadeMode] = useState<boolean>(true);
+  const [arcadeScore, setArcadeScore] = useState<number>(0);
+  const [comboCount, setComboCount] = useState<number>(0);
+  const lastPopTimeRef = useRef<number>(0);
+  const collectiblesRef = useRef<Map<string, { createdAt: number; sizeMult: number; type: "gold" | "neon" | "rainbow" }>>(new Map());
 
   // Web Audio Synthesizer (from homesec.tsx & pixel.tsx)
   const audioCtxRef = useRef<AudioContext | null>(null);
@@ -402,7 +411,42 @@ export const PixelEngine: React.FC = () => {
     entries.forEach((item) => {
       renderPixel(ctx, item.col, item.row, item.color, pixelSize, canvas.width, canvas.height, cols, rows);
     });
-  }, [pixelSize, perspective, renderPixel]);
+
+    // Render Arcade Collectibles (Gems)
+    if (isArcadeMode && collectiblesRef.current.size > 0) {
+      collectiblesRef.current.forEach((data, ckey) => {
+        const idx = ckey.indexOf("_");
+        const r = +ckey.slice(0, idx);
+        const c = +ckey.slice(idx + 1);
+        const color = data.type === "rainbow" ? "#06b6d4" : data.type === "neon" ? "#ec4899" : "#fbbf24";
+        const { x, y } = projectToScreen(c, r, pixelSize, canvas.width, canvas.height, cols, rows);
+
+        ctx.save();
+        ctx.fillStyle = color;
+        ctx.shadowColor = color;
+        ctx.shadowBlur = 8;
+        if (perspective === "isometric") {
+          const { hx, hy } = getIsoMetrics(pixelSize, canvas.width, canvas.height, cols, rows);
+          ctx.beginPath();
+          ctx.moveTo(x, y);
+          ctx.lineTo(x + hx, y + hy);
+          ctx.lineTo(x, y + 2 * hy);
+          ctx.lineTo(x - hx, y + hy);
+          ctx.closePath();
+          ctx.fill();
+          ctx.strokeStyle = "#ffffff";
+          ctx.lineWidth = 1.2;
+          ctx.stroke();
+        } else {
+          ctx.fillRect(x, y, pixelSize, pixelSize);
+          ctx.strokeStyle = "#ffffff";
+          ctx.lineWidth = 1.2;
+          ctx.strokeRect(x, y, pixelSize, pixelSize);
+        }
+        ctx.restore();
+      });
+    }
+  }, [pixelSize, perspective, renderPixel, isArcadeMode, projectToScreen, getIsoMetrics]);
 
   // Redraw Grid
   const drawGrid = useCallback(() => {
@@ -692,8 +736,124 @@ export const PixelEngine: React.FC = () => {
     [redrawAll, saveStep, playPopSound]
   );
 
+  // Spawning arcade collectibles
+  useEffect(() => {
+    if (!isArcadeMode) {
+      collectiblesRef.current.clear();
+      redrawAll();
+      return;
+    }
+
+    const trySpawnCollectible = () => {
+      if (collectiblesRef.current.size >= 4) return;
+      const canvas = artworkCanvasRef.current;
+      if (!canvas) return;
+      const cols = Math.ceil(canvas.width / pixelSize);
+      const rows = Math.ceil(canvas.height / pixelSize);
+      if (cols <= 4 || rows <= 4) return;
+
+      for (let i = 0; i < 30; i++) {
+        const r = Math.floor(2 + Math.random() * (rows - 4));
+        const c = Math.floor(2 + Math.random() * (cols - 4));
+        const key = `${r}_${c}`;
+        if (!pixelsRef.current.has(key) && !collectiblesRef.current.has(key)) {
+          const rand = Math.random();
+          const type: "gold" | "neon" | "rainbow" = rand > 0.85 ? "rainbow" : rand > 0.6 ? "neon" : "gold";
+          collectiblesRef.current.set(key, {
+            createdAt: Date.now(),
+            sizeMult: 1,
+            type,
+          });
+          redrawAll();
+          break;
+        }
+      }
+    };
+
+    const timer = setTimeout(trySpawnCollectible, 400);
+    const interval = setInterval(trySpawnCollectible, 2500);
+    return () => {
+      clearTimeout(timer);
+      clearInterval(interval);
+    };
+  }, [isArcadeMode, pixelSize, redrawAll]);
+
+  // Bresenham line algorithm for continuous uninterrupted drawing during fast mouse drags
+  const getLinePoints = (x0: number, y0: number, x1: number, y1: number) => {
+    const points: { col: number; row: number }[] = [];
+    const dx = Math.abs(x1 - x0);
+    const dy = Math.abs(y1 - y0);
+    const sx = x0 < x1 ? 1 : -1;
+    const sy = y0 < y1 ? 1 : -1;
+    let err = dx - dy;
+
+    let currX = x0;
+    let currY = y0;
+
+    while (true) {
+      points.push({ col: currX, row: currY });
+      if (currX === x1 && currY === y1) break;
+      const e2 = 2 * err;
+      if (e2 > -dy) {
+        err -= dy;
+        currX += sx;
+      }
+      if (e2 < dx) {
+        err += dx;
+        currY += sy;
+      }
+    }
+    return points;
+  };
+
+  // Hit-test and pop collectibles during drawing or clicking
+  const checkAndPopCollectible = useCallback((c: number, r: number) => {
+    if (collectiblesRef.current.size === 0) return;
+    let poppedKey: string | null = null;
+    let poppedData: { type: "gold" | "neon" | "rainbow"; sizeMult: number } | null = null;
+
+    collectiblesRef.current.forEach((data, ckey) => {
+      if (poppedKey) return;
+      const idx = ckey.indexOf("_");
+      const cr = +ckey.slice(0, idx);
+      const cc = +ckey.slice(idx + 1);
+      if (Math.abs(r - cr) <= 1 && Math.abs(c - cc) <= 1) {
+        poppedKey = ckey;
+        poppedData = data;
+      }
+    });
+
+    const targetData = poppedData as { type: "gold" | "neon" | "rainbow"; sizeMult: number } | null;
+    if (poppedKey && targetData) {
+      collectiblesRef.current.delete(poppedKey);
+      recordPixelPopped(1);
+      const now = performance.now();
+      let mult = 1;
+      if (now - lastPopTimeRef.current < 2500) {
+        setComboCount((prev) => {
+          const next = prev + 1;
+          mult = next > 12 ? 5 : next > 6 ? 3 : next > 2 ? 2 : 1;
+          return next;
+        });
+      } else {
+        setComboCount(1);
+      }
+      lastPopTimeRef.current = now;
+
+      const basePts = targetData.type === "rainbow" ? 50 : targetData.type === "neon" ? 30 : 15;
+      const awarded = basePts * mult;
+      setArcadeScore((prev) => prev + awarded);
+
+      playPopSound(targetData.type === "rainbow" ? 1200 : targetData.type === "neon" ? 900 : 700);
+    }
+  }, [playPopSound]);
+
   // Pointer Event Handlers
   const handlePointerDown = (e: React.PointerEvent<HTMLCanvasElement>) => {
+    try {
+      e.currentTarget.setPointerCapture(e.pointerId);
+    } catch {}
+
     const canvas = artworkCanvasRef.current;
     if (!canvas) return;
     const rect = canvas.getBoundingClientRect();
@@ -704,6 +864,7 @@ export const PixelEngine: React.FC = () => {
 
     const { col, row } = projectToGrid(mx, my, pixelSize, canvas.width, canvas.height, cols, rows);
     const key = `${row}_${col}`;
+    lastCoordRef.current = { col, row };
 
     if (activeTool === "picker") {
       const picked = pixelsRef.current.get(key);
@@ -752,6 +913,11 @@ export const PixelEngine: React.FC = () => {
       }
       playPopSound(520 + (col % 8) * 40);
     }
+
+    if (isArcadeMode) {
+      checkAndPopCollectible(col, row);
+    }
+
     redrawAll();
   };
 
@@ -794,36 +960,52 @@ export const PixelEngine: React.FC = () => {
 
     if (!isDrawingRef.current) return;
 
-    const key = `${row}_${col}`;
-    if (activeTool === "eraser" || e.buttons === 2) {
-      if (pixelsRef.current.has(key)) {
-        pixelsRef.current.delete(key);
-        recordPixelPopped(1);
-      }
-      if (isSymmetry) {
-        const centerCol = Math.floor(cols / 2);
-        const symCol = 2 * centerCol - col;
-        if (pixelsRef.current.has(`${row}_${symCol}`)) {
-          pixelsRef.current.delete(`${row}_${symCol}`);
+    // Continuous Bresenham line interpolation between previous and current coordinate
+    const prevCoord = lastCoordRef.current || { col, row };
+    const points = getLinePoints(prevCoord.col, prevCoord.row, col, row);
+    lastCoordRef.current = { col, row };
+
+    points.forEach((pt) => {
+      const key = `${pt.row}_${pt.col}`;
+      if (activeTool === "eraser" || e.buttons === 2) {
+        if (pixelsRef.current.has(key)) {
+          pixelsRef.current.delete(key);
           recordPixelPopped(1);
         }
-      }
-    } else if (activeTool === "pencil") {
-      pixelsRef.current.set(key, currentColor);
-      recordPixelDrawn(1);
-      if (isSymmetry) {
-        const centerCol = Math.floor(cols / 2);
-        const symCol = 2 * centerCol - col;
-        pixelsRef.current.set(`${row}_${symCol}`, currentColor);
+        if (isSymmetry) {
+          const centerCol = Math.floor(cols / 2);
+          const symCol = 2 * centerCol - pt.col;
+          if (pixelsRef.current.has(`${pt.row}_${symCol}`)) {
+            pixelsRef.current.delete(`${pt.row}_${symCol}`);
+            recordPixelPopped(1);
+          }
+        }
+      } else if (activeTool === "pencil") {
+        pixelsRef.current.set(key, currentColor);
         recordPixelDrawn(1);
+        if (isSymmetry) {
+          const centerCol = Math.floor(cols / 2);
+          const symCol = 2 * centerCol - pt.col;
+          pixelsRef.current.set(`${pt.row}_${symCol}`, currentColor);
+          recordPixelDrawn(1);
+        }
       }
-    }
+
+      if (isArcadeMode) {
+        checkAndPopCollectible(pt.col, pt.row);
+      }
+    });
+
     redrawAll();
   };
 
-  const handlePointerUp = () => {
+  const handlePointerUp = (e: React.PointerEvent<HTMLCanvasElement>) => {
+    try {
+      e.currentTarget.releasePointerCapture(e.pointerId);
+    } catch {}
     if (isDrawingRef.current) {
       isDrawingRef.current = false;
+      lastCoordRef.current = null;
       saveStep();
     }
   };
@@ -1053,6 +1235,30 @@ export const PixelEngine: React.FC = () => {
             className="p-1.5 rounded hover:opacity-80 transition-colors font-bold flex items-center gap-1"
           >
             <Flame className="w-3.5 h-3.5 text-amber-400" />
+          </button>
+
+          {/* Arcade Mini-Game Mode Toggle */}
+          <button
+            type="button"
+            onClick={() => {
+              setIsArcadeMode(!isArcadeMode);
+              playPopSound(720);
+            }}
+            title={isArcadeMode ? "Arcade Collectibles Game: ON (Click to Disable)" : "Arcade Collectibles Game: OFF (Click to Enable)"}
+            style={{
+              backgroundColor: isArcadeMode ? `${activeTheme.accent}25` : "transparent",
+              borderColor: isArcadeMode ? activeTheme.accent : "transparent",
+              color: isArcadeMode ? activeTheme.accent : activeTheme.textMuted,
+            }}
+            className="px-2 py-1 rounded border text-[10px] font-bold hover:opacity-90 transition-all flex items-center gap-1.5"
+          >
+            <Gamepad2 className="w-3.5 h-3.5" />
+            <span className="hidden sm:inline">GAME</span>
+            {isArcadeMode && (
+              <span className="bg-amber-400 text-black px-1 rounded text-[9px] font-mono font-bold">
+                {arcadeScore}
+              </span>
+            )}
           </button>
 
           {/* Audio Mute/Unmute */}
