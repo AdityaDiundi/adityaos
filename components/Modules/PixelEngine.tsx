@@ -26,8 +26,17 @@ import {
   Flame,
   Palette,
   Play,
+  Sliders,
+  Globe,
 } from "lucide-react";
 import { useThemeStore } from "@/store/themeStore";
+import { useSoundStore } from "@/store/soundStore";
+import {
+  subscribeToFirebaseStats,
+  recordPixelDrawn,
+  recordPixelPopped,
+  GlobalCommunityStats,
+} from "@/lib/firebaseStats";
 
 // 5x5 and 5x3 Pixel Bitmap Font from homesec.tsx / pixel.tsx
 const PIXEL_FONT: Record<string, string[]> = {
@@ -74,15 +83,9 @@ const PIXEL_FONT: Record<string, string[]> = {
   "+": ["000", "010", "111", "010", "000"],
 };
 
-const PALETTES: Record<string, string[]> = {
-  cyberpunk: ["#0D0E15", "#FF0055", "#00FFCC", "#FFFF00", "#9900FF", "#FF9900"],
-  gameboy: ["#0f380f", "#306230", "#8bac0f", "#9bbc0f"],
-  pastel: ["#FFB7B2", "#FFDAC1", "#E2F0CB", "#B5EAD7", "#C7CEEA"],
-  classic: ["#000000", "#FFFFFF", "#FF3B30", "#007AFF", "#34C759", "#AF52DE"],
-};
-
 export const PixelEngine: React.FC = () => {
   const { activeTheme } = useThemeStore();
+  const { playScrollNote, isSoundEnabled } = useSoundStore();
 
   // Tool & Canvas State
   const [activeTool, setActiveTool] = useState<"pencil" | "eraser" | "bucket" | "picker" | "type">("pencil");
@@ -92,7 +95,7 @@ export const PixelEngine: React.FC = () => {
   const [is3D, setIs3D] = useState<boolean>(true);
   const [showGrid, setShowGrid] = useState<boolean>(true);
   const [isSymmetry, setIsSymmetry] = useState<boolean>(false);
-  const [isAudioMuted, setIsAudioMuted] = useState<boolean>(false);
+  const [isAudioMuted, setIsAudioMuted] = useState<boolean>(!isSoundEnabled);
   const [typeString, setTypeString] = useState<string>("ADITYA");
   const [isTypeModalOpen, setIsTypeModalOpen] = useState<boolean>(false);
   const [hoverCoord, setHoverCoord] = useState<{ col: number; row: number } | null>(null);
@@ -102,6 +105,13 @@ export const PixelEngine: React.FC = () => {
     score: 0,
   });
 
+  // Global Community Stats synced via Firebase
+  const [globalStats, setGlobalStats] = useState<GlobalCommunityStats>({
+    totalPixelsDrawn: 0,
+    totalPixelsPopped: 0,
+    totalNotesPlayed: 0,
+  });
+
   // Docked Stats Sidebar Collapsed state (from homesec.tsx lines 11360-11440)
   const [isStatsCollapsed, setIsStatsCollapsed] = useState<boolean>(false);
 
@@ -109,6 +119,14 @@ export const PixelEngine: React.FC = () => {
   useEffect(() => {
     setCurrentColor(activeTheme.drawColor);
   }, [activeTheme.drawColor]);
+
+  // Subscribe to live Firebase community stats
+  useEffect(() => {
+    const unsubscribe = subscribeToFirebaseStats((newStats) => {
+      setGlobalStats(newStats);
+    });
+    return () => unsubscribe();
+  }, []);
 
   // Canvas Refs
   const containerRef = useRef<HTMLDivElement>(null);
@@ -435,15 +453,18 @@ export const PixelEngine: React.FC = () => {
     ctx.stroke();
   }, [showGrid, activeTheme.gridColor, pixelSize, perspective, getIsoMetrics]);
 
-  // Handle Resize
+  // FIX ISSUE 1: Exact dynamic canvas resizing via ResizeObserver on containerRef
+  // Automatically resizes when telemetry log is minimized/expanded or window is maximized
   useEffect(() => {
-    const resizeCanvases = () => {
-      const container = containerRef.current;
-      if (!container) return;
+    const container = containerRef.current;
+    if (!container) return;
 
+    const resizeCanvases = () => {
       const rect = container.getBoundingClientRect();
-      const width = Math.max(400, Math.floor(rect.width));
-      const height = Math.max(300, Math.floor(rect.height));
+      if (rect.width <= 0 || rect.height <= 0) return;
+
+      const width = Math.floor(rect.width);
+      const height = Math.floor(rect.height);
 
       [gridCanvasRef, artworkCanvasRef, previewCanvasRef].forEach((ref) => {
         if (ref.current) {
@@ -456,12 +477,23 @@ export const PixelEngine: React.FC = () => {
       redrawAll();
     };
 
+    // Execute immediately on mount & when isStatsCollapsed or pixelSize changes
     resizeCanvases();
-    window.addEventListener("resize", resizeCanvases);
-    return () => window.removeEventListener("resize", resizeCanvases);
-  }, [drawGrid, redrawAll]);
 
-  // Re-render when theme or state changes
+    // ResizeObserver watches for ANY container size change (including CSS transitions & window maximizations)
+    const observer = new ResizeObserver(() => {
+      resizeCanvases();
+    });
+    observer.observe(container);
+
+    window.addEventListener("resize", resizeCanvases);
+    return () => {
+      observer.disconnect();
+      window.removeEventListener("resize", resizeCanvases);
+    };
+  }, [drawGrid, redrawAll, isStatsCollapsed, pixelSize]);
+
+  // Re-render when theme changes
   useEffect(() => {
     drawGrid();
     redrawAll();
@@ -514,6 +546,7 @@ export const PixelEngine: React.FC = () => {
     (text: string, startCol: number, startRow: number) => {
       const upper = text.toUpperCase();
       let currentC = startCol;
+      let drawnCount = 0;
 
       for (let i = 0; i < upper.length; i++) {
         const char = upper[i];
@@ -529,10 +562,12 @@ export const PixelEngine: React.FC = () => {
                 const targetR = startRow + r;
                 const targetC = currentC + c;
                 pixelsRef.current.set(`${targetR}_${targetC}`, currentColor);
+                drawnCount++;
 
                 if (isSymmetry) {
                   const symC = startCol - (targetC - startCol);
                   pixelsRef.current.set(`${targetR}_${symC}`, currentColor);
+                  drawnCount++;
                 }
               }
             }
@@ -540,6 +575,7 @@ export const PixelEngine: React.FC = () => {
           currentC += charWidth + 1; // 1 pixel letter-spacing
         }
       }
+      recordPixelDrawn(drawnCount);
       redrawAll();
       saveStep();
       playPopSound(750);
@@ -561,6 +597,8 @@ export const PixelEngine: React.FC = () => {
     const entries = Array.from(pixelsRef.current.entries());
     const cols = Math.ceil(canvas.width / pixelSize) + 2;
     const rows = Math.ceil(canvas.height / pixelSize) + 2;
+
+    recordPixelPopped(entries.length);
 
     gravityPixelsRef.current = entries.map(([key, color]) => {
       const idx = key.indexOf("_");
@@ -646,6 +684,7 @@ export const PixelEngine: React.FC = () => {
           queue.push([c, r - 1]);
         }
       }
+      recordPixelDrawn(count);
       redrawAll();
       saveStep();
       playPopSound(500);
@@ -689,19 +728,27 @@ export const PixelEngine: React.FC = () => {
 
     isDrawingRef.current = true;
     if (activeTool === "eraser" || e.buttons === 2) {
-      pixelsRef.current.delete(key);
+      if (pixelsRef.current.has(key)) {
+        pixelsRef.current.delete(key);
+        recordPixelPopped(1);
+      }
       if (isSymmetry) {
         const centerCol = Math.floor(cols / 2);
         const symCol = 2 * centerCol - col;
-        pixelsRef.current.delete(`${row}_${symCol}`);
+        if (pixelsRef.current.has(`${row}_${symCol}`)) {
+          pixelsRef.current.delete(`${row}_${symCol}`);
+          recordPixelPopped(1);
+        }
       }
       playPopSound(340);
     } else {
       pixelsRef.current.set(key, currentColor);
+      recordPixelDrawn(1);
       if (isSymmetry) {
         const centerCol = Math.floor(cols / 2);
         const symCol = 2 * centerCol - col;
         pixelsRef.current.set(`${row}_${symCol}`, currentColor);
+        recordPixelDrawn(1);
       }
       playPopSound(520 + (col % 8) * 40);
     }
@@ -749,18 +796,26 @@ export const PixelEngine: React.FC = () => {
 
     const key = `${row}_${col}`;
     if (activeTool === "eraser" || e.buttons === 2) {
-      pixelsRef.current.delete(key);
+      if (pixelsRef.current.has(key)) {
+        pixelsRef.current.delete(key);
+        recordPixelPopped(1);
+      }
       if (isSymmetry) {
         const centerCol = Math.floor(cols / 2);
         const symCol = 2 * centerCol - col;
-        pixelsRef.current.delete(`${row}_${symCol}`);
+        if (pixelsRef.current.has(`${row}_${symCol}`)) {
+          pixelsRef.current.delete(`${row}_${symCol}`);
+          recordPixelPopped(1);
+        }
       }
     } else if (activeTool === "pencil") {
       pixelsRef.current.set(key, currentColor);
+      recordPixelDrawn(1);
       if (isSymmetry) {
         const centerCol = Math.floor(cols / 2);
         const symCol = 2 * centerCol - col;
         pixelsRef.current.set(`${row}_${symCol}`, currentColor);
+        recordPixelDrawn(1);
       }
     }
     redrawAll();
@@ -797,6 +852,7 @@ export const PixelEngine: React.FC = () => {
 
   // Clear Canvas
   const handleClear = () => {
+    recordPixelPopped(pixelsRef.current.size);
     pixelsRef.current.clear();
     redrawAll();
     saveStep();
@@ -832,11 +888,12 @@ export const PixelEngine: React.FC = () => {
 
   return (
     <div
+      onWheel={(e) => playScrollNote(e.deltaY)}
       style={{
         backgroundColor: activeTheme.windowBg,
         color: activeTheme.textPrimary,
       }}
-      className="flex flex-col h-full select-none font-mono text-xs"
+      className="flex flex-col h-full select-none font-mono text-xs overflow-hidden"
     >
       {/* Pixel Engine Header Controls Toolbar */}
       <div
@@ -845,7 +902,7 @@ export const PixelEngine: React.FC = () => {
           borderColor: activeTheme.headerBorder,
           color: activeTheme.textPrimary,
         }}
-        className="h-9 border-b px-2 sm:px-3 flex items-center justify-between gap-1 sm:gap-2 overflow-x-auto"
+        className="h-9 border-b px-2 sm:px-3 flex items-center justify-between gap-1 sm:gap-2 overflow-x-auto flex-shrink-0"
       >
         {/* Left: Tool buttons */}
         <div className="flex items-center gap-1">
@@ -927,7 +984,7 @@ export const PixelEngine: React.FC = () => {
               setActiveTool("type");
               setIsTypeModalOpen(!isTypeModalOpen);
             }}
-            title="Type Tool (Stamp Text)"
+            title="Type Tool (Stamp Text with PIXEL_FONT)"
             style={{
               backgroundColor: activeTool === "type" ? activeTheme.accent : "transparent",
               color:
@@ -1077,31 +1134,28 @@ export const PixelEngine: React.FC = () => {
           </button>
         </div>
 
-        {/* Right: Pixel Size Selector & Telemetry Toggle */}
-        <div className="flex items-center gap-1 text-[11px]" style={{ color: activeTheme.textMuted }}>
-          <span>SIZE:</span>
-          {[12, 18, 24, 32].map((s) => (
-            <button
-              key={s}
-              type="button"
-              onClick={() => setPixelSize(s)}
-              style={{
-                backgroundColor: pixelSize === s ? activeTheme.accent : activeTheme.cardBg,
-                color:
-                  pixelSize === s
-                    ? activeTheme.isDark
-                      ? "#000"
-                      : "#fff"
-                    : activeTheme.textPrimary,
-                borderColor: activeTheme.cardBorder,
-              }}
-              className="w-5 h-5 rounded flex items-center justify-center font-bold text-[10px] border transition-colors"
-            >
-              {s}
-            </button>
-          ))}
+        {/* Right: Grid Size Range Slider & Telemetry Toggle */}
+        <div className="flex items-center gap-2 text-[11px]" style={{ color: activeTheme.textMuted }}>
+          {/* Grid Size Slider (Issue 4) */}
+          <div className="flex items-center gap-1.5 bg-black/20 px-2 py-0.5 rounded border border-white/5">
+            <Sliders className="w-3 h-3 opacity-60" />
+            <span className="text-[10px] hidden sm:inline">SIZE:</span>
+            <input
+              type="range"
+              min="8"
+              max="48"
+              step="2"
+              value={pixelSize}
+              onChange={(e) => setPixelSize(Number(e.target.value))}
+              title={`Grid voxel size: ${pixelSize}px`}
+              className="w-16 sm:w-20 h-1.5 rounded-lg appearance-none cursor-pointer bg-white/20 accent-cyan-400"
+            />
+            <span className="font-mono font-bold text-[10px] w-5 text-right" style={{ color: activeTheme.accent }}>
+              {pixelSize}
+            </span>
+          </div>
 
-          {/* Toggle Sidebar */}
+          {/* Toggle Sidebar (Issue 1) */}
           <button
             type="button"
             onClick={() => setIsStatsCollapsed(!isStatsCollapsed)}
@@ -1111,22 +1165,23 @@ export const PixelEngine: React.FC = () => {
               borderColor: activeTheme.cardBorder,
               color: activeTheme.accent,
             }}
-            className="p-1 rounded border ml-1 hover:opacity-80 transition-colors"
+            className="p-1 rounded border hover:opacity-80 transition-colors flex items-center gap-1 font-semibold text-[10px]"
           >
             {isStatsCollapsed ? <ChevronLeft className="w-3.5 h-3.5" /> : <ChevronRight className="w-3.5 h-3.5" />}
+            <span className="hidden md:inline">{isStatsCollapsed ? "STATS" : "HIDE"}</span>
           </button>
         </div>
       </div>
 
       {/* Main Interactive Canvas Area with Swatch Bar & Docked Stats Panel */}
-      <div className="flex-1 flex overflow-hidden relative">
+      <div className="flex-1 flex overflow-hidden relative w-full h-full min-w-0 min-h-0">
         {/* Left Vertical Color Palette Swatches */}
         <div
           style={{
             backgroundColor: activeTheme.headerBg,
             borderColor: activeTheme.headerBorder,
           }}
-          className="w-10 border-r p-1.5 flex flex-col items-center gap-1.5 z-10 select-none"
+          className="w-10 border-r p-1.5 flex flex-col items-center gap-1.5 z-10 select-none flex-shrink-0"
         >
           <input
             type="color"
@@ -1158,14 +1213,14 @@ export const PixelEngine: React.FC = () => {
           ))}
         </div>
 
-        {/* Viewport Canvas Container */}
+        {/* Viewport Canvas Container (100% flex-1 to fill vacant space upon sidebar minimize) */}
         <div
           ref={containerRef}
           style={{ backgroundColor: activeTheme.canvasBg }}
-          className="flex-1 relative overflow-hidden cursor-crosshair"
+          className="flex-1 w-full h-full relative overflow-hidden cursor-crosshair min-w-0 min-h-0"
         >
           {/* Grid Canvas Layer */}
-          <canvas ref={gridCanvasRef} className="absolute inset-0 pointer-events-none" />
+          <canvas ref={gridCanvasRef} className="absolute inset-0 pointer-events-none block w-full h-full" />
 
           {/* Main Artwork Canvas Layer */}
           <canvas
@@ -1178,11 +1233,11 @@ export const PixelEngine: React.FC = () => {
               setHoverCoord(null);
             }}
             onContextMenu={(e) => e.preventDefault()}
-            className="absolute inset-0 touch-none"
+            className="absolute inset-0 touch-none block w-full h-full"
           />
 
           {/* Hover Preview Canvas Layer */}
-          <canvas ref={previewCanvasRef} className="absolute inset-0 pointer-events-none" />
+          <canvas ref={previewCanvasRef} className="absolute inset-0 pointer-events-none block w-full h-full" />
 
           {/* Type Stamp Text Modal Popover */}
           {isTypeModalOpen && (
@@ -1227,7 +1282,7 @@ export const PixelEngine: React.FC = () => {
         {!isStatsCollapsed && (
           <aside
             style={{
-              width: 220,
+              width: 230,
               backgroundColor: activeTheme.headerBg,
               borderLeft: `1px solid ${activeTheme.headerBorder}`,
               color: activeTheme.textPrimary,
@@ -1291,10 +1346,14 @@ export const PixelEngine: React.FC = () => {
                   </span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="opacity-70">PIXELS:</span>
+                  <span className="opacity-70">SESSION PX:</span>
                   <span className="font-mono font-bold" style={{ color: activeTheme.accent }}>
                     {stats.drawn}
                   </span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="opacity-70">GRID SIZE:</span>
+                  <span className="font-mono font-bold">{pixelSize}px</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="opacity-70">SYMMETRY:</span>
@@ -1302,15 +1361,38 @@ export const PixelEngine: React.FC = () => {
                     {isSymmetry ? "ON" : "OFF"}
                   </span>
                 </div>
-                <div className="flex justify-between">
-                  <span className="opacity-70">AUDIO SYNTH:</span>
-                  <span className="font-mono font-bold">
-                    {isAudioMuted ? "MUTED" : "ACTIVE"}
+              </div>
+
+              {/* Metric 3: Live Firebase Global Community Stats (Issue 3) */}
+              <div
+                style={{
+                  backgroundColor: activeTheme.cardBg,
+                  borderColor: activeTheme.cardBorder,
+                }}
+                className="p-2.5 rounded border space-y-1.5"
+              >
+                <div className="text-[10px] opacity-60 uppercase font-semibold flex items-center gap-1">
+                  <Globe className="w-3 h-3 text-cyan-400" />
+                  <span>FIREBASE TELEMETRY</span>
+                </div>
+                <div className="flex justify-between font-mono">
+                  <span className="opacity-70">GLOBAL DRAWN:</span>
+                  <span className="font-bold text-emerald-400">
+                    {(globalStats.totalPixelsDrawn + stats.drawn).toLocaleString()}
                   </span>
+                </div>
+                <div className="flex justify-between font-mono">
+                  <span className="opacity-70">GLOBAL POPPED:</span>
+                  <span className="font-bold text-amber-400">
+                    {globalStats.totalPixelsPopped.toLocaleString()}
+                  </span>
+                </div>
+                <div className="text-[9px] opacity-50 pt-0.5">
+                  Connected to Realtime Database
                 </div>
               </div>
 
-              {/* Metric 3: Memory Footprint */}
+              {/* Metric 4: Buffer Memory */}
               <div
                 style={{
                   backgroundColor: activeTheme.cardBg,
@@ -1324,7 +1406,7 @@ export const PixelEngine: React.FC = () => {
                   <span>{(stats.drawn * 0.12).toFixed(1)} KB</span>
                 </div>
                 <div className="flex justify-between font-mono">
-                  <span className="opacity-70">FPS:</span>
+                  <span className="opacity-70">RENDER RATE:</span>
                   <span className="text-emerald-400">60 FPS</span>
                 </div>
               </div>
@@ -1370,7 +1452,7 @@ export const PixelEngine: React.FC = () => {
           borderColor: activeTheme.headerBorder,
           color: activeTheme.textMuted,
         }}
-        className="h-6 border-t px-3 flex items-center justify-between text-[10px] select-none"
+        className="h-6 border-t px-3 flex items-center justify-between text-[10px] select-none flex-shrink-0"
       >
         <div className="flex items-center gap-3">
           <span className="flex items-center gap-1 font-semibold" style={{ color: activeTheme.accent }}>

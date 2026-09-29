@@ -7,8 +7,10 @@ import { ArchiveReader } from "@/components/Modules/ArchiveReader";
 import { StreamFeed } from "@/components/Modules/StreamFeed";
 import { PixelEngine } from "@/components/Modules/PixelEngine";
 import { TerminalDesktop } from "@/components/Modules/TerminalDesktop";
+import { ResumeViewer } from "@/components/Modules/ResumeViewer";
 import { useOSStore } from "@/store/osStore";
 import { useThemeStore, OS_THEMES, OSThemeId } from "@/store/themeStore";
+import { useSoundStore } from "@/store/soundStore";
 import {
   Sparkles,
   BookOpen,
@@ -19,15 +21,22 @@ import {
   Paintbrush,
   Sun,
   Moon,
-  Palette,
   ChevronDown,
   Check,
+  FileText,
+  Volume2,
+  VolumeX,
+  ExternalLink,
+  Layers,
+  Terminal,
+  Grid,
 } from "lucide-react";
 
 export default function Home() {
   const desktopContainerRef = useRef<HTMLDivElement>(null);
   const { openWindows, activeWindow, restoreWindow, focusWindow } = useOSStore();
   const { activeTheme, currentThemeId, setTheme, toggleDarkLight } = useThemeStore();
+  const { isSoundEnabled, toggleSound, playScrollNote, playClickChime } = useSoundStore();
 
   const [timeStr, setTimeStr] = useState<string>("12:00:00");
   const [cpuUsage, setCpuUsage] = useState<number>(14);
@@ -49,7 +58,6 @@ export default function Home() {
     updateClock();
     const interval = setInterval(updateClock, 1000);
 
-    // Subtle random fluctuation for riced telemetry
     const statInterval = setInterval(() => {
       setCpuUsage(Math.floor(10 + Math.random() * 15));
       setMemUsage(Math.floor(36 + Math.random() * 4));
@@ -61,9 +69,16 @@ export default function Home() {
     };
   }, []);
 
+  const openAndFocus = (id: string) => {
+    playClickChime(560);
+    restoreWindow(id);
+    focusWindow(id);
+  };
+
   return (
     <main
       ref={desktopContainerRef}
+      onWheel={(e) => playScrollNote(e.deltaY)}
       style={{
         backgroundColor: activeTheme.desktopBg,
         backgroundImage: `linear-gradient(to right, ${activeTheme.desktopGrid} 1px, transparent 1px), linear-gradient(to bottom, ${activeTheme.desktopGrid} 1px, transparent 1px)`,
@@ -71,54 +86,126 @@ export default function Home() {
       }}
       className="relative w-screen h-screen overflow-hidden select-none flex flex-col font-mono"
     >
-      {/* Top Riced Status Bar */}
+      {/* Top Riced Status Bar - Elevated z-[1000] so it ALWAYS stays above windows */}
       <header
         style={{
           backgroundColor: activeTheme.headerBg,
           borderColor: activeTheme.headerBorder,
           color: activeTheme.textPrimary,
         }}
-        className="h-8 border-b px-3 flex items-center justify-between text-xs z-50 backdrop-blur-md"
+        className="h-8 border-b px-3 flex items-center justify-between text-xs z-[1000] backdrop-blur-md relative"
       >
-        {/* Left: OS Branding & Workspace Tags */}
-        <div className="flex items-center gap-3">
-          <div className="flex items-center gap-1.5 font-bold">
+        {/* Left: OS Branding & Clickable Workspace Tags */}
+        <div className="flex items-center gap-2 sm:gap-3">
+          <button
+            type="button"
+            onClick={() => openAndFocus("coreIntro")}
+            title="Focus AdityaOS Core"
+            className="flex items-center gap-1.5 font-bold hover:opacity-80 transition-opacity cursor-pointer"
+          >
             <span style={{ color: activeTheme.accent }}>⟡</span>
             <span style={{ color: activeTheme.textPrimary }}>aditya-os</span>
-            <span style={{ color: activeTheme.textMuted }} className="text-[10px] font-normal">
+            <span style={{ color: activeTheme.textMuted }} className="text-[10px] font-normal hidden sm:inline">
               v2.4
             </span>
-          </div>
+          </button>
 
           <div
             style={{ backgroundColor: activeTheme.headerBorder }}
             className="h-3 w-px"
           />
 
-          {/* Workspaces */}
+          {/* Interactive Workspace Tags */}
           <div className="flex items-center gap-1 text-[11px]">
-            <span
+            {/* [1:SYS] -> coreIntro */}
+            <button
+              type="button"
+              onClick={() => openAndFocus("coreIntro")}
               style={{
-                backgroundColor: activeTheme.cardBg,
-                borderColor: activeTheme.accent,
-                color: activeTheme.accent,
+                backgroundColor:
+                  activeWindow === "coreIntro" ? activeTheme.cardBg : "transparent",
+                borderColor:
+                  activeWindow === "coreIntro" ? activeTheme.accent : "transparent",
+                color:
+                  activeWindow === "coreIntro" ? activeTheme.accent : activeTheme.textMuted,
               }}
-              className="px-1.5 py-0.2 rounded border font-bold"
+              className="px-1.5 py-0.2 rounded border font-semibold hover:opacity-100 transition-all cursor-pointer"
+              title="Workspace 1: Identity & Core Intro"
             >
               [1:SYS]
-            </span>
-            <span
-              style={{ color: activeTheme.textMuted }}
-              className="px-1.5 py-0.2 rounded hover:opacity-100 cursor-pointer"
+            </button>
+
+            {/* [2:ARCHIVE] -> archiveReader */}
+            <button
+              type="button"
+              onClick={() => openAndFocus("archiveReader")}
+              style={{
+                backgroundColor:
+                  activeWindow === "archiveReader" ? activeTheme.cardBg : "transparent",
+                borderColor:
+                  activeWindow === "archiveReader" ? activeTheme.accent : "transparent",
+                color:
+                  activeWindow === "archiveReader" ? activeTheme.accent : activeTheme.textMuted,
+              }}
+              className="px-1.5 py-0.2 rounded border font-semibold hover:opacity-100 transition-all cursor-pointer"
+              title="Workspace 2: Essays & Poetry Archive"
             >
               [2:ARCHIVE]
-            </span>
-            <span
-              style={{ color: activeTheme.textMuted }}
-              className="px-1.5 py-0.2 rounded hover:opacity-100 cursor-pointer"
+            </button>
+
+            {/* [3:MEDIA] -> streamFeed */}
+            <button
+              type="button"
+              onClick={() => openAndFocus("streamFeed")}
+              style={{
+                backgroundColor:
+                  activeWindow === "streamFeed" ? activeTheme.cardBg : "transparent",
+                borderColor:
+                  activeWindow === "streamFeed" ? activeTheme.accent : "transparent",
+                color:
+                  activeWindow === "streamFeed" ? activeTheme.accent : activeTheme.textMuted,
+              }}
+              className="px-1.5 py-0.2 rounded border font-semibold hover:opacity-100 transition-all cursor-pointer"
+              title="Workspace 3: @falsepeek Media & Shorts Feed"
             >
-              [3:CANVAS]
-            </span>
+              [3:MEDIA]
+            </button>
+
+            {/* [4:CANVAS] -> pixelEngine */}
+            <button
+              type="button"
+              onClick={() => openAndFocus("pixelEngine")}
+              style={{
+                backgroundColor:
+                  activeWindow === "pixelEngine" ? activeTheme.cardBg : "transparent",
+                borderColor:
+                  activeWindow === "pixelEngine" ? activeTheme.accent : "transparent",
+                color:
+                  activeWindow === "pixelEngine" ? activeTheme.accent : activeTheme.textMuted,
+              }}
+              className="px-1.5 py-0.2 rounded border font-semibold hover:opacity-100 transition-all cursor-pointer"
+              title="Workspace 4: Pixel Engine 2D/3D Voxel Canvas"
+            >
+              [4:CANVAS]
+            </button>
+
+            {/* [5:RESUME] -> resumeViewer */}
+            <button
+              type="button"
+              onClick={() => openAndFocus("resumeViewer")}
+              style={{
+                backgroundColor:
+                  activeWindow === "resumeViewer" ? activeTheme.cardBg : "transparent",
+                borderColor:
+                  activeWindow === "resumeViewer" ? activeTheme.accent : "transparent",
+                color:
+                  activeWindow === "resumeViewer" ? activeTheme.accent : activeTheme.textMuted,
+              }}
+              className="px-1.5 py-0.2 rounded border font-semibold hover:opacity-100 transition-all cursor-pointer"
+              title="Workspace 5: Resume & Experience Viewer"
+            >
+              [5:RESUME]
+            </button>
           </div>
         </div>
 
@@ -137,50 +224,44 @@ export default function Home() {
           </span>
         </div>
 
-        {/* Right: Theme Switcher + Quick Launchers + Hardware Telemetry & Clock */}
-        <div className="flex items-center gap-2 sm:gap-3 text-[11px]">
+        {/* Right: Launchers + Theme Switcher + Audio + Telemetry + Clock */}
+        <div className="flex items-center gap-1.5 sm:gap-2.5 text-[11px]">
           {/* Quick Taskbar Launchers */}
           <div className="flex items-center gap-1">
             {/* CoreIntro */}
             <button
               type="button"
-              onClick={() => {
-                restoreWindow("coreIntro");
-                focusWindow("coreIntro");
-              }}
+              onClick={() => openAndFocus("coreIntro")}
               title="Launch CoreIntro"
               style={{
                 borderColor:
                   openWindows.includes("coreIntro") && activeWindow === "coreIntro"
                     ? activeTheme.accent
-                    : undefined,
+                    : "transparent",
               }}
-              className={`p-1 rounded transition-colors ${
+              className={`p-1 rounded border transition-colors ${
                 openWindows.includes("coreIntro") && activeWindow === "coreIntro"
-                  ? "bg-onedark-surface border"
+                  ? "bg-white/10"
                   : "hover:opacity-80"
               }`}
             >
-              <Sparkles className="w-3.5 h-3.5 text-onedark-purple" />
+              <Sparkles className="w-3.5 h-3.5 text-purple-400" />
             </button>
 
             {/* PixelEngine */}
             <button
               type="button"
-              onClick={() => {
-                restoreWindow("pixelEngine");
-                focusWindow("pixelEngine");
-              }}
+              onClick={() => openAndFocus("pixelEngine")}
               title="Launch PixelEngine Canvas"
               style={{
                 borderColor:
                   openWindows.includes("pixelEngine") && activeWindow === "pixelEngine"
                     ? activeTheme.accent
-                    : undefined,
+                    : "transparent",
               }}
-              className={`p-1 rounded transition-colors ${
+              className={`p-1 rounded border transition-colors ${
                 openWindows.includes("pixelEngine") && activeWindow === "pixelEngine"
-                  ? "bg-onedark-surface border"
+                  ? "bg-white/10"
                   : "hover:opacity-80"
               }`}
             >
@@ -190,47 +271,61 @@ export default function Home() {
             {/* ArchiveReader */}
             <button
               type="button"
-              onClick={() => {
-                restoreWindow("archiveReader");
-                focusWindow("archiveReader");
-              }}
+              onClick={() => openAndFocus("archiveReader")}
               title="Launch ArchiveReader"
               style={{
                 borderColor:
                   openWindows.includes("archiveReader") && activeWindow === "archiveReader"
                     ? activeTheme.accent
-                    : undefined,
+                    : "transparent",
               }}
-              className={`p-1 rounded transition-colors ${
+              className={`p-1 rounded border transition-colors ${
                 openWindows.includes("archiveReader") && activeWindow === "archiveReader"
-                  ? "bg-onedark-surface border"
+                  ? "bg-white/10"
                   : "hover:opacity-80"
               }`}
             >
-              <BookOpen className="w-3.5 h-3.5 text-onedark-green" />
+              <BookOpen className="w-3.5 h-3.5 text-emerald-400" />
             </button>
 
             {/* StreamFeed */}
             <button
               type="button"
-              onClick={() => {
-                restoreWindow("streamFeed");
-                focusWindow("streamFeed");
-              }}
-              title="Launch StreamFeed"
+              onClick={() => openAndFocus("streamFeed")}
+              title="Launch @falsepeek StreamFeed"
               style={{
                 borderColor:
                   openWindows.includes("streamFeed") && activeWindow === "streamFeed"
                     ? activeTheme.accent
-                    : undefined,
+                    : "transparent",
               }}
-              className={`p-1 rounded transition-colors ${
+              className={`p-1 rounded border transition-colors ${
                 openWindows.includes("streamFeed") && activeWindow === "streamFeed"
-                  ? "bg-onedark-surface border"
+                  ? "bg-white/10"
                   : "hover:opacity-80"
               }`}
             >
-              <Tv className="w-3.5 h-3.5 text-onedark-yellow" />
+              <Tv className="w-3.5 h-3.5 text-amber-400" />
+            </button>
+
+            {/* ResumeViewer */}
+            <button
+              type="button"
+              onClick={() => openAndFocus("resumeViewer")}
+              title="Launch ResumeViewer"
+              style={{
+                borderColor:
+                  openWindows.includes("resumeViewer") && activeWindow === "resumeViewer"
+                    ? activeTheme.accent
+                    : "transparent",
+              }}
+              className={`p-1 rounded border transition-colors ${
+                openWindows.includes("resumeViewer") && activeWindow === "resumeViewer"
+                  ? "bg-white/10"
+                  : "hover:opacity-80"
+              }`}
+            >
+              <FileText className="w-3.5 h-3.5 text-cyan-400" />
             </button>
           </div>
 
@@ -239,7 +334,7 @@ export default function Home() {
             className="h-3 w-px"
           />
 
-          {/* Theme Selector Dropdown Menu */}
+          {/* Theme Selector Dropdown Menu with z-[1100] */}
           <div className="relative">
             <button
               type="button"
@@ -257,7 +352,7 @@ export default function Home() {
               <ChevronDown className="w-3 h-3 opacity-60" />
             </button>
 
-            {/* Dropdown Popover */}
+            {/* Dropdown Popover - Elevated z-[1100] to always overlay active windows */}
             {isThemeMenuOpen && (
               <div
                 style={{
@@ -265,13 +360,14 @@ export default function Home() {
                   borderColor: activeTheme.windowBorder,
                   color: activeTheme.textPrimary,
                 }}
-                className="absolute right-0 top-7 w-48 rounded-md border shadow-2xl p-1.5 z-50 flex flex-col gap-1 backdrop-blur-md"
+                className="absolute right-0 top-7 w-52 rounded-md border shadow-2xl p-1.5 z-[1100] flex flex-col gap-1 backdrop-blur-xl"
               >
                 <div
                   style={{ color: activeTheme.textMuted }}
-                  className="px-2 py-1 text-[10px] font-bold border-b border-white/5 uppercase tracking-wider"
+                  className="px-2 py-1 text-[10px] font-bold border-b border-white/5 uppercase tracking-wider flex items-center justify-between"
                 >
-                  Shell Themes
+                  <span>Linux Shell Themes</span>
+                  <span className="text-[9px] opacity-60">7 themes</span>
                 </div>
                 {Object.values(OS_THEMES).map((theme) => (
                   <button
@@ -280,12 +376,13 @@ export default function Home() {
                     onClick={() => {
                       setTheme(theme.id as OSThemeId);
                       setIsThemeMenuOpen(false);
+                      playClickChime(660);
                     }}
                     style={{
                       backgroundColor:
                         currentThemeId === theme.id ? activeTheme.cardBg : "transparent",
                     }}
-                    className="flex items-center justify-between px-2 py-1 rounded text-left text-xs hover:opacity-80 transition-all"
+                    className="flex items-center justify-between px-2 py-1.5 rounded text-left text-xs hover:bg-white/5 transition-all"
                   >
                     <div className="flex items-center gap-2">
                       <span>{theme.icon}</span>
@@ -310,7 +407,10 @@ export default function Home() {
           {/* Quick Dark / Light Toggle */}
           <button
             type="button"
-            onClick={toggleDarkLight}
+            onClick={() => {
+              toggleDarkLight();
+              playClickChime(500);
+            }}
             title={activeTheme.isDark ? "Switch to Light Mode" : "Switch to Dark Mode"}
             style={{
               backgroundColor: activeTheme.cardBg,
@@ -326,6 +426,28 @@ export default function Home() {
             )}
           </button>
 
+          {/* Audio Synthesizer / Scroll Note Toggle */}
+          <button
+            type="button"
+            onClick={() => {
+              toggleSound();
+              playClickChime(700);
+            }}
+            title={isSoundEnabled ? "Mute Scroll Sound Synth" : "Enable Scroll Sound Synth"}
+            style={{
+              backgroundColor: activeTheme.cardBg,
+              borderColor: isSoundEnabled ? activeTheme.accent : activeTheme.cardBorder,
+              color: isSoundEnabled ? activeTheme.accent : activeTheme.textMuted,
+            }}
+            className="p-1 rounded border hover:opacity-80 transition-colors flex items-center gap-1"
+          >
+            {isSoundEnabled ? (
+              <Volume2 className="w-3.5 h-3.5 text-emerald-400" />
+            ) : (
+              <VolumeX className="w-3.5 h-3.5 opacity-50" />
+            )}
+          </button>
+
           <div
             style={{ backgroundColor: activeTheme.headerBorder }}
             className="h-3 w-px hidden lg:block"
@@ -337,11 +459,11 @@ export default function Home() {
             style={{ color: activeTheme.textMuted }}
           >
             <div className="flex items-center gap-1">
-              <Cpu className="w-3 h-3 text-onedark-purple" />
+              <Cpu className="w-3 h-3 text-purple-400" />
               <span>{cpuUsage}%</span>
             </div>
             <div className="flex items-center gap-1">
-              <Activity className="w-3 h-3 text-onedark-green" />
+              <Activity className="w-3 h-3 text-emerald-400" />
               <span>{memUsage}%</span>
             </div>
           </div>
@@ -363,11 +485,183 @@ export default function Home() {
 
       {/* TWM Window Workspace Canvas */}
       <div className="relative flex-1 w-full h-[calc(100vh-72px)] overflow-hidden">
+        {/* Desktop Background Shortcuts & Widgets (Visible on empty canvas) */}
+        <div className="absolute inset-0 p-6 pointer-events-none flex flex-col justify-between z-0">
+          {/* Top-Left Desktop App Icons Grid */}
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3 max-w-4xl pointer-events-auto">
+            {/* Shortcut 1: Pixel Engine */}
+            <button
+              type="button"
+              onClick={() => openAndFocus("pixelEngine")}
+              style={{
+                backgroundColor: `${activeTheme.cardBg}cc`,
+                borderColor: activeTheme.cardBorder,
+                color: activeTheme.textPrimary,
+              }}
+              className="p-3 rounded-lg border backdrop-blur-sm flex flex-col items-center gap-2 text-center group hover:scale-[1.03] hover:border-cyan-400/60 transition-all shadow-sm"
+            >
+              <div
+                style={{ backgroundColor: `${activeTheme.accent}20` }}
+                className="w-10 h-10 rounded-md flex items-center justify-center group-hover:bg-cyan-500/30 transition-colors"
+              >
+                <Paintbrush className="w-5 h-5" style={{ color: activeTheme.accent }} />
+              </div>
+              <div className="space-y-0.5">
+                <div className="font-bold text-xs">PixelEngine</div>
+                <div className="text-[10px] opacity-60">2D/3D Voxel Canvas</div>
+              </div>
+            </button>
+
+            {/* Shortcut 2: Essays & Poetry Archive */}
+            <button
+              type="button"
+              onClick={() => openAndFocus("archiveReader")}
+              style={{
+                backgroundColor: `${activeTheme.cardBg}cc`,
+                borderColor: activeTheme.cardBorder,
+                color: activeTheme.textPrimary,
+              }}
+              className="p-3 rounded-lg border backdrop-blur-sm flex flex-col items-center gap-2 text-center group hover:scale-[1.03] hover:border-emerald-400/60 transition-all shadow-sm"
+            >
+              <div className="w-10 h-10 rounded-md bg-emerald-500/20 flex items-center justify-center group-hover:bg-emerald-500/30 transition-colors">
+                <BookOpen className="w-5 h-5 text-emerald-400" />
+              </div>
+              <div className="space-y-0.5">
+                <div className="font-bold text-xs">Archive</div>
+                <div className="text-[10px] opacity-60">Essays & Poetry</div>
+              </div>
+            </button>
+
+            {/* Shortcut 3: @falsepeek Media Feed */}
+            <button
+              type="button"
+              onClick={() => openAndFocus("streamFeed")}
+              style={{
+                backgroundColor: `${activeTheme.cardBg}cc`,
+                borderColor: activeTheme.cardBorder,
+                color: activeTheme.textPrimary,
+              }}
+              className="p-3 rounded-lg border backdrop-blur-sm flex flex-col items-center gap-2 text-center group hover:scale-[1.03] hover:border-amber-400/60 transition-all shadow-sm"
+            >
+              <div className="w-10 h-10 rounded-md bg-amber-500/20 flex items-center justify-center group-hover:bg-amber-500/30 transition-colors">
+                <Tv className="w-5 h-5 text-amber-400" />
+              </div>
+              <div className="space-y-0.5">
+                <div className="font-bold text-xs">StreamFeed</div>
+                <div className="text-[10px] opacity-60">@falsepeek MPV</div>
+              </div>
+            </button>
+
+            {/* Shortcut 4: Resume Viewer */}
+            <button
+              type="button"
+              onClick={() => openAndFocus("resumeViewer")}
+              style={{
+                backgroundColor: `${activeTheme.cardBg}cc`,
+                borderColor: activeTheme.cardBorder,
+                color: activeTheme.textPrimary,
+              }}
+              className="p-3 rounded-lg border backdrop-blur-sm flex flex-col items-center gap-2 text-center group hover:scale-[1.03] hover:border-cyan-400/60 transition-all shadow-sm"
+            >
+              <div className="w-10 h-10 rounded-md bg-cyan-500/20 flex items-center justify-center group-hover:bg-cyan-500/30 transition-colors">
+                <FileText className="w-5 h-5 text-cyan-400" />
+              </div>
+              <div className="space-y-0.5">
+                <div className="font-bold text-xs">Resume.pdf</div>
+                <div className="text-[10px] opacity-60">CV & Portfolio</div>
+              </div>
+            </button>
+
+            {/* Shortcut 5: System Core Intro */}
+            <button
+              type="button"
+              onClick={() => openAndFocus("coreIntro")}
+              style={{
+                backgroundColor: `${activeTheme.cardBg}cc`,
+                borderColor: activeTheme.cardBorder,
+                color: activeTheme.textPrimary,
+              }}
+              className="p-3 rounded-lg border backdrop-blur-sm flex flex-col items-center gap-2 text-center group hover:scale-[1.03] hover:border-purple-400/60 transition-all shadow-sm"
+            >
+              <div className="w-10 h-10 rounded-md bg-purple-500/20 flex items-center justify-center group-hover:bg-purple-500/30 transition-colors">
+                <Sparkles className="w-5 h-5 text-purple-400" />
+              </div>
+              <div className="space-y-0.5">
+                <div className="font-bold text-xs">CoreIntro</div>
+                <div className="text-[10px] opacity-60">Identity & Bio</div>
+              </div>
+            </button>
+
+            {/* Shortcut 6: YouTube Channel Link */}
+            <a
+              href="https://www.youtube.com/@falsepeek"
+              target="_blank"
+              rel="noopener noreferrer"
+              style={{
+                backgroundColor: `${activeTheme.cardBg}cc`,
+                borderColor: activeTheme.cardBorder,
+                color: activeTheme.textPrimary,
+              }}
+              className="p-3 rounded-lg border backdrop-blur-sm flex flex-col items-center gap-2 text-center group hover:scale-[1.03] hover:border-red-400/60 transition-all shadow-sm"
+            >
+              <div className="w-10 h-10 rounded-md bg-red-500/20 flex items-center justify-center group-hover:bg-red-500/30 transition-colors">
+                <ExternalLink className="w-5 h-5 text-red-400" />
+              </div>
+              <div className="space-y-0.5">
+                <div className="font-bold text-xs text-red-400">@falsepeek</div>
+                <div className="text-[10px] opacity-60">YouTube Channel ↗</div>
+              </div>
+            </a>
+          </div>
+
+          {/* Bottom Desktop System Info Widget */}
+          <div className="hidden md:flex items-end justify-between pointer-events-auto">
+            <div
+              style={{
+                backgroundColor: `${activeTheme.cardBg}99`,
+                borderColor: activeTheme.cardBorder,
+                color: activeTheme.textPrimary,
+              }}
+              className="p-3 rounded-md border text-[11px] backdrop-blur-md max-w-md space-y-1 shadow-md"
+            >
+              <div className="flex items-center gap-2 font-bold" style={{ color: activeTheme.accent }}>
+                <Terminal className="w-3.5 h-3.5" />
+                <span>ADITYA-OS // NOCTALIA TWM</span>
+              </div>
+              <p className="text-[10px] opacity-75 leading-relaxed">
+                Riced Web OS workstation. Tactile voxel engine, dynamic shell theming, Web Audio ASMR synth, and live telemetry.
+              </p>
+              <div className="flex items-center gap-3 text-[10px] opacity-60 pt-1">
+                <span>Kernel: 6.11.0-zen</span>
+                <span>•</span>
+                <span>Audio: Für Elise Synth</span>
+                <span>•</span>
+                <span>Firebase: Live</span>
+              </div>
+            </div>
+
+            <div
+              style={{
+                backgroundColor: `${activeTheme.cardBg}99`,
+                borderColor: activeTheme.cardBorder,
+                color: activeTheme.textPrimary,
+              }}
+              className="p-2.5 rounded-md border text-[10px] backdrop-blur-md text-right space-y-0.5"
+            >
+              <div className="font-semibold" style={{ color: activeTheme.accent }}>
+                Quick Keys & Help
+              </div>
+              <div className="opacity-70">Click top tabs [1:SYS] - [5:RESUME] to switch</div>
+              <div className="opacity-70">Type &apos;help&apos; or &apos;theme list&apos; in dock below</div>
+            </div>
+          </div>
+        </div>
+
         {/* Module 1: CoreIntro Window */}
         <WindowFrame
           id="coreIntro"
           title="identity // CoreIntro.tsx"
-          icon={<Sparkles className="w-3.5 h-3.5 text-onedark-purple" />}
+          icon={<Sparkles className="w-3.5 h-3.5 text-purple-400" />}
           defaultPosition={{ x: 50, y: 30 }}
           defaultSize={{ width: 620, height: 480 }}
           dragConstraintsRef={desktopContainerRef}
@@ -381,7 +675,7 @@ export default function Home() {
           title="canvas // PixelEngine.tsx"
           icon={<Paintbrush className="w-3.5 h-3.5" style={{ color: activeTheme.accent }} />}
           defaultPosition={{ x: 140, y: 60 }}
-          defaultSize={{ width: 740, height: 500 }}
+          defaultSize={{ width: 760, height: 520 }}
           dragConstraintsRef={desktopContainerRef}
         >
           <PixelEngine />
@@ -391,9 +685,9 @@ export default function Home() {
         <WindowFrame
           id="archiveReader"
           title="nvim // ArchiveReader.tsx"
-          icon={<BookOpen className="w-3.5 h-3.5 text-onedark-green" />}
-          defaultPosition={{ x: 380, y: 90 }}
-          defaultSize={{ width: 680, height: 460 }}
+          icon={<BookOpen className="w-3.5 h-3.5 text-emerald-400" />}
+          defaultPosition={{ x: 340, y: 80 }}
+          defaultSize={{ width: 700, height: 480 }}
           dragConstraintsRef={desktopContainerRef}
         >
           <ArchiveReader />
@@ -403,12 +697,24 @@ export default function Home() {
         <WindowFrame
           id="streamFeed"
           title="mpv // StreamFeed.tsx"
-          icon={<Tv className="w-3.5 h-3.5 text-onedark-yellow" />}
-          defaultPosition={{ x: 220, y: 150 }}
-          defaultSize={{ width: 560, height: 410 }}
+          icon={<Tv className="w-3.5 h-3.5 text-amber-400" />}
+          defaultPosition={{ x: 220, y: 130 }}
+          defaultSize={{ width: 600, height: 430 }}
           dragConstraintsRef={desktopContainerRef}
         >
           <StreamFeed />
+        </WindowFrame>
+
+        {/* Module 5: ResumeViewer Window */}
+        <WindowFrame
+          id="resumeViewer"
+          title="pdf // ResumeViewer.tsx"
+          icon={<FileText className="w-3.5 h-3.5 text-cyan-400" />}
+          defaultPosition={{ x: 260, y: 70 }}
+          defaultSize={{ width: 720, height: 530 }}
+          dragConstraintsRef={desktopContainerRef}
+        >
+          <ResumeViewer />
         </WindowFrame>
       </div>
 

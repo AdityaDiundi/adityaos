@@ -28,34 +28,50 @@ interface OSState {
   isWindowMaximized: (id: string) => boolean;
 }
 
+function computeNextZ(map: Record<string, number>, targetId: string) {
+  const currentHighest = Math.max(...Object.values(map), 10);
+  if (currentHighest >= 400) {
+    const sorted = Object.entries(map).sort((a, b) => a[1] - b[1]);
+    const normalized: Record<string, number> = {};
+    sorted.forEach(([k], idx) => {
+      normalized[k] = 10 + idx;
+    });
+    normalized[targetId] = 10 + sorted.length;
+    return { map: normalized, highest: 10 + sorted.length };
+  }
+  const next = currentHighest + 1;
+  return {
+    map: { ...map, [targetId]: next },
+    highest: next,
+  };
+}
+
 export const useOSStore = create<OSState>((set, get) => ({
   activeWindow: "coreIntro",
-  openWindows: ["coreIntro", "pixelEngine", "archiveReader", "streamFeed"],
+  openWindows: ["coreIntro", "pixelEngine"],
   minimizedWindows: [],
   maximizedWindows: [],
   zIndexMap: {
-    coreIntro: 11,
-    pixelEngine: 10,
+    coreIntro: 12,
+    pixelEngine: 11,
+    resumeViewer: 10,
     archiveReader: 9,
     streamFeed: 8,
     terminal: 7,
   },
-  highestZIndex: 11,
+  highestZIndex: 12,
 
   openWindow: (id: string) => {
-    const { openWindows, minimizedWindows, highestZIndex, zIndexMap } = get();
-    const newHighest = highestZIndex + 1;
+    const { openWindows, minimizedWindows, zIndexMap } = get();
     const isAlreadyOpen = openWindows.includes(id);
+    const { map, highest } = computeNextZ(zIndexMap, id);
 
     set({
       openWindows: isAlreadyOpen ? openWindows : [...openWindows, id],
       minimizedWindows: minimizedWindows.filter((winId) => winId !== id),
       activeWindow: id,
-      highestZIndex: newHighest,
-      zIndexMap: {
-        ...zIndexMap,
-        [id]: newHighest,
-      },
+      highestZIndex: highest,
+      zIndexMap: map,
     });
   },
 
@@ -120,44 +136,35 @@ export const useOSStore = create<OSState>((set, get) => ({
   },
 
   focusWindow: (id: string) => {
-    const { highestZIndex, zIndexMap, minimizedWindows } = get();
-    const newHighest = highestZIndex + 1;
+    const { zIndexMap, minimizedWindows } = get();
+    const { map, highest } = computeNextZ(zIndexMap, id);
     set({
       activeWindow: id,
-      highestZIndex: newHighest,
-      zIndexMap: {
-        ...zIndexMap,
-        [id]: newHighest,
-      },
+      highestZIndex: highest,
+      zIndexMap: map,
       minimizedWindows: minimizedWindows.filter((winId) => winId !== id),
     });
   },
 
   restoreWindow: (id: string) => {
-    const { openWindows, minimizedWindows, highestZIndex, zIndexMap } = get();
-    const newHighest = highestZIndex + 1;
+    const { openWindows, minimizedWindows, zIndexMap } = get();
+    const { map, highest } = computeNextZ(zIndexMap, id);
     set({
       openWindows: openWindows.includes(id) ? openWindows : [...openWindows, id],
       minimizedWindows: minimizedWindows.filter((winId) => winId !== id),
       activeWindow: id,
-      highestZIndex: newHighest,
-      zIndexMap: {
-        ...zIndexMap,
-        [id]: newHighest,
-      },
+      highestZIndex: highest,
+      zIndexMap: map,
     });
   },
 
   bringToFront: (id: string) => {
-    const { highestZIndex, zIndexMap } = get();
-    const newHighest = highestZIndex + 1;
+    const { zIndexMap } = get();
+    const { map, highest } = computeNextZ(zIndexMap, id);
     set({
       activeWindow: id,
-      highestZIndex: newHighest,
-      zIndexMap: {
-        ...zIndexMap,
-        [id]: newHighest,
-      },
+      highestZIndex: highest,
+      zIndexMap: map,
     });
   },
 

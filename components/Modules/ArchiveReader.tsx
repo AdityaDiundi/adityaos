@@ -2,6 +2,8 @@
 
 import React, { useState } from "react";
 import { Folder, FileText, ChevronRight, ChevronDown, Code2 } from "lucide-react";
+import { useThemeStore } from "@/store/themeStore";
+import { useSoundStore } from "@/store/soundStore";
 
 interface ArchiveItem {
   id: string;
@@ -112,6 +114,8 @@ const ARCHIVE_DATA: Record<string, ArchiveItem> = {
 };
 
 export const ArchiveReader: React.FC = () => {
+  const { activeTheme } = useThemeStore();
+  const { playScrollNote } = useSoundStore();
   const [selectedFile, setSelectedFile] = useState<string>("essays/Daughters_of_Misogyny.md");
   const [openFolders, setOpenFolders] = useState<Record<string, boolean>>({
     essays: true,
@@ -124,20 +128,43 @@ export const ArchiveReader: React.FC = () => {
 
   const currentItem = ARCHIVE_DATA[selectedFile] || ARCHIVE_DATA["essays/Daughters_of_Misogyny.md"];
 
+  // Group items by category dynamically
+  const categories = Array.from(new Set(Object.values(ARCHIVE_DATA).map((i) => i.category)));
+
   return (
-    <div className="flex flex-col h-full bg-onedark-dark select-text font-mono text-xs">
+    <div
+      onWheel={(e) => playScrollNote(e.deltaY)}
+      style={{
+        backgroundColor: activeTheme.windowBg,
+        color: activeTheme.textPrimary,
+      }}
+      className="flex flex-col h-full select-text font-mono text-xs overflow-hidden"
+    >
       {/* Nano/Vim top buffer tabs */}
-      <div className="h-7 bg-onedark-surface border-b border-onedark-border flex items-center justify-between px-3 text-[11px] select-none">
+      <div
+        style={{
+          backgroundColor: activeTheme.headerBg,
+          borderColor: activeTheme.headerBorder,
+          color: activeTheme.textPrimary,
+        }}
+        className="h-7 border-b flex items-center justify-between px-3 text-[11px] select-none flex-shrink-0"
+      >
         <div className="flex items-center gap-2 truncate">
-          <span className="px-1.5 py-0.5 rounded bg-onedark-purple/20 text-onedark-purple text-[10px] font-bold">
+          <span
+            style={{
+              backgroundColor: `${activeTheme.accent}20`,
+              color: activeTheme.accent,
+            }}
+            className="px-1.5 py-0.5 rounded text-[10px] font-bold"
+          >
             VIM
           </span>
-          <span className="text-onedark-textBright font-semibold truncate">
+          <span className="font-semibold truncate">
             {currentItem.path}
           </span>
-          <span className="text-onedark-muted">[RO]</span>
+          <span style={{ color: activeTheme.textMuted }}>[RO]</span>
         </div>
-        <div className="text-onedark-muted hidden sm:flex items-center gap-3 text-[10px]">
+        <div style={{ color: activeTheme.textMuted }} className="hidden sm:flex items-center gap-3 text-[10px]">
           <span>utf-8</span>
           <span>markdown/txt</span>
           <span>lines: {currentItem.lines.length}</span>
@@ -147,104 +174,109 @@ export const ArchiveReader: React.FC = () => {
       {/* Main 2-column flexbox */}
       <div className="flex-1 flex overflow-hidden">
         {/* Left Column: Directory Tree (Nvim Tree style) */}
-        <div className="w-56 md:w-64 border-r border-onedark-border bg-onedark-surface/40 flex flex-col flex-shrink-0 select-none">
-          <div className="px-3 py-2 text-[10px] uppercase font-bold text-onedark-muted border-b border-onedark-borderMuted flex items-center justify-between">
+        <div
+          style={{
+            backgroundColor: activeTheme.cardBg,
+            borderColor: activeTheme.cardBorder,
+          }}
+          className="w-56 md:w-64 border-r flex flex-col flex-shrink-0 select-none"
+        >
+          <div
+            style={{
+              borderColor: activeTheme.headerBorder,
+              color: activeTheme.textMuted,
+            }}
+            className="px-3 py-2 text-[10px] uppercase font-bold border-b flex items-center justify-between"
+          >
             <span>EXPLORER // ARCHIVE</span>
-            <Code2 className="w-3 h-3 text-onedark-muted" />
+            <Code2 className="w-3 h-3" />
           </div>
 
           <div className="p-2 space-y-1 overflow-y-auto flex-1">
-            {/* Folder: essays */}
-            <div>
-              <button
-                type="button"
-                onClick={() => toggleFolder("essays")}
-                className="w-full flex items-center gap-1.5 px-2 py-1 rounded text-onedark-textBright hover:bg-onedark-surface text-left transition-colors"
-              >
-                {openFolders.essays ? (
-                  <ChevronDown className="w-3 h-3 text-onedark-muted" />
-                ) : (
-                  <ChevronRight className="w-3 h-3 text-onedark-muted" />
-                )}
-                <Folder className="w-3.5 h-3.5 text-onedark-yellow" />
-                <span className="font-semibold text-xs">essays/</span>
-              </button>
-
-              {openFolders.essays && (
-                <div className="ml-4 mt-0.5 space-y-0.5 border-l border-onedark-borderMuted pl-1.5">
+            {categories.map((cat) => {
+              const catItems = Object.values(ARCHIVE_DATA).filter((i) => i.category === cat);
+              const isFolderOpen = openFolders[cat] ?? true;
+              return (
+                <div key={cat}>
                   <button
                     type="button"
-                    onClick={() => setSelectedFile("essays/Daughters_of_Misogyny.md")}
-                    className={`w-full flex items-center gap-1.5 px-2 py-1 rounded text-left text-xs transition-colors truncate ${
-                      selectedFile === "essays/Daughters_of_Misogyny.md"
-                        ? "bg-onedark-blue/20 text-onedark-blue font-semibold border border-onedark-blue/30"
-                        : "text-onedark-text hover:bg-onedark-surface hover:text-onedark-textBright"
-                    }`}
+                    onClick={() => toggleFolder(cat)}
+                    className="w-full flex items-center gap-1.5 px-2 py-1 rounded hover:bg-white/5 text-left transition-colors"
                   >
-                    <FileText className="w-3 h-3 text-onedark-blue flex-shrink-0" />
-                    <span className="truncate">Daughters_of_Misogyny.md</span>
+                    {isFolderOpen ? (
+                      <ChevronDown className="w-3 h-3 opacity-60" />
+                    ) : (
+                      <ChevronRight className="w-3 h-3 opacity-60" />
+                    )}
+                    <Folder className="w-3.5 h-3.5 text-amber-400" />
+                    <span className="font-semibold text-xs">{cat}/</span>
                   </button>
+
+                  {isFolderOpen && (
+                    <div
+                      style={{ borderColor: activeTheme.headerBorder }}
+                      className="ml-4 mt-0.5 space-y-0.5 border-l pl-1.5"
+                    >
+                      {catItems.map((item) => {
+                        const isSelected = selectedFile === item.path;
+                        return (
+                          <button
+                            key={item.id}
+                            type="button"
+                            onClick={() => setSelectedFile(item.path)}
+                            style={{
+                              backgroundColor: isSelected ? `${activeTheme.accent}25` : "transparent",
+                              borderColor: isSelected ? activeTheme.accent : "transparent",
+                              color: isSelected ? activeTheme.accent : activeTheme.textPrimary,
+                            }}
+                            className={`w-full flex items-center gap-1.5 px-2 py-1 rounded text-left text-xs transition-colors truncate border ${
+                              isSelected ? "font-semibold" : "hover:bg-white/5 opacity-80 hover:opacity-100"
+                            }`}
+                          >
+                            <FileText
+                              className="w-3 h-3 flex-shrink-0"
+                              style={{ color: isSelected ? activeTheme.accent : activeTheme.textMuted }}
+                            />
+                            <span className="truncate">{item.path.split("/").pop()}</span>
+                          </button>
+                        );
+                      })}
+                    </div>
+                  )}
                 </div>
-              )}
-            </div>
-
-            {/* Folder: poetry */}
-            <div>
-              <button
-                type="button"
-                onClick={() => toggleFolder("poetry")}
-                className="w-full flex items-center gap-1.5 px-2 py-1 rounded text-onedark-textBright hover:bg-onedark-surface text-left transition-colors"
-              >
-                {openFolders.poetry ? (
-                  <ChevronDown className="w-3 h-3 text-onedark-muted" />
-                ) : (
-                  <ChevronRight className="w-3 h-3 text-onedark-muted" />
-                )}
-                <Folder className="w-3.5 h-3.5 text-onedark-yellow" />
-                <span className="font-semibold text-xs">poetry/</span>
-              </button>
-
-              {openFolders.poetry && (
-                <div className="ml-4 mt-0.5 space-y-0.5 border-l border-onedark-borderMuted pl-1.5">
-                  <button
-                    type="button"
-                    onClick={() => setSelectedFile("poetry/तस्वीरें_छोटी_होनी_चाहिए.txt")}
-                    className={`w-full flex items-center gap-1.5 px-2 py-1 rounded text-left text-xs transition-colors truncate ${
-                      selectedFile === "poetry/तस्वीरें_छोटी_होनी_चाहिए.txt"
-                        ? "bg-onedark-blue/20 text-onedark-blue font-semibold border border-onedark-blue/30"
-                        : "text-onedark-text hover:bg-onedark-surface hover:text-onedark-textBright"
-                    }`}
-                  >
-                    <FileText className="w-3 h-3 text-onedark-green flex-shrink-0" />
-                    <span className="truncate">तस्वीरें_छोटी_होनी_चाहिए.txt</span>
-                  </button>
-
-                  <button
-                    type="button"
-                    onClick={() => setSelectedFile("poetry/गंजे_लोगों_की_पंचायत.txt")}
-                    className={`w-full flex items-center gap-1.5 px-2 py-1 rounded text-left text-xs transition-colors truncate ${
-                      selectedFile === "poetry/गंजे_लोगों_की_पंचायत.txt"
-                        ? "bg-onedark-blue/20 text-onedark-blue font-semibold border border-onedark-blue/30"
-                        : "text-onedark-text hover:bg-onedark-surface hover:text-onedark-textBright"
-                    }`}
-                  >
-                    <FileText className="w-3 h-3 text-onedark-yellow flex-shrink-0" />
-                    <span className="truncate">गंजे_लोगों_की_पंचायत.txt</span>
-                  </button>
-                </div>
-              )}
-            </div>
+              );
+            })}
           </div>
 
-          <div className="p-2 border-t border-onedark-borderMuted text-[10px] text-onedark-muted">
-            <span className="text-onedark-cyan font-bold">3 items</span> indexed
+          <div
+            style={{
+              borderColor: activeTheme.headerBorder,
+              color: activeTheme.textMuted,
+            }}
+            className="p-2 border-t text-[10px]"
+          >
+            <span style={{ color: activeTheme.accent }} className="font-bold">
+              {Object.keys(ARCHIVE_DATA).length} items
+            </span>{" "}
+            indexed
           </div>
         </div>
 
         {/* Right Column: Syntax-highlighted text reader with line numbers gutter */}
-        <div className="flex-1 overflow-auto bg-onedark-dark p-4 flex font-mono leading-relaxed">
+        <div
+          style={{
+            backgroundColor: activeTheme.windowBg,
+          }}
+          className="flex-1 overflow-auto p-4 flex font-mono leading-relaxed"
+        >
           {/* Gutter with line numbers */}
-          <div className="flex flex-col text-right pr-4 select-none text-onedark-muted/60 border-r border-onedark-borderMuted flex-shrink-0">
+          <div
+            style={{
+              borderColor: activeTheme.headerBorder,
+              color: activeTheme.textMuted,
+            }}
+            className="flex flex-col text-right pr-4 select-none opacity-50 border-r flex-shrink-0"
+          >
             {currentItem.lines.map((_, i) => (
               <span key={i} className="leading-6 text-[11px]">
                 {String(i + 1).padStart(2, "0")}
@@ -253,40 +285,41 @@ export const ArchiveReader: React.FC = () => {
           </div>
 
           {/* Reader text body */}
-          <div className="pl-4 flex-1 text-onedark-text text-[13px] leading-6 overflow-x-auto">
+          <div className="pl-4 flex-1 text-[13px] leading-6 overflow-x-auto" style={{ color: activeTheme.textPrimary }}>
             {currentItem.lines.map((line, idx) => {
-              // Basic syntax highlighting for markdown/txt
               if (line.startsWith("# ")) {
                 return (
-                  <div key={idx} className="font-bold text-onedark-purple text-base my-1">
+                  <div key={idx} style={{ color: activeTheme.accent }} className="font-bold text-base my-1">
                     {line}
                   </div>
                 );
               }
               if (line.startsWith("> ")) {
                 return (
-                  <div key={idx} className="italic text-onedark-yellow pl-2 border-l-2 border-onedark-yellow/50 my-1">
+                  <div
+                    key={idx}
+                    style={{ borderColor: activeTheme.accent }}
+                    className="italic text-amber-300 pl-2 border-l-2 my-1 opacity-90"
+                  >
                     {line}
                   </div>
                 );
               }
               if (line.startsWith("// ")) {
                 return (
-                  <div key={idx} className="text-onedark-muted italic">
+                  <div key={idx} style={{ color: activeTheme.textMuted }} className="italic">
                     {line}
                   </div>
                 );
               }
               if (line.startsWith("---")) {
                 return (
-                  <div key={idx} className="text-onedark-border my-2">
-                    {line}
-                  </div>
+                  <div key={idx} style={{ borderColor: activeTheme.headerBorder }} className="border-b my-2"></div>
                 );
               }
               if (line.startsWith("— ")) {
                 return (
-                  <div key={idx} className="text-onedark-cyan font-semibold mt-3">
+                  <div key={idx} style={{ color: activeTheme.accent }} className="font-semibold mt-3">
                     {line}
                   </div>
                 );
@@ -302,19 +335,32 @@ export const ArchiveReader: React.FC = () => {
       </div>
 
       {/* Vim bottom statusline */}
-      <div className="h-6 bg-onedark-surface2 border-t border-onedark-border flex items-center justify-between px-3 text-[10px] select-none text-onedark-text">
+      <div
+        style={{
+          backgroundColor: activeTheme.headerBg,
+          borderColor: activeTheme.headerBorder,
+          color: activeTheme.textPrimary,
+        }}
+        className="h-6 border-t flex items-center justify-between px-3 text-[10px] select-none flex-shrink-0"
+      >
         <div className="flex items-center gap-2">
-          <span className="px-1.5 py-0.2 rounded bg-onedark-blue text-onedark-dark font-bold uppercase">
+          <span
+            style={{
+              backgroundColor: activeTheme.accent,
+              color: activeTheme.isDark ? "#000" : "#fff",
+            }}
+            className="px-1.5 py-0.2 rounded font-bold uppercase"
+          >
             NORMAL
           </span>
-          <span className="text-onedark-textBright font-semibold truncate">
+          <span className="font-semibold truncate">
             {currentItem.title}
           </span>
         </div>
-        <div className="flex items-center gap-4 text-onedark-muted">
+        <div style={{ color: activeTheme.textMuted }} className="flex items-center gap-4">
           <span>unix</span>
           <span>utf-8</span>
-          <span className="text-onedark-textBright">100% ☰ {currentItem.lines.length}/L</span>
+          <span>100% ☰ {currentItem.lines.length}/L</span>
         </div>
       </div>
     </div>

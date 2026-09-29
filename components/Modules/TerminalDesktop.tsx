@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useRef, useEffect } from "react";
-import { Terminal, ChevronUp, ChevronDown, Palette, Paintbrush } from "lucide-react";
+import { Terminal, ChevronUp, ChevronDown, Palette, Paintbrush, FileText } from "lucide-react";
 import { useOSStore } from "@/store/osStore";
 import { useThemeStore, OS_THEMES, OSThemeId } from "@/store/themeStore";
 
@@ -65,6 +65,20 @@ export const TerminalDesktop: React.FC = () => {
       output = (
         <span className="text-onedark-purple">
           [OK] Restoring CoreIntro identity module.
+        </span>
+      );
+    } else if (
+      trimmed === "cat resume.pdf" ||
+      trimmed === "resume" ||
+      trimmed === "open resume" ||
+      trimmed === "./resume" ||
+      trimmed === "cv"
+    ) {
+      restoreWindow("resumeViewer");
+      focusWindow("resumeViewer");
+      output = (
+        <span className="text-onedark-yellow">
+          [OK] Spawning ResumeViewer window (typst/pdf renderer attached).
         </span>
       );
     } else if (
@@ -150,6 +164,7 @@ export const TerminalDesktop: React.FC = () => {
         <div className="space-y-1 text-onedark-text">
           <div>Available commands:</div>
           <div>  <span className="text-onedark-yellow">./pixel_engine</span>      - Open PixelEngine (2D/3D Voxel Canvas)</div>
+          <div>  <span className="text-onedark-yellow">cat resume.pdf</span>      - Open ResumeViewer (CV & Experience)</div>
           <div>  <span className="text-onedark-yellow">theme &lt;name&gt;</span>        - Switch OS theme (noctalia, caelestia, tokyo-night, catppuccin, matrix, onedark, light)</div>
           <div>  <span className="text-onedark-yellow">theme next</span>          - Cycle to next theme</div>
           <div>  <span className="text-onedark-yellow">theme list</span>          - List all available Linux shell themes</div>
@@ -171,6 +186,7 @@ export const TerminalDesktop: React.FC = () => {
         <div className="flex flex-wrap gap-4 text-onedark-text">
           <span className="text-onedark-blue font-bold">essays/</span>
           <span className="text-onedark-green font-bold">poetry/</span>
+          <span className="text-onedark-yellow font-bold">resume.pdf</span>
           <span className="text-onedark-yellow">CoreIntro.tsx</span>
           <span style={{ color: activeTheme.accent }} className="font-bold">pixel_engine*</span>
           <span className="text-onedark-purple font-bold">play_latest_match*</span>
@@ -236,10 +252,17 @@ export const TerminalDesktop: React.FC = () => {
       icon: <Paintbrush className="w-3 h-3 mr-1" />,
     },
     {
+      label: "cat resume.pdf",
+      action: "cat resume.pdf",
+      desc: "Open Resume",
+      color: "text-onedark-yellow border-onedark-yellow/40 hover:bg-onedark-yellow/10",
+      icon: <FileText className="w-3 h-3 mr-1" />,
+    },
+    {
       label: "theme next",
       action: "theme next",
       desc: "Cycle Theme",
-      color: "text-onedark-yellow border-onedark-yellow/40 hover:bg-onedark-yellow/10",
+      color: "text-onedark-purple border-onedark-purple/40 hover:bg-onedark-purple/10",
       icon: <Palette className="w-3 h-3 mr-1" />,
     },
     {
@@ -260,13 +283,13 @@ export const TerminalDesktop: React.FC = () => {
       label: "fetch core_intro",
       action: "fetch core_intro",
       desc: "Restore Intro",
-      color: "text-onedark-purple border-onedark-purple/40 hover:bg-onedark-purple/10",
+      color: "text-onedark-muted border-onedark-borderMuted hover:bg-white/5",
       icon: null,
     },
   ];
 
   return (
-    <div className="fixed bottom-0 left-0 right-0 z-40 flex flex-col font-mono select-none">
+    <div className="fixed bottom-0 left-0 right-0 z-[900] flex flex-col font-mono select-none">
       {/* Expanded Terminal Panel */}
       {isExpanded && (
         <div
