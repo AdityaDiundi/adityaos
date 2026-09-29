@@ -36,13 +36,15 @@ import {
   Image as ImageIcon,
   Compass,
   Brain,
+  Keyboard,
 } from "lucide-react";
 
 export default function Home() {
   const desktopContainerRef = useRef<HTMLDivElement>(null);
-  const { openWindows, activeWindow, restoreWindow, focusWindow } = useOSStore();
+  const { openWindows, activeWindow, restoreWindow, focusWindow, closeWindow } = useOSStore();
   const { activeTheme, currentThemeId, setTheme, toggleDarkLight } = useThemeStore();
   const { isSoundEnabled, toggleSound, playScrollNote, playClickChime } = useSoundStore();
+  const [showKeysModal, setShowKeysModal] = useState<boolean>(false);
 
   const [timeStr, setTimeStr] = useState<string>("12:00:00");
   const [cpuUsage, setCpuUsage] = useState<number>(14);
@@ -80,6 +82,42 @@ export default function Home() {
     restoreWindow(id);
     focusWindow(id);
   };
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      // Don't intercept if user is typing in an input or textarea
+      if (
+        e.target instanceof HTMLInputElement ||
+        e.target instanceof HTMLTextAreaElement ||
+        (e.target as HTMLElement)?.isContentEditable
+      ) {
+        return;
+      }
+
+      if (e.altKey || e.metaKey) {
+        if (e.key === "1") { e.preventDefault(); openAndFocus("coreIntro"); }
+        else if (e.key === "2") { e.preventDefault(); openAndFocus("archiveReader"); }
+        else if (e.key === "3") { e.preventDefault(); openAndFocus("streamFeed"); }
+        else if (e.key === "4") { e.preventDefault(); openAndFocus("pixelEngine"); }
+        else if (e.key === "5") { e.preventDefault(); openAndFocus("resumeViewer"); }
+        else if (e.key === "6") { e.preventDefault(); openAndFocus("galleryViewer"); }
+        else if (e.key === "7") { e.preventDefault(); openAndFocus("fieldJournal"); }
+        else if (e.key === "8") { e.preventDefault(); openAndFocus("learnabilityLab"); }
+        else if (e.key.toLowerCase() === "q") {
+          e.preventDefault();
+          if (activeWindow) {
+            closeWindow(activeWindow);
+            playClickChime(420);
+          }
+        }
+      } else if (e.key === "?") {
+        setShowKeysModal((prev) => !prev);
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [activeWindow, closeWindow]);
 
   return (
     <main
@@ -528,6 +566,25 @@ export default function Home() {
             )}
           </button>
 
+          {/* Keyboard Shortcuts Trigger */}
+          <button
+            type="button"
+            onClick={() => {
+              playClickChime(540);
+              setShowKeysModal(!showKeysModal);
+            }}
+            title="TWM Keyboard Shortcuts (Press ?)"
+            style={{
+              backgroundColor: showKeysModal ? activeTheme.accent : activeTheme.cardBg,
+              borderColor: showKeysModal ? activeTheme.accent : activeTheme.cardBorder,
+              color: showKeysModal ? (activeTheme.isDark ? "#000" : "#fff") : activeTheme.textMuted,
+            }}
+            className="p-1 rounded border hover:opacity-80 transition-colors hidden sm:flex items-center gap-1 text-[10px] font-bold"
+          >
+            <Keyboard className="w-3.5 h-3.5" />
+            <span className="hidden md:inline">KEYS</span>
+          </button>
+
           <div
             style={{ backgroundColor: activeTheme.headerBorder }}
             className="h-3 w-px hidden lg:block"
@@ -896,6 +953,85 @@ export default function Home() {
 
       {/* Minimized Terminal Shell State Anchored to Bottom */}
       <TerminalDesktop />
+
+      {/* TWM Keyboard Shortcuts Modal */}
+      {showKeysModal && (
+        <div
+          onClick={() => setShowKeysModal(false)}
+          className="fixed inset-0 z-[2000] bg-black/70 backdrop-blur-sm flex items-center justify-center p-4 animate-in fade-in duration-150"
+        >
+          <div
+            onClick={(e) => e.stopPropagation()}
+            style={{
+              backgroundColor: activeTheme.windowBg,
+              borderColor: activeTheme.accent,
+              color: activeTheme.textPrimary,
+            }}
+            className="w-full max-w-md p-4 rounded-xl border shadow-2xl space-y-3 font-mono text-xs select-none"
+          >
+            <div className="flex items-center justify-between pb-2 border-b" style={{ borderColor: activeTheme.headerBorder }}>
+              <div className="font-bold flex items-center gap-2" style={{ color: activeTheme.accent }}>
+                <Keyboard className="w-4 h-4" />
+                <span>ADITYA-OS // TWM SHORTCUTS</span>
+              </div>
+              <button
+                type="button"
+                onClick={() => setShowKeysModal(false)}
+                className="opacity-60 hover:opacity-100 text-[11px]"
+              >
+                [ESC / ×]
+              </button>
+            </div>
+
+            <div className="space-y-1.5 text-[11px]">
+              <div className="flex justify-between items-center py-1 border-b border-white/5">
+                <span className="opacity-75">Switch to Core Intro</span>
+                <kbd className="px-1.5 py-0.5 rounded bg-white/10 text-cyan-400 font-bold">Alt + 1</kbd>
+              </div>
+              <div className="flex justify-between items-center py-1 border-b border-white/5">
+                <span className="opacity-75">Switch to Archive Reader (Vim)</span>
+                <kbd className="px-1.5 py-0.5 rounded bg-white/10 text-cyan-400 font-bold">Alt + 2</kbd>
+              </div>
+              <div className="flex justify-between items-center py-1 border-b border-white/5">
+                <span className="opacity-75">Switch to Stream Feed (@falsepeek)</span>
+                <kbd className="px-1.5 py-0.5 rounded bg-white/10 text-cyan-400 font-bold">Alt + 3</kbd>
+              </div>
+              <div className="flex justify-between items-center py-1 border-b border-white/5">
+                <span className="opacity-75">Switch to Pixel Engine (2D/3D Voxel)</span>
+                <kbd className="px-1.5 py-0.5 rounded bg-white/10 text-cyan-400 font-bold">Alt + 4</kbd>
+              </div>
+              <div className="flex justify-between items-center py-1 border-b border-white/5">
+                <span className="opacity-75">Switch to Resume Viewer</span>
+                <kbd className="px-1.5 py-0.5 rounded bg-white/10 text-cyan-400 font-bold">Alt + 5</kbd>
+              </div>
+              <div className="flex justify-between items-center py-1 border-b border-white/5">
+                <span className="opacity-75">Switch to Image Gallery (Feh)</span>
+                <kbd className="px-1.5 py-0.5 rounded bg-white/10 text-cyan-400 font-bold">Alt + 6</kbd>
+              </div>
+              <div className="flex justify-between items-center py-1 border-b border-white/5">
+                <span className="opacity-75">Switch to Rural Field Journal</span>
+                <kbd className="px-1.5 py-0.5 rounded bg-white/10 text-cyan-400 font-bold">Alt + 7</kbd>
+              </div>
+              <div className="flex justify-between items-center py-1 border-b border-white/5">
+                <span className="opacity-75">Switch to Learnability Diagnostics</span>
+                <kbd className="px-1.5 py-0.5 rounded bg-white/10 text-cyan-400 font-bold">Alt + 8</kbd>
+              </div>
+              <div className="flex justify-between items-center py-1 border-b border-white/5">
+                <span className="opacity-75">Close Active Window</span>
+                <kbd className="px-1.5 py-0.5 rounded bg-white/10 text-red-400 font-bold">Alt + Q</kbd>
+              </div>
+              <div className="flex justify-between items-center py-1">
+                <span className="opacity-75">Toggle Shortcuts Cheatsheet</span>
+                <kbd className="px-1.5 py-0.5 rounded bg-white/10 text-amber-400 font-bold">?</kbd>
+              </div>
+            </div>
+
+            <div className="pt-2 text-[10px] opacity-60 text-center">
+              Press anywhere outside or click [ESC] to return to workspace.
+            </div>
+          </div>
+        </div>
+      )}
     </main>
   );
 }

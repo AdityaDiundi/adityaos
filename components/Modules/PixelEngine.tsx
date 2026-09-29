@@ -265,20 +265,16 @@ export const PixelEngine: React.FC = () => {
     }
   }, [isAudioMuted, initAudio]);
 
-  // Unified Isometric Metrics (from homesec.tsx)
+  // Unified Isometric Metrics covering 100% of canvas space
   const getIsoMetrics = useCallback(
     (size: number, width: number, height: number, cols: number, rows: number) => {
-      const totalSpan = (cols + rows) * size;
-      const canvasW = Math.max(width, totalSpan);
-      const canvasH = Math.max(height, totalSpan);
-      const isoScale = Math.min(1, (width - 40) / canvasW, (height - 40) / (canvasH * 0.55));
-      const isoSize = size * isoScale;
+      const isoSize = size;
       const hx = isoSize;
       const hy = isoSize * 0.5;
-      const isoTopX = width / 2 - ((cols - rows) * isoSize) / 2;
-      const isoTopY = height / 2 - ((cols + rows) * hy) / 2;
+      const isoTopX = width / 2;
+      const isoTopY = height / 2;
 
-      return { isoScale, isoSize, hx, hy, isoTopX, isoTopY };
+      return { isoScale: 1, isoSize, hx, hy, isoTopX, isoTopY };
     },
     []
   );
@@ -498,21 +494,23 @@ export const PixelEngine: React.FC = () => {
         ctx.lineTo(canvas.width, y);
       }
     } else {
-      // Isometric diamond grid
+      // Isometric diamond grid covering 100% of the canvas area
       const { hx, hy, isoTopX, isoTopY } = getIsoMetrics(pixelSize, canvas.width, canvas.height, cols, rows);
-      for (let r = 0; r <= rows; r++) {
-        const startX = isoTopX - r * hx;
-        const startY = isoTopY + r * hy;
-        const endX = startX + cols * hx;
-        const endY = startY + cols * hy;
+      const span = Math.ceil(Math.max(canvas.width / (2 * hx), canvas.height / (2 * hy))) + 10;
+
+      for (let r = -span; r <= span; r++) {
+        const startX = isoTopX - r * hx - span * hx;
+        const startY = isoTopY + r * hy - span * hy;
+        const endX = isoTopX - r * hx + span * hx;
+        const endY = isoTopY + r * hy + span * hy;
         ctx.moveTo(startX, startY);
         ctx.lineTo(endX, endY);
       }
-      for (let c = 0; c <= cols; c++) {
-        const startX = isoTopX + c * hx;
-        const startY = isoTopY + c * hy;
-        const endX = startX - rows * hx;
-        const endY = startY + rows * hy;
+      for (let c = -span; c <= span; c++) {
+        const startX = isoTopX + c * hx - span * hx;
+        const startY = isoTopY + c * hy + span * hy;
+        const endX = isoTopX + c * hx + span * hx;
+        const endY = isoTopY + c * hy - span * hy;
         ctx.moveTo(startX, startY);
         ctx.lineTo(endX, endY);
       }

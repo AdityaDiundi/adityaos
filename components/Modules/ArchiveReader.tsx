@@ -421,7 +421,7 @@ export const ArchiveReader: React.FC = () => {
               <FolderPlus className="w-3 h-3 text-emerald-400" />
             </div>
             <p className="opacity-70 text-[9px] leading-tight">
-              Add <code className="text-cyan-400">.md</code> files into <code className="text-cyan-400">content/essays/</code> via Git to publish instantly.
+              Curated essays, reflections, and poetry archives by Aditya Diundi.
             </p>
           </div>
         </div>

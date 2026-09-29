@@ -25,14 +25,14 @@ interface Dispatch {
   id: string;
   location: string;
   region: string;
-  coordinates: string;
+  organization: string;
   date: string;
   title: string;
   category: "Education Diagnostics" | "Youth Leadership" | "Water Commons" | "Self Discovery" | "Grassroots Art";
   summary: string;
   excerpt: string;
   essayLink: string;
-  stats: { label: string; value: string }[];
+  meta: { label: string; value: string }[];
   audioLabel: string;
   tags: string[];
 }
@@ -42,106 +42,127 @@ const DISPATCHES: Dispatch[] = [
     id: "aarohi-learnability",
     location: "Kabhra, Peora",
     region: "Kumaon Himalayas, Uttarakhand",
-    coordinates: "29.4975° N, 79.5768° E",
+    organization: "Aarohi Bal Sansar",
     date: "School Diagnostic Study",
     title: "Learnability at Aarohi: Inquiry & The Curiosity Cliff",
     category: "Education Diagnostics",
     summary:
-      "Conducting an empirical diagnostic at Aarohi Bal Sansar across Grades 8–10. Mapping student learning preferences (50% hands-on) against institutional chalk-and-talk, and uncovering the 82% drop in curiosity under board exam conditioning.",
+      "Empirical field diagnostic conducted at Aarohi Bal Sansar across Grades 8, 9, and 10. Analyzing student learning autonomy, hands-on preferences, and uncovering the 82% curiosity drop under board exam pressure.",
     excerpt:
-      "While students showed 100% resilience in persisting through confusion, question-asking plummeted from 70% in Grade 9 to just 12.5% in Grade 10. The study led to our systemic framework of zero-cost daily inquiry huddles and hands-on experimentation in rural mountain schools.",
+      "While Grade 10 students scored 100% on persistence when facing confusion, spontaneous question-asking collapsed from 70% in Grade 9 to just 12.5% in Grade 10. With 50% demanding hands-on learning, the findings prompted our framework for zero-cost daily inquiry huddles in rural schools.",
     essayLink: "Learnability_Aarohi_Bal_Sansar.md",
-    stats: [
-      { label: "Cohort Surveyed", value: "36 Students" },
-      { label: "Hands-on Demand", value: "50.0%" },
-      { label: "Grade 10 Resilience", value: "100%" },
+    meta: [
+      { label: "Partner", value: "Aarohi" },
+      { label: "Cohort", value: "N=36 Students (Gr 8-10)" },
+      { label: "Focus", value: "Curiosity & Autonomy" },
     ],
-    audioLabel: "Pine Forest Breeze / Mountain Bell Chimes",
-    tags: ["Rural Education", "Learnability Diagnostic", "Himalayan Fieldwork"],
+    audioLabel: "Himalayan Pine Forest Breeze",
+    tags: ["Rural Education", "Learnability Diagnostic", "Himalayas"],
   },
   {
     id: "youth-clubs",
-    location: "Bhilwara",
-    region: "Southern Rajasthan",
-    coordinates: "25.3462° N, 74.6364° E",
-    date: "India Fellow Residency",
-    title: "Identity in Youth Clubs: Mobilizing Rural Collectives",
+    location: "Thakurganj",
+    region: "Kishanganj, Bihar",
+    organization: "Project Potential",
+    date: "India Fellow Field Work",
+    title: "Identity In Youth Clubs In India",
     category: "Youth Leadership",
     summary:
-      "Establishing community-led youth organizations across rural hamlets. Moving beyond structured top-down administration to foster organic peer belonging, self-worth, and civic action.",
+      "Working on the ground in Thakurganj to build a network of 400+ youth by establishing clubs across neighbouring panchayats for youth empowerment, peer belonging, and collective agency.",
     excerpt:
-      "When we convened the first circle of ten young men and women in the panchayat hall, silence was the default state. Within five weeks of participatory problem-solving, that silence transformed into organized community action—from organizing local blood donation drives to tutoring primary students.",
-    essayLink: "Identity_In_Youth_Clubs.md",
-    stats: [
-      { label: "Youth Mobilized", value: "450+" },
-      { label: "Active Hamlets", value: "14" },
-      { label: "Panchayat Dialogues", value: "28" },
+      "Currently, in youth clubs, although there is togetherness and a sense of belonging among participants, these clubs are not operating at their full potential. The formation of identity in youth clubs is essential to creating a space that feels truly collective. For the past six months, I have lived in Thakurganj, Bihar, working with Project Potential to build a strong network of 400+ youths by forming clubs in neighbouring panchayats...",
+    essayLink: "Identity_In_Youth_Clubs_In_India.md",
+    meta: [
+      { label: "Partner", value: "Project Potential" },
+      { label: "Location", value: "Thakurganj, Bihar" },
+      { label: "Network", value: "400+ Rural Youth" },
     ],
-    audioLabel: "Panchayat Chopal Ambient / Evening Chimes",
-    tags: ["Grassroots", "Youth Mobilization", "Community Agency"],
+    audioLabel: "Panchayat Evening Field Recordings",
+    tags: ["Youth Empowerment", "Community Identity", "Panchayats"],
   },
   {
     id: "water-crisis",
-    location: "Aravalli Foothills",
-    region: "Rural Mewar",
-    coordinates: "24.5854° N, 73.7125° E",
-    date: "Resource Mapping",
-    title: "Balancing Act: The Rajasthan Water Crisis & The Commons",
+    location: "Rural Rajasthan",
+    region: "Mewar Belt, Rajasthan",
+    organization: "India Fellow Immersion",
+    date: "Field Observations",
+    title: "Balancing Act: Navigating Choices In Rural Rajasthan's Water Crisis",
     category: "Water Commons",
     summary:
-      "Investigating water sovereignty, traditional johad conservation systems, and the socio-economic burdens placed on village women traveling miles for potable water.",
+      "Deep dive into the lived reality of rural water scarcity in Rajasthan, examining household survival choices, social dynamics, and what water rationing means on the ground.",
     excerpt:
-      "Water in the arid belt is not merely a utility—it is currency, social standing, and caste demarcator. Restoring local community check-dams and participatory water testing required dismantling generations of ingrained resource hoarding.",
-    essayLink: "Balancing_Act_Rajasthan_Water_Crisis.md",
-    stats: [
-      { label: "Water Commons Mapped", value: "19 Sites" },
-      { label: "Johad Water Tables", value: "+1.8m" },
-      { label: "Household Surveys", value: "320" },
+      "Rural Rajasthan's water crisis is real. Believe me, there are people who are only drinking a litre of water a day. There I met the husband of Manbhar Devi. One doesn't go and start asking a ton of questions and trouble them in an already difficult time... Looking closely at community choices reveals the human side of survival that scientific metrics alone cannot capture.",
+    essayLink: "Balancing_Act_Navigating_Choices_In_Rural_Rajasthans_Water_Crisis.md",
+    meta: [
+      { label: "Field", value: "Rural Rajasthan" },
+      { label: "Context", value: "Water Scarcity & Lived Reality" },
+      { label: "Publication", value: "India Fellow Journal" },
     ],
-    audioLabel: "Stepwell Echoes / Wind through Keekar Trees",
-    tags: ["Ecology", "Resource Commons", "Field Research"],
+    audioLabel: "Arid Wind & Stepwell Echoes",
+    tags: ["Water Commons", "Field Immersion", "Rajasthan"],
   },
   {
     id: "human-process-lab",
-    location: "Kumbhalgarh Ridge",
-    region: "Western Ghats / Aravalli",
-    coordinates: "25.1528° N, 73.5872° E",
-    date: "Reflective Residency",
-    title: "Self Discovery in Human Process Lab",
+    location: "ISABS Residency",
+    region: "Indian Society For Applied Behaviour Science",
+    organization: "ISABS",
+    date: "Sensitivity & Behavioural Lab",
+    title: "Questions For Self-Discovery From A Human Process Lab",
     category: "Self Discovery",
     summary:
-      "T-Group laboratory and sensitivity training analyzing personal biases, active listening postures, and emotional vulnerability when working with marginalized communities.",
+      "Reflections and inquiry arising from the Basic Human Process Lab (BHPL) at ISABS. Interrogating self-awareness, active listening, and open communication.",
     excerpt:
-      "In the process lab, there is nowhere to hide behind technical jargon or urban privilege. You are stripped down to your authentic emotional responses. It rewired my entire approach to design empathy.",
-    essayLink: "Self_Discovery_Human_Process_Lab.md",
-    stats: [
-      { label: "Lab Duration", value: "7 Days" },
-      { label: "Peer Cohort", value: "22 Fellows" },
-      { label: "Empathy Metric", value: "100%" },
+      "During the Basic Human Process Lab at Indian Society For Applied Behaviour Science (ISABS), I encountered foundational questions: How do I perceive others, and how does that influence my listening? Am I genuinely hearing, or merely waiting to respond? It reshaped how I engage with individuals and communities without pre-constructed biases.",
+    essayLink: "Questions_For_Self_Discovery_From_A_Human_Process_Lab.md",
+    meta: [
+      { label: "Institution", value: "ISABS" },
+      { label: "Program", value: "Basic Human Process Lab" },
+      { label: "Core Focus", value: "Interpersonal Dynamics & Empathy" },
     ],
-    audioLabel: "Bonfire Night / Mountain Stillness",
-    tags: ["Introspection", "Empathy", "Behavioral Dynamics"],
+    audioLabel: "Stillness & Mountain Ambience",
+    tags: ["Self-Discovery", "Active Listening", "ISABS"],
+  },
+  {
+    id: "youth-art",
+    location: "Thakurganj",
+    region: "Kishanganj, Bihar",
+    organization: "Project Potential",
+    date: "Youth Resource Manual",
+    title: "Youth Masterpiece: Fostering Collaboration Through Art",
+    category: "Grassroots Art",
+    summary:
+      "Designing collaborative creative interventions in the Youth Resource Manual (YRM), including 'Midline Masterpiece', to spark non-verbal communication and collective creation among rural youth.",
+    excerpt:
+      "We're developing Midline Masterpiece as one of the many activities in the Youth Resource Manual (YRM). 'Alright folks, time to get artsy! Who is ready to Picasso their way through this?' When two creative minds collide across a shared canvas, hierarchical barriers melt away. Art becomes a bridge for rural youth who often struggle to articulate their agency in words.",
+    essayLink: "Youth_Masterpiece_Fostering_Collaboration_Through_Art.md",
+    meta: [
+      { label: "Project", value: "Youth Resource Manual (YRM)" },
+      { label: "Activity", value: "Midline Masterpiece" },
+      { label: "Method", value: "Collaborative Art" },
+    ],
+    audioLabel: "Youth Circle Discussions & Laughter",
+    tags: ["Grassroots Art", "Collaboration", "Youth Expression"],
   },
   {
     id: "rural-leadership",
-    location: "Rajsamand",
-    region: "Central Rajasthan",
-    coordinates: "25.0747° N, 73.8824° E",
-    date: "Leadership Fellowship",
-    title: "Motivation in Rural Leadership & Village Agency",
+    location: "Rural Community Centers",
+    region: "Community Spaces",
+    organization: "Project Potential & India Fellow",
+    date: "Leadership Analysis",
+    title: "Motivation In Rural Leadership Programs",
     category: "Youth Leadership",
     summary:
-      "Understanding what drives rural leaders to persist against entrenched systemic inertia without immediate financial reward or social validation.",
+      "Examining what sustains the motivation of rural youth volunteers who commit to year-long community programs, gathering in makeshift tin-roof spaces across harsh weather.",
     excerpt:
-      "True community leaders do not seek the spotlight. They operate as catalysts—quietly resolving conflicts between rival caste factions, securing ration cards for widows, and coaching adolescents.",
-    essayLink: "Motivation_In_Rural_Leadership.md",
-    stats: [
-      { label: "Fellow Mentorship", value: "12 Mos" },
-      { label: "Gram Sabha Sessions", value: "40+" },
-      { label: "Youth Mentored", value: "60+" },
+      "What drives motivation in rural leadership programs, prompting people to sit in a temporary space with tin roofs through changing seasons, working for community transformation? The members are youth volunteers who engage in these clubs for a year. Understanding intrinsic motivation versus extrinsic validation is the key to sustaining grassroots movements.",
+    essayLink: "Motivation_In_Rural_Leadership_Programs.md",
+    meta: [
+      { label: "Context", value: "Youth Volunteers" },
+      { label: "Setting", value: "Community Spaces" },
+      { label: "Insight", value: "Intrinsic Motivation & Sustainability" },
     ],
-    audioLabel: "Morning Temple Bells / Sarangi Melodies",
-    tags: ["Leadership", "Governance", "Public Agency"],
+    audioLabel: "Monsoon Rain on Tin Roof Ambience",
+    tags: ["Rural Leadership", "Volunteer Agency", "Community"],
   },
 ];
 
@@ -256,7 +277,7 @@ export const FieldJournal: React.FC = () => {
                     <MapPin className="w-3 h-3 text-amber-400" />
                     {d.location}
                   </span>
-                  <span className="opacity-50 text-[9px]">{d.coordinates}</span>
+                  <span className="opacity-60 text-[9px] truncate max-w-[100px]">{d.organization}</span>
                 </div>
                 <div className="font-semibold text-[11px] leading-tight line-clamp-1">
                   {d.title}
@@ -298,7 +319,7 @@ export const FieldJournal: React.FC = () => {
                 {activeDispatch.location}, {activeDispatch.region}
               </span>
               <span className="opacity-40">•</span>
-              <span className="opacity-70 font-mono">{activeDispatch.coordinates}</span>
+              <span className="text-cyan-400 font-semibold">{activeDispatch.organization}</span>
               <span className="opacity-40">•</span>
               <span className="flex items-center gap-1 text-emerald-400">
                 <Calendar className="w-3 h-3" />
@@ -326,9 +347,9 @@ export const FieldJournal: React.FC = () => {
             </div>
           </div>
 
-          {/* Key Metrics / Impact Counters */}
-          <div className="grid grid-cols-3 gap-2">
-            {activeDispatch.stats.map((s, idx) => (
+          {/* Key Context & Authentic Metadata Badges */}
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+            {activeDispatch.meta.map((m, idx) => (
               <div
                 key={idx}
                 style={{
@@ -337,11 +358,11 @@ export const FieldJournal: React.FC = () => {
                 }}
                 className="p-2.5 rounded border text-center space-y-0.5 shadow-sm"
               >
-                <div className="text-sm sm:text-base font-bold text-amber-400 font-mono">
-                  {s.value}
+                <div className="text-[11px] font-bold text-amber-400 font-mono">
+                  {m.value}
                 </div>
                 <div className="text-[9px] opacity-60 uppercase tracking-wider">
-                  {s.label}
+                  {m.label}
                 </div>
               </div>
             ))}
