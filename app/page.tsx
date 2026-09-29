@@ -13,6 +13,7 @@ import { FieldJournal } from "@/components/Modules/FieldJournal";
 import { LearnabilityLab } from "@/components/Modules/LearnabilityLab";
 import { WallpaperManager } from "@/components/Modules/WallpaperManager";
 import { DesktopStickyNote } from "@/components/Modules/DesktopStickyNote";
+import { HyprlandBootScreen } from "@/components/System/HyprlandBootScreen";
 import { useOSStore } from "@/store/osStore";
 import { useThemeStore, OS_THEMES, OSThemeId } from "@/store/themeStore";
 import { useSoundStore } from "@/store/soundStore";
@@ -40,6 +41,7 @@ import {
   Brain,
   Keyboard,
   MessageSquare,
+  Lock,
 } from "lucide-react";
 
 export default function Home() {
@@ -55,6 +57,8 @@ export default function Home() {
     toggleDesktopGrid,
     isStickyNoteOpen,
     toggleStickyNote,
+    isLocked,
+    lockSession,
     minimizeAllWindows,
     closeAllWindows,
   } = useOSStore();
@@ -121,6 +125,10 @@ export default function Home() {
         else if (e.key === "7") { e.preventDefault(); openAndFocus("fieldJournal"); }
         else if (e.key === "8") { e.preventDefault(); openAndFocus("learnabilityLab"); }
         else if (e.key === "9") { e.preventDefault(); openAndFocus("wallpaperManager"); }
+        else if (e.key.toLowerCase() === "l") {
+          e.preventDefault();
+          lockSession();
+        }
         else if (e.key.toLowerCase() === "q") {
           e.preventDefault();
           if (activeWindow) {
@@ -965,6 +973,9 @@ export default function Home() {
       {/* Floating Desktop Sticky Note / Visitor Scratchpad */}
       <DesktopStickyNote dragConstraintsRef={desktopContainerRef} />
 
+      {/* Hyprland Boot & Lock / Login Screen */}
+      <HyprlandBootScreen />
+
       {/* Desktop Right-Click Context Menu */}
       {contextMenu && (
         <div
@@ -992,6 +1003,22 @@ export default function Home() {
 
           {/* Section 1: Appearance & Desktop Customization */}
           <div className="space-y-0.5 pb-1 mb-1 border-b" style={{ borderColor: activeTheme.headerBorder }}>
+            <button
+              type="button"
+              onClick={() => {
+                lockSession();
+                playClickChime(400);
+                setContextMenu(null);
+              }}
+              className="w-full flex items-center justify-between px-2.5 py-1.5 rounded text-left hover:bg-white/10 transition-colors cursor-pointer"
+            >
+              <span className="flex items-center gap-2">
+                <Lock className="w-3.5 h-3.5 text-yellow-400" />
+                <span>Lock Session (Hyprlock)</span>
+              </span>
+              <kbd className="px-1 py-0.2 rounded bg-white/10 text-[9px] text-yellow-400">Alt+L</kbd>
+            </button>
+
             <button
               type="button"
               onClick={() => {
@@ -1280,6 +1307,10 @@ export default function Home() {
               <div className="flex justify-between items-center py-1 border-b border-white/5">
                 <span className="opacity-75">Switch to Wallpaper Engine</span>
                 <kbd className="px-1.5 py-0.5 rounded bg-white/10 text-rose-400 font-bold">Alt + 9</kbd>
+              </div>
+              <div className="flex justify-between items-center py-1 border-b border-white/5">
+                <span className="opacity-75">Lock Session (Hyprlock Boot Screen)</span>
+                <kbd className="px-1.5 py-0.5 rounded bg-white/10 text-yellow-400 font-bold">Alt + L</kbd>
               </div>
               <div className="flex justify-between items-center py-1 border-b border-white/5">
                 <span className="opacity-75">Close Active Window</span>

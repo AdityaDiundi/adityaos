@@ -8,6 +8,7 @@ interface SoundState {
   setVolume: (vol: number) => void;
   playScrollNote: (delta?: number) => void;
   playClickChime: (freq?: number) => void;
+  playBootChime: () => void;
 }
 
 // Beethoven - Für Elise (Linear Classical Music Box Sequence from legacy monolithic project)
@@ -239,6 +240,38 @@ export const useSoundStore = create<SoundState>((set, get) => ({
 
       osc.start(audioNow);
       osc.stop(audioNow + 0.07);
+    } catch {
+      // Audio unavailable
+    }
+  },
+
+  playBootChime: () => {
+    const { isSoundEnabled, volume } = get();
+    if (!isSoundEnabled) return;
+
+    try {
+      const ctx = getAudioContext();
+      if (!ctx) return;
+
+      const chord = [261.63, 329.63, 392.0, 523.25, 659.25]; // C major chord
+      chord.forEach((freq, idx) => {
+        const audioNow = ctx.currentTime + idx * 0.08 + 0.01;
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+
+        osc.type = "sine";
+        osc.frequency.setValueAtTime(freq, audioNow);
+
+        gain.gain.setValueAtTime(0, audioNow);
+        gain.gain.linearRampToValueAtTime(volume * 0.8, audioNow + 0.02);
+        gain.gain.exponentialRampToValueAtTime(0.0001, audioNow + 0.9);
+
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+
+        osc.start(audioNow);
+        osc.stop(audioNow + 0.9);
+      });
     } catch {
       // Audio unavailable
     }

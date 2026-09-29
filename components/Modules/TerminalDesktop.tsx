@@ -11,7 +11,7 @@ interface CommandHistoryItem {
 }
 
 export const TerminalDesktop: React.FC = () => {
-  const { restoreWindow, focusWindow, toggleStickyNote } = useOSStore();
+  const { restoreWindow, focusWindow, toggleStickyNote, lockSession } = useOSStore();
   const { activeTheme, currentThemeId, setTheme, nextTheme, toggleDarkLight } = useThemeStore();
   const [isExpanded, setIsExpanded] = useState<boolean>(false);
   const [inputVal, setInputVal] = useState<string>("");
@@ -164,6 +164,18 @@ export const TerminalDesktop: React.FC = () => {
         </span>
       );
     } else if (
+      trimmed === "hyprlock" ||
+      trimmed === "lock" ||
+      trimmed === "./lock" ||
+      trimmed === "logout"
+    ) {
+      lockSession();
+      output = (
+        <span className="text-yellow-400">
+          [OK] Locking desktop session (Hyprlock display manager active).
+        </span>
+      );
+    } else if (
       trimmed === "snake" ||
       trimmed === "life" ||
       trimmed === "sand" ||
@@ -248,6 +260,7 @@ export const TerminalDesktop: React.FC = () => {
           <div>  <span className="text-onedark-yellow">./pixel_engine</span>      - Open PixelEngine (2D/3D Voxel Canvas)</div>
           <div>  <span className="text-onedark-yellow">snake | life | sand</span> - Launch Pixel Mini-Games (Snake, Conway Life, Sand)</div>
           <div>  <span className="text-onedark-yellow">note | scratchpad</span>   - Toggle Visitor Scratchpad / Pinned Sticky Note</div>
+          <div>  <span className="text-onedark-yellow">hyprlock | lock</span>     - Lock Session (Hyprland Boot & Login Screen)</div>
           <div>  <span className="text-onedark-yellow">wallpaper | bg</span>      - Open Wallpaper Manager (Unsplash CDN & Custom URLs)</div>
           <div>  <span className="text-onedark-yellow">field | journal</span>     - Open Rural Field Journal (Aarohi & India Fellow)</div>
           <div>  <span className="text-onedark-yellow">learn | aarohi</span>      - Open Learnability Lab (School inquiry diagnostics)</div>

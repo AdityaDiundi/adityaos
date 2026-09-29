@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { Analytics } from "@vercel/analytics/react";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -18,6 +19,7 @@ export default function RootLayout({
     <html lang="en" className="dark">
       <body className="antialiased selection:bg-onedark-blue/30 selection:text-onedark-textBright">
         {children}
+        <Analytics />
       </body>
     </html>
   );

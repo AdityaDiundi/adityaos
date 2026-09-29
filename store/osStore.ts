@@ -17,12 +17,15 @@ interface OSState {
   wallpaperUrl: string;
   showDesktopGrid: boolean;
   isStickyNoteOpen: boolean;
+  isLocked: boolean;
 
   // Actions
   setWallpaper: (url: string) => void;
   toggleDesktopGrid: () => void;
   toggleStickyNote: () => void;
   setStickyNoteOpen: (open: boolean) => void;
+  lockSession: () => void;
+  unlockSession: () => void;
   minimizeAllWindows: () => void;
   closeAllWindows: () => void;
   openWindow: (id: string) => void;
@@ -76,11 +79,14 @@ export const useOSStore = create<OSState>((set, get) => ({
   wallpaperUrl: "https://images.unsplash.com/photo-1514565131-fce0801e5785?q=80&w=2560&auto=format&fit=crop",
   showDesktopGrid: true,
   isStickyNoteOpen: true,
+  isLocked: true,
 
   setWallpaper: (url: string) => set({ wallpaperUrl: url }),
   toggleDesktopGrid: () => set((state) => ({ showDesktopGrid: !state.showDesktopGrid })),
   toggleStickyNote: () => set((state) => ({ isStickyNoteOpen: !state.isStickyNoteOpen })),
   setStickyNoteOpen: (open: boolean) => set({ isStickyNoteOpen: open }),
+  lockSession: () => set({ isLocked: true }),
+  unlockSession: () => set({ isLocked: false }),
   minimizeAllWindows: () => {
     const { openWindows } = get();
     set({ minimizedWindows: [...openWindows], activeWindow: null });
