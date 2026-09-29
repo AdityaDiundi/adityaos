@@ -11,7 +11,7 @@ interface CommandHistoryItem {
 }
 
 export const TerminalDesktop: React.FC = () => {
-  const { restoreWindow, focusWindow } = useOSStore();
+  const { restoreWindow, focusWindow, toggleStickyNote } = useOSStore();
   const { activeTheme, currentThemeId, setTheme, nextTheme, toggleDarkLight } = useThemeStore();
   const [isExpanded, setIsExpanded] = useState<boolean>(false);
   const [inputVal, setInputVal] = useState<string>("");
@@ -151,6 +151,19 @@ export const TerminalDesktop: React.FC = () => {
         </span>
       );
     } else if (
+      trimmed === "./note" ||
+      trimmed === "note" ||
+      trimmed === "scratchpad" ||
+      trimmed === "sticky" ||
+      trimmed === "memo"
+    ) {
+      toggleStickyNote();
+      output = (
+        <span className="text-amber-400">
+          [OK] Toggling Visitor Scratchpad / Pinned Sticky Note on desktop.
+        </span>
+      );
+    } else if (
       trimmed === "snake" ||
       trimmed === "life" ||
       trimmed === "sand" ||
@@ -234,6 +247,7 @@ export const TerminalDesktop: React.FC = () => {
           <div>Available commands:</div>
           <div>  <span className="text-onedark-yellow">./pixel_engine</span>      - Open PixelEngine (2D/3D Voxel Canvas)</div>
           <div>  <span className="text-onedark-yellow">snake | life | sand</span> - Launch Pixel Mini-Games (Snake, Conway Life, Sand)</div>
+          <div>  <span className="text-onedark-yellow">note | scratchpad</span>   - Toggle Visitor Scratchpad / Pinned Sticky Note</div>
           <div>  <span className="text-onedark-yellow">wallpaper | bg</span>      - Open Wallpaper Manager (Unsplash CDN & Custom URLs)</div>
           <div>  <span className="text-onedark-yellow">field | journal</span>     - Open Rural Field Journal (Aarohi & India Fellow)</div>
           <div>  <span className="text-onedark-yellow">learn | aarohi</span>      - Open Learnability Lab (School inquiry diagnostics)</div>
@@ -260,6 +274,7 @@ export const TerminalDesktop: React.FC = () => {
         <div className="flex flex-wrap gap-4 text-onedark-text">
           <span className="text-onedark-blue font-bold">content/</span>
           <span className="text-onedark-purple font-bold">gallery/</span>
+          <span className="text-amber-400 font-bold">note.txt</span>
           <span className="text-onedark-yellow font-bold">Aditya_Diundi_Resume.pdf</span>
           <span className="text-onedark-yellow">CoreIntro.tsx</span>
           <span style={{ color: activeTheme.accent }} className="font-bold">pixel_engine*</span>

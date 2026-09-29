@@ -12,6 +12,7 @@ import { GalleryViewer } from "@/components/Modules/GalleryViewer";
 import { FieldJournal } from "@/components/Modules/FieldJournal";
 import { LearnabilityLab } from "@/components/Modules/LearnabilityLab";
 import { WallpaperManager } from "@/components/Modules/WallpaperManager";
+import { DesktopStickyNote } from "@/components/Modules/DesktopStickyNote";
 import { useOSStore } from "@/store/osStore";
 import { useThemeStore, OS_THEMES, OSThemeId } from "@/store/themeStore";
 import { useSoundStore } from "@/store/soundStore";
@@ -38,6 +39,7 @@ import {
   Compass,
   Brain,
   Keyboard,
+  MessageSquare,
 } from "lucide-react";
 
 export default function Home() {
@@ -51,6 +53,8 @@ export default function Home() {
     wallpaperUrl,
     showDesktopGrid,
     toggleDesktopGrid,
+    isStickyNoteOpen,
+    toggleStickyNote,
     minimizeAllWindows,
     closeAllWindows,
   } = useOSStore();
@@ -402,146 +406,40 @@ export default function Home() {
 
         {/* Right: Launchers + Theme Switcher + Audio + Telemetry + Clock */}
         <div className="flex items-center gap-1.5 sm:gap-2.5 text-[11px]">
-          {/* Quick Taskbar Launchers */}
-          <div className="flex items-center gap-1">
-            {/* CoreIntro */}
+          {/* Quick Utility Launchers: Visitor Note + Wallpaper Switcher */}
+          <div className="flex items-center gap-1.5">
+            {/* Sticky Note / Scratchpad Toggle */}
             <button
               type="button"
-              onClick={() => openAndFocus("coreIntro")}
-              title="Launch CoreIntro"
-              style={{
-                borderColor:
-                  openWindows.includes("coreIntro") && activeWindow === "coreIntro"
-                    ? activeTheme.accent
-                    : "transparent",
+              onClick={() => {
+                playClickChime(520);
+                toggleStickyNote();
               }}
-              className={`p-1 rounded border transition-colors ${
-                openWindows.includes("coreIntro") && activeWindow === "coreIntro"
-                  ? "bg-white/10"
-                  : "hover:opacity-80"
-              }`}
+              title="Toggle Visitor Scratchpad / Pinned Note"
+              style={{
+                backgroundColor: isStickyNoteOpen ? "rgba(245, 158, 11, 0.2)" : activeTheme.cardBg,
+                borderColor: isStickyNoteOpen ? "#fbbf24" : activeTheme.cardBorder,
+                color: isStickyNoteOpen ? "#fbbf24" : activeTheme.textMuted,
+              }}
+              className="flex items-center gap-1.5 px-2 py-0.5 rounded border text-[11px] font-semibold transition-all hover:opacity-100 cursor-pointer"
             >
-              <Sparkles className="w-3.5 h-3.5 text-purple-400" />
+              <MessageSquare className="w-3 h-3 text-amber-400" />
+              <span className="hidden sm:inline">Note</span>
             </button>
 
-            {/* PixelEngine */}
-            <button
-              type="button"
-              onClick={() => openAndFocus("pixelEngine")}
-              title="Launch PixelEngine Canvas"
-              style={{
-                borderColor:
-                  openWindows.includes("pixelEngine") && activeWindow === "pixelEngine"
-                    ? activeTheme.accent
-                    : "transparent",
-              }}
-              className={`p-1 rounded border transition-colors ${
-                openWindows.includes("pixelEngine") && activeWindow === "pixelEngine"
-                  ? "bg-white/10"
-                  : "hover:opacity-80"
-              }`}
-            >
-              <Paintbrush className="w-3.5 h-3.5" style={{ color: activeTheme.accent }} />
-            </button>
-
-            {/* ArchiveReader */}
-            <button
-              type="button"
-              onClick={() => openAndFocus("archiveReader")}
-              title="Launch ArchiveReader"
-              style={{
-                borderColor:
-                  openWindows.includes("archiveReader") && activeWindow === "archiveReader"
-                    ? activeTheme.accent
-                    : "transparent",
-              }}
-              className={`p-1 rounded border transition-colors ${
-                openWindows.includes("archiveReader") && activeWindow === "archiveReader"
-                  ? "bg-white/10"
-                  : "hover:opacity-80"
-              }`}
-            >
-              <BookOpen className="w-3.5 h-3.5 text-emerald-400" />
-            </button>
-
-            {/* StreamFeed */}
-            <button
-              type="button"
-              onClick={() => openAndFocus("streamFeed")}
-              title="Launch @falsepeek StreamFeed"
-              style={{
-                borderColor:
-                  openWindows.includes("streamFeed") && activeWindow === "streamFeed"
-                    ? activeTheme.accent
-                    : "transparent",
-              }}
-              className={`p-1 rounded border transition-colors ${
-                openWindows.includes("streamFeed") && activeWindow === "streamFeed"
-                  ? "bg-white/10"
-                  : "hover:opacity-80"
-              }`}
-            >
-              <Tv className="w-3.5 h-3.5 text-amber-400" />
-            </button>
-
-            {/* ResumeViewer */}
-            <button
-              type="button"
-              onClick={() => openAndFocus("resumeViewer")}
-              title="Launch ResumeViewer"
-              style={{
-                borderColor:
-                  openWindows.includes("resumeViewer") && activeWindow === "resumeViewer"
-                    ? activeTheme.accent
-                    : "transparent",
-              }}
-              className={`p-1 rounded border transition-colors ${
-                openWindows.includes("resumeViewer") && activeWindow === "resumeViewer"
-                  ? "bg-white/10"
-                  : "hover:opacity-80"
-              }`}
-            >
-              <FileText className="w-3.5 h-3.5 text-cyan-400" />
-            </button>
-
-            {/* GalleryViewer */}
-            <button
-              type="button"
-              onClick={() => openAndFocus("galleryViewer")}
-              title="Launch Feh/Nsxiv Gallery"
-              style={{
-                borderColor:
-                  openWindows.includes("galleryViewer") && activeWindow === "galleryViewer"
-                    ? activeTheme.accent
-                    : "transparent",
-              }}
-              className={`p-1 rounded border transition-colors ${
-                openWindows.includes("galleryViewer") && activeWindow === "galleryViewer"
-                  ? "bg-white/10"
-                  : "hover:opacity-80"
-              }`}
-            >
-              <ImageIcon className="w-3.5 h-3.5 text-pink-400" />
-            </button>
-
-            {/* WallpaperManager */}
+            {/* Wallpaper Engine Quick Launcher */}
             <button
               type="button"
               onClick={() => openAndFocus("wallpaperManager")}
-              title="Launch Wallpaper Engine"
+              title="Change Wallpaper (Alt+9)"
               style={{
-                borderColor:
-                  openWindows.includes("wallpaperManager") && activeWindow === "wallpaperManager"
-                    ? activeTheme.accent
-                    : "transparent",
+                backgroundColor: activeWindow === "wallpaperManager" ? activeTheme.cardBg : "transparent",
+                borderColor: activeWindow === "wallpaperManager" ? activeTheme.accent : activeTheme.cardBorder,
+                color: activeWindow === "wallpaperManager" ? activeTheme.accent : activeTheme.textMuted,
               }}
-              className={`p-1 rounded border transition-colors ${
-                openWindows.includes("wallpaperManager") && activeWindow === "wallpaperManager"
-                  ? "bg-white/10"
-                  : "hover:opacity-80"
-              }`}
+              className="p-1 rounded border hover:bg-white/10 transition-colors cursor-pointer"
             >
-              <Sparkles className="w-3.5 h-3.5 text-rose-400" />
+              <ImageIcon className="w-3.5 h-3.5 text-pink-400" />
             </button>
           </div>
 
@@ -1064,6 +962,9 @@ export default function Home() {
       {/* Minimized Terminal Shell State Anchored to Bottom */}
       <TerminalDesktop />
 
+      {/* Floating Desktop Sticky Note / Visitor Scratchpad */}
+      <DesktopStickyNote dragConstraintsRef={desktopContainerRef} />
+
       {/* Desktop Right-Click Context Menu */}
       {contextMenu && (
         <div
@@ -1091,6 +992,24 @@ export default function Home() {
 
           {/* Section 1: Appearance & Desktop Customization */}
           <div className="space-y-0.5 pb-1 mb-1 border-b" style={{ borderColor: activeTheme.headerBorder }}>
+            <button
+              type="button"
+              onClick={() => {
+                toggleStickyNote();
+                playClickChime(500);
+                setContextMenu(null);
+              }}
+              className="w-full flex items-center justify-between px-2.5 py-1.5 rounded text-left hover:bg-white/10 transition-colors cursor-pointer"
+            >
+              <span className="flex items-center gap-2">
+                <MessageSquare className="w-3.5 h-3.5 text-amber-400" />
+                <span>Visitor Scratchpad (Note)</span>
+              </span>
+              <span className={`text-[10px] font-bold ${isStickyNoteOpen ? "text-amber-400" : "opacity-40"}`}>
+                {isStickyNoteOpen ? "PINNED" : "OFF"}
+              </span>
+            </button>
+
             <button
               type="button"
               onClick={() => {
