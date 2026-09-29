@@ -2,7 +2,7 @@
 
 **Author:** Aditya Diundi  
 **Publication:** India Fellow  
-**Original URL:** [https://indiafellow.org/blog/all-posts/youth-masterpiece-fostering-collaboration-through-art/](https://indiafellow.org/blog/all-posts/youth-masterpiece-fostering-collaboration-through-art/)
+**Source Link:** [https://indiafellow.org/blog/all-posts/youth-masterpiece-fostering-collaboration-through-art/](https://indiafellow.org/blog/all-posts/youth-masterpiece-fostering-collaboration-through-art/)
 
 ---
 
@@ -30,6 +30,5 @@ The best part came during the reflection at the end. The conversations aligned w
 
 > Rural India Youth Leadership is a two-year experience for 25 young people who will be on a journey of leadership and learning that will enable them to form youth clubs and through the clubs, nurture 400+ grassroots youth leaders. RIYL program is designed and managed by Project Potential in Kishanganj district of Bihar.
 
-### Share this:
-
-### Like this:
+---
+*— Aditya Diundi*

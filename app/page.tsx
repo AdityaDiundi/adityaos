@@ -11,6 +11,7 @@ import { ResumeViewer } from "@/components/Modules/ResumeViewer";
 import { GalleryViewer } from "@/components/Modules/GalleryViewer";
 import { FieldJournal } from "@/components/Modules/FieldJournal";
 import { LearnabilityLab } from "@/components/Modules/LearnabilityLab";
+import { WallpaperManager } from "@/components/Modules/WallpaperManager";
 import { useOSStore } from "@/store/osStore";
 import { useThemeStore, OS_THEMES, OSThemeId } from "@/store/themeStore";
 import { useSoundStore } from "@/store/soundStore";
@@ -41,10 +42,22 @@ import {
 
 export default function Home() {
   const desktopContainerRef = useRef<HTMLDivElement>(null);
-  const { openWindows, activeWindow, restoreWindow, focusWindow, closeWindow } = useOSStore();
+  const {
+    openWindows,
+    activeWindow,
+    restoreWindow,
+    focusWindow,
+    closeWindow,
+    wallpaperUrl,
+    showDesktopGrid,
+    toggleDesktopGrid,
+    minimizeAllWindows,
+    closeAllWindows,
+  } = useOSStore();
   const { activeTheme, currentThemeId, setTheme, toggleDarkLight } = useThemeStore();
   const { isSoundEnabled, toggleSound, playScrollNote, playClickChime } = useSoundStore();
   const [showKeysModal, setShowKeysModal] = useState<boolean>(false);
+  const [contextMenu, setContextMenu] = useState<{ isOpen: boolean; x: number; y: number } | null>(null);
 
   const [timeStr, setTimeStr] = useState<string>("12:00:00");
   const [cpuUsage, setCpuUsage] = useState<number>(14);
@@ -103,6 +116,7 @@ export default function Home() {
         else if (e.key === "6") { e.preventDefault(); openAndFocus("galleryViewer"); }
         else if (e.key === "7") { e.preventDefault(); openAndFocus("fieldJournal"); }
         else if (e.key === "8") { e.preventDefault(); openAndFocus("learnabilityLab"); }
+        else if (e.key === "9") { e.preventDefault(); openAndFocus("wallpaperManager"); }
         else if (e.key.toLowerCase() === "q") {
           e.preventDefault();
           if (activeWindow) {
@@ -112,6 +126,9 @@ export default function Home() {
         }
       } else if (e.key === "?") {
         setShowKeysModal((prev) => !prev);
+      } else if (e.key === "Escape") {
+        setContextMenu(null);
+        setShowKeysModal(false);
       }
     };
 
@@ -119,17 +136,60 @@ export default function Home() {
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [activeWindow, closeWindow]);
 
+  const handleContextMenu = (e: React.MouseEvent) => {
+    const target = e.target as HTMLElement;
+    // Don't intercept right clicks if inside an active window frame, header, or interactive controls
+    if (
+      target.closest(".window-frame") ||
+      target.closest("header") ||
+      target.closest("input") ||
+      target.closest("textarea") ||
+      target.closest("button")
+    ) {
+      return;
+    }
+    e.preventDefault();
+    const menuWidth = 240;
+    const menuHeight = 360;
+    const x = Math.min(e.clientX, window.innerWidth - menuWidth - 10);
+    const y = Math.min(e.clientY, window.innerHeight - menuHeight - 10);
+    setContextMenu({ isOpen: true, x, y });
+    playClickChime(500);
+  };
+
   return (
     <main
       ref={desktopContainerRef}
-      onWheel={(e) => playScrollNote(e.deltaY)}
-      style={{
-        backgroundColor: activeTheme.desktopBg,
-        backgroundImage: `linear-gradient(to right, ${activeTheme.desktopGrid} 1px, transparent 1px), linear-gradient(to bottom, ${activeTheme.desktopGrid} 1px, transparent 1px)`,
-        backgroundSize: "24px 24px",
+      onContextMenu={handleContextMenu}
+      onClick={() => {
+        if (contextMenu) setContextMenu(null);
+        if (isThemeMenuOpen) setIsThemeMenuOpen(false);
       }}
+      onWheel={(e) => playScrollNote(e.deltaY)}
       className="relative w-screen h-screen overflow-hidden select-none flex flex-col font-mono"
     >
+      {/* Dynamic Wallpaper Layer */}
+      <div
+        className="absolute inset-0 bg-cover bg-center transition-all duration-700 ease-in-out pointer-events-none"
+        style={{
+          backgroundImage: wallpaperUrl ? `url(${wallpaperUrl})` : undefined,
+          backgroundColor: activeTheme.desktopBg,
+        }}
+      />
+
+      {/* Contrast Overlay: 65% dark overlay with slight blur so text/windows are perfectly legible */}
+      <div className="absolute inset-0 bg-black/65 backdrop-blur-[0.5px] pointer-events-none" />
+
+      {/* Desktop Grid Lines (Toggled via showDesktopGrid) */}
+      {showDesktopGrid && (
+        <div
+          className="absolute inset-0 pointer-events-none opacity-40 transition-opacity duration-300"
+          style={{
+            backgroundImage: `linear-gradient(to right, ${activeTheme.desktopGrid} 1px, transparent 1px), linear-gradient(to bottom, ${activeTheme.desktopGrid} 1px, transparent 1px)`,
+            backgroundSize: "24px 24px",
+          }}
+        />
+      )}
       {/* Top Riced Status Bar - Elevated z-[1000] so it ALWAYS stays above windows */}
       <header
         style={{
@@ -304,6 +364,24 @@ export default function Home() {
             >
               [8:DIAGNOSTICS]
             </button>
+
+            {/* [9:WALLPAPER] -> wallpaperManager */}
+            <button
+              type="button"
+              onClick={() => openAndFocus("wallpaperManager")}
+              style={{
+                backgroundColor:
+                  activeWindow === "wallpaperManager" ? activeTheme.cardBg : "transparent",
+                borderColor:
+                  activeWindow === "wallpaperManager" ? activeTheme.accent : "transparent",
+                color:
+                  activeWindow === "wallpaperManager" ? activeTheme.accent : activeTheme.textMuted,
+              }}
+              className="px-1.5 py-0.2 rounded border font-semibold hover:opacity-100 transition-all cursor-pointer hidden xl:inline-block"
+              title="Workspace 9: Dynamic Wallpaper Engine"
+            >
+              [9:WALLPAPER]
+            </button>
           </div>
         </div>
 
@@ -444,6 +522,26 @@ export default function Home() {
               }`}
             >
               <ImageIcon className="w-3.5 h-3.5 text-pink-400" />
+            </button>
+
+            {/* WallpaperManager */}
+            <button
+              type="button"
+              onClick={() => openAndFocus("wallpaperManager")}
+              title="Launch Wallpaper Engine"
+              style={{
+                borderColor:
+                  openWindows.includes("wallpaperManager") && activeWindow === "wallpaperManager"
+                    ? activeTheme.accent
+                    : "transparent",
+              }}
+              className={`p-1 rounded border transition-colors ${
+                openWindows.includes("wallpaperManager") && activeWindow === "wallpaperManager"
+                  ? "bg-white/10"
+                  : "hover:opacity-80"
+              }`}
+            >
+              <Sparkles className="w-3.5 h-3.5 text-rose-400" />
             </button>
           </div>
 
@@ -949,10 +1047,254 @@ export default function Home() {
         >
           <LearnabilityLab />
         </WindowFrame>
+
+        {/* Module 9: WallpaperManager Window */}
+        <WindowFrame
+          id="wallpaperManager"
+          title="wallpaper // WallpaperManager.tsx"
+          icon={<ImageIcon className="w-3.5 h-3.5 text-pink-400" />}
+          defaultPosition={{ x: 200, y: 70 }}
+          defaultSize={{ width: 760, height: 530 }}
+          dragConstraintsRef={desktopContainerRef}
+        >
+          <WallpaperManager />
+        </WindowFrame>
       </div>
 
       {/* Minimized Terminal Shell State Anchored to Bottom */}
       <TerminalDesktop />
+
+      {/* Desktop Right-Click Context Menu */}
+      {contextMenu && (
+        <div
+          onClick={(e) => e.stopPropagation()}
+          style={{
+            top: contextMenu.y,
+            left: contextMenu.x,
+            backgroundColor: activeTheme.windowBg,
+            borderColor: activeTheme.windowBorder,
+            color: activeTheme.textPrimary,
+          }}
+          className="fixed z-[1600] w-64 rounded-xl border shadow-2xl p-1.5 font-mono text-xs backdrop-blur-xl animate-in fade-in zoom-in-95 duration-100 select-none"
+        >
+          {/* Header / Brand */}
+          <div
+            className="px-2.5 py-1.5 border-b mb-1 flex items-center justify-between text-[10px] font-bold tracking-wider uppercase opacity-75"
+            style={{ borderColor: activeTheme.headerBorder, color: activeTheme.accent }}
+          >
+            <div className="flex items-center gap-1.5">
+              <span>⟡</span>
+              <span>ADITYA-OS DESKTOP</span>
+            </div>
+            <span className="opacity-60 text-[9px]">v2.4</span>
+          </div>
+
+          {/* Section 1: Appearance & Desktop Customization */}
+          <div className="space-y-0.5 pb-1 mb-1 border-b" style={{ borderColor: activeTheme.headerBorder }}>
+            <button
+              type="button"
+              onClick={() => {
+                openAndFocus("wallpaperManager");
+                setContextMenu(null);
+              }}
+              className="w-full flex items-center justify-between px-2.5 py-1.5 rounded text-left hover:bg-white/10 transition-colors cursor-pointer"
+            >
+              <span className="flex items-center gap-2">
+                <ImageIcon className="w-3.5 h-3.5 text-pink-400" />
+                <span>Change Wallpaper...</span>
+              </span>
+              <kbd className="px-1 py-0.2 rounded bg-white/10 text-[9px] text-pink-400">Alt+9</kbd>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => {
+                toggleDesktopGrid();
+                playClickChime(500);
+                setContextMenu(null);
+              }}
+              className="w-full flex items-center justify-between px-2.5 py-1.5 rounded text-left hover:bg-white/10 transition-colors cursor-pointer"
+            >
+              <span className="flex items-center gap-2">
+                <Grid className="w-3.5 h-3.5 text-cyan-400" />
+                <span>Toggle Desktop Grid</span>
+              </span>
+              {showDesktopGrid ? (
+                <span className="text-[10px] font-bold text-emerald-400 flex items-center gap-0.5">
+                  <Check className="w-3 h-3" /> ON
+                </span>
+              ) : (
+                <span className="text-[10px] opacity-40">OFF</span>
+              )}
+            </button>
+
+            <button
+              type="button"
+              onClick={() => {
+                toggleSound();
+                setContextMenu(null);
+              }}
+              className="w-full flex items-center justify-between px-2.5 py-1.5 rounded text-left hover:bg-white/10 transition-colors cursor-pointer"
+            >
+              <span className="flex items-center gap-2">
+                {isSoundEnabled ? (
+                  <Volume2 className="w-3.5 h-3.5 text-emerald-400" />
+                ) : (
+                  <VolumeX className="w-3.5 h-3.5 opacity-40" />
+                )}
+                <span>Für Elise Scroll Audio</span>
+              </span>
+              <span className={`text-[10px] font-bold ${isSoundEnabled ? "text-emerald-400" : "opacity-40"}`}>
+                {isSoundEnabled ? "ACTIVE" : "MUTED"}
+              </span>
+            </button>
+          </div>
+
+          {/* Section 2: Quick Launch Apps / Workspaces */}
+          <div className="space-y-0.5 pb-1 mb-1 border-b" style={{ borderColor: activeTheme.headerBorder }}>
+            <button
+              type="button"
+              onClick={() => {
+                openAndFocus("coreIntro");
+                setContextMenu(null);
+              }}
+              className="w-full flex items-center justify-between px-2.5 py-1 rounded text-left hover:bg-white/10 transition-colors cursor-pointer"
+            >
+              <span className="flex items-center gap-2">
+                <Sparkles className="w-3.5 h-3.5 text-purple-400" />
+                <span>Core Intro</span>
+              </span>
+              <kbd className="px-1 py-0.2 rounded bg-white/10 text-[9px] opacity-60">Alt+1</kbd>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => {
+                openAndFocus("archiveReader");
+                setContextMenu(null);
+              }}
+              className="w-full flex items-center justify-between px-2.5 py-1 rounded text-left hover:bg-white/10 transition-colors cursor-pointer"
+            >
+              <span className="flex items-center gap-2">
+                <BookOpen className="w-3.5 h-3.5 text-emerald-400" />
+                <span>Essays & Poetry</span>
+              </span>
+              <kbd className="px-1 py-0.2 rounded bg-white/10 text-[9px] opacity-60">Alt+2</kbd>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => {
+                openAndFocus("pixelEngine");
+                setContextMenu(null);
+              }}
+              className="w-full flex items-center justify-between px-2.5 py-1 rounded text-left hover:bg-white/10 transition-colors cursor-pointer"
+            >
+              <span className="flex items-center gap-2">
+                <Paintbrush className="w-3.5 h-3.5 text-amber-400" />
+                <span>Pixel Engine (2D/3D)</span>
+              </span>
+              <kbd className="px-1 py-0.2 rounded bg-white/10 text-[9px] opacity-60">Alt+4</kbd>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => {
+                openAndFocus("resumeViewer");
+                setContextMenu(null);
+              }}
+              className="w-full flex items-center justify-between px-2.5 py-1 rounded text-left hover:bg-white/10 transition-colors cursor-pointer"
+            >
+              <span className="flex items-center gap-2">
+                <FileText className="w-3.5 h-3.5 text-cyan-400" />
+                <span>Resume & Experience</span>
+              </span>
+              <kbd className="px-1 py-0.2 rounded bg-white/10 text-[9px] opacity-60">Alt+5</kbd>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => {
+                openAndFocus("fieldJournal");
+                setContextMenu(null);
+              }}
+              className="w-full flex items-center justify-between px-2.5 py-1 rounded text-left hover:bg-white/10 transition-colors cursor-pointer"
+            >
+              <span className="flex items-center gap-2">
+                <Compass className="w-3.5 h-3.5 text-amber-400" />
+                <span>Rural Field Journal</span>
+              </span>
+              <kbd className="px-1 py-0.2 rounded bg-white/10 text-[9px] opacity-60">Alt+7</kbd>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => {
+                openAndFocus("learnabilityLab");
+                setContextMenu(null);
+              }}
+              className="w-full flex items-center justify-between px-2.5 py-1 rounded text-left hover:bg-white/10 transition-colors cursor-pointer"
+            >
+              <span className="flex items-center gap-2">
+                <Brain className="w-3.5 h-3.5 text-cyan-400" />
+                <span>Learnability Lab</span>
+              </span>
+              <kbd className="px-1 py-0.2 rounded bg-white/10 text-[9px] opacity-60">Alt+8</kbd>
+            </button>
+          </div>
+
+          {/* Section 3: Window Management */}
+          <div className="space-y-0.5 pb-1 mb-1 border-b" style={{ borderColor: activeTheme.headerBorder }}>
+            <button
+              type="button"
+              onClick={() => {
+                minimizeAllWindows();
+                playClickChime(420);
+                setContextMenu(null);
+              }}
+              className="w-full flex items-center justify-between px-2.5 py-1.5 rounded text-left hover:bg-white/10 transition-colors cursor-pointer"
+            >
+              <span className="flex items-center gap-2">
+                <Layers className="w-3.5 h-3.5 opacity-60" />
+                <span>Minimize All Windows</span>
+              </span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => {
+                closeAllWindows();
+                playClickChime(380);
+                setContextMenu(null);
+              }}
+              className="w-full flex items-center justify-between px-2.5 py-1.5 rounded text-left hover:bg-white/10 text-red-400 transition-colors cursor-pointer"
+            >
+              <span className="flex items-center gap-2">
+                <span>✕</span>
+                <span>Close All Windows</span>
+              </span>
+            </button>
+          </div>
+
+          {/* Section 4: Shortcuts / Help */}
+          <div className="space-y-0.5">
+            <button
+              type="button"
+              onClick={() => {
+                setShowKeysModal(true);
+                setContextMenu(null);
+              }}
+              className="w-full flex items-center justify-between px-2.5 py-1.5 rounded text-left hover:bg-white/10 transition-colors cursor-pointer"
+            >
+              <span className="flex items-center gap-2">
+                <Keyboard className="w-3.5 h-3.5 text-yellow-400" />
+                <span>Keyboard Shortcuts</span>
+              </span>
+              <kbd className="px-1 py-0.2 rounded bg-white/10 text-[9px] text-yellow-400 font-bold">?</kbd>
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* TWM Keyboard Shortcuts Modal */}
       {showKeysModal && (
@@ -1017,6 +1359,10 @@ export default function Home() {
                 <kbd className="px-1.5 py-0.5 rounded bg-white/10 text-cyan-400 font-bold">Alt + 8</kbd>
               </div>
               <div className="flex justify-between items-center py-1 border-b border-white/5">
+                <span className="opacity-75">Switch to Wallpaper Engine</span>
+                <kbd className="px-1.5 py-0.5 rounded bg-white/10 text-rose-400 font-bold">Alt + 9</kbd>
+              </div>
+              <div className="flex justify-between items-center py-1 border-b border-white/5">
                 <span className="opacity-75">Close Active Window</span>
                 <kbd className="px-1.5 py-0.5 rounded bg-white/10 text-red-400 font-bold">Alt + Q</kbd>
               </div>
@@ -1027,7 +1373,7 @@ export default function Home() {
             </div>
 
             <div className="pt-2 text-[10px] opacity-60 text-center">
-              Press anywhere outside or click [ESC] to return to workspace.
+              Right-click anywhere on empty desktop for quick options or press [ESC] to return.
             </div>
           </div>
         </div>

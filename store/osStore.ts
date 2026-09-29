@@ -14,8 +14,14 @@ interface OSState {
   maximizedWindows: string[];
   zIndexMap: Record<string, number>;
   highestZIndex: number;
+  wallpaperUrl: string;
+  showDesktopGrid: boolean;
 
   // Actions
+  setWallpaper: (url: string) => void;
+  toggleDesktopGrid: () => void;
+  minimizeAllWindows: () => void;
+  closeAllWindows: () => void;
   openWindow: (id: string) => void;
   closeWindow: (id: string) => void;
   toggleMinimize: (id: string) => void;
@@ -60,9 +66,22 @@ export const useOSStore = create<OSState>((set, get) => ({
     galleryViewer: 7,
     fieldJournal: 6,
     learnabilityLab: 5,
+    wallpaperManager: 5,
     terminal: 4,
   },
   highestZIndex: 12,
+  wallpaperUrl: "https://images.unsplash.com/photo-1506744038136-46273834b3fb?q=80&w=1920&auto=format&fit=crop",
+  showDesktopGrid: true,
+
+  setWallpaper: (url: string) => set({ wallpaperUrl: url }),
+  toggleDesktopGrid: () => set((state) => ({ showDesktopGrid: !state.showDesktopGrid })),
+  minimizeAllWindows: () => {
+    const { openWindows } = get();
+    set({ minimizedWindows: [...openWindows], activeWindow: null });
+  },
+  closeAllWindows: () => {
+    set({ openWindows: [], minimizedWindows: [], maximizedWindows: [], activeWindow: null });
+  },
 
   openWindow: (id: string) => {
     const { openWindows, minimizedWindows, zIndexMap } = get();

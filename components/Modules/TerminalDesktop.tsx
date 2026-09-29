@@ -138,6 +138,19 @@ export const TerminalDesktop: React.FC = () => {
         </span>
       );
     } else if (
+      trimmed === "./change_wallpaper" ||
+      trimmed === "wallpaper" ||
+      trimmed === "bg" ||
+      trimmed === "./wallpaper"
+    ) {
+      restoreWindow("wallpaperManager");
+      focusWindow("wallpaperManager");
+      output = (
+        <span className="text-pink-400">
+          [OK] Opening WallpaperManager (Unsplash CDN presets & custom URLs).
+        </span>
+      );
+    } else if (
       trimmed === "snake" ||
       trimmed === "life" ||
       trimmed === "sand" ||
@@ -221,6 +234,7 @@ export const TerminalDesktop: React.FC = () => {
           <div>Available commands:</div>
           <div>  <span className="text-onedark-yellow">./pixel_engine</span>      - Open PixelEngine (2D/3D Voxel Canvas)</div>
           <div>  <span className="text-onedark-yellow">snake | life | sand</span> - Launch Pixel Mini-Games (Snake, Conway Life, Sand)</div>
+          <div>  <span className="text-onedark-yellow">wallpaper | bg</span>      - Open Wallpaper Manager (Unsplash CDN & Custom URLs)</div>
           <div>  <span className="text-onedark-yellow">field | journal</span>     - Open Rural Field Journal (Aarohi & India Fellow)</div>
           <div>  <span className="text-onedark-yellow">learn | aarohi</span>      - Open Learnability Lab (School inquiry diagnostics)</div>
           <div>  <span className="text-onedark-yellow">cat resume.pdf</span>      - Open ResumeViewer (CV & Experience)</div>
@@ -249,6 +263,7 @@ export const TerminalDesktop: React.FC = () => {
           <span className="text-onedark-yellow font-bold">Aditya_Diundi_Resume.pdf</span>
           <span className="text-onedark-yellow">CoreIntro.tsx</span>
           <span style={{ color: activeTheme.accent }} className="font-bold">pixel_engine*</span>
+          <span className="text-pink-400 font-bold">change_wallpaper*</span>
           <span className="text-onedark-purple font-bold">play_latest_match*</span>
           <span className="text-onedark-cyan">theme.config</span>
         </div>
@@ -310,6 +325,13 @@ export const TerminalDesktop: React.FC = () => {
       desc: "Pixel Engine Canvas",
       color: "text-onedark-cyan border-onedark-cyan/40 hover:bg-onedark-cyan/10",
       icon: <Paintbrush className="w-3 h-3 mr-1" />,
+    },
+    {
+      label: "./change_wallpaper",
+      action: "./change_wallpaper",
+      desc: "Wallpaper Manager",
+      color: "text-pink-400 border-pink-400/40 hover:bg-pink-400/10",
+      icon: <ImageIcon className="w-3 h-3 mr-1" />,
     },
     {
       label: "cat resume.pdf",
