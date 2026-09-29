@@ -8,6 +8,7 @@ import { StreamFeed } from "@/components/Modules/StreamFeed";
 import { PixelEngine } from "@/components/Modules/PixelEngine";
 import { TerminalDesktop } from "@/components/Modules/TerminalDesktop";
 import { ResumeViewer } from "@/components/Modules/ResumeViewer";
+import { GalleryViewer } from "@/components/Modules/GalleryViewer";
 import { useOSStore } from "@/store/osStore";
 import { useThemeStore, OS_THEMES, OSThemeId } from "@/store/themeStore";
 import { useSoundStore } from "@/store/soundStore";
@@ -30,6 +31,7 @@ import {
   Layers,
   Terminal,
   Grid,
+  Image as ImageIcon,
 } from "lucide-react";
 
 export default function Home() {
@@ -206,6 +208,24 @@ export default function Home() {
             >
               [5:RESUME]
             </button>
+
+            {/* [6:GALLERY] -> galleryViewer */}
+            <button
+              type="button"
+              onClick={() => openAndFocus("galleryViewer")}
+              style={{
+                backgroundColor:
+                  activeWindow === "galleryViewer" ? activeTheme.cardBg : "transparent",
+                borderColor:
+                  activeWindow === "galleryViewer" ? activeTheme.accent : "transparent",
+                color:
+                  activeWindow === "galleryViewer" ? activeTheme.accent : activeTheme.textMuted,
+              }}
+              className="px-1.5 py-0.2 rounded border font-semibold hover:opacity-100 transition-all cursor-pointer hidden md:inline-block"
+              title="Workspace 6: Feh Image Gallery"
+            >
+              [6:GALLERY]
+            </button>
           </div>
         </div>
 
@@ -327,6 +347,26 @@ export default function Home() {
             >
               <FileText className="w-3.5 h-3.5 text-cyan-400" />
             </button>
+
+            {/* GalleryViewer */}
+            <button
+              type="button"
+              onClick={() => openAndFocus("galleryViewer")}
+              title="Launch Feh/Nsxiv Gallery"
+              style={{
+                borderColor:
+                  openWindows.includes("galleryViewer") && activeWindow === "galleryViewer"
+                    ? activeTheme.accent
+                    : "transparent",
+              }}
+              className={`p-1 rounded border transition-colors ${
+                openWindows.includes("galleryViewer") && activeWindow === "galleryViewer"
+                  ? "bg-white/10"
+                  : "hover:opacity-80"
+              }`}
+            >
+              <ImageIcon className="w-3.5 h-3.5 text-pink-400" />
+            </button>
           </div>
 
           <div
@@ -426,14 +466,14 @@ export default function Home() {
             )}
           </button>
 
-          {/* Audio Synthesizer / Scroll Note Toggle */}
+          {/* Audio Synthesizer / Beethoven Für Elise Toggle */}
           <button
             type="button"
             onClick={() => {
               toggleSound();
               playClickChime(700);
             }}
-            title={isSoundEnabled ? "Mute Scroll Sound Synth" : "Enable Scroll Sound Synth"}
+            title={isSoundEnabled ? "Mute Beethoven Für Elise Music Box" : "Enable Beethoven Für Elise Music Box"}
             style={{
               backgroundColor: activeTheme.cardBg,
               borderColor: isSoundEnabled ? activeTheme.accent : activeTheme.cardBorder,
@@ -488,7 +528,7 @@ export default function Home() {
         {/* Desktop Background Shortcuts & Widgets (Visible on empty canvas) */}
         <div className="absolute inset-0 p-6 pointer-events-none flex flex-col justify-between z-0">
           {/* Top-Left Desktop App Icons Grid */}
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3 max-w-4xl pointer-events-auto">
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-7 gap-3 max-w-5xl pointer-events-auto">
             {/* Shortcut 1: Pixel Engine */}
             <button
               type="button"
@@ -568,11 +608,31 @@ export default function Home() {
               </div>
               <div className="space-y-0.5">
                 <div className="font-bold text-xs">Resume.pdf</div>
-                <div className="text-[10px] opacity-60">CV & Portfolio</div>
+                <div className="text-[10px] opacity-60">IIIT Delhi Designer</div>
               </div>
             </button>
 
-            {/* Shortcut 5: System Core Intro */}
+            {/* Shortcut 5: Gallery Viewer */}
+            <button
+              type="button"
+              onClick={() => openAndFocus("galleryViewer")}
+              style={{
+                backgroundColor: `${activeTheme.cardBg}cc`,
+                borderColor: activeTheme.cardBorder,
+                color: activeTheme.textPrimary,
+              }}
+              className="p-3 rounded-lg border backdrop-blur-sm flex flex-col items-center gap-2 text-center group hover:scale-[1.03] hover:border-pink-400/60 transition-all shadow-sm"
+            >
+              <div className="w-10 h-10 rounded-md bg-pink-500/20 flex items-center justify-center group-hover:bg-pink-500/30 transition-colors">
+                <ImageIcon className="w-5 h-5 text-pink-400" />
+              </div>
+              <div className="space-y-0.5">
+                <div className="font-bold text-xs">Gallery</div>
+                <div className="text-[10px] opacity-60">Feh Image Viewer</div>
+              </div>
+            </button>
+
+            {/* Shortcut 6: System Core Intro */}
             <button
               type="button"
               onClick={() => openAndFocus("coreIntro")}
@@ -592,7 +652,7 @@ export default function Home() {
               </div>
             </button>
 
-            {/* Shortcut 6: YouTube Channel Link */}
+            {/* Shortcut 7: YouTube Channel Link */}
             <a
               href="https://www.youtube.com/@falsepeek"
               target="_blank"
@@ -629,12 +689,12 @@ export default function Home() {
                 <span>ADITYA-OS // NOCTALIA TWM</span>
               </div>
               <p className="text-[10px] opacity-75 leading-relaxed">
-                Riced Web OS workstation. Tactile voxel engine, dynamic shell theming, Web Audio ASMR synth, and live telemetry.
+                Riced Web OS workstation. Tactile voxel engine, dynamic shell theming, Beethoven Für Elise music box synth, and live telemetry.
               </p>
               <div className="flex items-center gap-3 text-[10px] opacity-60 pt-1">
                 <span>Kernel: 6.11.0-zen</span>
                 <span>•</span>
-                <span>Audio: Für Elise Synth</span>
+                <span>Audio: Beethoven Für Elise</span>
                 <span>•</span>
                 <span>Firebase: Live</span>
               </div>
@@ -651,8 +711,8 @@ export default function Home() {
               <div className="font-semibold" style={{ color: activeTheme.accent }}>
                 Quick Keys & Help
               </div>
-              <div className="opacity-70">Click top tabs [1:SYS] - [5:RESUME] to switch</div>
-              <div className="opacity-70">Type &apos;help&apos; or &apos;theme list&apos; in dock below</div>
+              <div className="opacity-70">Click top tabs [1:SYS] - [6:GALLERY] to switch</div>
+              <div className="opacity-70">Type &apos;help&apos;, &apos;feh&apos;, or &apos;theme list&apos; in dock below</div>
             </div>
           </div>
         </div>
@@ -715,6 +775,18 @@ export default function Home() {
           dragConstraintsRef={desktopContainerRef}
         >
           <ResumeViewer />
+        </WindowFrame>
+
+        {/* Module 6: GalleryViewer Window */}
+        <WindowFrame
+          id="galleryViewer"
+          title="feh // GalleryViewer.tsx"
+          icon={<ImageIcon className="w-3.5 h-3.5 text-pink-400" />}
+          defaultPosition={{ x: 180, y: 90 }}
+          defaultSize={{ width: 740, height: 500 }}
+          dragConstraintsRef={desktopContainerRef}
+        >
+          <GalleryViewer />
         </WindowFrame>
       </div>
 

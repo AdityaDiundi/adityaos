@@ -1,23 +1,25 @@
 "use client";
 
-import React, { useState } from "react";
-import { Folder, FileText, ChevronRight, ChevronDown, Code2 } from "lucide-react";
+import React, { useState, useEffect } from "react";
+import { Folder, FileText, ChevronRight, ChevronDown, Code2, RefreshCw, FolderPlus } from "lucide-react";
 import { useThemeStore } from "@/store/themeStore";
 import { useSoundStore } from "@/store/soundStore";
 
-interface ArchiveItem {
+export interface ArchiveItem {
   id: string;
   path: string;
+  filename: string;
   title: string;
-  category: "essays" | "poetry";
+  category: string;
   extension: "md" | "txt";
   lines: string[];
 }
 
-const ARCHIVE_DATA: Record<string, ArchiveItem> = {
+const FALLBACK_ARCHIVE_DATA: Record<string, ArchiveItem> = {
   "essays/Daughters_of_Misogyny.md": {
     id: "daughters",
     path: "essays/Daughters_of_Misogyny.md",
+    filename: "Daughters_of_Misogyny.md",
     title: "Daughters of Misogyny",
     category: "essays",
     extension: "md",
@@ -46,11 +48,14 @@ const ARCHIVE_DATA: Record<string, ArchiveItem> = {
       "simply because 'it has always resolved this way.'",
       "",
       "True rebellion begins in refusing to inherit the compromise.",
+      "",
+      "— Aditya",
     ],
   },
   "poetry/तस्वीरें_छोटी_होनी_चाहिए.txt": {
     id: "tasveerein",
     path: "poetry/तस्वीरें_छोटी_होनी_चाहिए.txt",
+    filename: "तस्वीरें_छोटी_होनी_चाहिए.txt",
     title: "तस्वीरें छोटी होनी चाहिए",
     category: "poetry",
     extension: "txt",
@@ -83,6 +88,7 @@ const ARCHIVE_DATA: Record<string, ArchiveItem> = {
   "poetry/गंजे_लोगों_की_पंचायत.txt": {
     id: "panchayat",
     path: "poetry/गंजे_लोगों_की_पंचायत.txt",
+    filename: "गंजे_लोगों_की_पंचायत.txt",
     title: "गंजे लोगों की पंचायत",
     category: "poetry",
     extension: "txt",
@@ -115,21 +121,56 @@ const ARCHIVE_DATA: Record<string, ArchiveItem> = {
 
 export const ArchiveReader: React.FC = () => {
   const { activeTheme } = useThemeStore();
-  const { playScrollNote } = useSoundStore();
+  const { playScrollNote, playClickChime } = useSoundStore();
+
+  const [archiveMap, setArchiveMap] = useState<Record<string, ArchiveItem>>(FALLBACK_ARCHIVE_DATA);
   const [selectedFile, setSelectedFile] = useState<string>("essays/Daughters_of_Misogyny.md");
   const [openFolders, setOpenFolders] = useState<Record<string, boolean>>({
     essays: true,
     poetry: true,
   });
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+
+  const fetchContentFromApi = async () => {
+    setIsLoading(true);
+    try {
+      const res = await fetch("/api/content");
+      if (res.ok) {
+        const data = await res.json();
+        if (data.items && Array.isArray(data.items) && data.items.length > 0) {
+          const newMap: Record<string, ArchiveItem> = {};
+          data.items.forEach((item: ArchiveItem) => {
+            newMap[item.path] = item;
+          });
+          setArchiveMap(newMap);
+          // Auto-select first item if current selection not present
+          if (!newMap[selectedFile] && data.items[0]) {
+            setSelectedFile(data.items[0].path);
+          }
+        }
+      }
+    } catch {
+      // Keep fallback
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchContentFromApi();
+  }, []);
 
   const toggleFolder = (folder: string) => {
+    playClickChime(420);
     setOpenFolders((prev) => ({ ...prev, [folder]: !prev[folder] }));
   };
 
-  const currentItem = ARCHIVE_DATA[selectedFile] || ARCHIVE_DATA["essays/Daughters_of_Misogyny.md"];
+  const currentItem =
+    archiveMap[selectedFile] ||
+    Object.values(archiveMap)[0] ||
+    FALLBACK_ARCHIVE_DATA["essays/Daughters_of_Misogyny.md"];
 
-  // Group items by category dynamically
-  const categories = Array.from(new Set(Object.values(ARCHIVE_DATA).map((i) => i.category)));
+  const categories = Array.from(new Set(Object.values(archiveMap).map((i) => i.category)));
 
   return (
     <div
@@ -164,10 +205,24 @@ export const ArchiveReader: React.FC = () => {
           </span>
           <span style={{ color: activeTheme.textMuted }}>[RO]</span>
         </div>
-        <div style={{ color: activeTheme.textMuted }} className="hidden sm:flex items-center gap-3 text-[10px]">
-          <span>utf-8</span>
-          <span>markdown/txt</span>
-          <span>lines: {currentItem.lines.length}</span>
+
+        <div className="flex items-center gap-3">
+          <button
+            type="button"
+            onClick={fetchContentFromApi}
+            title="Reload content from content/ folder"
+            style={{ color: activeTheme.accent }}
+            className="flex items-center gap-1 hover:opacity-80 transition-opacity text-[10px]"
+          >
+            <RefreshCw className={`w-3 h-3 ${isLoading ? "animate-spin" : ""}`} />
+            <span className="hidden sm:inline">SYNC FOLDER</span>
+          </button>
+
+          <div style={{ color: activeTheme.textMuted }} className="hidden sm:flex items-center gap-3 text-[10px]">
+            <span>utf-8</span>
+            <span>markdown/txt</span>
+            <span>lines: {currentItem.lines.length}</span>
+          </div>
         </div>
       </div>
 
@@ -188,13 +243,13 @@ export const ArchiveReader: React.FC = () => {
             }}
             className="px-3 py-2 text-[10px] uppercase font-bold border-b flex items-center justify-between"
           >
-            <span>EXPLORER // ARCHIVE</span>
+            <span>EXPLORER // CONTENT</span>
             <Code2 className="w-3 h-3" />
           </div>
 
           <div className="p-2 space-y-1 overflow-y-auto flex-1">
             {categories.map((cat) => {
-              const catItems = Object.values(ARCHIVE_DATA).filter((i) => i.category === cat);
+              const catItems = Object.values(archiveMap).filter((i) => i.category === cat);
               const isFolderOpen = openFolders[cat] ?? true;
               return (
                 <div key={cat}>
@@ -223,7 +278,10 @@ export const ArchiveReader: React.FC = () => {
                           <button
                             key={item.id}
                             type="button"
-                            onClick={() => setSelectedFile(item.path)}
+                            onClick={() => {
+                              playClickChime(500);
+                              setSelectedFile(item.path);
+                            }}
                             style={{
                               backgroundColor: isSelected ? `${activeTheme.accent}25` : "transparent",
                               borderColor: isSelected ? activeTheme.accent : "transparent",
@@ -237,7 +295,7 @@ export const ArchiveReader: React.FC = () => {
                               className="w-3 h-3 flex-shrink-0"
                               style={{ color: isSelected ? activeTheme.accent : activeTheme.textMuted }}
                             />
-                            <span className="truncate">{item.path.split("/").pop()}</span>
+                            <span className="truncate">{item.filename}</span>
                           </button>
                         );
                       })}
@@ -248,17 +306,21 @@ export const ArchiveReader: React.FC = () => {
             })}
           </div>
 
+          {/* GitHub Instruction footer */}
           <div
             style={{
               borderColor: activeTheme.headerBorder,
               color: activeTheme.textMuted,
             }}
-            className="p-2 border-t text-[10px]"
+            className="p-2.5 border-t text-[10px] space-y-1"
           >
-            <span style={{ color: activeTheme.accent }} className="font-bold">
-              {Object.keys(ARCHIVE_DATA).length} items
-            </span>{" "}
-            indexed
+            <div className="flex items-center justify-between font-bold">
+              <span>{Object.keys(archiveMap).length} items indexed</span>
+              <FolderPlus className="w-3 h-3 text-emerald-400" />
+            </div>
+            <p className="opacity-70 text-[9px] leading-tight">
+              Add <code className="text-cyan-400">.md</code> files into <code className="text-cyan-400">content/essays/</code> via Git to publish instantly.
+            </p>
           </div>
         </div>
 

@@ -10,23 +10,104 @@ interface SoundState {
   playClickChime: (freq?: number) => void;
 }
 
-// Pentatonic & Beethoven Für Elise Note Sequences for ASMR tactile feedback
-const SCROLL_SCALE = [
-  261.63, // C4
-  293.66, // D4
-  329.63, // E4
-  392.0,  // G4
-  440.0,  // A4
-  523.25, // C5
-  587.33, // D5
-  659.25, // E5
-  783.99, // G5
-  880.0,  // A5
+// Beethoven - Für Elise (Linear Classical Music Box Sequence from legacy monolithic project)
+// Encodes frequency (f) and relative duration / intonation multiplier (d)
+const BEETHOVEN_FUR_ELISE: { f: number; d: number }[] = [
+  { f: 659.25, d: 1 },
+  { f: 622.25, d: 1 },
+  { f: 659.25, d: 1 },
+  { f: 622.25, d: 1 },
+  { f: 659.25, d: 1 },
+  { f: 493.88, d: 1 },
+  { f: 587.33, d: 1 },
+  { f: 523.25, d: 1 },
+  { f: 440, d: 3 },
+  { f: 261.63, d: 1 },
+  { f: 329.63, d: 1 },
+  { f: 440, d: 1 },
+  { f: 493.88, d: 3 },
+  { f: 329.63, d: 1 },
+  { f: 415.3, d: 1 },
+  { f: 493.88, d: 1 },
+  { f: 523.25, d: 3 },
+  { f: 329.63, d: 1 },
+  { f: 659.25, d: 1 },
+  { f: 622.25, d: 1 },
+  { f: 659.25, d: 1 },
+  { f: 622.25, d: 1 },
+  { f: 659.25, d: 1 },
+  { f: 493.88, d: 1 },
+  { f: 587.33, d: 1 },
+  { f: 523.25, d: 1 },
+  { f: 440, d: 3 },
+  { f: 261.63, d: 1 },
+  { f: 329.63, d: 1 },
+  { f: 440, d: 1 },
+  { f: 493.88, d: 3 },
+  { f: 329.63, d: 1 },
+  { f: 523.25, d: 1 },
+  { f: 493.88, d: 1 },
+  { f: 440, d: 6 },
+  { f: 493.88, d: 1 },
+  { f: 523.25, d: 1 },
+  { f: 587.33, d: 1 },
+  { f: 659.25, d: 3 },
+  { f: 392, d: 1 },
+  { f: 698.46, d: 1 },
+  { f: 659.25, d: 1 },
+  { f: 587.33, d: 3 },
+  { f: 349.23, d: 1 },
+  { f: 659.25, d: 1 },
+  { f: 587.33, d: 1 },
+  { f: 523.25, d: 3 },
+  { f: 329.63, d: 1 },
+  { f: 587.33, d: 1 },
+  { f: 523.25, d: 1 },
+  { f: 493.88, d: 3 },
+  { f: 329.63, d: 1 },
+  { f: 659.25, d: 1 },
+  { f: 329.63, d: 1 },
+  { f: 659.25, d: 1 },
+  { f: 659.25, d: 1 },
+  { f: 622.25, d: 1 },
+  { f: 659.25, d: 1 },
+  { f: 622.25, d: 1 },
+  { f: 659.25, d: 1 },
+  { f: 493.88, d: 1 },
+  { f: 587.33, d: 1 },
+  { f: 523.25, d: 1 },
+  { f: 440, d: 3 },
+  { f: 261.63, d: 1 },
+  { f: 329.63, d: 1 },
+  { f: 440, d: 1 },
+  { f: 493.88, d: 3 },
+  { f: 329.63, d: 1 },
+  { f: 415.3, d: 1 },
+  { f: 493.88, d: 1 },
+  { f: 523.25, d: 3 },
+  { f: 329.63, d: 1 },
+  { f: 659.25, d: 1 },
+  { f: 622.25, d: 1 },
+  { f: 659.25, d: 1 },
+  { f: 622.25, d: 1 },
+  { f: 659.25, d: 1 },
+  { f: 493.88, d: 1 },
+  { f: 587.33, d: 1 },
+  { f: 523.25, d: 1 },
+  { f: 440, d: 3 },
+  { f: 261.63, d: 1 },
+  { f: 329.63, d: 1 },
+  { f: 440, d: 1 },
+  { f: 493.88, d: 3 },
+  { f: 329.63, d: 1 },
+  { f: 523.25, d: 1 },
+  { f: 493.88, d: 1 },
+  { f: 440, d: 6 },
 ];
 
 let globalAudioCtx: AudioContext | null = null;
 let lastScrollTime = 0;
-let noteIndex = 0;
+let melodyIndex = 0;
 
 function getAudioContext(): AudioContext | null {
   if (typeof window === "undefined") return null;
@@ -50,7 +131,7 @@ function getAudioContext(): AudioContext | null {
 
 export const useSoundStore = create<SoundState>((set, get) => ({
   isSoundEnabled: true,
-  volume: 0.04,
+  volume: 0.025,
 
   toggleSound: () => {
     set((state) => ({ isSoundEnabled: !state.isSoundEnabled }));
@@ -69,8 +150,8 @@ export const useSoundStore = create<SoundState>((set, get) => ({
     if (!isSoundEnabled) return;
 
     const now = performance.now();
-    // Throttle to avoid audio clipping during rapid wheel scroll
-    if (now - lastScrollTime < 45) return;
+    // Throttle slightly to avoid harsh clipping during high-speed trackpad scrolling
+    if (now - lastScrollTime < 40) return;
     lastScrollTime = now;
 
     try {
@@ -79,30 +160,55 @@ export const useSoundStore = create<SoundState>((set, get) => ({
 
       const audioNow = ctx.currentTime + 0.005;
 
-      // Advance note in scale according to scroll direction
-      if (delta > 0) {
-        noteIndex = (noteIndex + 1) % SCROLL_SCALE.length;
+      // Advance Beethoven Für Elise Music Box linearly
+      if (delta >= 0) {
+        melodyIndex = (melodyIndex + 1) % BEETHOVEN_FUR_ELISE.length;
       } else {
-        noteIndex = (noteIndex - 1 + SCROLL_SCALE.length) % SCROLL_SCALE.length;
+        melodyIndex =
+          (melodyIndex - 1 + BEETHOVEN_FUR_ELISE.length) % BEETHOVEN_FUR_ELISE.length;
       }
 
-      const freq = SCROLL_SCALE[noteIndex];
+      const note = BEETHOVEN_FUR_ELISE[melodyIndex];
+      const freq = note.f;
+      const durationMult = note.d;
 
+      // Authentic Cinematic Hybrid Synth (Triangle + Sub Sine + Warm Lowpass)
       const osc = ctx.createOscillator();
+      const sub = ctx.createOscillator();
       const gain = ctx.createGain();
+      const filter = ctx.createBiquadFilter();
 
-      osc.type = "sine";
+      // Main melodic voice: Triangle (gentle grand piano / music box timbre)
+      osc.type = "triangle";
       osc.frequency.setValueAtTime(freq, audioNow);
 
-      gain.gain.setValueAtTime(0, audioNow);
-      gain.gain.linearRampToValueAtTime(volume * 0.7, audioNow + 0.008);
-      gain.gain.exponentialRampToValueAtTime(0.0001, audioNow + 0.08);
+      // Sub voice: Sine 1 octave down for rich tactile body
+      sub.type = "sine";
+      sub.frequency.setValueAtTime(freq / 2, audioNow);
 
-      osc.connect(gain);
+      // Warm lowpass filter with gentle resonance
+      filter.type = "lowpass";
+      filter.Q.value = 1.0;
+      filter.frequency.setValueAtTime(freq * 1.1, audioNow);
+      filter.frequency.exponentialRampToValueAtTime(freq * 2.0, audioNow + 0.08);
+      filter.frequency.exponentialRampToValueAtTime(freq * 1.1, audioNow + 0.9);
+
+      // Tail decays according to note intonation multiplier
+      const tail = Math.min(1.4 * durationMult, 2.5);
+
+      gain.gain.setValueAtTime(0, audioNow);
+      gain.gain.linearRampToValueAtTime(volume, audioNow + 0.03);
+      gain.gain.exponentialRampToValueAtTime(0.0001, audioNow + tail);
+
+      osc.connect(filter);
+      sub.connect(filter);
+      filter.connect(gain);
       gain.connect(ctx.destination);
 
       osc.start(audioNow);
-      osc.stop(audioNow + 0.08);
+      sub.start(audioNow);
+      osc.stop(audioNow + tail);
+      sub.stop(audioNow + tail);
     } catch {
       // Audio unavailable
     }
@@ -125,14 +231,14 @@ export const useSoundStore = create<SoundState>((set, get) => ({
       osc.frequency.exponentialRampToValueAtTime(freq * 1.5, audioNow + 0.05);
 
       gain.gain.setValueAtTime(0, audioNow);
-      gain.gain.linearRampToValueAtTime(volume, audioNow + 0.008);
-      gain.gain.exponentialRampToValueAtTime(0.0001, audioNow + 0.06);
+      gain.gain.linearRampToValueAtTime(volume * 1.2, audioNow + 0.008);
+      gain.gain.exponentialRampToValueAtTime(0.0001, audioNow + 0.07);
 
       osc.connect(gain);
       gain.connect(ctx.destination);
 
       osc.start(audioNow);
-      osc.stop(audioNow + 0.06);
+      osc.stop(audioNow + 0.07);
     } catch {
       // Audio unavailable
     }

@@ -57,7 +57,8 @@ export const useOSStore = create<OSState>((set, get) => ({
     resumeViewer: 10,
     archiveReader: 9,
     streamFeed: 8,
-    terminal: 7,
+    galleryViewer: 7,
+    terminal: 6,
   },
   highestZIndex: 12,
 

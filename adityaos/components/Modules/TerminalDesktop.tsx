@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useRef, useEffect } from "react";
-import { Terminal, ChevronUp, ChevronDown, Palette, Paintbrush, FileText } from "lucide-react";
+import { Terminal, ChevronUp, ChevronDown, Palette, Paintbrush, FileText, Image as ImageIcon } from "lucide-react";
 import { useOSStore } from "@/store/osStore";
 import { useThemeStore, OS_THEMES, OSThemeId } from "@/store/themeStore";
 
@@ -79,6 +79,20 @@ export const TerminalDesktop: React.FC = () => {
       output = (
         <span className="text-onedark-yellow">
           [OK] Spawning ResumeViewer window (typst/pdf renderer attached).
+        </span>
+      );
+    } else if (
+      trimmed === "feh" ||
+      trimmed === "nsxiv" ||
+      trimmed === "./gallery" ||
+      trimmed === "gallery" ||
+      trimmed === "open gallery"
+    ) {
+      restoreWindow("galleryViewer");
+      focusWindow("galleryViewer");
+      output = (
+        <span className="text-onedark-purple">
+          [OK] Launching Feh/Nsxiv Image Gallery (public/gallery/ buffer loaded).
         </span>
       );
     } else if (
@@ -165,6 +179,7 @@ export const TerminalDesktop: React.FC = () => {
           <div>Available commands:</div>
           <div>  <span className="text-onedark-yellow">./pixel_engine</span>      - Open PixelEngine (2D/3D Voxel Canvas)</div>
           <div>  <span className="text-onedark-yellow">cat resume.pdf</span>      - Open ResumeViewer (CV & Experience)</div>
+          <div>  <span className="text-onedark-yellow">feh</span>                   - Open Feh/Nsxiv Image Gallery (public/gallery/)</div>
           <div>  <span className="text-onedark-yellow">theme &lt;name&gt;</span>        - Switch OS theme (noctalia, caelestia, tokyo-night, catppuccin, matrix, onedark, light)</div>
           <div>  <span className="text-onedark-yellow">theme next</span>          - Cycle to next theme</div>
           <div>  <span className="text-onedark-yellow">theme list</span>          - List all available Linux shell themes</div>
@@ -184,9 +199,9 @@ export const TerminalDesktop: React.FC = () => {
     } else if (trimmed === "ls") {
       output = (
         <div className="flex flex-wrap gap-4 text-onedark-text">
-          <span className="text-onedark-blue font-bold">essays/</span>
-          <span className="text-onedark-green font-bold">poetry/</span>
-          <span className="text-onedark-yellow font-bold">resume.pdf</span>
+          <span className="text-onedark-blue font-bold">content/</span>
+          <span className="text-onedark-purple font-bold">gallery/</span>
+          <span className="text-onedark-yellow font-bold">Aditya_Diundi_Resume.pdf</span>
           <span className="text-onedark-yellow">CoreIntro.tsx</span>
           <span style={{ color: activeTheme.accent }} className="font-bold">pixel_engine*</span>
           <span className="text-onedark-purple font-bold">play_latest_match*</span>
@@ -257,6 +272,13 @@ export const TerminalDesktop: React.FC = () => {
       desc: "Open Resume",
       color: "text-onedark-yellow border-onedark-yellow/40 hover:bg-onedark-yellow/10",
       icon: <FileText className="w-3 h-3 mr-1" />,
+    },
+    {
+      label: "feh gallery",
+      action: "feh",
+      desc: "Image Gallery",
+      color: "text-onedark-cyan border-onedark-cyan/40 hover:bg-onedark-cyan/10",
+      icon: <ImageIcon className="w-3 h-3 mr-1" />,
     },
     {
       label: "theme next",

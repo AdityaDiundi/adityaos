@@ -12,8 +12,10 @@ import {
   Sparkles,
   FileText,
   Mail,
+  Phone,
   MapPin,
   Globe,
+  Eye,
 } from "lucide-react";
 import { useThemeStore } from "@/store/themeStore";
 import { useSoundStore } from "@/store/soundStore";
@@ -21,7 +23,7 @@ import { useSoundStore } from "@/store/soundStore";
 export const ResumeViewer: React.FC = () => {
   const { activeTheme } = useThemeStore();
   const { playScrollNote } = useSoundStore();
-  const [activeTab, setActiveTab] = useState<"visual" | "markdown">("visual");
+  const [activeTab, setActiveTab] = useState<"visual" | "pdf" | "markdown">("visual");
 
   const handlePrint = () => {
     window.print();
@@ -46,8 +48,8 @@ export const ResumeViewer: React.FC = () => {
       >
         <div className="flex items-center gap-2">
           <FileText className="w-3.5 h-3.5" style={{ color: activeTheme.accent }} />
-          <span className="font-bold text-[11px]">ADITYA_DIUNDI_RESUME.pdf</span>
-          <span className="text-[10px] opacity-60">// 2026 Edition</span>
+          <span className="font-bold text-[11px]">Aditya_Diundi_Resume.pdf</span>
+          <span className="text-[10px] opacity-60 hidden sm:inline">// IIIT Delhi • Product Designer</span>
         </div>
 
         <div className="flex items-center gap-1.5">
@@ -77,6 +79,23 @@ export const ResumeViewer: React.FC = () => {
             </button>
             <button
               type="button"
+              onClick={() => setActiveTab("pdf")}
+              style={{
+                backgroundColor: activeTab === "pdf" ? activeTheme.accent : "transparent",
+                color:
+                  activeTab === "pdf"
+                    ? activeTheme.isDark
+                      ? "#000"
+                      : "#fff"
+                    : activeTheme.textMuted,
+              }}
+              className="px-2 py-0.5 rounded font-semibold transition-colors flex items-center gap-1"
+            >
+              <Eye className="w-2.5 h-2.5" />
+              <span>PDF Embed</span>
+            </button>
+            <button
+              type="button"
               onClick={() => setActiveTab("markdown")}
               style={{
                 backgroundColor: activeTab === "markdown" ? activeTheme.accent : "transparent",
@@ -93,6 +112,21 @@ export const ResumeViewer: React.FC = () => {
             </button>
           </div>
 
+          <a
+            href="/Aditya_Diundi_Resume.pdf"
+            download="Aditya_Diundi_Resume.pdf"
+            title="Download PDF"
+            style={{
+              backgroundColor: activeTheme.cardBg,
+              borderColor: activeTheme.cardBorder,
+              color: activeTheme.accent,
+            }}
+            className="flex items-center gap-1 px-2 py-1 rounded border text-[10px] font-semibold hover:opacity-80 transition-opacity"
+          >
+            <Download className="w-3 h-3" />
+            <span className="hidden sm:inline">DOWNLOAD</span>
+          </a>
+
           <button
             type="button"
             onClick={handlePrint}
@@ -105,7 +139,7 @@ export const ResumeViewer: React.FC = () => {
             className="flex items-center gap-1 px-2 py-1 rounded border text-[10px] font-semibold hover:opacity-80 transition-opacity"
           >
             <Printer className="w-3 h-3" />
-            <span>PRINT / SAVE PDF</span>
+            <span className="hidden sm:inline">PRINT</span>
           </button>
         </div>
       </div>
@@ -127,26 +161,28 @@ export const ResumeViewer: React.FC = () => {
                   <h1 className="text-xl font-bold tracking-tight" style={{ color: activeTheme.accent }}>
                     Aditya Diundi
                   </h1>
-                  <p className="text-xs font-medium opacity-80 mt-0.5">
-                    Design Engineer & System Architect // Tactile Software & Creative Computing
+                  <p className="text-xs font-semibold text-emerald-400 mt-0.5">
+                    Product Designer & Systems Thinker
+                  </p>
+                  <p className="text-[11px] opacity-75 mt-1 max-w-lg leading-relaxed">
+                    3+ years of experience designing and shipping user-centric digital products across startups, social impact, and freelance client work. Skilled at leading cross-functional initiatives, crafting intuitive user experiences, and applying product thinking.
                   </p>
                 </div>
 
-                <div className="flex flex-wrap sm:flex-col gap-1.5 text-[11px] opacity-75">
+                <div className="flex flex-wrap sm:flex-col gap-1.5 text-[11px] opacity-80 flex-shrink-0">
                   <div className="flex items-center gap-1.5">
-                    <MapPin className="w-3 h-3" style={{ color: activeTheme.accent }} />
-                    <span>India (Global Remote)</span>
+                    <Mail className="w-3 h-3" style={{ color: activeTheme.accent }} />
+                    <a href="mailto:aditya15124@iiitd.ac.in" className="hover:underline">
+                      aditya15124@iiitd.ac.in
+                    </a>
                   </div>
                   <div className="flex items-center gap-1.5">
-                    <Globe className="w-3 h-3" style={{ color: activeTheme.accent }} />
-                    <a
-                      href="https://github.com/AdityaDiundi"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="hover:underline flex items-center gap-0.5"
-                    >
-                      github.com/AdityaDiundi <ExternalLink className="w-2.5 h-2.5" />
-                    </a>
+                    <Phone className="w-3 h-3" style={{ color: activeTheme.accent }} />
+                    <span>+91 8510860382</span>
+                  </div>
+                  <div className="flex items-center gap-1.5">
+                    <MapPin className="w-3 h-3" style={{ color: activeTheme.accent }} />
+                    <span>India (Immediately Available)</span>
                   </div>
                   <div className="flex items-center gap-1.5">
                     <Globe className="w-3 h-3 text-red-400" />
@@ -154,7 +190,7 @@ export const ResumeViewer: React.FC = () => {
                       href="https://youtube.com/@falsepeek"
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="hover:underline flex items-center gap-0.5"
+                      className="hover:underline flex items-center gap-0.5 text-red-400"
                     >
                       youtube.com/@falsepeek <ExternalLink className="w-2.5 h-2.5" />
                     </a>
@@ -163,7 +199,7 @@ export const ResumeViewer: React.FC = () => {
               </div>
             </div>
 
-            {/* Core Competencies */}
+            {/* Core Competencies Grid */}
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
               <div
                 style={{
@@ -172,16 +208,16 @@ export const ResumeViewer: React.FC = () => {
                 }}
                 className="p-3.5 rounded border"
               >
-                <div className="flex items-center gap-1.5 font-bold mb-2" style={{ color: activeTheme.accent }}>
-                  <Code className="w-3.5 h-3.5" />
-                  <span>CORE ENGINEERING</span>
+                <div className="flex items-center gap-1.5 font-bold mb-2 text-cyan-400">
+                  <Layers className="w-3.5 h-3.5" />
+                  <span>PRODUCT & DESIGN</span>
                 </div>
                 <div className="space-y-1 text-[11px] opacity-80">
-                  <div>• TypeScript / Next.js / React</div>
-                  <div>• Canvas 2D / WebGL / Voxel Math</div>
-                  <div>• Web Audio API & Synth DSP</div>
-                  <div>• State Systems (Zustand, Redux)</div>
-                  <div>• Node.js / Deno / REST / Firebase</div>
+                  <div>• Figma / Adobe XD / Sketch</div>
+                  <div>• Rapid Prototyping & Wireframing</div>
+                  <div>• Usability Testing & Research</div>
+                  <div>• Systems Thinking & UI/UX</div>
+                  <div>• Power BI / Tableau Analytics</div>
                 </div>
               </div>
 
@@ -193,15 +229,15 @@ export const ResumeViewer: React.FC = () => {
                 className="p-3.5 rounded border"
               >
                 <div className="flex items-center gap-1.5 font-bold mb-2 text-emerald-400">
-                  <Sparkles className="w-3.5 h-3.5" />
-                  <span>DESIGN & CRAFT</span>
+                  <Code className="w-3.5 h-3.5" />
+                  <span>TECH & CREATIVE CODE</span>
                 </div>
                 <div className="space-y-1 text-[11px] opacity-80">
-                  <div>• Tactile Desktop UI (TWM / Shells)</div>
-                  <div>• Framer Motion & Micro-interactions</div>
-                  <div>• Design Systems & Color Palettes</div>
-                  <div>• Typography & Layout Hierarchy</div>
-                  <div>• Hardware Acceleration & Perf</div>
+                  <div>• Next.js / TypeScript / React</div>
+                  <div>• Google App Script & APIs</div>
+                  <div>• HTML5 Canvas & Web Audio DSP</div>
+                  <div>• Python / SQL / Linux Shells</div>
+                  <div>• WordPress & Web Deployments</div>
                 </div>
               </div>
 
@@ -213,27 +249,27 @@ export const ResumeViewer: React.FC = () => {
                 className="p-3.5 rounded border"
               >
                 <div className="flex items-center gap-1.5 font-bold mb-2 text-purple-400">
-                  <Layers className="w-3.5 h-3.5" />
-                  <span>SYSTEMS & MEDIA</span>
+                  <Sparkles className="w-3.5 h-3.5" />
+                  <span>LEADERSHIP & CRAFT</span>
                 </div>
                 <div className="space-y-1 text-[11px] opacity-80">
-                  <div>• Linux Ricing (Hyprland / i3 / BSPWM)</div>
-                  <div>• Digital Video & MPV Workflows</div>
-                  <div>• Realtime Physics & Particle Sim</div>
-                  <div>• Gamification & Telemetry</div>
-                  <div>• Bilingual Stories & Architecture</div>
+                  <div>• Cross-functional Collaboration</div>
+                  <div>• Workshop Facilitation</div>
+                  <div>• Bilingual Storytelling & Essays</div>
+                  <div>• Stakeholder Management</div>
+                  <div>• Visual Communication</div>
                 </div>
               </div>
             </div>
 
-            {/* Experience & Projects */}
+            {/* Experience Section */}
             <div className="space-y-3">
               <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider" style={{ color: activeTheme.accent }}>
                 <Briefcase className="w-3.5 h-3.5" />
-                <span>Featured Systems & Projects</span>
+                <span>Professional Experience</span>
               </div>
 
-              {/* Project 1 */}
+              {/* Role 1 */}
               <div
                 style={{
                   backgroundColor: activeTheme.cardBg,
@@ -241,32 +277,20 @@ export const ResumeViewer: React.FC = () => {
                 }}
                 className="p-4 rounded border space-y-2"
               >
-                <div className="flex items-center justify-between">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1">
                   <span className="font-bold text-sm" style={{ color: activeTheme.accent }}>
-                    AdityaOS // Noctalia Web TWM Desktop Environment
+                    Freelance Product Designer — Invenix & Independent Clients
                   </span>
-                  <span className="text-[10px] opacity-60">2024 — Present</span>
+                  <span className="text-[10px] opacity-60">Oct 2025 – Present</span>
                 </div>
-                <p className="text-xs opacity-85 leading-relaxed">
-                  Engineered an autonomous agentic Web OS modeled after Linux TWM rices (Noctalia, Caelestia, OneDark). Features draggable floating windows, interactive zsh terminal emulator with shell command execution, hardware-accelerated isometric pixel engine, and multi-theme live switching.
-                </p>
-                <div className="flex flex-wrap gap-1.5 pt-1">
-                  {["Next.js", "TypeScript", "Tailwind CSS", "Zustand", "Framer Motion", "Canvas API"].map((tag) => (
-                    <span
-                      key={tag}
-                      style={{
-                        backgroundColor: activeTheme.tagBg,
-                        color: activeTheme.tagText,
-                      }}
-                      className="px-2 py-0.5 rounded text-[10px] font-semibold"
-                    >
-                      {tag}
-                    </span>
-                  ))}
-                </div>
+                <ul className="text-xs opacity-85 space-y-1 list-disc list-inside leading-relaxed">
+                  <li>Designed end-to-end website and product experiences for Invenix and clients across web and mobile platforms.</li>
+                  <li>Owned projects independently from discovery through delivery — user research, wireframing, UI design, and engineer handoff.</li>
+                  <li>Delivered live, production-shipped design work balancing brand identity with usability.</li>
+                </ul>
               </div>
 
-              {/* Project 2 */}
+              {/* Role 2 */}
               <div
                 style={{
                   backgroundColor: activeTheme.cardBg,
@@ -274,32 +298,43 @@ export const ResumeViewer: React.FC = () => {
                 }}
                 className="p-4 rounded border space-y-2"
               >
-                <div className="flex items-center justify-between">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1">
+                  <span className="font-bold text-sm text-emerald-400">
+                    Product & Program Design — Project Potential x India Fellow
+                  </span>
+                  <span className="text-[10px] opacity-60">Feb 2024 – Oct 2025</span>
+                </div>
+                <ul className="text-xs opacity-85 space-y-1 list-disc list-inside leading-relaxed">
+                  <li>Built a real-time, no-code attendance tracker with live location validation using Google Sheets, App Script, and HERE API.</li>
+                  <li>Co-authored a Youth Resource Manual and designed group activities and youth club layouts to foster leadership and civic participation.</li>
+                  <li>Led visual design for program reports, decks, and communication materials shared with partners and funders.</li>
+                  <li>Conducted district-wide data analysis on youth aspirations using Power BI to inform program strategy.</li>
+                  <li>Facilitated design thinking workshops and participatory co-creation with rural youth and stakeholders.</li>
+                </ul>
+              </div>
+
+              {/* Role 3 */}
+              <div
+                style={{
+                  backgroundColor: activeTheme.cardBg,
+                  borderColor: activeTheme.cardBorder,
+                }}
+                className="p-4 rounded border space-y-2"
+              >
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1">
                   <span className="font-bold text-sm text-amber-400">
-                    PixelEngine 2.0 // Isometric Voxel Engine & ASMR Synthesizer
+                    Product Designer — Mosaic Wellness
                   </span>
-                  <span className="text-[10px] opacity-60">2023 — 2026</span>
+                  <span className="text-[10px] opacity-60">Jun 2022 – Dec 2022</span>
                 </div>
-                <p className="text-xs opacity-85 leading-relaxed">
-                  Crafted an interactive voxel canvas with square/isometric matrix projections, directional 3D extrusion shading, Web Audio procedural sound synthesis, gravity drop physics, and live community stats syncing with Firebase Realtime Database.
-                </p>
-                <div className="flex flex-wrap gap-1.5 pt-1">
-                  {["HTML5 Canvas", "Web Audio API", "Physics Particles", "Firebase RTDB", "Isometric Raycasting"].map((tag) => (
-                    <span
-                      key={tag}
-                      style={{
-                        backgroundColor: activeTheme.tagBg,
-                        color: activeTheme.tagText,
-                      }}
-                      className="px-2 py-0.5 rounded text-[10px] font-semibold"
-                    >
-                      {tag}
-                    </span>
-                  ))}
-                </div>
+                <ul className="text-xs opacity-85 space-y-1 list-disc list-inside leading-relaxed">
+                  <li>Led UX for habit tracker on ManMatters app; onboarded 100+ users in week one, with 22 regular weekly active users.</li>
+                  <li>Increased tracker-to-product purchase conversion by 12% through nudge flows and simplified CTA redesigns.</li>
+                  <li>Coordinated with PMs and engineers to define delivery TATs and feature prioritization; contributed to BeBodywise and LittleJoys.</li>
+                </ul>
               </div>
 
-              {/* Project 3 */}
+              {/* Role 4 */}
               <div
                 style={{
                   backgroundColor: activeTheme.cardBg,
@@ -307,15 +342,65 @@ export const ResumeViewer: React.FC = () => {
                 }}
                 className="p-4 rounded border space-y-2"
               >
-                <div className="flex items-center justify-between">
-                  <span className="font-bold text-sm text-red-400">
-                    @falsepeek Media & Gaming Architecture
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1">
+                  <span className="font-bold text-sm text-cyan-400">
+                    Product Designer — MFine
                   </span>
-                  <span className="text-[10px] opacity-60">Active Channel</span>
+                  <span className="text-[10px] opacity-60">Nov 2021 – May 2022</span>
                 </div>
-                <p className="text-xs opacity-85 leading-relaxed">
-                  Digital gaming highlights and tactical analysis channel covering CS2, Valorant, and competitive gaming. Features high-frame-rate clip curation, precision video timing, and YouTube player integration.
-                </p>
+                <ul className="text-xs opacity-85 space-y-1 list-disc list-inside leading-relaxed">
+                  <li>Designed core patient-side app flows used by over 100K daily users.</li>
+                  <li>Developed corporate onboarding and wallet management tools for B2B expansion.</li>
+                  <li>Led UX revamp of user-facing claim settlement flow, reducing support tickets and enhancing patient satisfaction.</li>
+                </ul>
+              </div>
+
+              {/* Role 5 */}
+              <div
+                style={{
+                  backgroundColor: activeTheme.cardBg,
+                  borderColor: activeTheme.cardBorder,
+                }}
+                className="p-4 rounded border space-y-2"
+              >
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1">
+                  <span className="font-bold text-sm text-purple-400">
+                    Product Designer — Gemini Solutions
+                  </span>
+                  <span className="text-[10px] opacity-60">Sep 2020 – May 2021</span>
+                </div>
+                <ul className="text-xs opacity-85 space-y-1 list-disc list-inside leading-relaxed">
+                  <li>Designed internal employee management tools and an in-house social media platform.</li>
+                  <li>Collaborated on FinTech projects, leading redesigns to enhance usability and feature adoption.</li>
+                </ul>
+              </div>
+            </div>
+
+            {/* Internships & Early Work */}
+            <div className="space-y-3">
+              <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider" style={{ color: activeTheme.accent }}>
+                <Sparkles className="w-3.5 h-3.5" />
+                <span>Internships & Visual Media</span>
+              </div>
+              <div
+                style={{
+                  backgroundColor: activeTheme.cardBg,
+                  borderColor: activeTheme.cardBorder,
+                }}
+                className="p-4 rounded border space-y-3"
+              >
+                <div>
+                  <div className="font-bold text-xs">Visual Design Intern — GeeksforGeeks</div>
+                  <div className="text-[11px] opacity-80 mt-0.5">
+                    Managed visual identity for YouTube and contest channels; increased content views and engagement. Designed digital assets for social media and marketing campaigns.
+                  </div>
+                </div>
+                <div className="border-t border-white/5 pt-2">
+                  <div className="font-bold text-xs">Tech Intern & Graphic Designer — CampK12</div>
+                  <div className="text-[11px] opacity-80 mt-0.5">
+                    Taught app development and coding to school students during summer tech camps; created infographics and course content.
+                  </div>
+                </div>
               </div>
             </div>
 
@@ -323,22 +408,34 @@ export const ResumeViewer: React.FC = () => {
             <div className="space-y-2">
               <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider" style={{ color: activeTheme.accent }}>
                 <GraduationCap className="w-3.5 h-3.5" />
-                <span>Education & Philosophy</span>
+                <span>Education</span>
               </div>
               <div
                 style={{
                   backgroundColor: activeTheme.cardBg,
                   borderColor: activeTheme.cardBorder,
                 }}
-                className="p-3.5 rounded border flex justify-between items-center"
+                className="p-4 rounded border flex flex-col sm:flex-row justify-between sm:items-center gap-2"
               >
                 <div>
-                  <div className="font-bold">Computer Science & Design Systems</div>
-                  <div className="text-[11px] opacity-70">Focus on Human-Computer Interaction & Tactile Interfaces</div>
+                  <div className="font-bold text-sm">B.Tech in Electronics and Communication Engineering</div>
+                  <div className="text-xs text-emerald-400 font-semibold">IIIT Delhi (Indraprastha Institute of Information Technology Delhi)</div>
+                  <div className="text-[11px] opacity-70">Focus on Human-Centered Design, Systems Engineering & Creative Computing</div>
                 </div>
-                <span className="text-[10px] opacity-60">Continuous Craft</span>
+                <span className="text-[11px] px-2 py-0.5 rounded border border-white/10 font-mono flex-shrink-0">
+                  2015 – 2021
+                </span>
               </div>
             </div>
+          </div>
+        ) : activeTab === "pdf" ? (
+          /* Embedded PDF Viewer Mode */
+          <div className="h-full w-full flex flex-col rounded-lg overflow-hidden border border-white/10">
+            <iframe
+              src="/Aditya_Diundi_Resume.pdf#toolbar=1&navpanes=0"
+              title="Aditya Diundi Resume PDF"
+              className="w-full h-[calc(100vh-220px)] border-none rounded-lg bg-neutral-900"
+            />
           </div>
         ) : (
           /* Raw Markdown View */
@@ -349,33 +446,66 @@ export const ResumeViewer: React.FC = () => {
             }}
             className="p-4 rounded border max-w-3xl mx-auto"
           >
-            <pre className="text-xs whitespace-pre-wrap leading-relaxed opacity-90 select-text">
-{`# Aditya Diundi
-**Design Engineer & Systems Architect**
-Global Remote • India • GitHub: @AdityaDiundi • YouTube: @falsepeek
+            <pre className="text-xs whitespace-pre-wrap leading-relaxed opacity-90 select-text font-mono">
+{`# ADITYA DIUNDI
+Product Designer & Systems Thinker
+Email: aditya15124@iiitd.ac.in | Phone: +91 8510860382 | YouTube: @falsepeek
+Education: B.Tech in Electronics & Communication Engineering — IIIT Delhi (2015 – 2021)
+Status: Immediately Available
 
 ---
 
-### Core Specializations
-- **Frontend Systems:** TypeScript, Next.js App Router, React 18, Zustand, Framer Motion
-- **Graphics & Audio:** HTML5 2D Canvas, Isometric Voxel Projections, Web Audio API DSP
-- **Infrastructure:** Linux TWM Shells (Hyprland, i3, BSPWM), Firebase Realtime DB, Vercel
+### SUMMARY
+Product Designer and Systems Thinker with 3+ years of experience designing and shipping user-centric digital products across startups, social impact, and freelance client work. Skilled at leading cross-functional initiatives, crafting intuitive user experiences, and applying product thinking in ambiguous, high-impact settings.
 
 ---
 
-### Featured Products
-1. **AdityaOS (Noctalia Web TWM)**
-   - Autonomous web operating system replicating riced Linux desktop workflows.
-   - Draggable TWM tiling window manager with dynamic theme engine (Noctalia, Caelestia, OneDark, Tokyo Night).
-   - Embedded interactive Kitty/Alacritty terminal emulator.
+### EXPERIENCE
 
-2. **PixelEngine 2.0**
-   - Interactive voxel canvas with 2D/3D shading and square/isometric projection math.
-   - Web Audio ASMR procedural sound synthesizer and particle physics gravity fall.
-   - Connected live community telemetry via Firebase Realtime Database.
+#### Freelance Product Designer — Invenix & Independent Clients
+Oct 2025 – Present
+- Designed end-to-end website and product experiences for Invenix and clients across web and mobile platforms
+- Owned projects independently from discovery through delivery — user research, wireframing, UI design, and handoff
+- Delivered live, production-shipped design work balancing brand identity with usability
 
-3. **@falsepeek Media Feed**
-   - Curated competitive gaming highlights, tactical breakdown shorts, and telemetry feeds.
+#### Product & Program Design — Project Potential x India Fellow
+Feb 2024 – Oct 2025
+- Built a real-time, no-code attendance tracker with live location validation using Google Sheets, App Script, and HERE API
+- Co-authored a Youth Resource Manual and designed group activities and youth club layouts to foster leadership and civic participation
+- Led visual design for program reports, decks, and communication materials shared with partners and funders
+- Conducted district-wide data analysis on youth aspirations using Power BI to inform program strategy
+- Facilitated design thinking workshops and participatory co-creation with rural youth and stakeholders
+
+#### Product Designer — Mosaic Wellness
+Jun 2022 – Dec 2022
+- Led UX for habit tracker on ManMatters app; onboarded 100+ users in week one, with 22 regular weekly users
+- Increased tracker-to-product purchase conversion by 12% through nudge flows and simplified CTA redesigns
+- Coordinated with PMs and engineers to define delivery TATs and feature prioritization
+- Contributed to BeBodywise and LittleJoys with consistent UX delivery across platforms
+
+#### Product Designer — MFine
+Nov 2021 – May 2022
+- Designed core patient-side app flows used by over 100K daily users
+- Developed corporate onboarding and wallet management tools for B2B expansion
+- Led UX revamp of user-facing claim settlement flow, reducing support tickets and enhancing satisfaction
+
+#### Product Designer — Gemini Solutions
+Sep 2020 – May 2021
+- Designed internal employee management tools and an in-house social media platform
+- Collaborated on FinTech projects, leading redesigns to enhance usability and feature adoption
+
+---
+
+### INTERNSHIPS
+- Visual Design Intern — GeeksforGeeks (YouTube visual identity, digital assets)
+- Tech Intern & Graphic Designer — CampK12 (App dev teaching, infographics)
+
+---
+
+### SKILLS & TOOLS
+- Product & Design: Figma, Adobe XD, Sketch, Power BI, Tableau, Rapid Prototyping, Wireframing, Usability Testing, Branding, UI/UX, Systems Thinking
+- Tech & Data: Next.js, TypeScript, Canvas API, Web Audio API, Google App Script, HTML/CSS, WordPress, Python, SQL, Linux
+- Collaboration: Cross-functional Collaboration, Facilitation, Storytelling, Visual Communication, Stakeholder Management
 `}
             </pre>
           </div>
