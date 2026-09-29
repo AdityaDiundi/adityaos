@@ -109,6 +109,48 @@ export const TerminalDesktop: React.FC = () => {
           [OK] Initializing PixelEngine hardware canvas (2D/3D Voxel buffer attached).
         </span>
       );
+    } else if (
+      trimmed === "./field_journal" ||
+      trimmed === "field" ||
+      trimmed === "journal" ||
+      trimmed === "rajasthan" ||
+      trimmed === "fellow"
+    ) {
+      restoreWindow("fieldJournal");
+      focusWindow("fieldJournal");
+      output = (
+        <span className="text-amber-400">
+          [OK] Loading Rajasthan Field Journal & Grassroots Dispatches (India Fellow residency buffer).
+        </span>
+      );
+    } else if (
+      trimmed === "./logic_lab" ||
+      trimmed === "logic" ||
+      trimmed === "ece" ||
+      trimmed === "breadboard" ||
+      trimmed === "silicon"
+    ) {
+      restoreWindow("logicLab");
+      focusWindow("logicLab");
+      output = (
+        <span className="text-cyan-400">
+          [OK] Powering up IIIT Delhi ECE Logic Workbench (TTL gates & DSO active).
+        </span>
+      );
+    } else if (
+      trimmed === "snake" ||
+      trimmed === "life" ||
+      trimmed === "sand" ||
+      trimmed === "game" ||
+      trimmed === "arcade"
+    ) {
+      restoreWindow("pixelEngine");
+      focusWindow("pixelEngine");
+      output = (
+        <span style={{ color: activeTheme.accent }}>
+          [OK] Launching PixelEngine Mini-Games Deck ({trimmed.toUpperCase()} mode).
+        </span>
+      );
     } else if (lowerCmd.startsWith("theme")) {
       const parts = trimmed.split(" ").filter(Boolean);
       if (parts.length === 1 || parts[1] === "list") {
@@ -178,6 +220,9 @@ export const TerminalDesktop: React.FC = () => {
         <div className="space-y-1 text-onedark-text">
           <div>Available commands:</div>
           <div>  <span className="text-onedark-yellow">./pixel_engine</span>      - Open PixelEngine (2D/3D Voxel Canvas)</div>
+          <div>  <span className="text-onedark-yellow">snake | life | sand</span> - Launch Pixel Mini-Games (Snake, Conway Life, Sand)</div>
+          <div>  <span className="text-onedark-yellow">field | journal</span>     - Open Rajasthan Field Journal (India Fellow)</div>
+          <div>  <span className="text-onedark-yellow">logic | ece</span>         - Open IIIT Delhi ECE Logic Workbench</div>
           <div>  <span className="text-onedark-yellow">cat resume.pdf</span>      - Open ResumeViewer (CV & Experience)</div>
           <div>  <span className="text-onedark-yellow">feh</span>                   - Open Feh/Nsxiv Image Gallery (public/gallery/)</div>
           <div>  <span className="text-onedark-yellow">theme &lt;name&gt;</span>        - Switch OS theme (noctalia, caelestia, tokyo-night, catppuccin, matrix, onedark, light)</div>

@@ -9,6 +9,8 @@ import { PixelEngine } from "@/components/Modules/PixelEngine";
 import { TerminalDesktop } from "@/components/Modules/TerminalDesktop";
 import { ResumeViewer } from "@/components/Modules/ResumeViewer";
 import { GalleryViewer } from "@/components/Modules/GalleryViewer";
+import { FieldJournal } from "@/components/Modules/FieldJournal";
+import { LogicLab } from "@/components/Modules/LogicLab";
 import { useOSStore } from "@/store/osStore";
 import { useThemeStore, OS_THEMES, OSThemeId } from "@/store/themeStore";
 import { useSoundStore } from "@/store/soundStore";
@@ -32,6 +34,8 @@ import {
   Terminal,
   Grid,
   Image as ImageIcon,
+  Compass,
+  Zap,
 } from "lucide-react";
 
 export default function Home() {
@@ -225,6 +229,42 @@ export default function Home() {
               title="Workspace 6: Feh Image Gallery"
             >
               [6:GALLERY]
+            </button>
+
+            {/* [7:FIELD] -> fieldJournal */}
+            <button
+              type="button"
+              onClick={() => openAndFocus("fieldJournal")}
+              style={{
+                backgroundColor:
+                  activeWindow === "fieldJournal" ? activeTheme.cardBg : "transparent",
+                borderColor:
+                  activeWindow === "fieldJournal" ? activeTheme.accent : "transparent",
+                color:
+                  activeWindow === "fieldJournal" ? activeTheme.accent : activeTheme.textMuted,
+              }}
+              className="px-1.5 py-0.2 rounded border font-semibold hover:opacity-100 transition-all cursor-pointer hidden lg:inline-block"
+              title="Workspace 7: Rajasthan Field Journal & Grassroots Leadership"
+            >
+              [7:FIELD]
+            </button>
+
+            {/* [8:LOGIC] -> logicLab */}
+            <button
+              type="button"
+              onClick={() => openAndFocus("logicLab")}
+              style={{
+                backgroundColor:
+                  activeWindow === "logicLab" ? activeTheme.cardBg : "transparent",
+                borderColor:
+                  activeWindow === "logicLab" ? activeTheme.accent : "transparent",
+                color:
+                  activeWindow === "logicLab" ? activeTheme.accent : activeTheme.textMuted,
+              }}
+              className="px-1.5 py-0.2 rounded border font-semibold hover:opacity-100 transition-all cursor-pointer hidden lg:inline-block"
+              title="Workspace 8: IIIT Delhi ECE LogicLab"
+            >
+              [8:LOGIC]
             </button>
           </div>
         </div>
@@ -528,7 +568,7 @@ export default function Home() {
         {/* Desktop Background Shortcuts & Widgets (Visible on empty canvas) */}
         <div className="absolute inset-0 p-6 pb-16 pointer-events-none flex flex-col justify-between z-0">
           {/* Top-Left Desktop App Icons Grid */}
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-7 gap-3 max-w-5xl pointer-events-auto">
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-9 gap-3 max-w-6xl pointer-events-auto">
             {/* Shortcut 1: Pixel Engine */}
             <button
               type="button"
@@ -672,6 +712,46 @@ export default function Home() {
                 <div className="text-[10px] opacity-60">YouTube Channel ↗</div>
               </div>
             </a>
+
+            {/* Shortcut 8: Field Journal */}
+            <button
+              type="button"
+              onClick={() => openAndFocus("fieldJournal")}
+              style={{
+                backgroundColor: `${activeTheme.cardBg}cc`,
+                borderColor: activeTheme.cardBorder,
+                color: activeTheme.textPrimary,
+              }}
+              className="p-3 rounded-lg border backdrop-blur-sm flex flex-col items-center gap-2 text-center group hover:scale-[1.03] hover:border-amber-400/60 transition-all shadow-sm"
+            >
+              <div className="w-10 h-10 rounded-md bg-amber-500/20 flex items-center justify-center group-hover:bg-amber-500/30 transition-colors">
+                <Compass className="w-5 h-5 text-amber-400" />
+              </div>
+              <div className="space-y-0.5">
+                <div className="font-bold text-xs">FieldJournal</div>
+                <div className="text-[10px] opacity-60">Rajasthan Impact</div>
+              </div>
+            </button>
+
+            {/* Shortcut 9: LogicLab */}
+            <button
+              type="button"
+              onClick={() => openAndFocus("logicLab")}
+              style={{
+                backgroundColor: `${activeTheme.cardBg}cc`,
+                borderColor: activeTheme.cardBorder,
+                color: activeTheme.textPrimary,
+              }}
+              className="p-3 rounded-lg border backdrop-blur-sm flex flex-col items-center gap-2 text-center group hover:scale-[1.03] hover:border-cyan-400/60 transition-all shadow-sm"
+            >
+              <div className="w-10 h-10 rounded-md bg-cyan-500/20 flex items-center justify-center group-hover:bg-cyan-500/30 transition-colors">
+                <Zap className="w-5 h-5 text-cyan-400" />
+              </div>
+              <div className="space-y-0.5">
+                <div className="font-bold text-xs">LogicLab</div>
+                <div className="text-[10px] opacity-60">IIIT Delhi ECE</div>
+              </div>
+            </button>
           </div>
 
           {/* Bottom Desktop System Info Widget */}
@@ -787,6 +867,30 @@ export default function Home() {
           dragConstraintsRef={desktopContainerRef}
         >
           <GalleryViewer />
+        </WindowFrame>
+
+        {/* Module 7: FieldJournal Window */}
+        <WindowFrame
+          id="fieldJournal"
+          title="field // FieldJournal.tsx"
+          icon={<Compass className="w-3.5 h-3.5 text-amber-400" />}
+          defaultPosition={{ x: 140, y: 40 }}
+          defaultSize={{ width: 780, height: 520 }}
+          dragConstraintsRef={desktopContainerRef}
+        >
+          <FieldJournal />
+        </WindowFrame>
+
+        {/* Module 8: LogicLab Window */}
+        <WindowFrame
+          id="logicLab"
+          title="silicon // LogicLab.tsx"
+          icon={<Zap className="w-3.5 h-3.5 text-cyan-400" />}
+          defaultPosition={{ x: 220, y: 60 }}
+          defaultSize={{ width: 740, height: 510 }}
+          dragConstraintsRef={desktopContainerRef}
+        >
+          <LogicLab />
         </WindowFrame>
       </div>
 

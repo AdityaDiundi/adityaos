@@ -26,6 +26,9 @@ import {
   Flame,
   Palette,
   Play,
+  Pause,
+  RotateCcw,
+  StepForward,
   Sliders,
   Globe,
   Gamepad2,
@@ -143,6 +146,8 @@ export const PixelEngine: React.FC = () => {
   const lastCoordRef = useRef<{ col: number; row: number } | null>(null);
   const gravityPixelsRef = useRef<any[]>([]);
   const isGravityActiveRef = useRef<boolean>(false);
+  // Engine Modes & Mini-Games State
+  const [engineMode, setEngineMode] = useState<"draw" | "arcade" | "life" | "snake" | "sand">("draw");
 
   // Arcade Collectibles Mini-Game State
   const [isArcadeMode, setIsArcadeMode] = useState<boolean>(true);
@@ -150,6 +155,24 @@ export const PixelEngine: React.FC = () => {
   const [comboCount, setComboCount] = useState<number>(0);
   const lastPopTimeRef = useRef<number>(0);
   const collectiblesRef = useRef<Map<string, { createdAt: number; sizeMult: number; type: "gold" | "neon" | "rainbow" }>>(new Map());
+
+  // Conway's Game of Life State
+  const [isLifeRunning, setIsLifeRunning] = useState<boolean>(false);
+  const [lifeGeneration, setLifeGeneration] = useState<number>(0);
+
+  // Retro Voxel Snake State
+  const [snakeScore, setSnakeScore] = useState<number>(0);
+  const [snakeHighScore, setSnakeHighScore] = useState<number>(0);
+  const [isSnakeRunning, setIsSnakeRunning] = useState<boolean>(false);
+  const [isSnakeGameOver, setIsSnakeGameOver] = useState<boolean>(false);
+  const snakeBodyRef = useRef<{ col: number; row: number }[]>([]);
+  const snakeDirRef = useRef<{ col: number; row: number }>({ col: 1, row: 0 });
+  const nextSnakeDirRef = useRef<{ col: number; row: number }>({ col: 1, row: 0 });
+  const snakeFoodRef = useRef<{ col: number; row: number }>({ col: 10, row: 10 });
+
+  // Falling Sand Simulation State
+  const [sandElement, setSandElement] = useState<"sand" | "water" | "wood" | "acid">("sand");
+  const [isSandSimRunning, setIsSandSimRunning] = useState<boolean>(true);
 
   // Web Audio Synthesizer (from homesec.tsx & pixel.tsx)
   const audioCtxRef = useRef<AudioContext | null>(null);
@@ -738,7 +761,7 @@ export const PixelEngine: React.FC = () => {
 
   // Spawning arcade collectibles
   useEffect(() => {
-    if (!isArcadeMode) {
+    if (engineMode !== "arcade") {
       collectiblesRef.current.clear();
       redrawAll();
       return;
@@ -776,7 +799,317 @@ export const PixelEngine: React.FC = () => {
       clearTimeout(timer);
       clearInterval(interval);
     };
-  }, [isArcadeMode, pixelSize, redrawAll]);
+  }, [engineMode, pixelSize, redrawAll]);
+
+  // Conway's Game of Life Engine
+  const stepConwayLife = useCallback(() => {
+    const currentPixels = pixelsRef.current;
+    if (currentPixels.size === 0) return;
+
+    const neighborCounts = new Map<string, { count: number; dominantColor: string }>();
+
+    currentPixels.forEach((color, key) => {
+      const idx = key.indexOf("_");
+      const r = +key.slice(0, idx);
+      const c = +key.slice(idx + 1);
+
+      for (let dr = -1; dr <= 1; dr++) {
+        for (let dc = -1; dc <= 1; dc++) {
+          if (dr === 0 && dc === 0) continue;
+          const nKey = `${r + dr}_${c + dc}`;
+          const existing = neighborCounts.get(nKey);
+          if (existing) {
+            existing.count++;
+          } else {
+            neighborCounts.set(nKey, { count: 1, dominantColor: color });
+          }
+        }
+      }
+    });
+
+    const nextPixels = new Map<string, string>();
+    neighborCounts.forEach((info, key) => {
+      const isAlive = currentPixels.has(key);
+      if (isAlive) {
+        if (info.count === 2 || info.count === 3) {
+          nextPixels.set(key, currentPixels.get(key)!);
+        }
+      } else {
+        if (info.count === 3) {
+          nextPixels.set(key, info.dominantColor || currentColor);
+        }
+      }
+    });
+
+    pixelsRef.current = nextPixels;
+    setLifeGeneration((g) => g + 1);
+    redrawAll();
+    playPopSound(480 + (nextPixels.size % 8) * 40);
+  }, [currentColor, playPopSound, redrawAll]);
+
+  const seedConwayPreset = (preset: "glider" | "pulsar" | "random") => {
+    const canvas = artworkCanvasRef.current;
+    if (!canvas) return;
+    const cols = Math.ceil(canvas.width / pixelSize);
+    const rows = Math.ceil(canvas.height / pixelSize);
+    const midR = Math.floor(rows / 2);
+    const midC = Math.floor(cols / 2);
+
+    pixelsRef.current.clear();
+    setLifeGeneration(0);
+
+    if (preset === "glider") {
+      const gliderCoords = [
+        [0, 1],
+        [1, 2],
+        [2, 0],
+        [2, 1],
+        [2, 2],
+      ];
+      gliderCoords.forEach(([dr, dc]) => {
+        pixelsRef.current.set(`${midR + dr}_${midC + dc}`, currentColor);
+      });
+    } else if (preset === "pulsar") {
+      for (let i = -2; i <= 2; i++) {
+        pixelsRef.current.set(`${midR}_${midC + i}`, currentColor);
+        pixelsRef.current.set(`${midR + 3}_${midC + i}`, activeTheme.accent);
+        pixelsRef.current.set(`${midR - 3}_${midC + i}`, activeTheme.accent);
+      }
+    } else if (preset === "random") {
+      for (let i = 0; i < 90; i++) {
+        const r = Math.floor(midR - 8 + Math.random() * 16);
+        const c = Math.floor(midC - 12 + Math.random() * 24);
+        pixelsRef.current.set(`${r}_${c}`, currentColor);
+      }
+    }
+    recordPixelDrawn(pixelsRef.current.size);
+    redrawAll();
+    saveStep();
+    playPopSound(700);
+  };
+
+  useEffect(() => {
+    if (engineMode !== "life" || !isLifeRunning) return;
+    const interval = setInterval(() => {
+      stepConwayLife();
+    }, 160);
+    return () => clearInterval(interval);
+  }, [engineMode, isLifeRunning, stepConwayLife]);
+
+  // Retro Voxel Snake Game Engine
+  const renderSnakeToCanvas = useCallback(() => {
+    pixelsRef.current.clear();
+    const body = snakeBodyRef.current;
+    const food = snakeFoodRef.current;
+
+    // Render food in glowing neon
+    pixelsRef.current.set(`${food.row}_${food.col}`, "#FF2A85");
+
+    // Render snake
+    body.forEach((seg, idx) => {
+      if (idx === 0) {
+        pixelsRef.current.set(`${seg.row}_${seg.col}`, "#F59E0B"); // Head
+      } else {
+        pixelsRef.current.set(`${seg.row}_${seg.col}`, activeTheme.drawColor || "#00FFCC"); // Body
+      }
+    });
+
+    redrawAll();
+  }, [activeTheme.drawColor, redrawAll]);
+
+  const initSnakeGame = useCallback(() => {
+    const canvas = artworkCanvasRef.current;
+    if (!canvas) return;
+    const cols = Math.max(12, Math.ceil(canvas.width / pixelSize));
+    const rows = Math.max(12, Math.ceil(canvas.height / pixelSize));
+    const midR = Math.floor(rows / 2);
+    const midC = Math.floor(cols / 2);
+
+    snakeBodyRef.current = [
+      { col: midC, row: midR },
+      { col: midC - 1, row: midR },
+      { col: midC - 2, row: midR },
+    ];
+    snakeDirRef.current = { col: 1, row: 0 };
+    nextSnakeDirRef.current = { col: 1, row: 0 };
+    snakeFoodRef.current = {
+      col: Math.floor(2 + Math.random() * (cols - 4)),
+      row: Math.floor(2 + Math.random() * (rows - 4)),
+    };
+    setSnakeScore(0);
+    setIsSnakeGameOver(false);
+    setIsSnakeRunning(true);
+
+    renderSnakeToCanvas();
+    playPopSound(800);
+  }, [pixelSize, playPopSound, renderSnakeToCanvas]);
+
+  // Keyboard navigation for Snake
+  useEffect(() => {
+    if (engineMode !== "snake") return;
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      const key = e.key.toLowerCase();
+      const curr = snakeDirRef.current;
+      if ((key === "arrowup" || key === "w") && curr.row !== 1) {
+        nextSnakeDirRef.current = { col: 0, row: -1 };
+      } else if ((key === "arrowdown" || key === "s") && curr.row !== -1) {
+        nextSnakeDirRef.current = { col: 0, row: 1 };
+      } else if ((key === "arrowleft" || key === "a") && curr.col !== 1) {
+        nextSnakeDirRef.current = { col: -1, row: 0 };
+      } else if ((key === "arrowright" || key === "d") && curr.col !== -1) {
+        nextSnakeDirRef.current = { col: 1, row: 0 };
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [engineMode]);
+
+  // Snake Tick Loop
+  useEffect(() => {
+    if (engineMode !== "snake" || !isSnakeRunning || isSnakeGameOver) return;
+
+    const tickSnake = () => {
+      const canvas = artworkCanvasRef.current;
+      if (!canvas) return;
+      const cols = Math.max(12, Math.ceil(canvas.width / pixelSize));
+      const rows = Math.max(12, Math.ceil(canvas.height / pixelSize));
+
+      snakeDirRef.current = nextSnakeDirRef.current;
+      const dir = snakeDirRef.current;
+      const body = [...snakeBodyRef.current];
+      const head = body[0];
+      if (!head) return;
+
+      let newCol = head.col + dir.col;
+      let newRow = head.row + dir.row;
+      if (newCol < 0) newCol = cols - 1;
+      if (newCol >= cols) newCol = 0;
+      if (newRow < 0) newRow = rows - 1;
+      if (newRow >= rows) newRow = 0;
+
+      // Check self-collision
+      const selfHit = body.slice(1).some((seg) => seg.col === newCol && seg.row === newRow);
+      if (selfHit) {
+        setIsSnakeGameOver(true);
+        setIsSnakeRunning(false);
+        playPopSound(250);
+        return;
+      }
+
+      const newHead = { col: newCol, row: newRow };
+      body.unshift(newHead);
+
+      const food = snakeFoodRef.current;
+      if (newCol === food.col && newRow === food.row) {
+        setSnakeScore((prev) => {
+          const next = prev + 10;
+          setSnakeHighScore((hs) => Math.max(hs, next));
+          return next;
+        });
+        playPopSound(950);
+        recordPixelPopped(1);
+
+        snakeFoodRef.current = {
+          col: Math.floor(2 + Math.random() * (cols - 4)),
+          row: Math.floor(2 + Math.random() * (rows - 4)),
+        };
+      } else {
+        body.pop();
+      }
+
+      snakeBodyRef.current = body;
+      renderSnakeToCanvas();
+    };
+
+    const interval = setInterval(tickSnake, 120);
+    return () => clearInterval(interval);
+  }, [engineMode, isSnakeRunning, isSnakeGameOver, pixelSize, playPopSound, renderSnakeToCanvas]);
+
+  // Falling Sand Simulation Engine
+  const stepSandPhysics = useCallback(() => {
+    const currentPixels = pixelsRef.current;
+    if (currentPixels.size === 0) return;
+
+    const canvas = artworkCanvasRef.current;
+    if (!canvas) return;
+    const cols = Math.ceil(canvas.width / pixelSize);
+    const rows = Math.ceil(canvas.height / pixelSize);
+
+    const newMap = new Map<string, string>();
+    const entries: { r: number; c: number; color: string }[] = [];
+    currentPixels.forEach((color, key) => {
+      const idx = key.indexOf("_");
+      entries.push({ r: +key.slice(0, idx), c: +key.slice(idx + 1), color });
+    });
+
+    entries.sort((a, b) => b.r - a.r);
+
+    entries.forEach(({ r, c, color }) => {
+      const lower = color.toLowerCase();
+      const isSand = lower.includes("f59e") || lower.includes("fbbf") || color === "#f59e0b";
+      const isWater = lower.includes("06b6") || lower.includes("38bd") || color === "#06b6d4";
+      const isAcid = lower.includes("10b9") || lower.includes("4ade") || color === "#10b981";
+
+      if (isSand) {
+        if (r + 1 < rows && !newMap.has(`${r + 1}_${c}`) && !currentPixels.has(`${r + 1}_${c}`)) {
+          newMap.set(`${r + 1}_${c}`, color);
+        } else if (r + 1 < rows && c - 1 >= 0 && !newMap.has(`${r + 1}_${c - 1}`) && !currentPixels.has(`${r + 1}_${c - 1}`)) {
+          newMap.set(`${r + 1}_${c - 1}`, color);
+        } else if (r + 1 < rows && c + 1 < cols && !newMap.has(`${r + 1}_${c + 1}`) && !currentPixels.has(`${r + 1}_${c + 1}`)) {
+          newMap.set(`${r + 1}_${c + 1}`, color);
+        } else {
+          newMap.set(`${r}_${c}`, color);
+        }
+      } else if (isWater) {
+        if (r + 1 < rows && !newMap.has(`${r + 1}_${c}`) && !currentPixels.has(`${r + 1}_${c}`)) {
+          newMap.set(`${r + 1}_${c}`, color);
+        } else {
+          const dir = Math.random() > 0.5 ? 1 : -1;
+          if (c + dir >= 0 && c + dir < cols && !newMap.has(`${r}_${c + dir}`) && !currentPixels.has(`${r}_${c + dir}`)) {
+            newMap.set(`${r}_${c + dir}`, color);
+          } else {
+            newMap.set(`${r}_${c}`, color);
+          }
+        }
+      } else if (isAcid) {
+        let dissolved = false;
+        for (let dr = -1; dr <= 1; dr++) {
+          for (let dc = -1; dc <= 1; dc++) {
+            if (dr === 0 && dc === 0) continue;
+            const target = `${r + dr}_${c + dc}`;
+            if (currentPixels.has(target)) {
+              currentPixels.delete(target);
+              dissolved = true;
+              break;
+            }
+          }
+          if (dissolved) break;
+        }
+        if (!dissolved) {
+          if (r + 1 < rows && !newMap.has(`${r + 1}_${c}`) && !currentPixels.has(`${r + 1}_${c}`)) {
+            newMap.set(`${r + 1}_${c}`, color);
+          } else {
+            newMap.set(`${r}_${c}`, color);
+          }
+        }
+      } else {
+        newMap.set(`${r}_${c}`, color);
+      }
+    });
+
+    pixelsRef.current = newMap;
+    redrawAll();
+  }, [pixelSize, redrawAll]);
+
+  useEffect(() => {
+    if (engineMode !== "sand" || !isSandSimRunning) return;
+    const interval = setInterval(() => {
+      stepSandPhysics();
+    }, 60);
+    return () => clearInterval(interval);
+  }, [engineMode, isSandSimRunning, stepSandPhysics]);
 
   // Bresenham line algorithm for continuous uninterrupted drawing during fast mouse drags
   const getLinePoints = (x0: number, y0: number, x1: number, y1: number) => {
@@ -1376,6 +1709,262 @@ export const PixelEngine: React.FC = () => {
             {isStatsCollapsed ? <ChevronLeft className="w-3.5 h-3.5" /> : <ChevronRight className="w-3.5 h-3.5" />}
             <span className="hidden md:inline">{isStatsCollapsed ? "STATS" : "HIDE"}</span>
           </button>
+        </div>
+      </div>
+
+      {/* Mini-Games & Modes Selector Deck */}
+      <div
+        style={{
+          backgroundColor: `${activeTheme.cardBg}88`,
+          borderColor: activeTheme.headerBorder,
+        }}
+        className="h-8 border-b px-2 sm:px-3 flex items-center justify-between text-[11px] gap-2 overflow-x-auto flex-shrink-0 backdrop-blur-sm"
+      >
+        {/* Left: Mode Selection Tabs */}
+        <div className="flex items-center gap-1 flex-shrink-0">
+          <span className="text-[10px] font-bold opacity-60 mr-1 hidden sm:inline">MODE:</span>
+          <button
+            type="button"
+            onClick={() => {
+              setEngineMode("draw");
+              playPopSound(500);
+            }}
+            style={{
+              backgroundColor: engineMode === "draw" ? activeTheme.accent : "transparent",
+              color: engineMode === "draw" ? (activeTheme.isDark ? "#000" : "#fff") : activeTheme.textPrimary,
+              borderColor: engineMode === "draw" ? activeTheme.accent : "transparent",
+            }}
+            className="px-2 py-0.5 rounded border text-[10px] font-bold transition-all"
+          >
+            🎨 DRAW
+          </button>
+          <button
+            type="button"
+            onClick={() => {
+              setEngineMode("arcade");
+              playPopSound(600);
+            }}
+            style={{
+              backgroundColor: engineMode === "arcade" ? activeTheme.accent : "transparent",
+              color: engineMode === "arcade" ? (activeTheme.isDark ? "#000" : "#fff") : activeTheme.textPrimary,
+              borderColor: engineMode === "arcade" ? activeTheme.accent : "transparent",
+            }}
+            className="px-2 py-0.5 rounded border text-[10px] font-bold transition-all"
+          >
+            🎮 ARCADE
+          </button>
+          <button
+            type="button"
+            onClick={() => {
+              setEngineMode("life");
+              playPopSound(700);
+            }}
+            style={{
+              backgroundColor: engineMode === "life" ? activeTheme.accent : "transparent",
+              color: engineMode === "life" ? (activeTheme.isDark ? "#000" : "#fff") : activeTheme.textPrimary,
+              borderColor: engineMode === "life" ? activeTheme.accent : "transparent",
+            }}
+            className="px-2 py-0.5 rounded border text-[10px] font-bold transition-all"
+          >
+            🧬 GAME OF LIFE
+          </button>
+          <button
+            type="button"
+            onClick={() => {
+              setEngineMode("snake");
+              initSnakeGame();
+            }}
+            style={{
+              backgroundColor: engineMode === "snake" ? activeTheme.accent : "transparent",
+              color: engineMode === "snake" ? (activeTheme.isDark ? "#000" : "#fff") : activeTheme.textPrimary,
+              borderColor: engineMode === "snake" ? activeTheme.accent : "transparent",
+            }}
+            className="px-2 py-0.5 rounded border text-[10px] font-bold transition-all"
+          >
+            🐍 SNAKE
+          </button>
+          <button
+            type="button"
+            onClick={() => {
+              setEngineMode("sand");
+              playPopSound(550);
+            }}
+            style={{
+              backgroundColor: engineMode === "sand" ? activeTheme.accent : "transparent",
+              color: engineMode === "sand" ? (activeTheme.isDark ? "#000" : "#fff") : activeTheme.textPrimary,
+              borderColor: engineMode === "sand" ? activeTheme.accent : "transparent",
+            }}
+            className="px-2 py-0.5 rounded border text-[10px] font-bold transition-all"
+          >
+            ⏳ SAND SIM
+          </button>
+        </div>
+
+        {/* Right: Mode-Specific Interactive Controls */}
+        <div className="flex items-center gap-1.5 flex-shrink-0 text-[10px]">
+          {engineMode === "draw" && (
+            <span className="opacity-60 hidden md:inline">
+              Click & drag to paint • Continuous Bresenham interpolation active
+            </span>
+          )}
+
+          {engineMode === "arcade" && (
+            <div className="flex items-center gap-2 font-mono">
+              <span className="bg-amber-400 text-black px-1.5 py-0.5 rounded font-bold">
+                SCORE: {arcadeScore}
+              </span>
+              {comboCount > 1 && (
+                <span className="text-pink-400 font-bold animate-pulse">
+                  COMBO x{comboCount > 12 ? 5 : comboCount > 6 ? 3 : comboCount > 2 ? 2 : 1}!
+                </span>
+              )}
+              <span className="opacity-60 hidden sm:inline">
+                Pop gold/neon gems on canvas
+              </span>
+            </div>
+          )}
+
+          {engineMode === "life" && (
+            <div className="flex items-center gap-1.5">
+              <button
+                type="button"
+                onClick={() => {
+                  setIsLifeRunning(!isLifeRunning);
+                  playPopSound(isLifeRunning ? 400 : 700);
+                }}
+                className={`px-2 py-0.5 rounded border font-bold flex items-center gap-1 ${
+                  isLifeRunning ? "bg-emerald-500/20 text-emerald-400 border-emerald-500" : "bg-white/5 text-white/80 border-white/10"
+                }`}
+              >
+                {isLifeRunning ? <Pause className="w-3 h-3" /> : <Play className="w-3 h-3" />}
+                <span>{isLifeRunning ? "PAUSE" : "EVOLVE"}</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={stepConwayLife}
+                title="Advance 1 Generation"
+                className="px-1.5 py-0.5 rounded border border-white/10 bg-white/5 hover:bg-white/10 flex items-center gap-1"
+              >
+                <StepForward className="w-3 h-3" />
+                <span>STEP</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => seedConwayPreset("glider")}
+                className="px-1.5 py-0.5 rounded border border-white/10 bg-white/5 hover:bg-white/10"
+              >
+                Glider
+              </button>
+
+              <button
+                type="button"
+                onClick={() => seedConwayPreset("pulsar")}
+                className="px-1.5 py-0.5 rounded border border-white/10 bg-white/5 hover:bg-white/10"
+              >
+                Pulsar
+              </button>
+
+              <button
+                type="button"
+                onClick={() => seedConwayPreset("random")}
+                className="px-1.5 py-0.5 rounded border border-white/10 bg-white/5 hover:bg-white/10 hidden sm:inline"
+              >
+                Random
+              </button>
+
+              <span className="font-mono opacity-60 text-[9px]">Gen: {lifeGeneration}</span>
+            </div>
+          )}
+
+          {engineMode === "snake" && (
+            <div className="flex items-center gap-2">
+              <span className="font-mono text-amber-400 font-bold">
+                SCORE: {snakeScore}
+              </span>
+              <span className="font-mono opacity-60 hidden sm:inline">
+                HIGH: {snakeHighScore}
+              </span>
+              {isSnakeGameOver && (
+                <span className="text-red-400 font-bold animate-pulse">
+                  GAME OVER!
+                </span>
+              )}
+              <button
+                type="button"
+                onClick={initSnakeGame}
+                className="px-2 py-0.5 rounded border border-amber-400/40 bg-amber-400/10 text-amber-300 font-bold flex items-center gap-1"
+              >
+                <RotateCcw className="w-3 h-3" />
+                <span>RESTART</span>
+              </button>
+              <span className="opacity-50 text-[9px] hidden md:inline">
+                WASD / Arrow Keys
+              </span>
+            </div>
+          )}
+
+          {engineMode === "sand" && (
+            <div className="flex items-center gap-1.5">
+              <button
+                type="button"
+                onClick={() => {
+                  setSandElement("sand");
+                  setCurrentColor("#F59E0B");
+                }}
+                className={`px-1.5 py-0.5 rounded border text-[10px] font-bold ${
+                  sandElement === "sand" ? "bg-amber-400 text-black border-amber-400" : "bg-white/5 border-white/10 text-amber-300"
+                }`}
+              >
+                Sand
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setSandElement("water");
+                  setCurrentColor("#06B6D4");
+                }}
+                className={`px-1.5 py-0.5 rounded border text-[10px] font-bold ${
+                  sandElement === "water" ? "bg-cyan-400 text-black border-cyan-400" : "bg-white/5 border-white/10 text-cyan-300"
+                }`}
+              >
+                Water
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setSandElement("wood");
+                  setCurrentColor("#854D0E");
+                }}
+                className={`px-1.5 py-0.5 rounded border text-[10px] font-bold ${
+                  sandElement === "wood" ? "bg-amber-800 text-white border-amber-700" : "bg-white/5 border-white/10 text-amber-600"
+                }`}
+              >
+                Wood
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setSandElement("acid");
+                  setCurrentColor("#10B981");
+                }}
+                className={`px-1.5 py-0.5 rounded border text-[10px] font-bold ${
+                  sandElement === "acid" ? "bg-emerald-400 text-black border-emerald-400" : "bg-white/5 border-white/10 text-emerald-300"
+                }`}
+              >
+                Acid
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setIsSandSimRunning(!isSandSimRunning)}
+                className="px-1.5 py-0.5 rounded border border-white/10 bg-white/5 font-semibold"
+              >
+                {isSandSimRunning ? "PAUSE" : "RESUME"}
+              </button>
+            </div>
+          )}
         </div>
       </div>
 
