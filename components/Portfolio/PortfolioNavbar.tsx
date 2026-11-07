@@ -16,8 +16,7 @@ export function PortfolioNavbar({ onLaunchOS, onNavigateSection }: PortfolioNavb
   const { currentThemeId, setTheme, activeTheme } = useThemeStore();
 
   const navLinks = [
-    { label: "Scrollytelling Work", target: "work" },
-    { label: "Field Ethnography", target: "research" },
+    { label: "Works", target: "work" },
     { label: "Writing", target: "essays" },
     { label: "Trajectory", target: "resume" },
   ];

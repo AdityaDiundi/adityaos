@@ -3,8 +3,7 @@
 import React, { useRef } from "react";
 import { PortfolioNavbar } from "./PortfolioNavbar";
 import { PortfolioHero } from "./PortfolioHero";
-import { StoryScroller } from "./StoryScroller";
-import { FieldResearchSection } from "./FieldResearchSection";
+import { CinematicShowcase } from "./CinematicShowcase";
 import { EssaysSection } from "./EssaysSection";
 import { ResumeSection } from "./ResumeSection";
 import { PortfolioFooter } from "./PortfolioFooter";
@@ -48,10 +47,8 @@ export function PortfolioView({ onLaunchOS }: PortfolioViewProps) {
           onLaunchOS={onLaunchOS}
         />
 
-        {/* Award-Winning 6-Chapter Scrollytelling Stage */}
-        <StoryScroller />
-
-        <FieldResearchSection />
+        {/* Minimal Kinetic Scroll Showcase (Low Cognitive Load, High Impact) */}
+        <CinematicShowcase />
 
         <EssaysSection />
 
