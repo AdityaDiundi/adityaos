@@ -323,6 +323,66 @@ export const FEATURED_ESSAYS: EssayItem[] = [
     theme: "Philosophy of Mind",
   },
   {
+    id: "identity-in-youth-clubs-in-india",
+    title: "Identity In Youth Clubs In India",
+    category: "Essay",
+    source: "India Fellow",
+    readTime: "6 min read",
+    year: "2024",
+    excerpt:
+      "Examining collective identity formation, youth empowerment networks, and active citizenship across panchayats in rural Bihar.",
+    url: "https://indiafellow.org/blog/all-posts/identity-in-youth-clubs-in-india/",
+    theme: "Community Systems",
+  },
+  {
+    id: "motivation-in-rural-leadership-programs",
+    title: "Motivation In Rural Leadership Programs",
+    category: "Essay",
+    source: "India Fellow",
+    readTime: "5 min read",
+    year: "2024",
+    excerpt:
+      "Understanding intrinsic motivation drivers prompting rural youth to participate in unventilated 39°C community spaces.",
+    url: "https://indiafellow.org/blog/all-posts/motivation-in-rural-leadership-programs/",
+    theme: "Behavioral Drivers",
+  },
+  {
+    id: "questions-for-self-discovery",
+    title: "Questions For Self-Discovery From A Human Process Lab",
+    category: "Essay",
+    source: "India Fellow",
+    readTime: "6 min read",
+    year: "2024",
+    excerpt:
+      "Key introspective reflections from the ISABS Basic Human Process Lab at Sevagram, exploring interpersonal dynamics and self-awareness.",
+    url: "https://indiafellow.org/blog/all-posts/questions-for-self-discovery-from-a-human-process-lab/",
+    theme: "Introspection & ISABS",
+  },
+  {
+    id: "youth-masterpiece-collaboration-art",
+    title: "Youth Masterpiece: Fostering Collaboration Through Art",
+    category: "Essay",
+    source: "India Fellow",
+    readTime: "4 min read",
+    year: "2024",
+    excerpt:
+      "Designing experiential midline activities in the Youth Resource Manual to build teamwork, communication, and creative confidence.",
+    url: "https://indiafellow.org/blog/all-posts/youth-masterpiece-fostering-collaboration-through-art/",
+    theme: "Pedagogy & Design",
+  },
+  {
+    id: "balancing-act-rajasthan-water-crisis",
+    title: "Balancing Act: Navigating Choices In Rural Rajasthan's Water Crisis",
+    category: "Essay",
+    source: "India Fellow",
+    readTime: "8 min read",
+    year: "2023",
+    excerpt:
+      "First-person ethnography documenting groundwater depletion, fluoride contamination, and the resilience of rural families in Jaipur.",
+    url: "https://indiafellow.org/blog/all-posts/balancing-act-navigating-choices-in-rural-rajasthans-water-crisis/",
+    theme: "Environmental Ethnography",
+  },
+  {
     id: "the-fire-i-watered",
     title: "The Fire I Watered",
     category: "Poem",
@@ -346,4 +406,101 @@ export const FEATURED_ESSAYS: EssayItem[] = [
     url: "https://diundi.bearblog.dev/1925/",
     theme: "Memory & Heritage",
   },
+  {
+    id: "tasveerein-chhoti-honi-chahiye",
+    title: "तस्वीरें छोटी होनी चाहिए",
+    category: "Poem",
+    source: "diundi.bearblog.dev/3499/",
+    readTime: "2 min read",
+    year: "2024",
+    excerpt:
+      "यादों के बोझ, संकोचों और पुरानी तस्वीरों के आकार पर एक विचारशील काव्यात्मक दृष्टि।",
+    url: "https://diundi.bearblog.dev/3499/",
+    theme: "काव्य / Poetics",
+  },
+  {
+    id: "ganje-logon-ki-panchayat",
+    title: "गंजे लोगों की पंचायत",
+    category: "Poem",
+    source: "diundi.bearblog.dev/6075/",
+    readTime: "2 min read",
+    year: "2024",
+    excerpt:
+      "पारिवारिक बैठकों, उम्र के तकाजों और सामाजिक संकोचों पर व्यंग्यात्मक काव्य।",
+    url: "https://diundi.bearblog.dev/6075/",
+    theme: "व्यंग्य / Satire",
+  },
+  {
+    id: "nahi-bulana",
+    title: "नहीं बुलाना",
+    category: "Poem",
+    source: "diundi.bearblog.dev/1925/",
+    readTime: "2 min read",
+    year: "2024",
+    excerpt:
+      "दूरी, आत्मसम्मान और रिश्तों की मौन सीमाओं पर कविता।",
+    url: "https://diundi.bearblog.dev/1925/",
+    theme: "काव्य / Poetics",
+  },
 ];
+
+export interface YouTubeItem {
+  id: string;
+  title: string;
+  category: string;
+  url: string;
+  duration: string;
+}
+
+export const FEATURED_YOUTUBE_VIDEOS: YouTubeItem[] = [
+  {
+    id: "gnzulGkZYDQ",
+    title: "Don’t worry, I am here. Hard Hitting Boom Bot",
+    category: "Shorts",
+    url: "https://www.youtube.com/watch?v=gnzulGkZYDQ",
+    duration: "0:30",
+  },
+  {
+    id: "k3goWR93wbo",
+    title: "Playing against aim god chamber 🌪️🥴",
+    category: "Shorts",
+    url: "https://www.youtube.com/watch?v=k3goWR93wbo",
+    duration: "0:45",
+  },
+  {
+    id: "pVAsX76IOgw",
+    title: "1v4 Clutch 🕺☺️🌪️ #donk #cs2",
+    category: "Highlight",
+    url: "https://www.youtube.com/watch?v=pVAsX76IOgw",
+    duration: "0:52",
+  },
+  {
+    id: "3Xe_lpRTBDs",
+    title: "Trainspotting everybody #falsepeek #cs2",
+    category: "Match",
+    url: "https://www.youtube.com/watch?v=3Xe_lpRTBDs",
+    duration: "0:48",
+  },
+  {
+    id: "Ap8IwdhArQ4",
+    title: "Another savage 🕺 #mlbb",
+    category: "Shorts",
+    url: "https://www.youtube.com/watch?v=Ap8IwdhArQ4",
+    duration: "0:34",
+  },
+  {
+    id: "RFq3SF1kN18",
+    title: "Savage Highlight 🕺 #mobalegends",
+    category: "Highlight",
+    url: "https://www.youtube.com/watch?v=RFq3SF1kN18",
+    duration: "0:40",
+  },
+  {
+    id: "l6kADNHmNDc",
+    title: "Monica 👯‍♂️💃🕺 #cs2",
+    category: "Match",
+    url: "https://www.youtube.com/watch?v=l6kADNHmNDc",
+    duration: "0:35",
+  },
+];
+
