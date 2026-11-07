@@ -49,7 +49,7 @@ export function PortfolioSidebar({
   ];
 
   return (
-    <aside className="w-full lg:w-64 xl:w-72 flex-shrink-0 lg:sticky lg:top-0 lg:h-screen lg:max-h-screen border-b lg:border-b-0 lg:border-r border-zinc-800 p-5 sm:p-6 flex flex-col justify-between bg-zinc-950/95 z-30 overflow-y-auto">
+    <aside className="w-full lg:w-64 xl:w-72 flex-shrink-0 lg:sticky lg:top-0 lg:self-start lg:h-screen lg:max-h-screen border-b lg:border-b-0 lg:border-r border-zinc-800 p-5 sm:p-6 flex flex-col justify-between bg-zinc-950/95 z-30 overflow-y-auto">
       {/* Top Identity Block */}
       <div className="space-y-5">
         <div className="flex items-center gap-3">

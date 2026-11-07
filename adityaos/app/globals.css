@@ -18,11 +18,13 @@
   padding: 0;
 }
 
-html,
+html {
+  scroll-behavior: smooth;
+}
+
 body {
   min-height: 100vh;
   width: 100%;
-  overflow-x: hidden;
   background-color: #08090C;
   color: #abb2bf;
   font-family: var(--font-mono, "JetBrains Mono", monospace);

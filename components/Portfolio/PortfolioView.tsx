@@ -34,7 +34,7 @@ export function PortfolioView({ onLaunchOS }: PortfolioViewProps) {
   return (
     <div
       ref={containerRef}
-      className="min-h-screen w-full relative overflow-x-clip transition-colors duration-300"
+      className="min-h-screen w-full relative transition-colors duration-300"
       style={{
         backgroundColor: activeTheme.desktopBg,
         color: activeTheme.textPrimary,
