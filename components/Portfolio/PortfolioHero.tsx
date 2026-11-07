@@ -24,15 +24,15 @@ export function PortfolioHero({ onExploreWork, onLaunchOS }: PortfolioHeroProps)
   ];
 
   return (
-    <section className="relative pt-28 md:pt-36 overflow-hidden">
+    <section className="relative overflow-hidden">
       {/* Outer Continuous Grid Container */}
       <div className="max-w-7xl mx-auto border-x border-zinc-800 relative">
         {/* Corner Crosshairs */}
-        <span className="absolute -top-2 -left-2 font-mono text-xs text-zinc-600 select-none z-20">+</span>
-        <span className="absolute -top-2 -right-2 font-mono text-xs text-zinc-600 select-none z-20">+</span>
+        <span className="absolute -top-1.5 -left-1.5 font-mono text-xs text-zinc-600 select-none z-20">+</span>
+        <span className="absolute -top-1.5 -right-1.5 font-mono text-xs text-zinc-600 select-none z-20">+</span>
 
         {/* Hero Content Body */}
-        <div className="px-6 sm:px-10 lg:px-14 pt-8 pb-16 space-y-10">
+        <div className="px-6 sm:px-10 lg:px-14 pt-10 sm:pt-14 pb-12 sm:pb-16 space-y-9">
           {/* Metadata Track */}
           <div className="flex flex-wrap items-center gap-3 text-xs font-mono">
             <span
