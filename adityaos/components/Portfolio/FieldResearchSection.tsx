@@ -35,7 +35,7 @@ export function FieldResearchSection() {
   ];
 
   return (
-    <section id="research" className="py-20 relative border-t border-white/10 bg-[#07090c]">
+    <section id="research" className="py-20 relative border-t border-white/10 bg-transparent">
       <div className="max-w-6xl mx-auto px-4 sm:px-6">
         {/* Section Header */}
         <div className="space-y-2 mb-12">
@@ -83,7 +83,7 @@ export function FieldResearchSection() {
           </div>
 
           {/* Diagnostic Metrics Matrix */}
-          <div className="lg:col-span-5 p-6 rounded-2xl bg-[#0b0e14] border border-white/10 space-y-6">
+          <div className="lg:col-span-5 p-6 rounded-2xl bg-white/[0.03] border border-white/10 space-y-6">
             <div className="space-y-1">
               <span className="text-xs font-mono text-cyan-400 uppercase tracking-widest flex items-center gap-1.5">
                 <Activity className="w-3.5 h-3.5" />

@@ -13,7 +13,7 @@ export function PortfolioFooter({ onLaunchOS }: PortfolioFooterProps) {
   };
 
   return (
-    <footer className="py-12 border-t border-white/10 bg-[#050608] text-xs font-mono text-zinc-500">
+    <footer className="py-12 border-t border-white/10 bg-black/40 text-xs font-mono text-zinc-500">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 flex flex-col md:flex-row items-center justify-between gap-6">
         <div className="flex flex-col sm:flex-row items-center gap-4 text-center sm:text-left">
           <div className="text-zinc-300 font-sans font-medium text-sm">

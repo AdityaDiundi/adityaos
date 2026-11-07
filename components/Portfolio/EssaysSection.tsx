@@ -6,7 +6,7 @@ import { BookOpen, ExternalLink, Feather, Clock, ArrowUpRight } from "lucide-rea
 
 export function EssaysSection() {
   return (
-    <section id="essays" className="py-20 relative border-t border-white/10 bg-[#080a0f]">
+    <section id="essays" className="py-20 relative border-t border-white/10 bg-transparent">
       <div className="max-w-6xl mx-auto px-4 sm:px-6">
         {/* Section Header */}
         <div className="flex flex-col md:flex-row md:items-end justify-between mb-12 gap-4">
