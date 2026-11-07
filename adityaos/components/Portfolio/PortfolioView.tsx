@@ -28,7 +28,9 @@ export function PortfolioView({ onLaunchOS }: PortfolioViewProps) {
   return (
     <div
       ref={containerRef}
-      className="min-h-screen w-full relative overflow-x-hidden transition-colors duration-300"
+      className={`min-h-screen w-full relative overflow-x-hidden transition-colors duration-300 ${
+        activeTheme.isDark ? "blueprint-grid" : "blueprint-grid-light"
+      }`}
       style={{
         backgroundColor: activeTheme.desktopBg,
         color: activeTheme.textPrimary,

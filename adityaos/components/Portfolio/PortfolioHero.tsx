@@ -97,7 +97,13 @@ export function PortfolioHero({ onExploreWork, onLaunchOS }: PortfolioHeroProps)
 
           {/* Right Column: High-Fidelity Interactive System Visualization */}
           <div className="lg:col-span-5">
-            <div className="relative rounded-3xl overflow-hidden bg-[#0A0D14] border border-white/12 shadow-[0_20px_60px_rgba(0,0,0,0.7)] p-6 space-y-6">
+            <div className="relative rounded-3xl overflow-hidden bg-[#0A0D14]/90 backdrop-blur-xl border border-white/15 shadow-[0_20px_60px_rgba(0,0,0,0.7)] p-6 space-y-6">
+              {/* Drafting Corner Crosshairs */}
+              <span className="absolute -top-1.5 -left-1.5 font-mono text-[10px] text-zinc-600 select-none">+</span>
+              <span className="absolute -top-1.5 -right-1.5 font-mono text-[10px] text-zinc-600 select-none">+</span>
+              <span className="absolute -bottom-1.5 -left-1.5 font-mono text-[10px] text-zinc-600 select-none">+</span>
+              <span className="absolute -bottom-1.5 -right-1.5 font-mono text-[10px] text-zinc-600 select-none">+</span>
+
               {/* Telemetry Console Top Chrome */}
               <div className="flex items-center justify-between border-b border-white/10 pb-4">
                 <div className="flex items-center gap-2">

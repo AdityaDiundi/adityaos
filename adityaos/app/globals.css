@@ -54,6 +54,25 @@ body {
 }
 
 /* Custom Sleek Scrollbar */
+/* Architectural Blueprint Paper Canvas Grid */
+.blueprint-grid {
+  background-image:
+    linear-gradient(to right, rgba(255, 255, 255, 0.04) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255, 255, 255, 0.04) 1px, transparent 1px),
+    linear-gradient(to right, rgba(255, 255, 255, 0.09) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255, 255, 255, 0.09) 1px, transparent 1px);
+  background-size: 32px 32px, 32px 32px, 160px 160px, 160px 160px;
+}
+
+.blueprint-grid-light {
+  background-image:
+    linear-gradient(to right, rgba(0, 0, 0, 0.04) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(0, 0, 0, 0.04) 1px, transparent 1px),
+    linear-gradient(to right, rgba(0, 0, 0, 0.08) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(0, 0, 0, 0.08) 1px, transparent 1px);
+  background-size: 32px 32px, 32px 32px, 160px 160px, 160px 160px;
+}
+
 ::-webkit-scrollbar {
   width: 6px;
   height: 6px;

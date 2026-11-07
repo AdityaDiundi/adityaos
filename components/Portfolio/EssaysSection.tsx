@@ -9,8 +9,10 @@ export function EssaysSection() {
   const poems = FEATURED_ESSAYS.filter((item) => item.category === "Poem");
 
   return (
-    <section id="essays" className="py-24 relative border-t border-white/10 bg-[#07090E]">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6">
+    <section id="essays" className="py-24 relative border-t border-white/10 bg-[#07090E]/80 backdrop-blur-md">
+      {/* Background Architectural Grid Accent */}
+      <div className="absolute inset-0 blueprint-grid pointer-events-none opacity-40" />
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 relative z-10">
         {/* Editorial Section Header */}
         <div className="flex flex-col md:flex-row md:items-end justify-between mb-16 gap-6 border-b border-white/10 pb-8">
           <div className="space-y-3 max-w-2xl">
