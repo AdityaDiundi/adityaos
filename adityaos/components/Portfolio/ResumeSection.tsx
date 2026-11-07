@@ -65,8 +65,8 @@ export function ResumeSection() {
               <Briefcase className="w-3.5 h-3.5" />
               Verified Career Trajectory
             </div>
-            <h2 className="text-3xl sm:text-4xl md:text-5xl font-sans font-bold text-white tracking-tight">
-              Experience, education & <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-emerald-400">proven execution</span>.
+            <h2 className="text-3xl sm:text-4xl md:text-5xl font-sans font-semibold text-zinc-100 tracking-tight">
+              Experience, education & proven execution.
             </h2>
           </div>
 

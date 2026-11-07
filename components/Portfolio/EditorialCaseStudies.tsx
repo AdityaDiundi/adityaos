@@ -17,6 +17,7 @@ interface ProjectShowcase {
   solution: string;
   impact: { label: string; value: string }[];
   imageSrc: string;
+  secondaryImageSrc?: string;
   imageAlt: string;
   figmaUrl?: string;
   liveUrl?: string;
@@ -48,7 +49,9 @@ export function EditorialCaseStudies() {
         { label: "Domain Evaluators", value: "10 Experts" },
       ],
       imageSrc: "/case-studies/janeval_page-1.png",
+      secondaryImageSrc: "/case-studies/janeval_page-3.png",
       imageAlt: "Janeval AI Healthcare Evaluation Interface - Blind Pairwise Comparison",
+      liveUrl: "https://janeval.vercel.app/",
       repoUrl: "https://github.com/AdityaDiundi/drishti-health-eval",
       tags: ["AI Benchmarking", "Healthcare UX", "Next.js", "Design System"],
     },
@@ -149,33 +152,33 @@ export function EditorialCaseStudies() {
   ];
 
   return (
-    <section id="work" className="py-24 relative border-t border-white/10">
-      <div className="max-w-6xl mx-auto px-4 sm:px-6">
+    <section id="work" className="py-24 relative border-t border-white/10 bg-[#08090C]">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6">
         {/* Section Header with Tasteful Typography */}
-        <div className="mb-20 space-y-4 max-w-3xl">
-          <div className="inline-flex items-center gap-2 text-xs font-mono uppercase tracking-[0.25em] text-cyan-400">
-            <span className="w-2 h-2 rounded-full bg-cyan-400" />
+        <div className="mb-24 space-y-4 max-w-3xl">
+          <div className="inline-flex items-center gap-2 text-xs font-mono uppercase tracking-[0.25em] text-zinc-400">
+            <span className="w-1.5 h-1.5 rounded-full bg-zinc-400" />
             Selected Design Systems & Case Studies
           </div>
-          <h2 className="text-4xl sm:text-5xl md:text-6xl font-sans font-bold text-white tracking-tight leading-[1.08]">
+          <h2 className="text-4xl sm:text-5xl md:text-6xl font-sans font-semibold text-zinc-100 tracking-[-0.035em] leading-[1.08]">
             Real systems. Grounded constraints. <span className="text-zinc-500 font-normal">Authentic craft.</span>
           </h2>
-          <p className="text-base sm:text-lg text-zinc-400 font-sans leading-relaxed">
+          <p className="text-base sm:text-lg text-zinc-400 font-sans leading-relaxed max-w-[65ch]">
             Every project below is grounded in actual production constraints, authentic user research, and comprehensive Figma design systems. Click any screen to inspect full-resolution artboards.
           </p>
         </div>
 
         {/* Editorial Project Walkthrough */}
-        <div className="space-y-32">
+        <div className="space-y-36">
           {projects.map((project, idx) => (
             <article
               key={project.id}
-              className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-start"
+              className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-14 items-start border-t border-white/10 pt-16 first:border-t-0 first:pt-0"
             >
               {/* Left Column: Editorial Narrative & Strategy */}
               <div className="lg:col-span-5 space-y-6">
                 <div className="flex items-center gap-3 text-xs font-mono text-zinc-500">
-                  <span className="text-cyan-400 font-bold">{project.number}</span>
+                  <span className="text-zinc-300 font-semibold">{project.number}</span>
                   <span>/</span>
                   <span className="uppercase tracking-wider">{project.category}</span>
                   <span>/</span>
@@ -183,7 +186,7 @@ export function EditorialCaseStudies() {
                 </div>
 
                 <div className="space-y-2">
-                  <h3 className="text-3xl sm:text-4xl font-bold font-sans text-white tracking-tight">
+                  <h3 className="text-3xl sm:text-4xl font-semibold font-sans text-zinc-100 tracking-tight">
                     {project.title}
                   </h3>
                   <p className="text-base font-sans text-zinc-300 font-medium">
@@ -193,13 +196,13 @@ export function EditorialCaseStudies() {
 
                 {/* Role & Tags */}
                 <div className="flex flex-wrap items-center gap-2 text-xs font-mono">
-                  <span className="px-2.5 py-1 rounded-full bg-white/5 border border-white/10 text-zinc-300">
+                  <span className="px-3 py-1 rounded-full bg-white/[0.04] border border-white/10 text-zinc-300">
                     Role: {project.role}
                   </span>
                   {project.tags.map((tag) => (
                     <span
                       key={tag}
-                      className="px-2 py-0.5 rounded text-[11px] bg-white/[0.03] text-zinc-500 border border-white/5"
+                      className="px-2.5 py-1 rounded-full text-[11px] bg-white/[0.02] text-zinc-500 border border-white/5"
                     >
                       {tag}
                     </span>
@@ -212,20 +215,20 @@ export function EditorialCaseStudies() {
                 </p>
 
                 {/* Ground Friction */}
-                <div className="p-4 rounded-xl bg-white/[0.02] border border-white/10 space-y-2">
-                  <div className="text-xs font-mono uppercase tracking-wider text-rose-400 font-semibold flex items-center gap-1.5">
-                    <ShieldAlert className="w-3.5 h-3.5" />
-                    The Ground Friction
+                <div className="p-5 rounded-xl bg-white/[0.02] border border-white/10 space-y-2">
+                  <div className="text-xs font-mono uppercase tracking-wider text-rose-300 font-semibold flex items-center gap-2">
+                    <ShieldAlert className="w-3.5 h-3.5 text-rose-400" strokeWidth={1.5} />
+                    Ground Friction
                   </div>
                   <p className="text-xs sm:text-sm text-zinc-300 font-sans leading-relaxed">
                     {project.problem}
                   </p>
                 </div>
 
-                {/* The Solution */}
-                <div className="p-4 rounded-xl bg-cyan-950/20 border border-cyan-500/20 space-y-2">
-                  <div className="text-xs font-mono uppercase tracking-wider text-cyan-400 font-semibold flex items-center gap-1.5">
-                    <CheckCircle2 className="w-3.5 h-3.5" />
+                {/* Solution Architecture */}
+                <div className="p-5 rounded-xl bg-white/[0.03] border border-white/10 space-y-2">
+                  <div className="text-xs font-mono uppercase tracking-wider text-zinc-200 font-semibold flex items-center gap-2">
+                    <CheckCircle2 className="w-3.5 h-3.5 text-zinc-400" strokeWidth={1.5} />
                     Solution Architecture
                   </div>
                   <p className="text-xs sm:text-sm text-zinc-300 font-sans leading-relaxed">
@@ -233,11 +236,11 @@ export function EditorialCaseStudies() {
                   </p>
                 </div>
 
-                {/* Metrics */}
-                <div className="grid grid-cols-3 gap-3 pt-2">
+                {/* Impact Metrics (No boxed cards, clean division) */}
+                <div className="grid grid-cols-3 gap-4 pt-2 border-t border-white/10">
                   {project.impact.map((metric, i) => (
                     <div key={i} className="space-y-0.5">
-                      <div className="text-2xl font-bold font-mono text-white tracking-tight">
+                      <div className="text-2xl font-bold font-mono text-zinc-100 tracking-tight">
                         {metric.value}
                       </div>
                       <div className="text-[11px] text-zinc-500 font-sans leading-tight">
@@ -248,17 +251,29 @@ export function EditorialCaseStudies() {
                 </div>
 
                 {/* Direct Action Links */}
-                <div className="flex flex-wrap items-center gap-3 pt-3">
+                <div className="flex flex-wrap items-center gap-3 pt-3 font-mono text-xs">
+                  {project.liveUrl && (
+                    <a
+                      href={project.liveUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="px-4 py-2.5 rounded-full bg-zinc-100 hover:bg-white text-zinc-950 font-medium flex items-center gap-2 transition-colors shadow-sm"
+                    >
+                      <span>Live Benchmark</span>
+                      <ArrowUpRight className="w-3.5 h-3.5" strokeWidth={1.5} />
+                    </a>
+                  )}
+
                   {project.figmaUrl && (
                     <a
                       href={project.figmaUrl}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="px-4 py-2 rounded-full bg-purple-600 hover:bg-purple-500 text-white font-mono text-xs flex items-center gap-2 transition-all shadow-[0_0_20px_rgba(168,85,247,0.3)]"
+                      className="px-4 py-2.5 rounded-full bg-white/[0.04] hover:bg-white/[0.08] border border-white/10 text-zinc-200 flex items-center gap-2 transition-colors"
                     >
-                      <Sparkles className="w-3.5 h-3.5" />
+                      <Sparkles className="w-3.5 h-3.5 text-zinc-400" strokeWidth={1.5} />
                       <span>Inspect Figma File</span>
-                      <ExternalLink className="w-3 h-3 opacity-70" />
+                      <ExternalLink className="w-3 h-3 opacity-60" strokeWidth={1.5} />
                     </a>
                   )}
 
@@ -267,16 +282,16 @@ export function EditorialCaseStudies() {
                       href={project.repoUrl}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="px-4 py-2 rounded-full bg-white/5 hover:bg-white/10 border border-white/10 text-zinc-200 font-mono text-xs flex items-center gap-2 transition-all"
+                      className="px-4 py-2.5 rounded-full bg-white/[0.02] hover:bg-white/[0.06] border border-white/10 text-zinc-400 hover:text-zinc-200 flex items-center gap-2 transition-colors"
                     >
-                      <span>GitHub Repo</span>
-                      <ArrowUpRight className="w-3.5 h-3.5" />
+                      <span>GitHub Repository</span>
+                      <ArrowUpRight className="w-3.5 h-3.5" strokeWidth={1.5} />
                     </a>
                   )}
                 </div>
               </div>
 
-              {/* Right Column: Real Design Screenshot in Sleek Browser Frame */}
+              {/* Right Column: Real Design Screenshot in Clean Browser Frame */}
               <div className="lg:col-span-7 space-y-3">
                 <div
                   onClick={() =>
@@ -286,20 +301,20 @@ export function EditorialCaseStudies() {
                       title: `${project.title} — ${project.subtitle}`,
                     })
                   }
-                  className="group relative rounded-2xl overflow-hidden bg-[#0c0e14] border border-white/15 hover:border-cyan-400/50 transition-all duration-500 shadow-[0_20px_50px_rgba(0,0,0,0.8)] cursor-pointer"
+                  className="group relative rounded-2xl overflow-hidden bg-[#0a0c10] border border-white/10 hover:border-white/30 transition-all duration-300 shadow-[0_12px_40px_rgba(0,0,0,0.6)] cursor-pointer"
                 >
                   {/* Browser Chrome Header */}
-                  <div className="px-4 py-2.5 bg-black/60 border-b border-white/10 flex items-center justify-between">
+                  <div className="px-4 py-3 bg-black/60 border-b border-white/10 flex items-center justify-between">
                     <div className="flex items-center gap-1.5">
-                      <span className="w-2.5 h-2.5 rounded-full bg-rose-500/80" />
-                      <span className="w-2.5 h-2.5 rounded-full bg-amber-500/80" />
-                      <span className="w-2.5 h-2.5 rounded-full bg-emerald-500/80" />
+                      <span className="w-2.5 h-2.5 rounded-full bg-zinc-700" />
+                      <span className="w-2.5 h-2.5 rounded-full bg-zinc-700" />
+                      <span className="w-2.5 h-2.5 rounded-full bg-zinc-700" />
                     </div>
                     <span className="text-[11px] font-mono text-zinc-500 truncate max-w-xs">
-                      figma.com/@adityadiundi/{project.id}
+                      {project.figmaUrl ? "figma.com/design/@adityadiundi" : "janeval.vercel.app"}
                     </span>
-                    <span className="text-zinc-500 group-hover:text-cyan-400 transition-colors flex items-center gap-1 text-[11px] font-mono">
-                      <Maximize2 className="w-3 h-3" />
+                    <span className="text-zinc-500 group-hover:text-zinc-200 transition-colors flex items-center gap-1 text-[11px] font-mono">
+                      <Maximize2 className="w-3 h-3" strokeWidth={1.5} />
                       <span className="hidden sm:inline">Expand</span>
                     </span>
                   </div>
@@ -310,21 +325,40 @@ export function EditorialCaseStudies() {
                       src={project.imageSrc}
                       alt={project.imageAlt}
                       fill
-                      className="object-cover object-top group-hover:scale-[1.02] transition-transform duration-700"
+                      className="object-cover object-top group-hover:scale-[1.01] transition-transform duration-500"
                       priority={idx < 2}
                     />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-4">
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-4">
                       <span className="px-3 py-1.5 rounded-full bg-black/80 backdrop-blur-md text-white font-mono text-xs flex items-center gap-2 border border-white/20">
-                        <Eye className="w-3.5 h-3.5 text-cyan-400" />
+                        <Eye className="w-3.5 h-3.5" strokeWidth={1.5} />
                         Click to view full-resolution artboard
                       </span>
                     </div>
                   </div>
                 </div>
 
-                <div className="flex items-center justify-between text-xs font-mono text-zinc-500 px-1">
+                {/* Secondary Image Preview if available */}
+                {project.secondaryImageSrc && (
+                  <div
+                    onClick={() =>
+                      setSelectedImage({
+                        src: project.secondaryImageSrc!,
+                        alt: `${project.title} - Secondary Screen`,
+                        title: `${project.title} — Evaluator Consent Flow`,
+                      })
+                    }
+                    className="p-3 rounded-xl bg-white/[0.02] border border-white/10 hover:border-white/20 flex items-center justify-between text-xs font-mono text-zinc-400 cursor-pointer transition-colors"
+                  >
+                    <span>View Screen 2: Frontline Evaluator Consent & Onboarding</span>
+                    <span className="text-zinc-200 flex items-center gap-1 font-semibold">
+                      Open Preview <ArrowUpRight className="w-3.5 h-3.5" strokeWidth={1.5} />
+                    </span>
+                  </div>
+                )}
+
+                <div className="flex items-center justify-between text-xs font-mono text-zinc-500 px-1 pt-1">
                   <span>{project.imageAlt}</span>
-                  <span className="text-cyan-400">Authentic Figma Render</span>
+                  <span className="text-zinc-400">Authentic Figma Artboard</span>
                 </div>
               </div>
             </article>
@@ -336,23 +370,23 @@ export function EditorialCaseStudies() {
       {selectedImage && (
         <div
           onClick={() => setSelectedImage(null)}
-          className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-8 bg-black/90 backdrop-blur-2xl animate-in fade-in duration-200 cursor-zoom-out"
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-8 bg-black/95 backdrop-blur-2xl animate-in fade-in duration-200 cursor-zoom-out"
         >
           <div
             onClick={(e) => e.stopPropagation()}
-            className="relative w-full max-w-6xl max-h-[92vh] flex flex-col rounded-2xl bg-[#0c0e14] border border-white/20 overflow-hidden shadow-2xl"
+            className="relative w-full max-w-6xl max-h-[92vh] flex flex-col rounded-2xl bg-[#0c0e14] border border-white/15 overflow-hidden shadow-2xl"
           >
             {/* Modal Top Bar */}
-            <div className="px-6 py-3 border-b border-white/10 flex items-center justify-between bg-black/60">
+            <div className="px-6 py-3.5 border-b border-white/10 flex items-center justify-between bg-black/80">
               <span className="font-mono text-xs text-zinc-300 font-semibold truncate">
                 {selectedImage.title}
               </span>
               <button
                 onClick={() => setSelectedImage(null)}
-                className="p-1.5 rounded-full hover:bg-white/10 text-zinc-400 hover:text-white transition-colors"
+                className="p-1.5 rounded-full hover:bg-white/10 text-zinc-400 hover:text-white transition-colors cursor-pointer"
                 aria-label="Close image viewer"
               >
-                <X className="w-5 h-5" />
+                <X className="w-5 h-5" strokeWidth={1.5} />
               </button>
             </div>
 

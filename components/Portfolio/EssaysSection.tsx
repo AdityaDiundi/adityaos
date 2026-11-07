@@ -15,8 +15,8 @@ export function EssaysSection() {
               <Feather className="w-3.5 h-3.5" />
               Essays, Epistemic Inquiries & Poetics
             </div>
-            <h2 className="text-3xl sm:text-4xl md:text-5xl font-sans font-bold text-white tracking-tight">
-              Writing to <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 via-pink-300 to-white">untangle mental models</span>.
+            <h2 className="text-3xl sm:text-4xl md:text-5xl font-sans font-semibold text-zinc-100 tracking-tight">
+              Writing to untangle mental models.
             </h2>
           </div>
           <p className="text-xs sm:text-sm font-mono text-zinc-400 max-w-sm">

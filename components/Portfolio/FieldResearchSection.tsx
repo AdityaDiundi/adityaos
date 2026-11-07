@@ -43,8 +43,8 @@ export function FieldResearchSection() {
             <Compass className="w-3.5 h-3.5" />
             Grassroots Fieldwork & Participatory Research
           </div>
-          <h2 className="text-3xl sm:text-4xl md:text-5xl font-sans font-bold text-white tracking-tight">
-            Human empathy forged in the <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-cyan-400">field, not the lab</span>.
+          <h2 className="text-3xl sm:text-4xl md:text-5xl font-sans font-semibold text-zinc-100 tracking-tight">
+            Human empathy forged in the field, not the lab.
           </h2>
           <p className="text-sm sm:text-base text-zinc-400 font-sans max-w-2xl leading-relaxed">
             A full year of immersive grassroots work as an India Fellow in rural Uttarakhand, researching human-scale systems, rural education diagnostics, and community mental models.
