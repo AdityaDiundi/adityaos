@@ -14,6 +14,7 @@ import { LearnabilityLab } from "@/components/Modules/LearnabilityLab";
 import { WallpaperManager } from "@/components/Modules/WallpaperManager";
 import { DesktopStickyNote } from "@/components/Modules/DesktopStickyNote";
 import { HyprlandBootScreen } from "@/components/System/HyprlandBootScreen";
+import { PortfolioView } from "@/components/Portfolio/PortfolioView";
 import { useOSStore } from "@/store/osStore";
 import { useThemeStore, OS_THEMES, OSThemeId } from "@/store/themeStore";
 import { useSoundStore } from "@/store/soundStore";
@@ -71,6 +72,16 @@ export default function Home() {
   const [cpuUsage, setCpuUsage] = useState<number>(14);
   const [memUsage, setMemUsage] = useState<number>(38);
   const [isThemeMenuOpen, setIsThemeMenuOpen] = useState<boolean>(false);
+  const [viewMode, setViewMode] = useState<"portfolio" | "os">("portfolio");
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const params = new URLSearchParams(window.location.search);
+      if (params.get("mode") === "os") {
+        setViewMode("os");
+      }
+    }
+  }, []);
 
   useEffect(() => {
     const updateClock = () => {
@@ -169,6 +180,10 @@ export default function Home() {
     playClickChime(500);
   };
 
+  if (viewMode === "portfolio") {
+    return <PortfolioView onLaunchOS={() => setViewMode("os")} />;
+  }
+
   return (
     <main
       ref={desktopContainerRef}
@@ -224,6 +239,20 @@ export default function Home() {
             <span style={{ color: activeTheme.textMuted }} className="text-[10px] font-normal hidden sm:inline">
               v2.4
             </span>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => setViewMode("portfolio")}
+            className="px-2 py-0.5 rounded border font-semibold flex items-center gap-1 hover:opacity-100 transition-all cursor-pointer text-[10px]"
+            style={{
+              backgroundColor: "rgba(0, 240, 255, 0.15)",
+              borderColor: "#00F0FF",
+              color: "#00F0FF",
+            }}
+            title="Exit back to Product Designer Portfolio"
+          >
+            <span>← Portfolio</span>
           </button>
 
           <div
