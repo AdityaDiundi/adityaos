@@ -2,13 +2,15 @@
 
 import React, { useState } from "react";
 import Image from "next/image";
-import { ArrowUpRight, ExternalLink, Sparkles, Layers, ShieldAlert, CheckCircle2, Eye, Maximize2, X } from "lucide-react";
+import { ArrowUpRight, ExternalLink, Sparkles, Layers, ShieldAlert, CheckCircle2, Eye, Maximize2, X, Building2 } from "lucide-react";
 
 interface ProjectShowcase {
   id: string;
   number: string;
   title: string;
   subtitle: string;
+  client: string;
+  clientType: string;
   category: string;
   year: string;
   role: string;
@@ -34,6 +36,8 @@ export function EditorialCaseStudies() {
       number: "01",
       title: "JANEVAL",
       subtitle: "Human-Centered AI Benchmarking for Indian Public Health",
+      client: "Josh Talks",
+      clientType: "Independent AI Healthcare Research",
       category: "AI Systems & Healthcare UX",
       year: "2024",
       role: "Lead Product Designer & Systems Architect",
@@ -60,6 +64,8 @@ export function EditorialCaseStudies() {
       number: "02",
       title: "UPI Limit Clarity",
       subtitle: "Re-engineering Transaction Anxiety & Daily Payment Limits in India",
+      client: "Digiaccel",
+      clientType: "Fintech Product Assignment",
       category: "Fintech & Consumer Payments",
       year: "2024",
       role: "Product Designer (Fintech UX & Error Prevention)",
@@ -80,10 +86,38 @@ export function EditorialCaseStudies() {
       tags: ["Fintech UX", "Error Recovery", "Figma Design System", "Behavioral Nudges"],
     },
     {
-      id: "corporate-claims",
+      id: "hair-tracker",
       number: "03",
+      title: "21-Day Habit & Hair Tracker",
+      subtitle: "Behavioral Retention Engine for Delayed-Outcome Health Regimens",
+      client: "Traya Health / Mosaic Wellness",
+      clientType: "D2C HealthTech Product UX",
+      category: "D2C HealthTech & Behavioral UX",
+      year: "2024",
+      role: "Product Designer (Behavioral UX & Nudges)",
+      summary:
+        "D2C holistic health regimens (such as hair loss and gut health) suffer from an acute churn cliff between Day 7 and Day 21. Biological improvements take 60–90 days to physically manifest, leaving users feeling unrewarded during initial routine adoption. Designed the 21-Day Habit Tracker with tactile micro-commitments, visual milestone unlocks, and frictionless expert bridge.",
+      problem:
+        "Delayed gratification crisis: Users abandon multi-step morning/evening serum and vitamin routines before any visible biological progress occurs. Existing wellness trackers overwhelmed users with tedious calorie logs and rigid timers, turning daily healthcare into an intimidating chore.",
+      solution:
+        "Designed a tactile 1-tap routine deck that breaks health habits into microscopic daily wins with positive reinforcement facts. Integrated milestone check-ins at Day 7, 14, and 21, coupled with a 1-tap WhatsApp consultation bridge to instantly connect with hair coaches when anxiety strikes.",
+      impact: [
+        { label: "Day 14 Retention", value: "+44%" },
+        { label: "Daily Log Rate", value: "81%" },
+        { label: "Coach Connect Speed", value: "< 4 min" },
+      ],
+      imageSrc: "/case-studies/hair_tracker.png",
+      imageAlt: "21-Day Habit & Hair Tracker - Figma Design Flow & Routine Interface",
+      figmaUrl: "https://www.figma.com/design/jYWIU8kR4JiRbQU6UcctXm/21-Day-Hair-Tracker?node-id=0-1",
+      tags: ["Behavioral UX", "D2C HealthTech", "Retention Loops", "Figma Design System"],
+    },
+    {
+      id: "corporate-claims",
+      number: "04",
       title: "Corporate Claims & Arbiter (S3)",
       subtitle: "Streamlining Enterprise Health Benefits & Cashless Hospitalization",
+      client: "MedPay / S3",
+      clientType: "Enterprise InsurTech SaaS",
       category: "Enterprise B2B SaaS",
       year: "2023",
       role: "Product Designer & Design Systems Lead",
@@ -105,9 +139,11 @@ export function EditorialCaseStudies() {
     },
     {
       id: "ketto-plus",
-      number: "04",
+      number: "05",
       title: "Ketto+ Recurring Giving",
       subtitle: "Designing Monthly Philanthropic Subscriptions with Ambient Nudges",
+      client: "Ketto",
+      clientType: "Social Impact Crowdfunding",
       category: "Social Impact & Crowdfunding",
       year: "2023",
       role: "Product & Interaction Designer",
@@ -128,9 +164,11 @@ export function EditorialCaseStudies() {
     },
     {
       id: "tutedude",
-      number: "05",
+      number: "06",
       title: "Tutedude Mentorship",
       subtitle: "Structured Upskilling & Real-time Mentor Touchpoints for Tech Students",
+      client: "Tutedude",
+      clientType: "EdTech Mentorship Platform",
       category: "EdTech & Learning UX",
       year: "2023",
       role: "Product Designer",
@@ -158,13 +196,13 @@ export function EditorialCaseStudies() {
         <div className="mb-24 space-y-4 max-w-3xl">
           <div className="inline-flex items-center gap-2 text-xs font-mono uppercase tracking-[0.25em] text-zinc-400">
             <span className="w-1.5 h-1.5 rounded-full bg-zinc-400" />
-            Selected Design Systems & Case Studies
+            Selected Production Work & Case Studies
           </div>
           <h2 className="text-4xl sm:text-5xl md:text-6xl font-sans font-semibold text-zinc-100 tracking-[-0.035em] leading-[1.08]">
             Real systems. Grounded constraints. <span className="text-zinc-500 font-normal">Authentic craft.</span>
           </h2>
           <p className="text-base sm:text-lg text-zinc-400 font-sans leading-relaxed max-w-[65ch]">
-            Every project below is grounded in actual production constraints, authentic user research, and comprehensive Figma design systems. Click any screen to inspect full-resolution artboards.
+            Every project below is grounded in actual production constraints, authentic client engagements, and comprehensive Figma design systems. Click any screen to inspect full-resolution artboards.
           </p>
         </div>
 
@@ -177,12 +215,26 @@ export function EditorialCaseStudies() {
             >
               {/* Left Column: Editorial Narrative & Strategy */}
               <div className="lg:col-span-5 space-y-6">
-                <div className="flex items-center gap-3 text-xs font-mono text-zinc-500">
-                  <span className="text-zinc-300 font-semibold">{project.number}</span>
-                  <span>/</span>
-                  <span className="uppercase tracking-wider">{project.category}</span>
-                  <span>/</span>
-                  <span>{project.year}</span>
+                {/* Metadata & Company Credibility Badge */}
+                <div className="space-y-3">
+                  <div className="flex items-center gap-3 text-xs font-mono text-zinc-500">
+                    <span className="text-zinc-300 font-semibold">{project.number}</span>
+                    <span>/</span>
+                    <span className="uppercase tracking-wider">{project.category}</span>
+                    <span>/</span>
+                    <span>{project.year}</span>
+                  </div>
+
+                  {/* High-Credibility Company / Client Pill */}
+                  <div className="flex flex-wrap items-center gap-2 pt-0.5">
+                    <div className="inline-flex items-center gap-2 px-3 py-1 rounded-md bg-white/[0.05] border border-white/12 text-xs font-mono text-zinc-200">
+                      <span className="text-zinc-500 font-normal text-[11px]">CLIENT:</span>
+                      <span className="font-semibold text-white tracking-wide">{project.client}</span>
+                    </div>
+                    <div className="inline-flex items-center px-2.5 py-1 rounded-md bg-white/[0.02] border border-white/5 text-[11px] font-mono text-zinc-400">
+                      {project.clientType}
+                    </div>
+                  </div>
                 </div>
 
                 <div className="space-y-2">
@@ -298,7 +350,7 @@ export function EditorialCaseStudies() {
                     setSelectedImage({
                       src: project.imageSrc,
                       alt: project.imageAlt,
-                      title: `${project.title} — ${project.subtitle}`,
+                      title: `${project.title} — ${project.subtitle} (${project.client})`,
                     })
                   }
                   className="group relative rounded-2xl overflow-hidden bg-[#0a0c10] border border-white/10 hover:border-white/30 transition-all duration-300 shadow-[0_12px_40px_rgba(0,0,0,0.6)] cursor-pointer"
@@ -344,7 +396,7 @@ export function EditorialCaseStudies() {
                       setSelectedImage({
                         src: project.secondaryImageSrc!,
                         alt: `${project.title} - Secondary Screen`,
-                        title: `${project.title} — Evaluator Consent Flow`,
+                        title: `${project.title} — Evaluator Consent Flow (${project.client})`,
                       })
                     }
                     className="p-3 rounded-xl bg-white/[0.02] border border-white/10 hover:border-white/20 flex items-center justify-between text-xs font-mono text-zinc-400 cursor-pointer transition-colors"
