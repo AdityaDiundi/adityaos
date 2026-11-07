@@ -3,7 +3,7 @@
 import React, { useRef } from "react";
 import { PortfolioNavbar } from "./PortfolioNavbar";
 import { PortfolioHero } from "./PortfolioHero";
-import { CinematicShowcase } from "./CinematicShowcase";
+import { BreakTheGridShowcase } from "./BreakTheGridShowcase";
 import { EssaysSection } from "./EssaysSection";
 import { ResumeSection } from "./ResumeSection";
 import { PortfolioFooter } from "./PortfolioFooter";
@@ -47,8 +47,8 @@ export function PortfolioView({ onLaunchOS }: PortfolioViewProps) {
           onLaunchOS={onLaunchOS}
         />
 
-        {/* Minimal Kinetic Scroll Showcase (Low Cognitive Load, High Impact) */}
-        <CinematicShowcase />
+        {/* Break The Grid Showcase: 2 Flagships + Asymmetric Bento Grid */}
+        <BreakTheGridShowcase />
 
         <EssaysSection />
 
