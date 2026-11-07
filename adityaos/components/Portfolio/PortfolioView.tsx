@@ -3,7 +3,7 @@
 import React, { useRef } from "react";
 import { PortfolioNavbar } from "./PortfolioNavbar";
 import { PortfolioHero } from "./PortfolioHero";
-import { BentoCaseStudies } from "./BentoCaseStudies";
+import { EditorialCaseStudies } from "./EditorialCaseStudies";
 import { FieldResearchSection } from "./FieldResearchSection";
 import { EssaysSection } from "./EssaysSection";
 import { ResumeSection } from "./ResumeSection";
@@ -42,7 +42,7 @@ export function PortfolioView({ onLaunchOS }: PortfolioViewProps) {
           onLaunchOS={onLaunchOS}
         />
 
-        <BentoCaseStudies />
+        <EditorialCaseStudies />
 
         <FieldResearchSection />
 
