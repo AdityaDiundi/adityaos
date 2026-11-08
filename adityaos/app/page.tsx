@@ -93,7 +93,10 @@ export default function Home() {
       const params = new URLSearchParams(window.location.search);
       const pathname = window.location.pathname;
       const appParam = params.get("app");
+      const hostname = window.location.hostname;
+      const isPixelDomain = hostname.includes("pixel-engine") || hostname.includes("pixel-studio");
       const isPixelLink =
+        isPixelDomain ||
         pathname === "/pixel" ||
         pathname === "/studio" ||
         pathname === "/pixelengine" ||

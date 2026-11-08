@@ -35,6 +35,9 @@ import {
   Bot,
   Upload,
   FileCode,
+  Video,
+  VideoOff,
+  Zap,
 } from "lucide-react";
 import { useThemeStore } from "@/store/themeStore";
 import { useSoundStore } from "@/store/soundStore";
@@ -167,6 +170,28 @@ export const PixelEngine: React.FC = () => {
   // Conway's Game of Life State
   const [isLifeRunning, setIsLifeRunning] = useState<boolean>(false);
   const [lifeGeneration, setLifeGeneration] = useState<number>(0);
+  const [lifeSpeed, setLifeSpeed] = useState<number>(140);
+
+  // Rainbow / Chroma Brush State
+  const [isRainbowBrush, setIsRainbowBrush] = useState<boolean>(false);
+  const rainbowHueRef = useRef<number>(0);
+
+  // Automated Interactive Showcase Demo & Virtual Cursor
+  const [isShowcasePlaying, setIsShowcasePlaying] = useState<boolean>(false);
+  const [virtualCursor, setVirtualCursor] = useState<{
+    x: number;
+    y: number;
+    visible: boolean;
+    label?: string;
+    clicking?: boolean;
+  } | null>(null);
+  const showcaseAbortRef = useRef<boolean>(false);
+  const showcaseTimeoutRefs = useRef<NodeJS.Timeout[]>([]);
+
+  // Video Recording State (MediaRecorder)
+  const [isRecording, setIsRecording] = useState<boolean>(false);
+  const mediaRecorderRef = useRef<MediaRecorder | null>(null);
+  const recordedChunksRef = useRef<Blob[]>([]);
 
   // Retro Voxel Snake State
   const [snakeScore, setSnakeScore] = useState<number>(0);
@@ -272,6 +297,15 @@ export const PixelEngine: React.FC = () => {
       // Audio fail
     }
   }, [isAudioMuted, initAudio]);
+
+  // Dynamic Draw Color (Standard vs Rainbow Chroma Brush)
+  const getActiveDrawColor = useCallback(() => {
+    if (isRainbowBrush) {
+      rainbowHueRef.current = (rainbowHueRef.current + 14) % 360;
+      return `hsl(${rainbowHueRef.current}, 100%, 55%)`;
+    }
+    return currentColor;
+  }, [isRainbowBrush, currentColor]);
 
   // Unified Isometric Metrics covering 100% of canvas space
   const getIsoMetrics = useCallback(
@@ -905,9 +939,9 @@ export const PixelEngine: React.FC = () => {
     if (engineMode !== "life" || !isLifeRunning) return;
     const interval = setInterval(() => {
       stepConwayLife();
-    }, 160);
+    }, lifeSpeed);
     return () => clearInterval(interval);
-  }, [engineMode, isLifeRunning, stepConwayLife]);
+  }, [engineMode, isLifeRunning, stepConwayLife, lifeSpeed]);
 
   // Retro Voxel Snake Game Engine
   const renderSnakeToCanvas = useCallback(() => {
@@ -1196,6 +1230,10 @@ export const PixelEngine: React.FC = () => {
 
   // Pointer Event Handlers
   const handlePointerDown = (e: React.PointerEvent<HTMLCanvasElement>) => {
+    if (isShowcasePlaying) {
+      stopShowcase();
+    }
+
     try {
       e.currentTarget.setPointerCapture(e.pointerId);
     } catch {}
@@ -1249,12 +1287,13 @@ export const PixelEngine: React.FC = () => {
       }
       playPopSound(340);
     } else {
-      pixelsRef.current.set(key, currentColor);
+      const drawCol = getActiveDrawColor();
+      pixelsRef.current.set(key, drawCol);
       recordPixelDrawn(1);
       if (isSymmetry) {
         const centerCol = Math.floor(cols / 2);
         const symCol = 2 * centerCol - col;
-        pixelsRef.current.set(`${row}_${symCol}`, currentColor);
+        pixelsRef.current.set(`${row}_${symCol}`, drawCol);
         recordPixelDrawn(1);
       }
       playPopSound(520 + (col % 8) * 40);
@@ -1327,12 +1366,13 @@ export const PixelEngine: React.FC = () => {
           }
         }
       } else if (activeTool === "pencil") {
-        pixelsRef.current.set(key, currentColor);
+        const drawCol = getActiveDrawColor();
+        pixelsRef.current.set(key, drawCol);
         recordPixelDrawn(1);
         if (isSymmetry) {
           const centerCol = Math.floor(cols / 2);
           const symCol = 2 * centerCol - pt.col;
-          pixelsRef.current.set(`${pt.row}_${symCol}`, currentColor);
+          pixelsRef.current.set(`${pt.row}_${symCol}`, drawCol);
           recordPixelDrawn(1);
         }
       }
@@ -1430,6 +1470,226 @@ export const PixelEngine: React.FC = () => {
   useEffect(() => {
     return () => {
       if (botTimerRef.current) clearInterval(botTimerRef.current);
+    };
+  }, []);
+
+  // Stop and Reset Automated Showcase Tour
+  const stopShowcase = useCallback(() => {
+    showcaseAbortRef.current = true;
+    showcaseTimeoutRefs.current.forEach((t) => clearTimeout(t));
+    showcaseTimeoutRefs.current = [];
+    setIsShowcasePlaying(false);
+    setVirtualCursor(null);
+  }, []);
+
+  // Run Automated Showcase Demo Tour
+  const runShowcaseTour = useCallback(() => {
+    stopShowcase();
+    showcaseAbortRef.current = false;
+    setIsShowcasePlaying(true);
+
+    const canvas = artworkCanvasRef.current;
+    if (!canvas) return;
+
+    const width = canvas.width;
+    const height = canvas.height;
+    const cols = Math.ceil(width / pixelSize);
+    const rows = Math.ceil(height / pixelSize);
+    const midR = Math.floor(rows / 2);
+    const midC = Math.floor(cols / 2);
+
+    const schedule = (fn: () => void, delay: number) => {
+      const id = setTimeout(() => {
+        if (!showcaseAbortRef.current) fn();
+      }, delay);
+      showcaseTimeoutRefs.current.push(id);
+    };
+
+    // Stage 0: Initial clean state
+    setEngineMode("draw");
+    setIsLifeRunning(false);
+    pixelsRef.current.clear();
+    redrawAll();
+
+    const startX = Math.max(20, width * 0.15);
+    const startY = Math.max(40, height * 0.7);
+    setVirtualCursor({ x: startX, y: startY, visible: true, label: "Booting Pixel Studio..." });
+
+    // Stage 1: Draw 8-bit Heart
+    const heartCoords = [
+      [-3, -2], [-3, -1], [-3, 1], [-3, 2],
+      [-2, -3], [-2, -2], [-2, -1], [-2, 0], [-2, 1], [-2, 2], [-2, 3],
+      [-1, -3], [-1, -2], [-1, -1], [-1, 0], [-1, 1], [-1, 2], [-1, 3],
+      [0, -2], [0, -1], [0, 0], [0, 1], [0, 2],
+      [1, -1], [1, 0], [1, 1],
+      [2, 0],
+    ];
+
+    let t = 500;
+    schedule(() => {
+      setVirtualCursor({ x: width / 2, y: height / 2 - 30, visible: true, label: "Drawing 8-bit Sprite..." });
+    }, t);
+
+    heartCoords.forEach(([dr, dc], idx) => {
+      t += 50;
+      schedule(() => {
+        const r = midR + dr;
+        const c = midC + dc;
+        const key = `${r}_${c}`;
+        const color = idx % 2 === 0 ? "#FF2A85" : "#00FFCC";
+        pixelsRef.current.set(key, color);
+        redrawAll();
+        const screen = projectToScreen(c, r, pixelSize, width, height, cols, rows);
+        setVirtualCursor({ x: screen.x + pixelSize / 2, y: screen.y + pixelSize / 2, visible: true, label: "8-bit Sprite", clicking: true });
+        if (idx % 3 === 0) playPopSound(440 + idx * 15);
+      }, t);
+    });
+
+    // Stage 2: Rainbow Chroma Brush
+    t += 300;
+    schedule(() => {
+      setIsRainbowBrush(true);
+      setVirtualCursor({ x: width * 0.3, y: height * 0.3, visible: true, label: "🌈 Rainbow Chroma Brush Enabled" });
+      playPopSound(720);
+    }, t);
+
+    const wavePoints: [number, number][] = [];
+    for (let c = -9; c <= 9; c += 1) {
+      const r = Math.round(Math.sin(c * 0.45) * 3) - 5;
+      wavePoints.push([r, c]);
+    }
+
+    wavePoints.forEach(([dr, dc], idx) => {
+      t += 40;
+      schedule(() => {
+        const r = midR + dr;
+        const c = midC + dc;
+        const hue = (idx * 22) % 360;
+        const color = `hsl(${hue}, 100%, 60%)`;
+        pixelsRef.current.set(`${r}_${c}`, color);
+        redrawAll();
+        const screen = projectToScreen(c, r, pixelSize, width, height, cols, rows);
+        setVirtualCursor({ x: screen.x + pixelSize / 2, y: screen.y + pixelSize / 2, visible: true, label: "Rainbow Chroma", clicking: true });
+        if (idx % 2 === 0) playPopSound(520 + idx * 25);
+      }, t);
+    });
+
+    // Stage 3: Conway's Game of Life (Autoplay)
+    t += 400;
+    schedule(() => {
+      setEngineMode("life");
+      setIsLifeRunning(true);
+      setVirtualCursor({ x: width / 2, y: 35, visible: true, label: "🧬 Conway's Game of Life (Autoplay)" });
+      playPopSound(880);
+    }, t);
+
+    // Let life run for 2.6s
+    t += 2600;
+
+    // Stage 4: Falling Sand Simulation
+    schedule(() => {
+      setIsLifeRunning(false);
+      setEngineMode("sand");
+      setSandElement("sand");
+      setVirtualCursor({ x: width / 2, y: height * 0.2, visible: true, label: "⏳ Falling Sand Physics Particles" });
+      playPopSound(650);
+    }, t);
+
+    for (let s = 0; s < 14; s++) {
+      t += 55;
+      schedule(() => {
+        const r = Math.floor(midR - 8);
+        const c = Math.floor(midC - 7 + (s % 14));
+        pixelsRef.current.set(`${r}_${c}`, s % 2 === 0 ? "#FBBF24" : "#38BDF8");
+        redrawAll();
+        const screen = projectToScreen(c, r, pixelSize, width, height, cols, rows);
+        setVirtualCursor({ x: screen.x, y: screen.y, visible: true, label: "Cellular Sand", clicking: true });
+        playPopSound(320 + s * 25);
+      }, t);
+    }
+
+    // Stage 5: Finish tour
+    t += 1000;
+    schedule(() => {
+      setVirtualCursor({ x: width / 2, y: height / 2, visible: true, label: "✨ Click anywhere to draw & explore!" });
+      playPopSound(950);
+    }, t);
+
+    t += 2000;
+    schedule(() => {
+      stopShowcase();
+    }, t);
+  }, [stopShowcase, pixelSize, redrawAll, projectToScreen, playPopSound]);
+
+  // Video Recording Engine (HTML5 Canvas MediaRecorder)
+  const toggleRecording = useCallback(() => {
+    if (isRecording) {
+      if (mediaRecorderRef.current && mediaRecorderRef.current.state !== "inactive") {
+        mediaRecorderRef.current.stop();
+      }
+      setIsRecording(false);
+      playPopSound(440);
+    } else {
+      const canvas = artworkCanvasRef.current;
+      if (!canvas) return;
+      try {
+        const stream = canvas.captureStream(30);
+        const mimeType =
+          typeof MediaRecorder !== "undefined" && MediaRecorder.isTypeSupported("video/webm;codecs=vp9")
+            ? "video/webm;codecs=vp9"
+            : typeof MediaRecorder !== "undefined" && MediaRecorder.isTypeSupported("video/webm")
+            ? "video/webm"
+            : "video/mp4";
+
+        const recorder = new MediaRecorder(stream, { mimeType });
+        recordedChunksRef.current = [];
+
+        recorder.ondataavailable = (e) => {
+          if (e.data && e.data.size > 0) {
+            recordedChunksRef.current.push(e.data);
+          }
+        };
+
+        recorder.onstop = () => {
+          const blob = new Blob(recordedChunksRef.current, { type: mimeType });
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement("a");
+          a.href = url;
+          a.download = `adityaos-pixel-demo-${Date.now()}.webm`;
+          a.click();
+          URL.revokeObjectURL(url);
+        };
+
+        recorder.start();
+        mediaRecorderRef.current = recorder;
+        setIsRecording(true);
+        playPopSound(800);
+      } catch (err) {
+        console.error("Recording not supported or failed", err);
+      }
+    }
+  }, [isRecording, playPopSound]);
+
+  // Auto-launch showcase if URL has ?demo=1 or ?showcase=1
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const p = new URLSearchParams(window.location.search);
+      if (p.get("demo") === "1" || p.get("showcase") === "1") {
+        const timer = setTimeout(() => {
+          runShowcaseTour();
+        }, 800);
+        return () => clearTimeout(timer);
+      }
+    }
+  }, [runShowcaseTour]);
+
+  // Cleanup on unmount
+  useEffect(() => {
+    return () => {
+      showcaseTimeoutRefs.current.forEach((t) => clearTimeout(t));
+      if (mediaRecorderRef.current && mediaRecorderRef.current.state !== "inactive") {
+        mediaRecorderRef.current.stop();
+      }
     };
   }, []);
 
@@ -1645,6 +1905,27 @@ export const PixelEngine: React.FC = () => {
             <FlipHorizontal className="w-3.5 h-3.5" />
           </button>
 
+          {/* Rainbow / Chroma Brush */}
+          <button
+            type="button"
+            onClick={() => {
+              setIsRainbowBrush(!isRainbowBrush);
+              playPopSound(isRainbowBrush ? 400 : 700);
+            }}
+            title={isRainbowBrush ? "Rainbow Chroma Brush: ON (Click to Disable)" : "Rainbow Chroma Brush: OFF (Click to Enable)"}
+            style={{
+              background: isRainbowBrush
+                ? "linear-gradient(135deg, rgba(255,0,128,0.25), rgba(0,255,200,0.25))"
+                : "transparent",
+              borderColor: isRainbowBrush ? "#00FFCC" : "transparent",
+              color: isRainbowBrush ? "#00FFCC" : activeTheme.textPrimary,
+            }}
+            className="p-1.5 rounded border transition-all hover:opacity-90 flex items-center gap-1 font-bold shadow-sm"
+          >
+            <Sparkles className={`w-3.5 h-3.5 ${isRainbowBrush ? "text-pink-400 animate-spin" : ""}`} />
+            <span className="text-[9px] hidden xl:inline">RAINBOW</span>
+          </button>
+
           <div
             style={{ backgroundColor: activeTheme.headerBorder }}
             className="h-4 w-px mx-1"
@@ -1739,6 +2020,28 @@ export const PixelEngine: React.FC = () => {
             className="p-1.5 rounded hover:opacity-80 transition-colors"
           >
             <Download className="w-3.5 h-3.5" />
+          </button>
+
+          {/* Record Video Clip */}
+          <button
+            type="button"
+            onClick={toggleRecording}
+            title={isRecording ? "Stop Video Recording & Download .webm" : "Record Video Clip (.webm)"}
+            style={{
+              backgroundColor: isRecording ? "rgba(239, 68, 68, 0.2)" : "transparent",
+              borderColor: isRecording ? "#EF4444" : "transparent",
+              color: isRecording ? "#EF4444" : activeTheme.accent,
+            }}
+            className="p-1.5 rounded border hover:opacity-80 transition-colors flex items-center gap-1 font-semibold"
+          >
+            {isRecording ? (
+              <>
+                <VideoOff className="w-3.5 h-3.5 animate-pulse text-red-500" />
+                <span className="text-[9px] text-red-400 font-bold hidden sm:inline">REC...</span>
+              </>
+            ) : (
+              <Video className="w-3.5 h-3.5" />
+            )}
           </button>
         </div>
 
@@ -1920,9 +2223,21 @@ export const PixelEngine: React.FC = () => {
         <div className="flex items-center gap-1.5 flex-shrink-0 text-[10px]">
           {engineMode === "draw" && (
             <div className="flex items-center gap-1.5">
-              <span className="opacity-60 hidden xl:inline mr-1">
-                40×24 Locked Grid
-              </span>
+              {/* Automated Showcase Tour Button */}
+              <button
+                type="button"
+                onClick={isShowcasePlaying ? stopShowcase : runShowcaseTour}
+                title="Automated Interactive Showcase Tour (Virtual Animated Cursor)"
+                style={{
+                  backgroundColor: isShowcasePlaying ? "rgba(0,255,204,0.2)" : activeTheme.cardBg,
+                  borderColor: isShowcasePlaying ? "#00FFCC" : activeTheme.cardBorder,
+                  color: isShowcasePlaying ? "#00FFCC" : activeTheme.textPrimary,
+                }}
+                className="px-2 py-0.5 rounded border font-semibold flex items-center gap-1 hover:opacity-85 transition-all cursor-pointer shadow-sm"
+              >
+                <Sparkles className={`w-3 h-3 ${isShowcasePlaying ? "text-cyan-300 animate-spin" : "text-amber-400"}`} />
+                <span>{isShowcasePlaying ? "STOP TOUR" : "🎬 SHOWCASE TOUR"}</span>
+              </button>
 
               {/* Bot Playback Button */}
               <button
@@ -1937,7 +2252,7 @@ export const PixelEngine: React.FC = () => {
                 className="px-2 py-0.5 rounded border font-semibold flex items-center gap-1 hover:opacity-85 transition-all cursor-pointer"
               >
                 <Bot className={`w-3 h-3 ${isBotDrawing ? "animate-spin" : ""}`} />
-                <span>{isBotDrawing ? "BOT DRAWING..." : "AUTO-BOT"}</span>
+                <span>{isBotDrawing ? "BOT..." : "AUTO-BOT"}</span>
               </button>
 
               {/* Hidden File Input */}
@@ -2007,22 +2322,48 @@ export const PixelEngine: React.FC = () => {
                   setIsLifeRunning(!isLifeRunning);
                   playPopSound(isLifeRunning ? 400 : 700);
                 }}
-                className={`px-2 py-0.5 rounded border font-bold flex items-center gap-1 ${
-                  isLifeRunning ? "bg-emerald-500/20 text-emerald-400 border-emerald-500" : "bg-white/5 text-white/80 border-white/10"
+                className={`px-2 py-0.5 rounded border font-bold flex items-center gap-1 transition-all ${
+                  isLifeRunning
+                    ? "bg-emerald-500/25 text-emerald-300 border-emerald-400 shadow-[0_0_10px_rgba(16,185,129,0.3)]"
+                    : "bg-white/10 text-white hover:bg-white/15 border-white/20"
                 }`}
               >
-                {isLifeRunning ? <Pause className="w-3 h-3" /> : <Play className="w-3 h-3" />}
-                <span>{isLifeRunning ? "PAUSE" : "EVOLVE"}</span>
+                {isLifeRunning ? (
+                  <>
+                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping inline-block" />
+                    <Pause className="w-3 h-3 text-emerald-400" />
+                    <span>PAUSE</span>
+                  </>
+                ) : (
+                  <>
+                    <Play className="w-3 h-3 text-cyan-400" />
+                    <span>AUTOPLAY (EVOLVE)</span>
+                  </>
+                )}
               </button>
 
               <button
                 type="button"
                 onClick={stepConwayLife}
-                title="Advance 1 Generation"
-                className="px-1.5 py-0.5 rounded border border-white/10 bg-white/5 hover:bg-white/10 flex items-center gap-1"
+                title="Advance 1 Generation manually"
+                className="px-1.5 py-0.5 rounded border border-white/10 bg-white/5 hover:bg-white/10 flex items-center gap-1 font-semibold"
               >
                 <StepForward className="w-3 h-3" />
                 <span>STEP</span>
+              </button>
+
+              {/* Speed Toggle */}
+              <button
+                type="button"
+                onClick={() => {
+                  setLifeSpeed((prev) => (prev === 280 ? 140 : prev === 140 ? 70 : 280));
+                  playPopSound(600);
+                }}
+                title="Toggle Evolution Speed"
+                className="px-1.5 py-0.5 rounded border border-white/10 bg-white/5 hover:bg-white/10 flex items-center gap-1 text-[9px] font-mono font-bold"
+              >
+                <Zap className="w-2.5 h-2.5 text-amber-400" />
+                <span>{lifeSpeed === 70 ? "3x" : lifeSpeed === 140 ? "1x" : "0.5x"}</span>
               </button>
 
               <button
@@ -2049,7 +2390,9 @@ export const PixelEngine: React.FC = () => {
                 Random
               </button>
 
-              <span className="font-mono opacity-60 text-[9px]">Gen: {lifeGeneration}</span>
+              <span className="font-mono opacity-80 text-[9px] bg-white/5 px-1.5 py-0.5 rounded border border-white/5">
+                GEN: {lifeGeneration}
+              </span>
             </div>
           )}
 
@@ -2208,6 +2551,41 @@ export const PixelEngine: React.FC = () => {
 
           {/* Hover Preview Canvas Layer */}
           <canvas ref={previewCanvasRef} className="absolute inset-0 pointer-events-none block w-full h-full" />
+
+          {/* Animated Virtual Cursor for Automated Showcase Demo */}
+          {virtualCursor && virtualCursor.visible && (
+            <div
+              className="pointer-events-none absolute z-40 transition-all duration-75 ease-out -translate-x-1/2 -translate-y-1/2"
+              style={{
+                left: `${virtualCursor.x}px`,
+                top: `${virtualCursor.y}px`,
+              }}
+            >
+              <div
+                className={`relative flex items-center gap-1.5 ${
+                  virtualCursor.clicking ? "scale-90" : "scale-100"
+                } transition-transform`}
+              >
+                {/* Glowing Retro Pointer SVG */}
+                <div className="w-5 h-5 relative filter drop-shadow-[0_0_8px_rgba(0,255,204,0.9)]">
+                  <svg viewBox="0 0 24 24" fill="none" className="w-full h-full">
+                    <path
+                      d="M3 3L10.07 19.97L12.58 12.58L19.97 10.07L3 3Z"
+                      fill="#00FFCC"
+                      stroke="#000000"
+                      strokeWidth="2"
+                      strokeLinejoin="round"
+                    />
+                  </svg>
+                </div>
+                {virtualCursor.label && (
+                  <div className="bg-black/90 text-cyan-300 font-mono text-[10px] px-2 py-0.5 rounded-full border border-cyan-400/60 shadow-lg whitespace-nowrap animate-pulse">
+                    {virtualCursor.label}
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
 
           {/* Type Stamp Text Modal Popover */}
           {isTypeModalOpen && (
