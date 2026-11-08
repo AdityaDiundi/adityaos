@@ -32,6 +32,7 @@ interface OSState {
   closeWindow: (id: string) => void;
   toggleMinimize: (id: string) => void;
   toggleMaximize: (id: string) => void;
+  maximizeWindow: (id: string) => void;
   focusWindow: (id: string) => void;
   restoreWindow: (id: string) => void;
   bringToFront: (id: string) => void;
@@ -166,6 +167,14 @@ export const useOSStore = create<OSState>((set, get) => ({
         ? maximizedWindows.filter((winId) => winId !== id)
         : [...maximizedWindows, id],
     });
+    get().bringToFront(id);
+  },
+
+  maximizeWindow: (id: string) => {
+    const { maximizedWindows } = get();
+    if (!maximizedWindows.includes(id)) {
+      set({ maximizedWindows: [...maximizedWindows, id] });
+    }
     get().bringToFront(id);
   },
 

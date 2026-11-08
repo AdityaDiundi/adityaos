@@ -79,7 +79,7 @@ export const useOSStore = create<OSState>((set, get) => ({
   highestZIndex: 12,
   wallpaperUrl: "",
   showDesktopGrid: true,
-  isStickyNoteOpen: true,
+  isStickyNoteOpen: false,
   isLocked: false,
 
   setWallpaper: (url: string) => set({ wallpaperUrl: url }),
