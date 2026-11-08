@@ -41,6 +41,7 @@ import { useSoundStore } from "@/store/soundStore";
 import {
   subscribeToFirebaseStats,
   recordPixelDrawn,
+  recordCanvasEdit,
   recordPixelPopped,
   GlobalCommunityStats,
 } from "@/lib/firebaseStats";
@@ -119,7 +120,7 @@ export const PixelEngine: React.FC = () => {
   // Global Community Stats synced via Firebase
   const [globalStats, setGlobalStats] = useState<GlobalCommunityStats>({
     totalPixelsDrawn: 0,
-    totalPixelsPopped: 0,
+    totalCanvasEdits: 0,
     totalNotesPlayed: 0,
   });
 
@@ -588,6 +589,7 @@ export const PixelEngine: React.FC = () => {
       drawn: pixelsRef.current.size,
       score: prev.score + 5,
     }));
+    recordCanvasEdit(1);
   }, []);
 
   const handleUndo = () => {
@@ -601,6 +603,7 @@ export const PixelEngine: React.FC = () => {
         undos: prev.undos + 1,
       }));
       playPopSound(420);
+      recordCanvasEdit(1);
     }
   };
 
@@ -614,6 +617,7 @@ export const PixelEngine: React.FC = () => {
         drawn: pixelsRef.current.size,
       }));
       playPopSound(580);
+      recordCanvasEdit(1);
     }
   };
 
@@ -2329,7 +2333,7 @@ export const PixelEngine: React.FC = () => {
                 </div>
               </div>
 
-              {/* Metric 3: Live Firebase Global Community Stats (Issue 3) */}
+              {/* Metric 3: Live Firebase Global Community Stats */}
               <div
                 style={{
                   backgroundColor: activeTheme.cardBg,
@@ -2337,24 +2341,30 @@ export const PixelEngine: React.FC = () => {
                 }}
                 className="p-2.5 rounded border space-y-1.5"
               >
-                <div className="text-[10px] opacity-60 uppercase font-semibold flex items-center gap-1">
-                  <Globe className="w-3 h-3 text-cyan-400" />
-                  <span>FIREBASE TELEMETRY</span>
-                </div>
-                <div className="flex justify-between font-mono">
-                  <span className="opacity-70">GLOBAL DRAWN:</span>
-                  <span className="font-bold text-emerald-400">
-                    {(globalStats.totalPixelsDrawn + stats.drawn).toLocaleString()}
+                <div className="text-[10px] opacity-60 uppercase font-semibold flex items-center justify-between">
+                  <span className="flex items-center gap-1.5">
+                    <Globe className="w-3 h-3 text-cyan-400" />
+                    COMMUNITY TELEMETRY
+                  </span>
+                  <span className="text-[9px] text-emerald-400 font-mono flex items-center gap-1 font-bold">
+                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                    LIVE
                   </span>
                 </div>
-                <div className="flex justify-between font-mono">
-                  <span className="opacity-70">GLOBAL POPPED:</span>
-                  <span className="font-bold text-amber-400">
-                    {globalStats.totalPixelsPopped.toLocaleString()}
+                <div className="flex justify-between font-mono text-[11px]">
+                  <span className="opacity-70">PIXELS PAINTED:</span>
+                  <span className="font-bold text-emerald-400">
+                    {(globalStats.totalPixelsDrawn + stats.drawn).toLocaleString()} PX
+                  </span>
+                </div>
+                <div className="flex justify-between font-mono text-[11px]">
+                  <span className="opacity-70">CANVAS EDITS:</span>
+                  <span className="font-bold text-cyan-400">
+                    {(globalStats.totalCanvasEdits + stats.undos + (stats.drawn > 0 ? 1 : 0)).toLocaleString()} EDITS
                   </span>
                 </div>
                 <div className="text-[9px] opacity-50 pt-0.5">
-                  Connected to Realtime Database
+                  Synchronized via Realtime Database
                 </div>
               </div>
 

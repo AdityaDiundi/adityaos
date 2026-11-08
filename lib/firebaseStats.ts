@@ -30,14 +30,15 @@ export function getFirebaseDatabase(): Database | null {
 
 export interface GlobalCommunityStats {
   totalPixelsDrawn: number;
-  totalPixelsPopped: number;
+  totalCanvasEdits: number;
+  totalPixelsPopped?: number;
   totalNotesPlayed: number;
 }
 
 // Queue to batch increments every few seconds
 const pendingIncrements = {
   drawn: 0,
-  popped: 0,
+  edits: 0,
 };
 
 let batchIntervalStarted = false;
@@ -47,18 +48,18 @@ function ensureBatchProcessor() {
   batchIntervalStarted = true;
 
   setInterval(() => {
-    const { drawn, popped } = pendingIncrements;
-    if (drawn <= 0 && popped <= 0) return;
+    const { drawn, edits } = pendingIncrements;
+    if (drawn <= 0 && edits <= 0) return;
 
     // Reset local queue
     pendingIncrements.drawn = 0;
-    pendingIncrements.popped = 0;
+    pendingIncrements.edits = 0;
 
     const database = getFirebaseDatabase();
     if (!database) return;
 
     const drawnInc = Math.min(drawn, 1000);
-    const poppedInc = Math.min(popped, 1000);
+    const editsInc = Math.min(edits, 500);
 
     if (drawnInc > 0) {
       runTransaction(ref(database, "stats/totalPixelsDrawn"), (curr) => {
@@ -66,9 +67,9 @@ function ensureBatchProcessor() {
       }).catch(() => {});
     }
 
-    if (poppedInc > 0) {
-      runTransaction(ref(database, "stats/totalPixelsPopped"), (curr) => {
-        return (curr || 0) + poppedInc;
+    if (editsInc > 0) {
+      runTransaction(ref(database, "stats/totalCanvasEdits"), (curr) => {
+        return (curr || 0) + editsInc;
       }).catch(() => {});
     }
   }, 3500);
@@ -91,8 +92,16 @@ export function subscribeToFirebaseStats(
       (snapshot) => {
         const val = snapshot.val();
         if (val) {
+          const drawn = Number(val.totalPixelsDrawn || 0);
+          // If totalCanvasEdits doesn't exist yet in RTDB, fallback to totalPixelsPopped or proportional seed
+          const edits =
+            val.totalCanvasEdits !== undefined
+              ? Number(val.totalCanvasEdits)
+              : Number(val.totalPixelsPopped || Math.max(1, Math.floor(drawn / 10)));
+
           onStats({
-            totalPixelsDrawn: Number(val.totalPixelsDrawn || 0),
+            totalPixelsDrawn: drawn,
+            totalCanvasEdits: edits,
             totalPixelsPopped: Number(val.totalPixelsPopped || 0),
             totalNotesPlayed: Number(val.totalNotesPlayed || 0),
           });
@@ -115,7 +124,12 @@ export function recordPixelDrawn(count = 1) {
   ensureBatchProcessor();
 }
 
-export function recordPixelPopped(count = 1) {
-  pendingIncrements.popped += count;
+export function recordCanvasEdit(count = 1) {
+  pendingIncrements.edits += count;
   ensureBatchProcessor();
+}
+
+// Deprecated alias for backwards compatibility
+export function recordPixelPopped(count = 1) {
+  recordCanvasEdit(count);
 }
