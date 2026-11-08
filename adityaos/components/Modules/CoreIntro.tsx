@@ -12,7 +12,7 @@ import {
   MapPin,
   Bot,
   Brain,
-  MessageSquare,
+  StickyNote,
   Compass,
 } from "lucide-react";
 import { useThemeStore } from "@/store/themeStore";
@@ -180,8 +180,8 @@ export const CoreIntro: React.FC = () => {
               }}
               className="px-3 py-1.5 rounded font-semibold text-xs border flex items-center gap-1.5 hover:bg-amber-500/10 transition-colors cursor-pointer"
             >
-              <MessageSquare className="w-3.5 h-3.5" />
-              <span>Pin Sticky Note</span>
+              <StickyNote className="w-3.5 h-3.5" />
+              <span>Sticky Note</span>
             </button>
 
             <a

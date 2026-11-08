@@ -42,6 +42,7 @@ import {
   Brain,
   Keyboard,
   MessageSquare,
+  StickyNote,
   Lock,
 } from "lucide-react";
 
@@ -459,14 +460,14 @@ export default function Home() {
         <div className="flex items-center gap-1.5 sm:gap-2.5 text-[11px]">
           {/* Quick Utility Launchers: Visitor Note + Wallpaper Switcher */}
           <div className="flex items-center gap-1.5">
-            {/* Sticky Note / Scratchpad Toggle */}
+            {/* Sticky Note Toggle */}
             <button
               type="button"
               onClick={() => {
                 playClickChime(520);
                 toggleStickyNote();
               }}
-              title="Toggle Visitor Scratchpad / Pinned Note"
+              title="Toggle Sticky Note"
               style={{
                 backgroundColor: isStickyNoteOpen ? "rgba(245, 158, 11, 0.2)" : activeTheme.cardBg,
                 borderColor: isStickyNoteOpen ? "#fbbf24" : activeTheme.cardBorder,
@@ -474,7 +475,7 @@ export default function Home() {
               }}
               className="flex items-center gap-1.5 px-2 py-0.5 rounded border text-[11px] font-semibold transition-all hover:opacity-100 cursor-pointer"
             >
-              <MessageSquare className="w-3 h-3 text-amber-400" />
+              <StickyNote className="w-3 h-3 text-amber-500" />
               <span className="hidden sm:inline">Note</span>
             </button>
 
@@ -1072,8 +1073,8 @@ export default function Home() {
               className="w-full flex items-center justify-between px-2.5 py-1.5 rounded text-left hover:bg-white/10 transition-colors cursor-pointer"
             >
               <span className="flex items-center gap-2">
-                <MessageSquare className="w-3.5 h-3.5 text-amber-400" />
-                <span>Visitor Scratchpad (Note)</span>
+                <StickyNote className="w-3.5 h-3.5 text-amber-400" />
+                <span>Sticky Note</span>
               </span>
               <span className={`text-[10px] font-bold ${isStickyNoteOpen ? "text-amber-400" : "opacity-40"}`}>
                 {isStickyNoteOpen ? "PINNED" : "OFF"}
