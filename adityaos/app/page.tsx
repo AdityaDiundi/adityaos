@@ -210,8 +210,16 @@ export default function Home() {
         }}
       />
 
-      {/* Contrast Overlay: 65% dark overlay with slight blur so text/windows are perfectly legible */}
-      <div className="absolute inset-0 bg-black/65 backdrop-blur-[0.5px] pointer-events-none" />
+      {/* Adaptive Wallpaper Overlay: Only applied if an external wallpaper image is loaded */}
+      {wallpaperUrl && (
+        <div
+          className={`absolute inset-0 pointer-events-none transition-colors duration-500 ${
+            activeTheme.isDark
+              ? "bg-black/40 backdrop-blur-[0.5px]"
+              : "bg-white/20 backdrop-blur-[0.5px]"
+          }`}
+        />
+      )}
 
       {/* Desktop Grid Lines (Toggled via showDesktopGrid) */}
       {showDesktopGrid && (
@@ -252,9 +260,9 @@ export default function Home() {
             onClick={() => setViewMode("portfolio")}
             className="px-2 py-0.5 rounded border font-semibold flex items-center gap-1 hover:opacity-100 transition-all cursor-pointer text-[10px]"
             style={{
-              backgroundColor: "rgba(0, 240, 255, 0.15)",
-              borderColor: "#00F0FF",
-              color: "#00F0FF",
+              backgroundColor: activeTheme.isDark ? "rgba(0, 255, 204, 0.15)" : "rgba(18, 19, 22, 0.08)",
+              borderColor: activeTheme.isDark ? "#00FFCC" : "rgba(0, 0, 0, 0.18)",
+              color: activeTheme.isDark ? "#00FFCC" : "#121316",
             }}
             title="Exit back to Product Designer Portfolio"
           >
@@ -670,7 +678,7 @@ export default function Home() {
               type="button"
               onClick={() => openAndFocus("pixelEngine")}
               style={{
-                backgroundColor: `${activeTheme.cardBg}cc`,
+                backgroundColor: activeTheme.cardBg,
                 borderColor: activeTheme.cardBorder,
                 color: activeTheme.textPrimary,
               }}
@@ -693,14 +701,14 @@ export default function Home() {
               type="button"
               onClick={() => openAndFocus("archiveReader")}
               style={{
-                backgroundColor: `${activeTheme.cardBg}cc`,
+                backgroundColor: activeTheme.cardBg,
                 borderColor: activeTheme.cardBorder,
                 color: activeTheme.textPrimary,
               }}
               className="p-3 rounded-lg border backdrop-blur-sm flex flex-col items-center gap-2 text-center group hover:scale-[1.03] hover:border-emerald-400/60 transition-all shadow-sm"
             >
               <div className="w-10 h-10 rounded-md bg-emerald-500/20 flex items-center justify-center group-hover:bg-emerald-500/30 transition-colors">
-                <BookOpen className="w-5 h-5 text-emerald-400" />
+                <BookOpen className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
               </div>
               <div className="space-y-0.5">
                 <div className="font-bold text-xs">Archive</div>
@@ -713,14 +721,14 @@ export default function Home() {
               type="button"
               onClick={() => openAndFocus("streamFeed")}
               style={{
-                backgroundColor: `${activeTheme.cardBg}cc`,
+                backgroundColor: activeTheme.cardBg,
                 borderColor: activeTheme.cardBorder,
                 color: activeTheme.textPrimary,
               }}
               className="p-3 rounded-lg border backdrop-blur-sm flex flex-col items-center gap-2 text-center group hover:scale-[1.03] hover:border-amber-400/60 transition-all shadow-sm"
             >
               <div className="w-10 h-10 rounded-md bg-amber-500/20 flex items-center justify-center group-hover:bg-amber-500/30 transition-colors">
-                <Tv className="w-5 h-5 text-amber-400" />
+                <Tv className="w-5 h-5 text-amber-600 dark:text-amber-400" />
               </div>
               <div className="space-y-0.5">
                 <div className="font-bold text-xs">StreamFeed</div>
@@ -733,14 +741,14 @@ export default function Home() {
               type="button"
               onClick={() => openAndFocus("resumeViewer")}
               style={{
-                backgroundColor: `${activeTheme.cardBg}cc`,
+                backgroundColor: activeTheme.cardBg,
                 borderColor: activeTheme.cardBorder,
                 color: activeTheme.textPrimary,
               }}
               className="p-3 rounded-lg border backdrop-blur-sm flex flex-col items-center gap-2 text-center group hover:scale-[1.03] hover:border-cyan-400/60 transition-all shadow-sm"
             >
               <div className="w-10 h-10 rounded-md bg-cyan-500/20 flex items-center justify-center group-hover:bg-cyan-500/30 transition-colors">
-                <FileText className="w-5 h-5 text-cyan-400" />
+                <FileText className="w-5 h-5 text-cyan-700 dark:text-cyan-400" />
               </div>
               <div className="space-y-0.5">
                 <div className="font-bold text-xs">Resume.pdf</div>
@@ -753,14 +761,14 @@ export default function Home() {
               type="button"
               onClick={() => openAndFocus("galleryViewer")}
               style={{
-                backgroundColor: `${activeTheme.cardBg}cc`,
+                backgroundColor: activeTheme.cardBg,
                 borderColor: activeTheme.cardBorder,
                 color: activeTheme.textPrimary,
               }}
               className="p-3 rounded-lg border backdrop-blur-sm flex flex-col items-center gap-2 text-center group hover:scale-[1.03] hover:border-pink-400/60 transition-all shadow-sm"
             >
               <div className="w-10 h-10 rounded-md bg-pink-500/20 flex items-center justify-center group-hover:bg-pink-500/30 transition-colors">
-                <ImageIcon className="w-5 h-5 text-pink-400" />
+                <ImageIcon className="w-5 h-5 text-pink-600 dark:text-pink-400" />
               </div>
               <div className="space-y-0.5">
                 <div className="font-bold text-xs">Gallery</div>
@@ -773,14 +781,14 @@ export default function Home() {
               type="button"
               onClick={() => openAndFocus("coreIntro")}
               style={{
-                backgroundColor: `${activeTheme.cardBg}cc`,
+                backgroundColor: activeTheme.cardBg,
                 borderColor: activeTheme.cardBorder,
                 color: activeTheme.textPrimary,
               }}
               className="p-3 rounded-lg border backdrop-blur-sm flex flex-col items-center gap-2 text-center group hover:scale-[1.03] hover:border-purple-400/60 transition-all shadow-sm"
             >
               <div className="w-10 h-10 rounded-md bg-purple-500/20 flex items-center justify-center group-hover:bg-purple-500/30 transition-colors">
-                <Sparkles className="w-5 h-5 text-purple-400" />
+                <Sparkles className="w-5 h-5 text-purple-700 dark:text-purple-400" />
               </div>
               <div className="space-y-0.5">
                 <div className="font-bold text-xs">CoreIntro</div>
@@ -794,17 +802,17 @@ export default function Home() {
               target="_blank"
               rel="noopener noreferrer"
               style={{
-                backgroundColor: `${activeTheme.cardBg}cc`,
+                backgroundColor: activeTheme.cardBg,
                 borderColor: activeTheme.cardBorder,
                 color: activeTheme.textPrimary,
               }}
               className="p-3 rounded-lg border backdrop-blur-sm flex flex-col items-center gap-2 text-center group hover:scale-[1.03] hover:border-red-400/60 transition-all shadow-sm"
             >
               <div className="w-10 h-10 rounded-md bg-red-500/20 flex items-center justify-center group-hover:bg-red-500/30 transition-colors">
-                <ExternalLink className="w-5 h-5 text-red-400" />
+                <ExternalLink className="w-5 h-5 text-red-600 dark:text-red-400" />
               </div>
               <div className="space-y-0.5">
-                <div className="font-bold text-xs text-red-400">@falsepeek</div>
+                <div className="font-bold text-xs text-red-600 dark:text-red-400">@falsepeek</div>
                 <div className="text-[10px] opacity-60">YouTube Channel ↗</div>
               </div>
             </a>
@@ -814,14 +822,14 @@ export default function Home() {
               type="button"
               onClick={() => openAndFocus("fieldJournal")}
               style={{
-                backgroundColor: `${activeTheme.cardBg}cc`,
+                backgroundColor: activeTheme.cardBg,
                 borderColor: activeTheme.cardBorder,
                 color: activeTheme.textPrimary,
               }}
               className="p-3 rounded-lg border backdrop-blur-sm flex flex-col items-center gap-2 text-center group hover:scale-[1.03] hover:border-amber-400/60 transition-all shadow-sm"
             >
               <div className="w-10 h-10 rounded-md bg-amber-500/20 flex items-center justify-center group-hover:bg-amber-500/30 transition-colors">
-                <Compass className="w-5 h-5 text-amber-400" />
+                <Compass className="w-5 h-5 text-amber-700 dark:text-amber-400" />
               </div>
               <div className="space-y-0.5">
                 <div className="font-bold text-xs">FieldJournal</div>
@@ -834,14 +842,14 @@ export default function Home() {
               type="button"
               onClick={() => openAndFocus("learnabilityLab")}
               style={{
-                backgroundColor: `${activeTheme.cardBg}cc`,
+                backgroundColor: activeTheme.cardBg,
                 borderColor: activeTheme.cardBorder,
                 color: activeTheme.textPrimary,
               }}
               className="p-3 rounded-lg border backdrop-blur-sm flex flex-col items-center gap-2 text-center group hover:scale-[1.03] hover:border-cyan-400/60 transition-all shadow-sm"
             >
               <div className="w-10 h-10 rounded-md bg-cyan-500/20 flex items-center justify-center group-hover:bg-cyan-500/30 transition-colors">
-                <Brain className="w-5 h-5 text-cyan-400" />
+                <Brain className="w-5 h-5 text-cyan-700 dark:text-cyan-400" />
               </div>
               <div className="space-y-0.5">
                 <div className="font-bold text-xs">Learnability</div>
@@ -854,7 +862,7 @@ export default function Home() {
           <div className="hidden md:flex items-end justify-between pointer-events-auto">
             <div
               style={{
-                backgroundColor: `${activeTheme.cardBg}99`,
+                backgroundColor: activeTheme.cardBg,
                 borderColor: activeTheme.cardBorder,
                 color: activeTheme.textPrimary,
               }}
@@ -862,7 +870,7 @@ export default function Home() {
             >
               <div className="flex items-center gap-2 font-bold" style={{ color: activeTheme.accent }}>
                 <Terminal className="w-3.5 h-3.5" />
-                <span>ADITYA-OS // NOCTALIA TWM</span>
+                <span>ADITYA-OS // {activeTheme.name.toUpperCase()} TWM</span>
               </div>
               <p className="text-[10px] opacity-75 leading-relaxed">
                 Riced Web OS workstation. Tactile voxel engine, dynamic shell theming, Beethoven Für Elise music box synth, and live telemetry.
@@ -878,11 +886,11 @@ export default function Home() {
 
             <div
               style={{
-                backgroundColor: `${activeTheme.cardBg}99`,
+                backgroundColor: activeTheme.cardBg,
                 borderColor: activeTheme.cardBorder,
                 color: activeTheme.textPrimary,
               }}
-              className="p-2.5 rounded-md border text-[10px] backdrop-blur-md text-right space-y-0.5"
+              className="p-2.5 rounded-md border text-[10px] backdrop-blur-md text-right space-y-0.5 shadow-md"
             >
               <div className="font-semibold" style={{ color: activeTheme.accent }}>
                 Quick Keys & Help

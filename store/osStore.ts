@@ -76,7 +76,7 @@ export const useOSStore = create<OSState>((set, get) => ({
     terminal: 4,
   },
   highestZIndex: 12,
-  wallpaperUrl: "https://images.unsplash.com/photo-1514565131-fce0801e5785?q=80&w=2560&auto=format&fit=crop",
+  wallpaperUrl: "",
   showDesktopGrid: true,
   isStickyNoteOpen: true,
   isLocked: false,

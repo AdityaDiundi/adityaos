@@ -351,56 +351,56 @@ export const TerminalDesktop: React.FC = () => {
       label: "./pixel_engine",
       action: "./pixel_engine",
       desc: "Pixel Engine Canvas",
-      color: "text-onedark-cyan border-onedark-cyan/40 hover:bg-onedark-cyan/10",
+      accent: activeTheme.accent,
       icon: <Paintbrush className="w-3 h-3 mr-1" />,
     },
     {
       label: "./change_wallpaper",
       action: "./change_wallpaper",
       desc: "Wallpaper Manager",
-      color: "text-pink-400 border-pink-400/40 hover:bg-pink-400/10",
+      accent: "#ec4899",
       icon: <ImageIcon className="w-3 h-3 mr-1" />,
     },
     {
       label: "cat resume.pdf",
       action: "cat resume.pdf",
       desc: "Open Resume",
-      color: "text-onedark-yellow border-onedark-yellow/40 hover:bg-onedark-yellow/10",
+      accent: activeTheme.isDark ? "#eab308" : "#b45309",
       icon: <FileText className="w-3 h-3 mr-1" />,
     },
     {
       label: "feh gallery",
       action: "feh",
       desc: "Image Gallery",
-      color: "text-onedark-cyan border-onedark-cyan/40 hover:bg-onedark-cyan/10",
+      accent: activeTheme.isDark ? "#06b6d4" : "#0891b2",
       icon: <ImageIcon className="w-3 h-3 mr-1" />,
     },
     {
       label: "theme next",
       action: "theme next",
       desc: "Cycle Theme",
-      color: "text-onedark-purple border-onedark-purple/40 hover:bg-onedark-purple/10",
+      accent: activeTheme.isDark ? "#c084fc" : "#7c3aed",
       icon: <Palette className="w-3 h-3 mr-1" />,
     },
     {
       label: "cat poetry.txt",
       action: "cat poetry.txt",
       desc: "Open Archive",
-      color: "text-onedark-green border-onedark-green/40 hover:bg-onedark-green/10",
+      accent: activeTheme.isDark ? "#34d399" : "#059669",
       icon: null,
     },
     {
       label: "./play_latest_match",
       action: "./play_latest_match",
       desc: "Stream Feed",
-      color: "text-onedark-blue border-onedark-blue/40 hover:bg-onedark-blue/10",
+      accent: activeTheme.isDark ? "#60a5fa" : "#2563eb",
       icon: null,
     },
     {
       label: "fetch core_intro",
       action: "fetch core_intro",
       desc: "Restore Intro",
-      color: "text-onedark-muted border-onedark-borderMuted hover:bg-white/5",
+      accent: activeTheme.textMuted,
       icon: null,
     },
   ];
@@ -423,9 +423,9 @@ export const TerminalDesktop: React.FC = () => {
                 <span style={{ color: activeTheme.accent }} className="font-bold">
                   aditya@{activeTheme.shellName}
                 </span>
-                <span className="text-onedark-muted">:</span>
-                <span className="text-onedark-blue font-bold">~</span>
-                <span className="text-onedark-muted">$</span>
+                <span style={{ color: activeTheme.textMuted }}>:</span>
+                <span style={{ color: activeTheme.accent }} className="font-bold">~</span>
+                <span style={{ color: activeTheme.textMuted }}>$</span>
                 <span style={{ color: activeTheme.textPrimary }}>{item.command}</span>
               </div>
               <div className="mt-1 ml-4">{item.output}</div>
@@ -458,20 +458,20 @@ export const TerminalDesktop: React.FC = () => {
             <Terminal className="w-3.5 h-3.5" style={{ color: activeTheme.accent }} />
             <span className="hidden sm:inline font-semibold">SHELL</span>
             {isExpanded ? (
-              <ChevronDown className="w-3 h-3 text-onedark-muted" />
+              <ChevronDown className="w-3 h-3 opacity-60" />
             ) : (
-              <ChevronUp className="w-3 h-3 text-onedark-muted" />
+              <ChevronUp className="w-3 h-3 opacity-60" />
             )}
           </button>
 
           {/* Prompt */}
-          <div className="flex items-center gap-1.5 text-xs text-onedark-muted flex-1 truncate">
+          <div className="flex items-center gap-1.5 text-xs flex-1 truncate" style={{ color: activeTheme.textMuted }}>
             <span style={{ color: activeTheme.accent }} className="font-bold hidden sm:inline">
               aditya@{activeTheme.shellName}
             </span>
-            <span className="text-onedark-muted hidden sm:inline">:</span>
-            <span className="text-onedark-blue font-bold hidden sm:inline">~</span>
-            <span className="text-onedark-muted font-bold">$</span>
+            <span className="hidden sm:inline" style={{ color: activeTheme.textMuted }}>:</span>
+            <span style={{ color: activeTheme.accent }} className="font-bold hidden sm:inline">~</span>
+            <span style={{ color: activeTheme.textMuted }} className="font-bold">$</span>
             <input
               ref={inputRef}
               type="text"
@@ -480,7 +480,7 @@ export const TerminalDesktop: React.FC = () => {
               onKeyDown={handleKeyDown}
               placeholder="type command or click chip..."
               style={{ color: activeTheme.textPrimary }}
-              className="bg-transparent border-none outline-none placeholder:text-onedark-muted/60 text-xs w-full font-mono select-text"
+              className="bg-transparent border-none outline-none placeholder:opacity-50 text-xs w-full font-mono select-text"
             />
           </div>
         </div>
@@ -495,10 +495,19 @@ export const TerminalDesktop: React.FC = () => {
                 executeCommand(chip.action);
               }}
               title={chip.desc}
-              className={`px-2 py-0.5 rounded text-[11px] border font-mono tracking-tight transition-all active:scale-95 shadow-chip flex items-center ${chip.color}`}
+              style={{
+                backgroundColor: activeTheme.isDark ? "rgba(255, 255, 255, 0.04)" : "rgba(0, 0, 0, 0.03)",
+                borderColor: activeTheme.cardBorder,
+                color: activeTheme.textPrimary,
+              }}
+              className="px-2 py-0.5 rounded text-[11px] border font-mono tracking-tight transition-all hover:scale-[1.02] active:scale-95 shadow-sm flex items-center group cursor-pointer"
             >
-              {chip.icon}
-              <span>{chip.label}</span>
+              {chip.icon && (
+                <span style={{ color: chip.accent }} className="transition-transform group-hover:scale-110">
+                  {chip.icon}
+                </span>
+              )}
+              <span className="group-hover:opacity-100 opacity-90">{chip.label}</span>
             </button>
           ))}
         </div>

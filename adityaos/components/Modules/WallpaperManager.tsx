@@ -18,21 +18,55 @@ import {
 export interface WallpaperPreset {
   id: string;
   name: string;
-  category: "Atmospheric" | "Cyber" | "Minimal" | "Himalaya" | "System";
+  category: "Editorial" | "Minimal" | "Atmospheric" | "Cyber" | "Himalaya" | "System";
   url: string;
   thumb: string;
   author: string;
 }
 
 export const WALLPAPER_PRESETS: WallpaperPreset[] = [
+  // Editorial & Architectural (Pairs exceptionally with both light and dark modes)
   {
-    id: "cyberpunk-rain",
-    name: "Neo-Tokyo Rain Reflections",
-    category: "Cyber",
-    url: "https://images.unsplash.com/photo-1514565131-fce0801e5785?q=80&w=2560&auto=format&fit=crop",
-    thumb: "https://images.unsplash.com/photo-1514565131-fce0801e5785?q=70&w=400&auto=format&fit=crop",
-    author: "Aleksandar Pasaric",
+    id: "kinfolk-concrete",
+    name: "Kinfolk Architectural Light & Shadow",
+    category: "Editorial",
+    url: "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?q=80&w=2560&auto=format&fit=crop",
+    thumb: "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?q=70&w=400&auto=format&fit=crop",
+    author: "R Architecture",
   },
+  {
+    id: "serene-washi",
+    name: "Serene Botanical Linen & Washi Grain",
+    category: "Editorial",
+    url: "https://images.unsplash.com/photo-1579783900882-c0d3dad7b119?q=80&w=2560&auto=format&fit=crop",
+    thumb: "https://images.unsplash.com/photo-1579783900882-c0d3dad7b119?q=70&w=400&auto=format&fit=crop",
+    author: "Europeana",
+  },
+  {
+    id: "bauhaus-shadows",
+    name: "Bauhaus Minimalist Sunlight Geometry",
+    category: "Editorial",
+    url: "https://images.unsplash.com/photo-1513694203232-719a280e022f?q=80&w=2560&auto=format&fit=crop",
+    thumb: "https://images.unsplash.com/photo-1513694203232-719a280e022f?q=70&w=400&auto=format&fit=crop",
+    author: "Kirill",
+  },
+  {
+    id: "brutalist-concrete",
+    name: "Brutalist Concrete Monolith",
+    category: "Editorial",
+    url: "https://images.unsplash.com/photo-1513584684374-8bab748fbf90?q=80&w=2560&auto=format&fit=crop",
+    thumb: "https://images.unsplash.com/photo-1513584684374-8bab748fbf90?q=70&w=400&auto=format&fit=crop",
+    author: "Simone Hutsch",
+  },
+  {
+    id: "zen-ripples",
+    name: "Kyoto Zen Sand Ripples",
+    category: "Editorial",
+    url: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?q=80&w=2560&auto=format&fit=crop",
+    thumb: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?q=70&w=400&auto=format&fit=crop",
+    author: "Sean Oulashin",
+  },
+  // Minimal & Monochromatic
   {
     id: "obsidian-fluid",
     name: "Obsidian Liquid Wave (Sonoma Dark)",
@@ -42,13 +76,22 @@ export const WALLPAPER_PRESETS: WallpaperPreset[] = [
     author: "Milad Fakurian",
   },
   {
-    id: "shibuya-cyber",
-    name: "Cyber Neon Shibuya Alley",
-    category: "Cyber",
-    url: "https://images.unsplash.com/photo-1542051841857-5f90071e7989?q=80&w=2560&auto=format&fit=crop",
-    thumb: "https://images.unsplash.com/photo-1542051841857-5f90071e7989?q=70&w=400&auto=format&fit=crop",
-    author: "Clay Banks",
+    id: "abstract-geometry",
+    name: "Dark Obsidian Prisms",
+    category: "Minimal",
+    url: "https://images.unsplash.com/photo-1618005198919-d3d4b5a92ead?q=80&w=2560&auto=format&fit=crop",
+    thumb: "https://images.unsplash.com/photo-1618005198919-d3d4b5a92ead?q=70&w=400&auto=format&fit=crop",
+    author: "Milad Fakurian",
   },
+  {
+    id: "monochrome-mist",
+    name: "Nordic Mist Lake Horizon",
+    category: "Minimal",
+    url: "https://images.unsplash.com/photo-1498084393753-b411b2d26b34?q=80&w=2560&auto=format&fit=crop",
+    thumb: "https://images.unsplash.com/photo-1498084393753-b411b2d26b34?q=70&w=400&auto=format&fit=crop",
+    author: "Danielle MacInnes",
+  },
+  // Atmospheric & Celestial
   {
     id: "milky-way-alpine",
     name: "Milky Way Over Alpine Peaks",
@@ -66,36 +109,12 @@ export const WALLPAPER_PRESETS: WallpaperPreset[] = [
     author: "Vincent Guth",
   },
   {
-    id: "abstract-geometry",
-    name: "Dark Obsidian Prisms",
-    category: "Minimal",
-    url: "https://images.unsplash.com/photo-1618005198919-d3d4b5a92ead?q=80&w=2560&auto=format&fit=crop",
-    thumb: "https://images.unsplash.com/photo-1618005198919-d3d4b5a92ead?q=70&w=400&auto=format&fit=crop",
-    author: "Milad Fakurian",
-  },
-  {
     id: "moody-forest",
     name: "Indigo Forest Fog & Pines",
     category: "Atmospheric",
     url: "https://images.unsplash.com/photo-1448375240586-882707db888b?q=80&w=2560&auto=format&fit=crop",
     thumb: "https://images.unsplash.com/photo-1448375240586-882707db888b?q=70&w=400&auto=format&fit=crop",
     author: "Sebastian Unrau",
-  },
-  {
-    id: "himalayan-peaks",
-    name: "Kumaon Himalayan Ridge",
-    category: "Himalaya",
-    url: "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?q=80&w=2560&auto=format&fit=crop",
-    thumb: "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?q=70&w=400&auto=format&fit=crop",
-    author: "Kaloyan Christov",
-  },
-  {
-    id: "tokyo-cyber",
-    name: "Tokyo Cyber Twilight",
-    category: "Cyber",
-    url: "https://images.unsplash.com/photo-1509198397868-475647b2a1e5?q=80&w=2560&auto=format&fit=crop",
-    thumb: "https://images.unsplash.com/photo-1509198397868-475647b2a1e5?q=70&w=400&auto=format&fit=crop",
-    author: "Aleksandar Pasaric",
   },
   {
     id: "deep-cosmos",
@@ -105,6 +124,48 @@ export const WALLPAPER_PRESETS: WallpaperPreset[] = [
     thumb: "https://images.unsplash.com/photo-1506703719100-a0f3a48c0f86?q=70&w=400&auto=format&fit=crop",
     author: "Vincentiu Solomon",
   },
+  // Himalaya & Altitude
+  {
+    id: "himalayan-peaks",
+    name: "Kumaon Himalayan Ridge",
+    category: "Himalaya",
+    url: "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?q=80&w=2560&auto=format&fit=crop",
+    thumb: "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?q=70&w=400&auto=format&fit=crop",
+    author: "Kaloyan Christov",
+  },
+  {
+    id: "alpine-snow",
+    name: "High Alpine Snow Ridge",
+    category: "Himalaya",
+    url: "https://images.unsplash.com/photo-1486870591958-9b9d0d1dda99?q=80&w=2560&auto=format&fit=crop",
+    thumb: "https://images.unsplash.com/photo-1486870591958-9b9d0d1dda99?q=70&w=400&auto=format&fit=crop",
+    author: "Jerry Zhang",
+  },
+  // Cyberpunk & Digital
+  {
+    id: "tokyo-cyber",
+    name: "Tokyo Cyber Twilight",
+    category: "Cyber",
+    url: "https://images.unsplash.com/photo-1509198397868-475647b2a1e5?q=80&w=2560&auto=format&fit=crop",
+    thumb: "https://images.unsplash.com/photo-1509198397868-475647b2a1e5?q=70&w=400&auto=format&fit=crop",
+    author: "Aleksandar Pasaric",
+  },
+  {
+    id: "cyberpunk-rain",
+    name: "Neo-Tokyo Rain Reflections",
+    category: "Cyber",
+    url: "https://images.unsplash.com/photo-1514565131-fce0801e5785?q=80&w=2560&auto=format&fit=crop",
+    thumb: "https://images.unsplash.com/photo-1514565131-fce0801e5785?q=70&w=400&auto=format&fit=crop",
+    author: "Aleksandar Pasaric",
+  },
+  {
+    id: "shibuya-cyber",
+    name: "Cyber Neon Shibuya Alley",
+    category: "Cyber",
+    url: "https://images.unsplash.com/photo-1542051841857-5f90071e7989?q=80&w=2560&auto=format&fit=crop",
+    thumb: "https://images.unsplash.com/photo-1542051841857-5f90071e7989?q=70&w=400&auto=format&fit=crop",
+    author: "Clay Banks",
+  },
   {
     id: "matrix-grid",
     name: "Retro Digital Stream (Matrix Fall)",
@@ -113,21 +174,14 @@ export const WALLPAPER_PRESETS: WallpaperPreset[] = [
     thumb: "https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?q=70&w=400&auto=format&fit=crop",
     author: "Markus Spiske",
   },
-  {
-    id: "minimal-horizon",
-    name: "Midnight Calm Horizon",
-    category: "Minimal",
-    url: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?q=80&w=2560&auto=format&fit=crop",
-    thumb: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?q=70&w=400&auto=format&fit=crop",
-    author: "Sean Oulashin",
-  },
+  // System Native Canvas (Pure Slate)
   {
     id: "clean-slate",
-    name: "Pure OneDark Canvas (No Image)",
+    name: "Pure Desktop Theme Canvas (No Image)",
     category: "System",
     url: "",
     thumb: "",
-    author: "Solid Dark Theme Default",
+    author: "Native OS Background Grid",
   },
 ];
 
@@ -139,7 +193,7 @@ export const WallpaperManager: React.FC = () => {
   const [customInput, setCustomInput] = useState<string>("");
   const [selectedCategory, setSelectedCategory] = useState<string>("All");
 
-  const categories = ["All", "Atmospheric", "Cyber", "Minimal", "Himalaya", "System"];
+  const categories = ["All", "Editorial", "Minimal", "Atmospheric", "Cyber", "Himalaya", "System"];
 
   const filteredPresets = selectedCategory === "All"
     ? WALLPAPER_PRESETS
@@ -333,8 +387,11 @@ export const WallpaperManager: React.FC = () => {
                   {/* Active Indicator Badge */}
                   {active && (
                     <div
-                      style={{ backgroundColor: activeTheme.accent }}
-                      className="absolute top-2 right-2 px-1.5 py-0.5 rounded text-[10px] font-bold text-black flex items-center gap-1 shadow-md"
+                      style={{
+                        backgroundColor: activeTheme.accent,
+                        color: activeTheme.isDark ? "#000" : "#fff",
+                      }}
+                      className="absolute top-2 right-2 px-1.5 py-0.5 rounded text-[10px] font-bold flex items-center gap-1 shadow-md"
                     >
                       <Check className="w-3 h-3 stroke-[3]" />
                       ACTIVE
