@@ -11,11 +11,13 @@ import {
   Globe,
   Palette,
   Check,
+  Copy,
   Layers,
   BookOpen,
   Briefcase,
   PlaySquare,
   Sparkles,
+  ExternalLink,
 } from "lucide-react";
 import { useThemeStore, OSThemeId } from "@/store/themeStore";
 
@@ -25,14 +27,28 @@ interface PortfolioSidebarProps {
   onLaunchOS: () => void;
 }
 
+const LinkedinIcon = (props: React.SVGProps<SVGSVGElement>) => (
+  <svg viewBox="0 0 24 24" fill="currentColor" {...props}>
+    <path d="M19 3a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h14m-.5 15.5v-5.3a3.26 3.26 0 0 0-3.26-3.26c-.85 0-1.84.52-2.28 1.3v-1.11h-2.79v8.37h2.79v-4.93c0-.77.62-1.4 1.39-1.4a1.4 1.4 0 0 1 1.4 1.4v4.93h2.75M6.46 8.76a1.53 1.53 0 0 0 0-3.06 1.53 1.53 0 0 0 0 3.06m1.4 9.74v-8.37H5.06v8.37h2.8z" />
+  </svg>
+);
+
 export function PortfolioSidebar({
   activeFilter,
   onSelectFilter,
   onLaunchOS,
 }: PortfolioSidebarProps) {
   const [themeDropdownOpen, setThemeDropdownOpen] = useState(false);
+  const [copiedEmail, setCopiedEmail] = useState(false);
   const { currentThemeId, setTheme, activeTheme } = useThemeStore();
   const isDark = activeTheme.isDark;
+
+  const handleCopyEmail = (e: React.MouseEvent) => {
+    e.preventDefault();
+    navigator.clipboard.writeText("aditya15124@iiitd.ac.in");
+    setCopiedEmail(true);
+    setTimeout(() => setCopiedEmail(false), 2200);
+  };
 
   const feedToggles = [
     { id: "all", label: "All Items", icon: Layers, count: "27" },
@@ -58,7 +74,7 @@ export function PortfolioSidebar({
       }`}
     >
       {/* Top Identity & Above-The-Fold Conversion Block */}
-      <div className="space-y-6">
+      <div className="space-y-5">
         {/* Profile Avatar & Title */}
         <div className="flex items-center gap-3.5">
           <div
@@ -83,11 +99,18 @@ export function PortfolioSidebar({
               Aditya Diundi
             </h1>
             <p
-              className={`text-xs font-mono ${
-                isDark ? "text-zinc-400" : "text-stone-600"
+              className={`text-xs font-mono font-medium ${
+                isDark ? "text-cyan-400" : "text-cyan-700"
               }`}
             >
-              Product Designer
+              Product Designer & Design Technologist
+            </p>
+            <p
+              className={`text-[10px] font-mono opacity-60 ${
+                isDark ? "text-zinc-400" : "text-stone-500"
+              }`}
+            >
+              IIIT Delhi · B.Tech ECE
             </p>
           </div>
         </div>
@@ -99,7 +122,7 @@ export function PortfolioSidebar({
           }`}
         >
           <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-          <span>Delhi, India</span>
+          <span>Delhi NCR · Bangalore</span>
           <span className={isDark ? "text-zinc-600" : "text-stone-300"}>·</span>
           <span className="text-emerald-500 font-medium">Available</span>
         </div>
@@ -113,9 +136,33 @@ export function PortfolioSidebar({
           Bridging engineering depth from IIIT Delhi, grassroots ethnography, and systems craft to build straightforward software.
         </p>
 
+        {/* Open To Work Target Roles Card */}
+        <div
+          className={`p-2.5 rounded-lg border text-xs font-mono space-y-1.5 shadow-sm transition-colors ${
+            isDark
+              ? "bg-zinc-900/60 border-zinc-800 text-zinc-300"
+              : "bg-stone-100/90 border-stone-200 text-stone-700"
+          }`}
+        >
+          <div className="flex items-center justify-between text-[10px] uppercase font-bold text-emerald-500">
+            <span className="flex items-center gap-1.5">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+              Open For Roles
+            </span>
+            <span className="opacity-60 text-[9px]">Immediate</span>
+          </div>
+          <div className="text-[11px] leading-snug">
+            <strong>Target:</strong> Product Designer, Design Technologist, Systems Architect
+          </div>
+          <div className="text-[10px] opacity-75">
+            <strong>Preference:</strong> Remote / Hybrid (India / US / Global)
+          </div>
+        </div>
+
         {/* Above-The-Fold High-Contrast Conversion Path for Recruiters */}
         <div className="space-y-2 pt-1 pb-1">
-          <div className="flex flex-col sm:flex-row lg:flex-col gap-2 font-mono text-xs">
+          <div className="flex flex-col gap-2 font-mono text-xs">
+            {/* 1. Primary Resume Button */}
             <a
               href="/Aditya_Diundi_Resume.pdf"
               target="_blank"
@@ -137,17 +184,49 @@ export function PortfolioSidebar({
               </span>
             </a>
 
-            <a
-              href="mailto:aditya15124@iiitd.ac.in"
-              className={`w-full py-2.5 px-3.5 rounded-lg border font-semibold flex items-center justify-center gap-2 transition-all cursor-pointer ${
-                isDark
-                  ? "border-emerald-500/30 bg-emerald-950/20 hover:bg-emerald-900/40 text-emerald-300"
-                  : "border-emerald-600/30 bg-emerald-50 hover:bg-emerald-100 text-emerald-700"
-              }`}
-            >
-              <Mail className="w-3.5 h-3.5" />
-              <span>Get in Touch</span>
-            </a>
+            {/* 2. Dual Connect Row: LinkedIn & Copy Email */}
+            <div className="grid grid-cols-2 gap-2">
+              <a
+                href="https://www.linkedin.com/in/adityadiundi/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className={`py-2 px-2.5 rounded-lg border font-semibold flex items-center justify-center gap-1.5 transition-all cursor-pointer ${
+                  isDark
+                    ? "border-blue-500/30 bg-blue-950/20 hover:bg-blue-900/40 text-blue-300"
+                    : "border-blue-600/30 bg-blue-50 hover:bg-blue-100 text-blue-700"
+                }`}
+              >
+                <LinkedinIcon className="w-3.5 h-3.5 text-[#0A66C2]" />
+                <span>LinkedIn</span>
+                <ExternalLink className="w-3 h-3 opacity-60" />
+              </a>
+
+              <button
+                type="button"
+                onClick={handleCopyEmail}
+                className={`py-2 px-2.5 rounded-lg border font-semibold flex items-center justify-center gap-1.5 transition-all cursor-pointer ${
+                  copiedEmail
+                    ? isDark
+                      ? "border-emerald-500 bg-emerald-950/40 text-emerald-300"
+                      : "border-emerald-600 bg-emerald-100 text-emerald-800"
+                    : isDark
+                    ? "border-emerald-500/30 bg-emerald-950/20 hover:bg-emerald-900/40 text-emerald-300"
+                    : "border-emerald-600/30 bg-emerald-50 hover:bg-emerald-100 text-emerald-700"
+                }`}
+              >
+                {copiedEmail ? (
+                  <>
+                    <Check className="w-3.5 h-3.5 text-emerald-400 stroke-[3]" />
+                    <span>Copied!</span>
+                  </>
+                ) : (
+                  <>
+                    <Copy className="w-3.5 h-3.5" />
+                    <span>Copy Email</span>
+                  </>
+                )}
+              </button>
+            </div>
           </div>
         </div>
 
@@ -178,20 +257,20 @@ export function PortfolioSidebar({
                         ? "bg-zinc-100 text-zinc-950 font-semibold shadow-sm"
                         : "bg-stone-900 text-white font-semibold shadow-sm"
                       : isDark
-                      ? "text-zinc-400 hover:text-white hover:bg-zinc-900/70"
-                      : "text-stone-600 hover:text-stone-900 hover:bg-stone-100"
+                      ? "text-zinc-400 hover:bg-zinc-900/80 hover:text-zinc-200"
+                      : "text-stone-600 hover:bg-stone-100 hover:text-stone-900"
                   }`}
                 >
                   <div className="flex items-center gap-2.5">
-                    <Icon className="w-4 h-4" />
+                    <Icon className="w-3.5 h-3.5" />
                     <span>{item.label}</span>
                   </div>
                   <span
-                    className={`text-[10px] px-1.5 py-0.5 rounded ${
+                    className={`text-[10px] px-1.5 py-0.5 rounded font-mono ${
                       isActive
                         ? isDark
-                          ? "bg-zinc-300 text-zinc-900 font-bold"
-                          : "bg-stone-800 text-stone-200 font-bold"
+                          ? "bg-zinc-200 text-zinc-900"
+                          : "bg-stone-800 text-white"
                         : isDark
                         ? "bg-zinc-900 text-zinc-500"
                         : "bg-stone-200 text-stone-600"
@@ -239,7 +318,7 @@ export function PortfolioSidebar({
               <Palette className="w-3 h-3 text-zinc-400" />
               <span className={isDark ? "text-zinc-500" : "text-stone-500"}>Theme:</span>
               <span className={`font-medium ${isDark ? "text-zinc-200" : "text-stone-900"}`}>
-                {themeOptions.find((t) => t.id === currentThemeId)?.label.split(" ")[0] || "Obsidian"}
+                {themeOptions.find((t) => t.id === currentThemeId)?.label.split(" ")[0] || "Editorial"}
               </span>
             </div>
             <span className={`text-[10px] ${isDark ? "text-zinc-500" : "text-stone-500"}`}>
@@ -289,6 +368,15 @@ export function PortfolioSidebar({
             isDark ? "text-zinc-400" : "text-stone-500"
           }`}
         >
+          <a
+            href="https://www.linkedin.com/in/adityadiundi/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className={`transition-colors p-1 hover:text-blue-500`}
+            title="LinkedIn"
+          >
+            <LinkedinIcon className="w-3.5 h-3.5" />
+          </a>
           <a
             href="https://github.com/AdityaDiundi"
             target="_blank"

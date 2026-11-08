@@ -316,16 +316,27 @@ export function ResumeSection() {
                   isDark ? "text-zinc-400" : "text-stone-600"
                 }`}
               >
-                Based in Delhi. Open for full-time product designer roles, systems architecture, and design advisory.
+                Based in Delhi NCR. Open for full-time Product Designer, Design Technologist, and Systems Architect roles (Remote / Hybrid / Relocation).
               </p>
-              <div className="space-y-2 pt-1">
+              <div className="space-y-2 pt-1 font-mono">
+                <a
+                  href="https://www.linkedin.com/in/adityadiundi/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className={`flex items-center gap-2 transition-colors text-xs ${
+                    isDark ? "text-blue-400 hover:text-blue-300" : "text-blue-700 hover:text-blue-900"
+                  }`}
+                >
+                  <ExternalLink className="w-3.5 h-3.5" />
+                  <span>linkedin.com/in/adityadiundi</span>
+                </a>
                 <a
                   href="mailto:aditya15124@iiitd.ac.in"
                   className={`flex items-center gap-2 transition-colors text-xs ${
                     isDark ? "text-zinc-300 hover:text-white" : "text-stone-800 hover:text-black"
                   }`}
                 >
-                  <Mail className="w-4 h-4 text-emerald-500" />
+                  <Mail className="w-3.5 h-3.5 text-emerald-500" />
                   <span>aditya15124@iiitd.ac.in</span>
                 </a>
                 <div
@@ -333,7 +344,7 @@ export function ResumeSection() {
                     isDark ? "text-zinc-400" : "text-stone-600"
                   }`}
                 >
-                  <Phone className="w-4 h-4 text-zinc-500" />
+                  <Phone className="w-3.5 h-3.5 text-zinc-500" />
                   <span>+91 8510860382</span>
                 </div>
               </div>
