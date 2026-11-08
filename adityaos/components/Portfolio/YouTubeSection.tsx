@@ -11,18 +11,18 @@ export function YouTubeSection() {
     <section id="youtube" className="relative">
       <div className="max-w-7xl mx-auto border-x border-zinc-800 relative bg-zinc-950/40">
         {/* Section Header */}
-        <div className="border-b border-zinc-800 p-6 sm:p-10 lg:p-12 relative flex flex-col sm:flex-row sm:items-end justify-between gap-4">
+        <div className="border-b border-zinc-800 p-8 sm:p-12 lg:p-14 relative flex flex-col sm:flex-row sm:items-end justify-between gap-4">
           <span className="absolute -top-2 -left-2 font-mono text-xs text-zinc-600 select-none">+</span>
           <span className="absolute -top-2 -right-2 font-mono text-xs text-zinc-600 select-none">+</span>
 
-          <div className="space-y-2">
+          <div className="space-y-3">
             <div className="text-xs font-mono text-zinc-500 uppercase tracking-wider">
               03 // Media & Streams
             </div>
             <h2 className="text-3xl sm:text-4xl md:text-5xl font-sans font-semibold text-zinc-100 tracking-tight">
               YouTube & video logs.
             </h2>
-            <p className="text-sm sm:text-base text-zinc-400 font-sans max-w-xl pt-1">
+            <p className="text-sm sm:text-base text-zinc-400 font-sans max-w-xl pt-1 leading-relaxed">
               Gaming highlights, clutch gameplay analysis, and stream shorts from the @falsepeek channel.
             </p>
           </div>
@@ -31,52 +31,52 @@ export function YouTubeSection() {
             href="https://youtube.com/@falsepeek"
             target="_blank"
             rel="noopener noreferrer"
-            className="px-4 py-2 rounded-full bg-red-600 hover:bg-red-500 text-white font-mono text-xs flex items-center gap-1.5 transition-colors self-start sm:self-auto cursor-pointer"
+            className="px-4 py-2 rounded-full bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 hover:border-red-500/50 text-zinc-300 hover:text-white font-mono text-xs flex items-center gap-2 transition-all self-start sm:self-auto cursor-pointer group/ytlink"
           >
-            <Youtube className="w-4 h-4" />
+            <Youtube className="w-4 h-4 text-zinc-400 group-hover/ytlink:text-red-500 transition-colors" />
             <span>@falsepeek Channel</span>
-            <ExternalLink className="w-3 h-3 ml-0.5" />
+            <ExternalLink className="w-3 h-3 ml-0.5 text-zinc-500" />
           </a>
         </div>
 
         {/* Video Grid */}
-        <div className="p-6 sm:p-10 border-b border-zinc-800">
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="p-8 sm:p-12 lg:p-14 border-b border-zinc-800">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
             {FEATURED_YOUTUBE_VIDEOS.map((video) => (
               <div
                 key={video.id}
                 onClick={() => setActiveVideo(video)}
                 className="group rounded-xl border border-zinc-800 bg-zinc-950/80 overflow-hidden hover:border-zinc-700 transition-all cursor-pointer shadow-sm flex flex-col justify-between"
               >
-                {/* Video Thumbnail Frame */}
+                {/* Muted Monochrome Video Thumbnail Frame (Reveals brand color only on hover) */}
                 <div className="relative aspect-video bg-zinc-900 overflow-hidden flex items-center justify-center">
                   <img
                     src={`https://img.youtube.com/vi/${video.id}/hqdefault.jpg`}
                     alt={video.title}
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                    className="w-full h-full object-cover filter grayscale contrast-125 opacity-70 group-hover:grayscale-0 group-hover:opacity-100 group-hover:scale-105 transition-all duration-500"
                     loading="lazy"
                   />
-                  <div className="absolute inset-0 bg-black/40 group-hover:bg-black/20 transition-colors flex items-center justify-center">
-                    <div className="w-10 h-10 rounded-full bg-red-600/90 text-white flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform">
-                      <Play className="w-4 h-4 ml-0.5 fill-white" />
+                  <div className="absolute inset-0 bg-black/40 group-hover:bg-black/10 transition-colors flex items-center justify-center">
+                    <div className="w-11 h-11 rounded-full bg-zinc-900/90 border border-zinc-700/80 text-zinc-300 group-hover:bg-red-600 group-hover:border-red-600 group-hover:text-white flex items-center justify-center shadow-lg group-hover:scale-110 transition-all duration-300">
+                      <Play className="w-4 h-4 ml-0.5 fill-current" />
                     </div>
                   </div>
 
-                  <span className="absolute bottom-2 right-2 px-1.5 py-0.5 rounded bg-black/80 font-mono text-[10px] text-zinc-300">
+                  <span className="absolute bottom-2.5 right-2.5 px-2 py-0.5 rounded bg-black/85 font-mono text-[10px] text-zinc-300 border border-zinc-800">
                     {video.duration}
                   </span>
                 </div>
 
                 {/* Details */}
-                <div className="p-4 space-y-2">
-                  <div className="flex items-center justify-between text-[11px] font-mono text-zinc-500">
-                    <span className="px-1.5 py-0.5 rounded bg-zinc-900 border border-zinc-800 text-zinc-300">
+                <div className="p-5 space-y-2.5">
+                  <div className="flex items-center justify-between text-xs font-mono text-zinc-500">
+                    <span className="px-2 py-0.5 rounded bg-zinc-900 border border-zinc-800 text-zinc-300 text-[11px]">
                       {video.category}
                     </span>
                     <span>@falsepeek</span>
                   </div>
 
-                  <h3 className="font-sans font-medium text-sm text-zinc-100 group-hover:text-white line-clamp-2 leading-snug">
+                  <h3 className="font-sans font-medium text-sm text-zinc-200 group-hover:text-white line-clamp-2 leading-snug">
                     {video.title}
                   </h3>
                 </div>

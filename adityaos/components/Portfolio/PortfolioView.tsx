@@ -54,28 +54,28 @@ export function PortfolioView({ onLaunchOS }: PortfolioViewProps) {
           <div>
             {/* Quick Stats Ledger Strip Snapped to Top of Feed */}
             <div className="border-b border-zinc-800 grid grid-cols-2 sm:grid-cols-4 divide-x divide-y sm:divide-y-0 divide-zinc-800 bg-zinc-950/60 font-mono text-xs">
-              <div className="p-4 sm:p-5 space-y-0.5">
-                <span className="text-[10px] text-zinc-500 uppercase">Experience</span>
-                <div className="text-xl font-bold text-white tracking-tight">3+ Years</div>
-                <div className="text-[11px] text-zinc-400 font-sans">Product & Systems</div>
+              <div className="p-6 sm:p-7 space-y-1">
+                <span className="text-[11px] text-zinc-500 uppercase tracking-wider">Experience</span>
+                <div className="text-2xl font-bold text-white tracking-tight">3+ Years</div>
+                <div className="text-xs text-zinc-400 font-sans">Product & Systems</div>
               </div>
 
-              <div className="p-4 sm:p-5 space-y-0.5">
-                <span className="text-[10px] text-zinc-500 uppercase">Scale</span>
-                <div className="text-xl font-bold text-indigo-400 tracking-tight">100K+ DAU</div>
-                <div className="text-[11px] text-zinc-400 font-sans">Claims UX (MFine)</div>
+              <div className="p-6 sm:p-7 space-y-1">
+                <span className="text-[11px] text-zinc-500 uppercase tracking-wider">Scale</span>
+                <div className="text-2xl font-bold text-indigo-400 tracking-tight">100K+ DAU</div>
+                <div className="text-xs text-zinc-400 font-sans">Claims UX (MFine)</div>
               </div>
 
-              <div className="p-4 sm:p-5 space-y-0.5">
-                <span className="text-[10px] text-zinc-500 uppercase">AI Benchmark</span>
-                <div className="text-xl font-bold text-emerald-400 tracking-tight">120+ Evals</div>
-                <div className="text-[11px] text-zinc-400 font-sans">Health AI (JANEVAL)</div>
+              <div className="p-6 sm:p-7 space-y-1">
+                <span className="text-[11px] text-zinc-500 uppercase tracking-wider">AI Benchmark</span>
+                <div className="text-2xl font-bold text-emerald-400 tracking-tight">120+ Evals</div>
+                <div className="text-xs text-zinc-400 font-sans">Health AI (JANEVAL)</div>
               </div>
 
-              <div className="p-4 sm:p-5 space-y-0.5">
-                <span className="text-[10px] text-zinc-500 uppercase">Adherence</span>
-                <div className="text-xl font-bold text-amber-400 tracking-tight">+12% Conv</div>
-                <div className="text-[11px] text-zinc-400 font-sans">Habit Engine (Mosaic)</div>
+              <div className="p-6 sm:p-7 space-y-1">
+                <span className="text-[11px] text-zinc-500 uppercase tracking-wider">Adherence</span>
+                <div className="text-2xl font-bold text-amber-400 tracking-tight">+12% Conv</div>
+                <div className="text-xs text-zinc-400 font-sans">Habit Engine (Mosaic)</div>
               </div>
             </div>
 

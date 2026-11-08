@@ -49,11 +49,12 @@ export function PortfolioSidebar({
   ];
 
   return (
-    <aside className="w-full lg:w-64 xl:w-72 flex-shrink-0 lg:sticky lg:top-0 lg:self-start lg:h-screen lg:max-h-screen border-b lg:border-b-0 lg:border-r border-zinc-800 p-5 sm:p-6 flex flex-col justify-between bg-zinc-950/95 z-30 overflow-y-auto">
-      {/* Top Identity Block */}
-      <div className="space-y-5">
-        <div className="flex items-center gap-3">
-          <div className="relative w-10 h-10 rounded-full overflow-hidden border border-zinc-700 flex-shrink-0">
+    <aside className="w-full lg:w-80 xl:w-84 flex-shrink-0 lg:sticky lg:top-0 lg:self-start lg:h-screen lg:max-h-screen border-b lg:border-b-0 lg:border-r border-zinc-800 p-6 sm:p-7 xl:p-8 flex flex-col justify-between bg-zinc-950/95 z-30 overflow-y-auto">
+      {/* Top Identity & Above-The-Fold Conversion Block */}
+      <div className="space-y-6">
+        {/* Profile Avatar & Title */}
+        <div className="flex items-center gap-3.5">
+          <div className="relative w-12 h-12 rounded-full overflow-hidden border border-zinc-700 flex-shrink-0 shadow-md">
             <Image
               src="/aditya_avatar_sq.jpg"
               alt="Aditya Diundi"
@@ -63,34 +64,58 @@ export function PortfolioSidebar({
             />
           </div>
           <div>
-            <h1 className="font-sans font-bold text-base text-white tracking-tight">
+            <h1 className="font-sans font-bold text-lg text-white tracking-tight">
               Aditya Diundi
             </h1>
-            <p className="text-[11px] font-mono text-zinc-400">
+            <p className="text-xs font-mono text-zinc-400">
               Product Designer
             </p>
           </div>
         </div>
 
-        {/* Location & Status */}
-        <div className="flex items-center gap-1.5 text-[11px] font-mono text-zinc-400">
-          <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+        {/* Location & Status Pill */}
+        <div className="flex items-center gap-2 text-xs font-mono text-zinc-400">
+          <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
           <span>Delhi, India</span>
           <span className="text-zinc-600">·</span>
-          <span>Available</span>
+          <span className="text-emerald-400 font-medium">Available</span>
         </div>
 
-        {/* Single Personal Statement */}
-        <p className="text-xs text-zinc-400 font-sans leading-relaxed">
+        {/* Systems Statement Bio */}
+        <p className="text-xs sm:text-[13px] text-zinc-400 font-sans leading-relaxed">
           Bridging engineering depth from IIIT Delhi, grassroots ethnography, and systems craft to build straightforward software.
         </p>
 
-        {/* Feed Section Toggles */}
-        <div className="space-y-1.5 pt-2 border-t border-zinc-800">
-          <div className="text-[10px] font-mono text-zinc-500 uppercase tracking-wider pb-0.5">
-            Sections
+        {/* Above-The-Fold High-Contrast Conversion Path for Recruiters */}
+        <div className="space-y-2 pt-1 pb-1">
+          <div className="flex flex-col sm:flex-row lg:flex-col gap-2 font-mono text-xs">
+            <a
+              href="/Aditya_Diundi_Resume.pdf"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="w-full py-2.5 px-3.5 rounded-lg bg-white hover:bg-zinc-200 text-zinc-950 font-bold flex items-center justify-center gap-2 shadow-[0_2px_10px_rgba(255,255,255,0.1)] transition-all cursor-pointer group/cta"
+            >
+              <FileText className="w-4 h-4 text-zinc-900" />
+              <span>View Resume (PDF)</span>
+              <span className="text-[10px] bg-zinc-200 px-1.5 py-0.5 rounded text-zinc-800 ml-auto font-medium">1.2MB</span>
+            </a>
+
+            <a
+              href="mailto:aditya15124@iiitd.ac.in"
+              className="w-full py-2.5 px-3.5 rounded-lg border border-emerald-500/30 bg-emerald-950/20 hover:bg-emerald-900/40 text-emerald-300 font-semibold flex items-center justify-center gap-2 transition-all cursor-pointer"
+            >
+              <Mail className="w-3.5 h-3.5 text-emerald-400" />
+              <span>Get in Touch</span>
+            </a>
           </div>
-          <div className="space-y-0.5">
+        </div>
+
+        {/* Feed Section Toggles */}
+        <div className="space-y-2 pt-3 border-t border-zinc-800/80">
+          <div className="text-[10px] font-mono text-zinc-500 uppercase tracking-wider pb-1">
+            Site Architecture
+          </div>
+          <div className="space-y-1">
             {feedToggles.map((item) => {
               const Icon = item.icon;
               const isActive = activeFilter === item.id;
@@ -98,19 +123,19 @@ export function PortfolioSidebar({
                 <button
                   key={item.id}
                   onClick={() => onSelectFilter(item.id)}
-                  className={`w-full flex items-center justify-between px-2.5 py-1.5 rounded-md text-xs font-mono transition-all cursor-pointer ${
+                  className={`w-full flex items-center justify-between px-3 py-2 rounded-lg text-xs font-mono transition-all cursor-pointer ${
                     isActive
-                      ? "bg-white text-zinc-950 font-semibold shadow-sm"
-                      : "text-zinc-400 hover:text-white hover:bg-zinc-900/60"
+                      ? "bg-zinc-100 text-zinc-950 font-semibold shadow-sm"
+                      : "text-zinc-400 hover:text-white hover:bg-zinc-900/70"
                   }`}
                 >
-                  <div className="flex items-center gap-2">
-                    <Icon className="w-3.5 h-3.5" />
+                  <div className="flex items-center gap-2.5">
+                    <Icon className="w-4 h-4" />
                     <span>{item.label}</span>
                   </div>
                   <span
-                    className={`text-[10px] px-1 py-0.2 rounded ${
-                      isActive ? "bg-zinc-200 text-zinc-900" : "bg-zinc-900 text-zinc-500"
+                    className={`text-[10px] px-1.5 py-0.5 rounded ${
+                      isActive ? "bg-zinc-300 text-zinc-900 font-bold" : "bg-zinc-900 text-zinc-500"
                     }`}
                   >
                     {item.count}
@@ -123,27 +148,15 @@ export function PortfolioSidebar({
       </div>
 
       {/* Bottom Actions & Controls */}
-      <div className="space-y-3.5 pt-4 border-t border-zinc-800">
-        {/* Quick Action Buttons */}
-        <div className="flex flex-col gap-1.5 font-mono text-xs">
-          <a
-            href="/Aditya_Diundi_Resume.pdf"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="w-full py-2 px-2.5 rounded bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 text-zinc-200 flex items-center justify-center gap-1.5 transition-colors cursor-pointer text-[11px]"
-          >
-            <FileText className="w-3.5 h-3.5 text-zinc-400" />
-            <span>Resume (PDF)</span>
-          </a>
-
-          <button
-            onClick={onLaunchOS}
-            className="w-full py-2 px-2.5 rounded border border-cyan-500/30 bg-cyan-950/20 hover:bg-cyan-900/40 text-cyan-300 flex items-center justify-center gap-1.5 transition-colors cursor-pointer text-[11px]"
-          >
-            <Terminal className="w-3.5 h-3.5 text-cyan-400" />
-            <span>Launch adityaos</span>
-          </button>
-        </div>
+      <div className="space-y-4 pt-6 mt-6 border-t border-zinc-800/80">
+        {/* Launch adityaos Terminal Engine */}
+        <button
+          onClick={onLaunchOS}
+          className="w-full py-2.5 px-3 rounded-lg border border-cyan-500/30 bg-cyan-950/20 hover:bg-cyan-900/40 text-cyan-300 flex items-center justify-center gap-2 transition-colors cursor-pointer text-xs font-mono"
+        >
+          <Terminal className="w-3.5 h-3.5 text-cyan-400" />
+          <span>Launch adityaos Shell</span>
+        </button>
 
         {/* Theme Selector */}
         <div className="relative">
