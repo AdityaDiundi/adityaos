@@ -1443,7 +1443,7 @@ export const PixelEngine: React.FC = () => {
     setTimeout(() => setIsExportCopied(false), 2000);
   }, [playPopSound]);
 
-  // Image Upload & Auto-Gridify (Downscale & Quantize to 40x24)
+  // Image Upload & Auto-Gridify (Smart subject auto-crop, dynamic grid sizing & contrast boost)
   const fileInputRef = useRef<HTMLInputElement>(null);
   const handleImageUpload = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -1454,33 +1454,123 @@ export const PixelEngine: React.FC = () => {
       reader.onload = (event) => {
         const img = new Image();
         img.onload = () => {
+          // 1. Analyze source image to detect subject bounding box (auto-trim empty margins/padding)
+          const scanCanvas = document.createElement("canvas");
+          const scanW = Math.min(img.width, 320);
+          const scanH = Math.min(img.height, Math.round((320 * img.height) / img.width));
+          scanCanvas.width = scanW;
+          scanCanvas.height = scanH;
+          const scanCtx = scanCanvas.getContext("2d");
+          if (!scanCtx) return;
+
+          scanCtx.drawImage(img, 0, 0, scanW, scanH);
+          const scanData = scanCtx.getImageData(0, 0, scanW, scanH).data;
+
+          // Corner sample to detect dominant background (transparent, dark, or light)
+          const cornerR = scanData[0];
+          const cornerG = scanData[1];
+          const cornerB = scanData[2];
+          const cornerA = scanData[3];
+          const isCornerDark = cornerA < 30 || (cornerR < 25 && cornerG < 25 && cornerB < 25);
+          const isCornerWhite = cornerA > 200 && cornerR > 240 && cornerG > 240 && cornerB > 240;
+
+          let minX = scanW, minY = scanH, maxX = 0, maxY = 0;
+          let hasContent = false;
+
+          for (let y = 0; y < scanH; y++) {
+            for (let x = 0; x < scanW; x++) {
+              const idx = (y * scanW + x) * 4;
+              const a = scanData[idx + 3];
+              const r = scanData[idx];
+              const g = scanData[idx + 1];
+              const b = scanData[idx + 2];
+
+              let isSubject = false;
+              if (isCornerDark) {
+                isSubject = a > 40 && (r > 24 || g > 24 || b > 24);
+              } else if (isCornerWhite) {
+                isSubject = a > 40 && (r < 235 || g < 235 || b < 235);
+              } else {
+                isSubject = a > 50;
+              }
+
+              if (isSubject) {
+                hasContent = true;
+                if (x < minX) minX = x;
+                if (x > maxX) maxX = x;
+                if (y < minY) minY = y;
+                if (y > maxY) maxY = y;
+              }
+            }
+          }
+
+          // Compute crop coordinates based on subject bounding box
+          let cropX = 0, cropY = 0, cropW = img.width, cropH = img.height;
+          if (hasContent && maxX > minX && maxY > minY) {
+            const padRatio = 0.03;
+            const padX = (maxX - minX) * padRatio;
+            const padY = (maxY - minY) * padRatio;
+            cropX = Math.max(0, Math.floor(((minX - padX) / scanW) * img.width));
+            cropY = Math.max(0, Math.floor(((minY - padY) / scanH) * img.height));
+            cropW = Math.min(img.width - cropX, Math.ceil(((maxX - minX + 2 * padX) / scanW) * img.width));
+            cropH = Math.min(img.height - cropY, Math.ceil(((maxY - minY + 2 * padY) / scanH) * img.height));
+          }
+
+          // 2. Compute dynamic grid dimensions from active canvas and selected pixelSize
+          const canvas = artworkCanvasRef.current;
+          const availableCols = canvas ? Math.max(16, Math.floor(canvas.width / pixelSize)) : 48;
+          const availableRows = canvas ? Math.max(16, Math.floor(canvas.height / pixelSize)) : 32;
+
+          const aspect = cropW / cropH;
+          let targetW = availableCols - 4;
+          let targetH = Math.round(targetW / aspect);
+
+          if (targetH > availableRows - 4) {
+            targetH = availableRows - 4;
+            targetW = Math.round(targetH * aspect);
+          }
+          targetW = Math.max(8, targetW);
+          targetH = Math.max(8, targetH);
+
+          // 3. Render cropped subject to target pixel grid with crisp downscaling
           const tempCanvas = document.createElement("canvas");
-          const targetW = 40;
-          const targetH = 24;
           tempCanvas.width = targetW;
           tempCanvas.height = targetH;
           const tempCtx = tempCanvas.getContext("2d");
           if (!tempCtx) return;
 
-          tempCtx.drawImage(img, 0, 0, targetW, targetH);
+          tempCtx.imageSmoothingEnabled = true;
+          tempCtx.imageSmoothingQuality = "high";
+          tempCtx.drawImage(img, cropX, cropY, cropW, cropH, 0, 0, targetW, targetH);
+
           const imgData = tempCtx.getImageData(0, 0, targetW, targetH).data;
 
           pixelsRef.current.clear();
-          const startCol = 4;
-          const startRow = 3;
+          const startCol = Math.max(0, Math.floor((availableCols - targetW) / 2));
+          const startRow = Math.max(0, Math.floor((availableRows - targetH) / 2));
 
+          // 4. Contrast enhancement & pixel populating
           for (let y = 0; y < targetH; y++) {
             for (let x = 0; x < targetW; x++) {
               const i = (y * targetW + x) * 4;
-              const r = imgData[i];
-              const g = imgData[i + 1];
-              const b = imgData[i + 2];
+              let r = imgData[i];
+              let g = imgData[i + 1];
+              let b = imgData[i + 2];
               const a = imgData[i + 3];
 
-              if (a > 64 && (r > 15 || g > 15 || b > 15)) {
-                const hex = "#" + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1);
-                pixelsRef.current.set(`${y + startRow}_${x + startCol}`, hex);
+              // Filter out transparent or background pixels
+              if (a < 50 || (r < 18 && g < 18 && b < 18)) {
+                continue;
               }
+
+              // Contrast enhancement so fine details (hair, eyes, uniforms) don't wash out
+              const contrastFactor = 1.15;
+              r = Math.min(255, Math.max(0, Math.round(((r / 255 - 0.5) * contrastFactor + 0.5) * 255)));
+              g = Math.min(255, Math.max(0, Math.round(((g / 255 - 0.5) * contrastFactor + 0.5) * 255)));
+              b = Math.min(255, Math.max(0, Math.round(((b / 255 - 0.5) * contrastFactor + 0.5) * 255)));
+
+              const hex = "#" + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1);
+              pixelsRef.current.set(`${y + startRow}_${x + startCol}`, hex);
             }
           }
 
@@ -1492,7 +1582,7 @@ export const PixelEngine: React.FC = () => {
       };
       reader.readAsDataURL(file);
     },
-    [redrawAll, saveStep, playPopSound]
+    [redrawAll, saveStep, playPopSound, pixelSize]
   );
 
   // Swatch Palette (Combines active theme + cyberpunk palette)
@@ -1802,7 +1892,7 @@ export const PixelEngine: React.FC = () => {
             <span className="text-[10px] hidden sm:inline">SIZE:</span>
             <input
               type="range"
-              min="8"
+              min="6"
               max="48"
               step="2"
               value={pixelSize}
