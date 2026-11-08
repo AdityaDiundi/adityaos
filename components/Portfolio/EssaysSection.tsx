@@ -59,11 +59,11 @@ export function EssaysSection() {
                 isDark ? "text-zinc-400" : "text-stone-600"
               }`}
             >
-              Reflections on mental models, rural ethnography, youth systems, and personal agency published on India Fellow and Medium.
+              Reflections on mental models, rural ethnography, youth systems, and personal agency published on India Fellow, Medium, and Bear Blog.
             </p>
           </div>
 
-          <div className="flex flex-wrap items-center gap-4 text-xs font-mono">
+          <div className="flex flex-wrap items-center gap-3 sm:gap-4 text-xs font-mono">
             <a
               href="https://indiafellow.org/blog/all-posts/author/adityadiundi/"
               target="_blank"
@@ -84,7 +84,19 @@ export function EssaysSection() {
                 isDark ? "text-zinc-400 hover:text-white" : "text-stone-600 hover:text-stone-900"
               }`}
             >
-              <span>medium.com/@adityadiundi</span>
+              <span>medium.com</span>
+              <ArrowUpRight className="w-3.5 h-3.5" />
+            </a>
+            <span className={isDark ? "text-zinc-700" : "text-stone-300"}>•</span>
+            <a
+              href="https://diundi.bearblog.dev"
+              target="_blank"
+              rel="noopener noreferrer"
+              className={`flex items-center gap-1.5 hover:underline py-1 ${
+                isDark ? "text-zinc-400 hover:text-white" : "text-stone-600 hover:text-stone-900"
+              }`}
+            >
+              <span>diundi.bearblog.dev</span>
               <ArrowUpRight className="w-3.5 h-3.5" />
             </a>
           </div>
@@ -147,7 +159,7 @@ export function EssaysSection() {
               isDark ? "text-zinc-500" : "text-stone-500"
             }`}
           >
-            India Fellow · Medium · Personal Archive
+            India Fellow · Medium · Bear Blog · Archive
           </span>
         </div>
 
