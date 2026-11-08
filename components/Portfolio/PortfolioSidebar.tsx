@@ -32,6 +32,7 @@ export function PortfolioSidebar({
 }: PortfolioSidebarProps) {
   const [themeDropdownOpen, setThemeDropdownOpen] = useState(false);
   const { currentThemeId, setTheme, activeTheme } = useThemeStore();
+  const isDark = activeTheme.isDark;
 
   const feedToggles = [
     { id: "all", label: "All Items", icon: Layers, count: "26" },
@@ -49,12 +50,22 @@ export function PortfolioSidebar({
   ];
 
   return (
-    <aside className="w-full lg:w-80 xl:w-84 flex-shrink-0 lg:sticky lg:top-0 lg:self-start lg:h-screen lg:max-h-screen border-b lg:border-b-0 lg:border-r border-zinc-800 p-6 sm:p-7 xl:p-8 flex flex-col justify-between bg-zinc-950/95 z-30 overflow-y-auto">
+    <aside
+      className={`w-full lg:w-80 xl:w-84 flex-shrink-0 lg:sticky lg:top-0 lg:self-start lg:h-screen lg:max-h-screen border-b lg:border-b-0 lg:border-r p-6 sm:p-7 xl:p-8 flex flex-col justify-between z-30 overflow-y-auto transition-colors ${
+        isDark
+          ? "bg-[#0b0d13]/95 border-zinc-800 text-zinc-100"
+          : "bg-[#FBFBF9]/95 border-stone-200 text-stone-900"
+      }`}
+    >
       {/* Top Identity & Above-The-Fold Conversion Block */}
       <div className="space-y-6">
         {/* Profile Avatar & Title */}
         <div className="flex items-center gap-3.5">
-          <div className="relative w-12 h-12 rounded-full overflow-hidden border border-zinc-700 flex-shrink-0 shadow-md">
+          <div
+            className={`relative w-12 h-12 rounded-full overflow-hidden border flex-shrink-0 shadow-md ${
+              isDark ? "border-zinc-700" : "border-stone-300"
+            }`}
+          >
             <Image
               src="/aditya_avatar_sq.jpg"
               alt="Aditya Diundi"
@@ -64,25 +75,41 @@ export function PortfolioSidebar({
             />
           </div>
           <div>
-            <h1 className="font-sans font-bold text-lg text-white tracking-tight">
+            <h1
+              className={`font-sans font-bold text-lg tracking-tight ${
+                isDark ? "text-white" : "text-stone-900"
+              }`}
+            >
               Aditya Diundi
             </h1>
-            <p className="text-xs font-mono text-zinc-400">
+            <p
+              className={`text-xs font-mono ${
+                isDark ? "text-zinc-400" : "text-stone-600"
+              }`}
+            >
               Product Designer
             </p>
           </div>
         </div>
 
         {/* Location & Status Pill */}
-        <div className="flex items-center gap-2 text-xs font-mono text-zinc-400">
-          <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+        <div
+          className={`flex items-center gap-2 text-xs font-mono ${
+            isDark ? "text-zinc-400" : "text-stone-600"
+          }`}
+        >
+          <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
           <span>Delhi, India</span>
-          <span className="text-zinc-600">·</span>
-          <span className="text-emerald-400 font-medium">Available</span>
+          <span className={isDark ? "text-zinc-600" : "text-stone-300"}>·</span>
+          <span className="text-emerald-500 font-medium">Available</span>
         </div>
 
         {/* Systems Statement Bio */}
-        <p className="text-xs sm:text-[13px] text-zinc-400 font-sans leading-relaxed">
+        <p
+          className={`text-xs sm:text-[13px] font-sans leading-relaxed ${
+            isDark ? "text-zinc-400" : "text-stone-600"
+          }`}
+        >
           Bridging engineering depth from IIIT Delhi, grassroots ethnography, and systems craft to build straightforward software.
         </p>
 
@@ -93,26 +120,48 @@ export function PortfolioSidebar({
               href="/Aditya_Diundi_Resume.pdf"
               target="_blank"
               rel="noopener noreferrer"
-              className="w-full py-2.5 px-3.5 rounded-lg bg-white hover:bg-zinc-200 text-zinc-950 font-bold flex items-center justify-center gap-2 shadow-[0_2px_10px_rgba(255,255,255,0.1)] transition-all cursor-pointer group/cta"
+              className={`w-full py-2.5 px-3.5 rounded-lg font-bold flex items-center justify-center gap-2 transition-all cursor-pointer group/cta shadow-sm ${
+                isDark
+                  ? "bg-white hover:bg-zinc-200 text-zinc-950"
+                  : "bg-stone-900 hover:bg-black text-white"
+              }`}
             >
-              <FileText className="w-4 h-4 text-zinc-900" />
+              <FileText className="w-4 h-4" />
               <span>View Resume (PDF)</span>
-              <span className="text-[10px] bg-zinc-200 px-1.5 py-0.5 rounded text-zinc-800 ml-auto font-medium">1.2MB</span>
+              <span
+                className={`text-[10px] px-1.5 py-0.5 rounded ml-auto font-medium ${
+                  isDark ? "bg-zinc-200 text-zinc-800" : "bg-stone-800 text-stone-200"
+                }`}
+              >
+                1.2MB
+              </span>
             </a>
 
             <a
               href="mailto:aditya15124@iiitd.ac.in"
-              className="w-full py-2.5 px-3.5 rounded-lg border border-emerald-500/30 bg-emerald-950/20 hover:bg-emerald-900/40 text-emerald-300 font-semibold flex items-center justify-center gap-2 transition-all cursor-pointer"
+              className={`w-full py-2.5 px-3.5 rounded-lg border font-semibold flex items-center justify-center gap-2 transition-all cursor-pointer ${
+                isDark
+                  ? "border-emerald-500/30 bg-emerald-950/20 hover:bg-emerald-900/40 text-emerald-300"
+                  : "border-emerald-600/30 bg-emerald-50 hover:bg-emerald-100 text-emerald-700"
+              }`}
             >
-              <Mail className="w-3.5 h-3.5 text-emerald-400" />
+              <Mail className="w-3.5 h-3.5" />
               <span>Get in Touch</span>
             </a>
           </div>
         </div>
 
         {/* Feed Section Toggles */}
-        <div className="space-y-2 pt-3 border-t border-zinc-800/80">
-          <div className="text-[10px] font-mono text-zinc-500 uppercase tracking-wider pb-1">
+        <div
+          className={`space-y-2 pt-3 border-t ${
+            isDark ? "border-zinc-800/80" : "border-stone-200"
+          }`}
+        >
+          <div
+            className={`text-[10px] font-mono uppercase tracking-wider pb-1 ${
+              isDark ? "text-zinc-500" : "text-stone-500"
+            }`}
+          >
             Site Architecture
           </div>
           <div className="space-y-1">
@@ -125,8 +174,12 @@ export function PortfolioSidebar({
                   onClick={() => onSelectFilter(item.id)}
                   className={`w-full flex items-center justify-between px-3 py-2 rounded-lg text-xs font-mono transition-all cursor-pointer ${
                     isActive
-                      ? "bg-zinc-100 text-zinc-950 font-semibold shadow-sm"
-                      : "text-zinc-400 hover:text-white hover:bg-zinc-900/70"
+                      ? isDark
+                        ? "bg-zinc-100 text-zinc-950 font-semibold shadow-sm"
+                        : "bg-stone-900 text-white font-semibold shadow-sm"
+                      : isDark
+                      ? "text-zinc-400 hover:text-white hover:bg-zinc-900/70"
+                      : "text-stone-600 hover:text-stone-900 hover:bg-stone-100"
                   }`}
                 >
                   <div className="flex items-center gap-2.5">
@@ -135,7 +188,13 @@ export function PortfolioSidebar({
                   </div>
                   <span
                     className={`text-[10px] px-1.5 py-0.5 rounded ${
-                      isActive ? "bg-zinc-300 text-zinc-900 font-bold" : "bg-zinc-900 text-zinc-500"
+                      isActive
+                        ? isDark
+                          ? "bg-zinc-300 text-zinc-900 font-bold"
+                          : "bg-stone-800 text-stone-200 font-bold"
+                        : isDark
+                        ? "bg-zinc-900 text-zinc-500"
+                        : "bg-stone-200 text-stone-600"
                     }`}
                   >
                     {item.count}
@@ -148,13 +207,21 @@ export function PortfolioSidebar({
       </div>
 
       {/* Bottom Actions & Controls */}
-      <div className="space-y-4 pt-6 mt-6 border-t border-zinc-800/80">
+      <div
+        className={`space-y-4 pt-6 mt-6 border-t ${
+          isDark ? "border-zinc-800/80" : "border-stone-200"
+        }`}
+      >
         {/* Launch adityaos Terminal Engine */}
         <button
           onClick={onLaunchOS}
-          className="w-full py-2.5 px-3 rounded-lg border border-cyan-500/30 bg-cyan-950/20 hover:bg-cyan-900/40 text-cyan-300 flex items-center justify-center gap-2 transition-colors cursor-pointer text-xs font-mono"
+          className={`w-full py-2.5 px-3 rounded-lg border flex items-center justify-center gap-2 transition-colors cursor-pointer text-xs font-mono ${
+            isDark
+              ? "border-cyan-500/30 bg-cyan-950/20 hover:bg-cyan-900/40 text-cyan-300"
+              : "border-stone-300 bg-stone-100 hover:bg-stone-200 text-stone-800"
+          }`}
         >
-          <Terminal className="w-3.5 h-3.5 text-cyan-400" />
+          <Terminal className="w-3.5 h-3.5 text-cyan-500" />
           <span>Launch adityaos Shell</span>
         </button>
 
@@ -162,20 +229,32 @@ export function PortfolioSidebar({
         <div className="relative">
           <button
             onClick={() => setThemeDropdownOpen(!themeDropdownOpen)}
-            className="w-full flex items-center justify-between px-2.5 py-1.5 rounded border border-zinc-800 bg-zinc-900/50 hover:bg-zinc-900 text-zinc-300 font-mono text-[11px] cursor-pointer transition-colors"
+            className={`w-full flex items-center justify-between px-2.5 py-1.5 rounded border font-mono text-[11px] cursor-pointer transition-colors ${
+              isDark
+                ? "border-zinc-800 bg-zinc-900/50 hover:bg-zinc-900 text-zinc-300"
+                : "border-stone-200 bg-stone-100 hover:bg-stone-200 text-stone-800"
+            }`}
           >
             <div className="flex items-center gap-1.5">
               <Palette className="w-3 h-3 text-zinc-400" />
-              <span className="text-zinc-500">Theme:</span>
-              <span className="font-medium text-zinc-200">
+              <span className={isDark ? "text-zinc-500" : "text-stone-500"}>Theme:</span>
+              <span className={`font-medium ${isDark ? "text-zinc-200" : "text-stone-900"}`}>
                 {themeOptions.find((t) => t.id === currentThemeId)?.label.split(" ")[0] || "Obsidian"}
               </span>
             </div>
-            <span className="text-[10px] text-zinc-500">Switch</span>
+            <span className={`text-[10px] ${isDark ? "text-zinc-500" : "text-stone-500"}`}>
+              Switch
+            </span>
           </button>
 
           {themeDropdownOpen && (
-            <div className="absolute bottom-full mb-1.5 left-0 right-0 rounded-lg p-1 border border-zinc-800 bg-zinc-950 shadow-2xl backdrop-blur-2xl z-50 text-xs font-mono">
+            <div
+              className={`absolute bottom-full mb-1.5 left-0 right-0 rounded-lg p-1 border shadow-2xl backdrop-blur-2xl z-50 text-xs font-mono ${
+                isDark
+                  ? "border-zinc-800 bg-[#090b10] text-zinc-300"
+                  : "border-stone-200 bg-white text-stone-800"
+              }`}
+            >
               {themeOptions.map((opt) => {
                 const isSelected = currentThemeId === opt.id;
                 return (
@@ -185,12 +264,18 @@ export function PortfolioSidebar({
                       setTheme(opt.id);
                       setThemeDropdownOpen(false);
                     }}
-                    className="w-full text-left px-2 py-1.5 rounded flex items-center justify-between hover:bg-zinc-900 transition-colors cursor-pointer text-[11px]"
+                    className={`w-full text-left px-2 py-1.5 rounded flex items-center justify-between transition-colors cursor-pointer text-[11px] ${
+                      isSelected
+                        ? isDark
+                          ? "bg-zinc-800 text-white font-medium"
+                          : "bg-stone-100 text-stone-900 font-semibold"
+                        : isDark
+                        ? "text-zinc-400 hover:bg-zinc-900 hover:text-white"
+                        : "text-stone-600 hover:bg-stone-50 hover:text-stone-900"
+                    }`}
                   >
-                    <span className={isSelected ? "text-white font-medium" : "text-zinc-400"}>
-                      {opt.label}
-                    </span>
-                    {isSelected && <Check className="w-3 h-3 text-white" />}
+                    <span>{opt.label}</span>
+                    {isSelected && <Check className="w-3 h-3" />}
                   </button>
                 );
               })}
@@ -199,12 +284,16 @@ export function PortfolioSidebar({
         </div>
 
         {/* Social Links & Email */}
-        <div className="flex items-center justify-between text-xs font-mono text-zinc-400 pt-0.5">
+        <div
+          className={`flex items-center justify-between text-xs font-mono pt-0.5 ${
+            isDark ? "text-zinc-400" : "text-stone-500"
+          }`}
+        >
           <a
             href="https://github.com/AdityaDiundi"
             target="_blank"
             rel="noopener noreferrer"
-            className="hover:text-white transition-colors p-1"
+            className={`transition-colors p-1 ${isDark ? "hover:text-white" : "hover:text-stone-900"}`}
             title="GitHub"
           >
             <Github className="w-3.5 h-3.5" />
@@ -213,7 +302,7 @@ export function PortfolioSidebar({
             href="https://youtube.com/@falsepeek"
             target="_blank"
             rel="noopener noreferrer"
-            className="hover:text-red-400 transition-colors p-1"
+            className="hover:text-red-500 transition-colors p-1"
             title="YouTube @falsepeek"
           >
             <Youtube className="w-3.5 h-3.5" />
@@ -222,14 +311,14 @@ export function PortfolioSidebar({
             href="https://diundi.bearblog.dev"
             target="_blank"
             rel="noopener noreferrer"
-            className="hover:text-purple-400 transition-colors p-1"
+            className="hover:text-purple-500 transition-colors p-1"
             title="Bear Blog"
           >
             <Globe className="w-3.5 h-3.5" />
           </a>
           <a
             href="mailto:aditya15124@iiitd.ac.in"
-            className="hover:text-cyan-400 transition-colors p-1"
+            className="hover:text-emerald-500 transition-colors p-1"
             title="Email"
           >
             <Mail className="w-3.5 h-3.5" />

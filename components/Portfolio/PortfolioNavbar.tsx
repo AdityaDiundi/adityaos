@@ -36,8 +36,6 @@ export function PortfolioNavbar({ onLaunchOS, onNavigateSection }: PortfolioNavb
   return (
     <header className="sticky top-0 z-50 w-full backdrop-blur-xl bg-zinc-950/90 transition-colors duration-300">
       <div className="max-w-7xl mx-auto border-x border-b border-zinc-800 relative flex items-center justify-between text-xs font-mono">
-        <span className="absolute -bottom-1.5 -left-1.5 text-zinc-600 select-none z-20">+</span>
-        <span className="absolute -bottom-1.5 -right-1.5 text-zinc-600 select-none z-20">+</span>
 
         {/* Identity */}
         <div className="flex items-center gap-3 px-6 sm:px-8 py-3.5 border-r border-zinc-800 h-full flex-shrink-0">
