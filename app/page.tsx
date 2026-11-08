@@ -276,18 +276,18 @@ export default function Home() {
           borderColor: activeTheme.headerBorder,
           color: activeTheme.textPrimary,
         }}
-        className="h-8 border-b px-3 flex items-center justify-between text-xs z-[1000] backdrop-blur-md relative"
+        className="h-8 border-b px-3 flex items-center justify-between text-xs z-[1000] backdrop-blur-md relative whitespace-nowrap select-none overflow-hidden"
       >
         {/* Left: OS Branding & Clickable Workspace Tags */}
-        <div className="flex items-center gap-2 sm:gap-3">
+        <div className="flex items-center gap-2 sm:gap-3 shrink-0 whitespace-nowrap">
           <button
             type="button"
             onClick={() => openAndFocus("coreIntro")}
             title="Focus AdityaOS Core"
-            className="flex items-center gap-1.5 font-bold hover:opacity-80 transition-opacity cursor-pointer"
+            className="flex items-center gap-1.5 font-bold hover:opacity-80 transition-opacity cursor-pointer whitespace-nowrap shrink-0"
           >
             <span style={{ color: activeTheme.accent }}>⟡</span>
-            <span style={{ color: activeTheme.textPrimary }}>aditya-os</span>
+            <span className="whitespace-nowrap" style={{ color: activeTheme.textPrimary }}>aditya-os</span>
             <span style={{ color: activeTheme.textMuted }} className="text-[10px] font-normal hidden sm:inline">
               v2.4
             </span>
@@ -296,7 +296,7 @@ export default function Home() {
           <button
             type="button"
             onClick={() => setViewMode("portfolio")}
-            className="px-2 py-0.5 rounded border font-semibold flex items-center gap-1 hover:opacity-100 transition-all cursor-pointer text-[10px]"
+            className="px-2 py-0.5 rounded border font-semibold flex items-center gap-1 hover:opacity-100 transition-all cursor-pointer text-[10px] whitespace-nowrap shrink-0"
             style={{
               backgroundColor: activeTheme.isDark ? "rgba(0, 255, 204, 0.15)" : "rgba(18, 19, 22, 0.08)",
               borderColor: activeTheme.isDark ? "#00FFCC" : "rgba(0, 0, 0, 0.18)",
@@ -309,11 +309,11 @@ export default function Home() {
 
           <div
             style={{ backgroundColor: activeTheme.headerBorder }}
-            className="h-3 w-px"
+            className="h-3 w-px shrink-0"
           />
 
           {/* Interactive Workspace Tags */}
-          <div className="flex items-center gap-1 text-[11px]">
+          <div className="flex items-center gap-1 text-[11px] shrink-0 whitespace-nowrap">
             {/* [1:SYS] -> coreIntro */}
             <button
               type="button"
@@ -326,7 +326,7 @@ export default function Home() {
                 color:
                   activeWindow === "coreIntro" ? activeTheme.accent : activeTheme.textMuted,
               }}
-              className="px-1.5 py-0.2 rounded border font-semibold hover:opacity-100 transition-all cursor-pointer"
+              className="px-1.5 py-0.2 rounded border font-semibold hover:opacity-100 transition-all cursor-pointer shrink-0"
               title="Workspace 1: Identity & Core Intro"
             >
               [1:CORE]
@@ -344,7 +344,7 @@ export default function Home() {
                 color:
                   activeWindow === "archiveReader" ? activeTheme.accent : activeTheme.textMuted,
               }}
-              className="px-1.5 py-0.2 rounded border font-semibold hover:opacity-100 transition-all cursor-pointer"
+              className="px-1.5 py-0.2 rounded border font-semibold hover:opacity-100 transition-all cursor-pointer shrink-0"
               title="Workspace 2: Essays & Poetry Archive"
             >
               [2:ARCHIVE]
@@ -362,7 +362,7 @@ export default function Home() {
                 color:
                   activeWindow === "streamFeed" ? activeTheme.accent : activeTheme.textMuted,
               }}
-              className="px-1.5 py-0.2 rounded border font-semibold hover:opacity-100 transition-all cursor-pointer"
+              className="px-1.5 py-0.2 rounded border font-semibold hover:opacity-100 transition-all cursor-pointer shrink-0"
               title="Workspace 3: @falsepeek Media & Shorts Feed"
             >
               [3:MEDIA]
@@ -380,7 +380,7 @@ export default function Home() {
                 color:
                   activeWindow === "pixelEngine" ? activeTheme.accent : activeTheme.textMuted,
               }}
-              className="px-1.5 py-0.2 rounded border font-semibold hover:opacity-100 transition-all cursor-pointer"
+              className="px-1.5 py-0.2 rounded border font-semibold hover:opacity-100 transition-all cursor-pointer shrink-0"
               title="Workspace 4: Pixel Engine 2D/3D Voxel Canvas"
             >
               [4:CANVAS]
@@ -398,7 +398,7 @@ export default function Home() {
                 color:
                   activeWindow === "resumeViewer" ? activeTheme.accent : activeTheme.textMuted,
               }}
-              className="px-1.5 py-0.2 rounded border font-semibold hover:opacity-100 transition-all cursor-pointer"
+              className="px-1.5 py-0.2 rounded border font-semibold hover:opacity-100 transition-all cursor-pointer hidden sm:inline-block shrink-0"
               title="Workspace 5: Resume & Experience Viewer"
             >
               [5:RESUME]
@@ -416,7 +416,7 @@ export default function Home() {
                 color:
                   activeWindow === "galleryViewer" ? activeTheme.accent : activeTheme.textMuted,
               }}
-              className="px-1.5 py-0.2 rounded border font-semibold hover:opacity-100 transition-all cursor-pointer hidden md:inline-block"
+              className="px-1.5 py-0.2 rounded border font-semibold hover:opacity-100 transition-all cursor-pointer hidden lg:inline-block shrink-0"
               title="Workspace 6: Feh Image Gallery"
             >
               [6:GALLERY]
@@ -434,7 +434,7 @@ export default function Home() {
                 color:
                   activeWindow === "fieldJournal" ? activeTheme.accent : activeTheme.textMuted,
               }}
-              className="px-1.5 py-0.2 rounded border font-semibold hover:opacity-100 transition-all cursor-pointer hidden lg:inline-block"
+              className="px-1.5 py-0.2 rounded border font-semibold hover:opacity-100 transition-all cursor-pointer hidden xl:inline-block shrink-0"
               title="Workspace 7: Rajasthan Field Journal & Grassroots Leadership"
             >
               [7:FIELD]
@@ -452,7 +452,7 @@ export default function Home() {
                 color:
                   activeWindow === "learnabilityLab" ? activeTheme.accent : activeTheme.textMuted,
               }}
-              className="px-1.5 py-0.2 rounded border font-semibold hover:opacity-100 transition-all cursor-pointer hidden lg:inline-block"
+              className="px-1.5 py-0.2 rounded border font-semibold hover:opacity-100 transition-all cursor-pointer hidden 2xl:inline-block shrink-0"
               title="Workspace 8: Aarohi Bal Sansar Learnability Lab"
             >
               [8:DIAGNOSTICS]
@@ -470,7 +470,7 @@ export default function Home() {
                 color:
                   activeWindow === "wallpaperManager" ? activeTheme.accent : activeTheme.textMuted,
               }}
-              className="px-1.5 py-0.2 rounded border font-semibold hover:opacity-100 transition-all cursor-pointer hidden xl:inline-block"
+              className="px-1.5 py-0.2 rounded border font-semibold hover:opacity-100 transition-all cursor-pointer hidden 2xl:inline-block shrink-0"
               title="Workspace 9: Dynamic Wallpaper Engine"
             >
               [9:WALLPAPER]
@@ -479,7 +479,7 @@ export default function Home() {
         </div>
 
         {/* Center: Active Window Title Tag */}
-        <div className="hidden md:flex items-center gap-2 text-[11px]" style={{ color: activeTheme.textMuted }}>
+        <div className="hidden xl:flex items-center gap-2 text-[11px] shrink-0 whitespace-nowrap" style={{ color: activeTheme.textMuted }}>
           <span>ACTIVE:</span>
           <span
             style={{
@@ -494,7 +494,7 @@ export default function Home() {
         </div>
 
         {/* Right: Launchers + Theme Switcher + Audio + Telemetry + Clock */}
-        <div className="flex items-center gap-1.5 sm:gap-2.5 text-[11px]">
+        <div className="flex items-center gap-1.5 sm:gap-2.5 text-[11px] shrink-0 whitespace-nowrap">
           {/* Quick Utility Launchers: Visitor Note + Wallpaper Switcher */}
           <div className="flex items-center gap-1.5">
             {/* Sticky Note Toggle */}
