@@ -36,5 +36,5 @@ export const metadata: Metadata = {
 };
 
 export default function PixelPage() {
-  return <DesktopPage />;
+  return <DesktopPage initialViewMode="os" defaultApp="pixelEngine" />;
 }

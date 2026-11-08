@@ -58,7 +58,13 @@ const APP_LABELS: Record<string, string> = {
   wallpaperManager: "Wallpaper Gallery",
 };
 
-export default function Home() {
+export default function Home({
+  initialViewMode,
+  defaultApp,
+}: {
+  initialViewMode?: "portfolio" | "os";
+  defaultApp?: string;
+} = {}) {
   const desktopContainerRef = useRef<HTMLDivElement>(null);
   const {
     openWindows,
@@ -86,7 +92,28 @@ export default function Home() {
   const [cpuUsage, setCpuUsage] = useState<number>(14);
   const [memUsage, setMemUsage] = useState<number>(38);
   const [isThemeMenuOpen, setIsThemeMenuOpen] = useState<boolean>(false);
-  const [viewMode, setViewMode] = useState<"portfolio" | "os">("portfolio");
+
+  const [viewMode, setViewMode] = useState<"portfolio" | "os">(() => {
+    if (initialViewMode) return initialViewMode;
+    if (typeof window !== "undefined") {
+      const hostname = window.location.hostname;
+      const pathname = window.location.pathname;
+      const params = new URLSearchParams(window.location.search);
+      const appParam = params.get("app");
+      const isPixel =
+        hostname.includes("pixel-engine") ||
+        hostname.includes("pixel-studio") ||
+        pathname.startsWith("/pixel") ||
+        pathname.startsWith("/studio") ||
+        pathname.startsWith("/pixelengine") ||
+        params.get("mode") === "os" ||
+        appParam === "pixel" ||
+        appParam === "pixelEngine" ||
+        defaultApp === "pixelEngine";
+      if (isPixel) return "os";
+    }
+    return "portfolio";
+  });
 
   useEffect(() => {
     if (typeof window !== "undefined") {
@@ -102,13 +129,15 @@ export default function Home() {
         pathname === "/pixelengine" ||
         appParam === "pixel" ||
         appParam === "pixelEngine" ||
-        appParam === "studio";
+        appParam === "studio" ||
+        defaultApp === "pixelEngine";
 
       if (isPixelLink) {
         setViewMode("os");
         restoreWindow("pixelEngine");
         focusWindow("pixelEngine");
         maximizeWindow("pixelEngine");
+        closeWindow("coreIntro");
       } else if (params.get("mode") === "os") {
         setViewMode("os");
       }
