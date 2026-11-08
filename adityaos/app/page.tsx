@@ -232,11 +232,28 @@ export default function Home({
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [activeWindow, closeWindow]);
 
+  // Dismiss context menu whenever clicking outside the menu
+  useEffect(() => {
+    if (!contextMenu) return;
+    const handleGlobalPointerDown = (e: PointerEvent | MouseEvent) => {
+      const target = e.target as HTMLElement | null;
+      if (target?.closest("#desktop-context-menu")) return;
+      setContextMenu(null);
+    };
+    window.addEventListener("pointerdown", handleGlobalPointerDown);
+    return () => window.removeEventListener("pointerdown", handleGlobalPointerDown);
+  }, [contextMenu]);
+
   const handleContextMenu = (e: React.MouseEvent) => {
     const target = e.target as HTMLElement;
-    // Don't intercept right clicks if inside an active window frame, header, or interactive controls
+    // Don't intercept right clicks if inside an active window frame, canvas, header, or interactive controls
     if (
       target.closest(".window-frame") ||
+      target.closest("[data-window-id]") ||
+      target.closest("canvas") ||
+      target.closest(".pixel-engine") ||
+      target.closest(".pixel-engine-viewport") ||
+      target.closest(".pixel-engine-canvas") ||
       target.closest("header") ||
       target.closest("input") ||
       target.closest("textarea") ||
@@ -1089,7 +1106,9 @@ export default function Home({
       {/* Desktop Right-Click Context Menu */}
       {contextMenu && (
         <div
+          id="desktop-context-menu"
           onClick={(e) => e.stopPropagation()}
+          onContextMenu={(e) => e.stopPropagation()}
           style={{
             top: contextMenu.y,
             left: contextMenu.x,

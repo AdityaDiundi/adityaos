@@ -126,7 +126,8 @@ export const WindowFrame: React.FC<WindowFrameProps> = ({
         borderColor: isActive ? activeTheme.windowActiveBorder : activeTheme.windowBorder,
         boxShadow: isActive ? `0 12px 36px -8px ${activeTheme.accentGlow}` : undefined,
       }}
-      className={`flex flex-col border rounded-md shadow-window overflow-hidden backdrop-blur-md relative ${className}`}
+      data-window-id={id}
+      className={`window-frame flex flex-col border rounded-md shadow-window overflow-hidden backdrop-blur-md relative ${className}`}
     >
       {/* TWM Title Bar */}
       <div

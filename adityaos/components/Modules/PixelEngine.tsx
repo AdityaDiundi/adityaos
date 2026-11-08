@@ -1272,7 +1272,7 @@ export const PixelEngine: React.FC = () => {
     }
 
     isDrawingRef.current = true;
-    if (activeTool === "eraser" || e.buttons === 2) {
+    if (activeTool === "eraser" || e.buttons === 2 || e.button === 2) {
       if (pixelsRef.current.has(key)) {
         pixelsRef.current.delete(key);
         recordPixelPopped(1);
@@ -1352,7 +1352,7 @@ export const PixelEngine: React.FC = () => {
 
     points.forEach((pt) => {
       const key = `${pt.row}_${pt.col}`;
-      if (activeTool === "eraser" || e.buttons === 2) {
+      if (activeTool === "eraser" || (e.buttons & 2) === 2 || e.buttons === 2) {
         if (pixelsRef.current.has(key)) {
           pixelsRef.current.delete(key);
           recordPixelPopped(1);
@@ -1780,11 +1780,15 @@ export const PixelEngine: React.FC = () => {
   return (
     <div
       onWheel={(e) => playScrollNote(e.deltaY)}
+      onContextMenu={(e) => {
+        // Prevent desktop context menu from opening when interacting with Pixel Engine
+        e.stopPropagation();
+      }}
       style={{
         backgroundColor: activeTheme.windowBg,
         color: activeTheme.textPrimary,
       }}
-      className="flex flex-col h-full select-none font-mono text-xs overflow-hidden"
+      className="pixel-engine flex flex-col h-full select-none font-mono text-xs overflow-hidden"
     >
       {/* Pixel Engine Header Controls Toolbar */}
       <div
@@ -2529,11 +2533,15 @@ export const PixelEngine: React.FC = () => {
         {/* Viewport Canvas Container (100% flex-1 to fill vacant space upon sidebar minimize) */}
         <div
           ref={containerRef}
+          onContextMenu={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+          }}
           style={{ backgroundColor: activeTheme.canvasBg }}
-          className="flex-1 w-full h-full relative overflow-hidden cursor-crosshair min-w-0 min-h-0"
+          className="flex-1 w-full h-full relative overflow-hidden cursor-crosshair min-w-0 min-h-0 pixel-engine-viewport"
         >
           {/* Grid Canvas Layer */}
-          <canvas ref={gridCanvasRef} className="absolute inset-0 pointer-events-none block w-full h-full" />
+          <canvas ref={gridCanvasRef} className="absolute inset-0 pointer-events-none block w-full h-full pointer-events-none" />
 
           {/* Main Artwork Canvas Layer */}
           <canvas
@@ -2545,8 +2553,11 @@ export const PixelEngine: React.FC = () => {
               isDrawingRef.current = false;
               setHoverCoord(null);
             }}
-            onContextMenu={(e) => e.preventDefault()}
-            className="absolute inset-0 touch-none block w-full h-full"
+            onContextMenu={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+            }}
+            className="absolute inset-0 touch-none block w-full h-full pixel-engine-canvas"
           />
 
           {/* Hover Preview Canvas Layer */}
