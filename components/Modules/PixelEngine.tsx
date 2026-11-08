@@ -32,6 +32,9 @@ import {
   Sliders,
   Globe,
   Gamepad2,
+  Bot,
+  Upload,
+  FileCode,
 } from "lucide-react";
 import { useThemeStore } from "@/store/themeStore";
 import { useSoundStore } from "@/store/soundStore";
@@ -41,7 +44,7 @@ import {
   recordPixelPopped,
   GlobalCommunityStats,
 } from "@/lib/firebaseStats";
-import { createInitialPixelArt } from "./pixelArtPresets";
+import { createInitialPixelArt, INITIAL_PIXELS } from "./pixelArtPresets";
 
 // 5x5 and 5x3 Pixel Bitmap Font from homesec.tsx / pixel.tsx
 const PIXEL_FONT: Record<string, string[]> = {
@@ -1377,6 +1380,121 @@ export const PixelEngine: React.FC = () => {
     playPopSound(300);
   };
 
+  // Automated Bot Placement Engine (r/place bot simulation)
+  const [isBotDrawing, setIsBotDrawing] = useState<boolean>(false);
+  const botTimerRef = useRef<NodeJS.Timeout | null>(null);
+
+  const runBotPlacement = useCallback(() => {
+    if (isBotDrawing) {
+      if (botTimerRef.current) clearInterval(botTimerRef.current);
+      setIsBotDrawing(false);
+      return;
+    }
+
+    pixelsRef.current.clear();
+    redrawAll();
+    setStats((prev) => ({ ...prev, drawn: 0, score: 0 }));
+    setIsBotDrawing(true);
+
+    let idx = 0;
+    const batchSize = 8;
+    botTimerRef.current = setInterval(() => {
+      const nextBatch = INITIAL_PIXELS.slice(idx, idx + batchSize);
+      if (nextBatch.length === 0) {
+        if (botTimerRef.current) clearInterval(botTimerRef.current);
+        setIsBotDrawing(false);
+        saveStep();
+        playPopSound(880);
+        return;
+      }
+
+      nextBatch.forEach(([r, c, col]) => {
+        pixelsRef.current.set(`${r}_${c}`, col);
+      });
+      idx += batchSize;
+      redrawAll();
+      setStats((prev) => ({ ...prev, drawn: idx, score: idx * 5 }));
+      if (idx % 24 === 0) {
+        playPopSound(340 + (idx % 440));
+      }
+    }, 20);
+  }, [isBotDrawing, redrawAll, saveStep, playPopSound]);
+
+  useEffect(() => {
+    return () => {
+      if (botTimerRef.current) clearInterval(botTimerRef.current);
+    };
+  }, []);
+
+  // Export Matrix JSON to Clipboard
+  const [isExportCopied, setIsExportCopied] = useState<boolean>(false);
+  const handleExportMatrixJSON = useCallback(() => {
+    const entries: { col: number; row: number; color: string }[] = [];
+    pixelsRef.current.forEach((color, key) => {
+      const idx = key.indexOf("_");
+      const r = +key.slice(0, idx);
+      const c = +key.slice(idx + 1);
+      entries.push({ col: c, row: r, color });
+    });
+    const jsonStr = JSON.stringify(entries, null, 2);
+    navigator.clipboard.writeText(jsonStr);
+    setIsExportCopied(true);
+    playPopSound(800);
+    setTimeout(() => setIsExportCopied(false), 2000);
+  }, [playPopSound]);
+
+  // Image Upload & Auto-Gridify (Downscale & Quantize to 40x24)
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const handleImageUpload = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      const file = e.target.files?.[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        const img = new Image();
+        img.onload = () => {
+          const tempCanvas = document.createElement("canvas");
+          const targetW = 40;
+          const targetH = 24;
+          tempCanvas.width = targetW;
+          tempCanvas.height = targetH;
+          const tempCtx = tempCanvas.getContext("2d");
+          if (!tempCtx) return;
+
+          tempCtx.drawImage(img, 0, 0, targetW, targetH);
+          const imgData = tempCtx.getImageData(0, 0, targetW, targetH).data;
+
+          pixelsRef.current.clear();
+          const startCol = 4;
+          const startRow = 3;
+
+          for (let y = 0; y < targetH; y++) {
+            for (let x = 0; x < targetW; x++) {
+              const i = (y * targetW + x) * 4;
+              const r = imgData[i];
+              const g = imgData[i + 1];
+              const b = imgData[i + 2];
+              const a = imgData[i + 3];
+
+              if (a > 64 && (r > 15 || g > 15 || b > 15)) {
+                const hex = "#" + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1);
+                pixelsRef.current.set(`${y + startRow}_${x + startCol}`, hex);
+              }
+            }
+          }
+
+          redrawAll();
+          saveStep();
+          playPopSound(700);
+        };
+        img.src = event.target?.result as string;
+      };
+      reader.readAsDataURL(file);
+    },
+    [redrawAll, saveStep, playPopSound]
+  );
+
   // Swatch Palette (Combines active theme + cyberpunk palette)
   const palette = useMemo(() => {
     return [
@@ -1806,9 +1924,68 @@ export const PixelEngine: React.FC = () => {
         {/* Right: Mode-Specific Interactive Controls */}
         <div className="flex items-center gap-1.5 flex-shrink-0 text-[10px]">
           {engineMode === "draw" && (
-            <span className="opacity-60 hidden md:inline">
-              Click & drag to paint • Continuous Bresenham interpolation active
-            </span>
+            <div className="flex items-center gap-1.5">
+              <span className="opacity-60 hidden xl:inline mr-1">
+                40×24 Locked Grid
+              </span>
+
+              {/* Bot Playback Button */}
+              <button
+                type="button"
+                onClick={runBotPlacement}
+                title="Automated Bot Placement Playback"
+                style={{
+                  backgroundColor: isBotDrawing ? activeTheme.accent : activeTheme.cardBg,
+                  borderColor: isBotDrawing ? activeTheme.accent : activeTheme.cardBorder,
+                  color: isBotDrawing ? (activeTheme.isDark ? "#000" : "#fff") : activeTheme.textPrimary,
+                }}
+                className="px-2 py-0.5 rounded border font-semibold flex items-center gap-1 hover:opacity-85 transition-all cursor-pointer"
+              >
+                <Bot className={`w-3 h-3 ${isBotDrawing ? "animate-spin" : ""}`} />
+                <span>{isBotDrawing ? "BOT DRAWING..." : "AUTO-BOT"}</span>
+              </button>
+
+              {/* Hidden File Input */}
+              <input
+                type="file"
+                ref={fileInputRef}
+                onChange={handleImageUpload}
+                accept="image/*"
+                className="hidden"
+              />
+
+              {/* Import Image Button */}
+              <button
+                type="button"
+                onClick={() => fileInputRef.current?.click()}
+                title="Import & Auto-Gridify Image to 40x24 Matrix"
+                style={{
+                  backgroundColor: activeTheme.cardBg,
+                  borderColor: activeTheme.cardBorder,
+                  color: activeTheme.textPrimary,
+                }}
+                className="px-2 py-0.5 rounded border font-semibold flex items-center gap-1 hover:opacity-85 transition-all cursor-pointer"
+              >
+                <Upload className="w-3 h-3" />
+                <span>IMPORT</span>
+              </button>
+
+              {/* Export JSON Matrix Button */}
+              <button
+                type="button"
+                onClick={handleExportMatrixJSON}
+                title="Export Coordinates Matrix as JSON"
+                style={{
+                  backgroundColor: isExportCopied ? "#10B981" : activeTheme.cardBg,
+                  borderColor: isExportCopied ? "#10B981" : activeTheme.cardBorder,
+                  color: isExportCopied ? "#fff" : activeTheme.textPrimary,
+                }}
+                className="px-2 py-0.5 rounded border font-semibold flex items-center gap-1 hover:opacity-85 transition-all cursor-pointer"
+              >
+                {isExportCopied ? <Check className="w-3 h-3" /> : <FileCode className="w-3 h-3" />}
+                <span>{isExportCopied ? "COPIED JSON!" : "MATRIX JSON"}</span>
+              </button>
+            </div>
           )}
 
           {engineMode === "arcade" && (
