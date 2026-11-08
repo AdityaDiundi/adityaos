@@ -43,8 +43,8 @@ export function PortfolioSidebar({
   ];
 
   const themeOptions: { id: OSThemeId; label: string; tag: string }[] = [
+    { id: "light", label: "Editorial Newspaper", tag: "Light" },
     { id: "noctalia", label: "Obsidian Void", tag: "Dark" },
-    { id: "light", label: "Editorial Paper", tag: "Light" },
     { id: "caelestia", label: "Nordic Frost", tag: "Slate" },
     { id: "matrix", label: "Terminal Mono", tag: "Phosphor" },
   ];

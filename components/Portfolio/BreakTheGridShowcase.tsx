@@ -392,10 +392,10 @@ export function BreakTheGridShowcase({ onLaunchOS }: BreakTheGridShowcaseProps) 
                       "Interactive in-browser pixel & voxel synthesis with real-time 3D projection, procedural bitmap fonts, and cellular automata.",
                     isPixelEngine: true,
                     onLaunchOS,
-                    primaryImage: "/gallery/voxel_3d_projection.png",
-                    secondaryImage: "/gallery/pixel_engine_canvas.png",
-                    primaryLabel: "Voxel 3D Projection",
-                    secondaryLabel: "Pixel Canvas Specification",
+                    primaryImage: "/case-studies/adityaos_pixel_engine_studio.png",
+                    secondaryImage: "/case-studies/adityaos_pixel_engine_desktop.png",
+                    primaryLabel: "2.5D Isometric Voxel Studio",
+                    secondaryLabel: "adityaos Desktop Environment",
                     defaultMode: "pixel",
                   })
                 }
@@ -414,10 +414,10 @@ export function BreakTheGridShowcase({ onLaunchOS }: BreakTheGridShowcaseProps) 
                     category: "Creative Graphics & Voxel Engine",
                     isPixelEngine: true,
                     onLaunchOS,
-                    primaryImage: "/gallery/voxel_3d_projection.png",
-                    secondaryImage: "/gallery/pixel_engine_canvas.png",
-                    primaryLabel: "Voxel 3D Projection",
-                    secondaryLabel: "Pixel Canvas Specification",
+                    primaryImage: "/case-studies/adityaos_pixel_engine_studio.png",
+                    secondaryImage: "/case-studies/adityaos_pixel_engine_desktop.png",
+                    primaryLabel: "2.5D Isometric Voxel Studio",
+                    secondaryLabel: "adityaos Desktop Environment",
                     defaultMode: "screens",
                   })
                 }
@@ -537,7 +537,7 @@ export function BreakTheGridShowcase({ onLaunchOS }: BreakTheGridShowcaseProps) 
                       : "text-stone-500 hover:text-stone-900"
                   }`}
                 >
-                  Pixel Canvas Studio
+                  2.5D Voxel Studio
                 </button>
                 <button
                   onClick={() => setPixelTab("voxel")}
@@ -551,7 +551,7 @@ export function BreakTheGridShowcase({ onLaunchOS }: BreakTheGridShowcaseProps) 
                       : "text-stone-500 hover:text-stone-900"
                   }`}
                 >
-                  Voxel 3D Projection
+                  adityaos Desktop
                 </button>
               </div>
               <span
@@ -571,10 +571,10 @@ export function BreakTheGridShowcase({ onLaunchOS }: BreakTheGridShowcaseProps) 
                   category: "Creative Graphics & Voxel Engine",
                   isPixelEngine: true,
                   onLaunchOS,
-                  primaryImage: "/gallery/pixel_engine_canvas.png",
-                  secondaryImage: "/gallery/voxel_3d_projection.png",
-                  primaryLabel: "Pixel Canvas Specification",
-                  secondaryLabel: "Voxel 3D Projection",
+                  primaryImage: "/case-studies/adityaos_pixel_engine_studio.png",
+                  secondaryImage: "/case-studies/adityaos_pixel_engine_desktop.png",
+                  primaryLabel: "2.5D Isometric Voxel Studio",
+                  secondaryLabel: "adityaos Desktop Environment",
                   defaultMode: "pixel",
                 })
               }
@@ -608,10 +608,10 @@ export function BreakTheGridShowcase({ onLaunchOS }: BreakTheGridShowcaseProps) 
                 <Image
                   src={
                     pixelTab === "canvas"
-                      ? "/gallery/pixel_engine_canvas.png"
-                      : "/gallery/voxel_3d_projection.png"
+                      ? "/case-studies/adityaos_pixel_engine_studio.png"
+                      : "/case-studies/adityaos_pixel_engine_desktop.png"
                   }
-                  alt="Pixel Engine & Voxel Studio"
+                  alt="adityaos Pixel Engine & Voxel Studio"
                   fill
                   className="object-cover object-top"
                   priority

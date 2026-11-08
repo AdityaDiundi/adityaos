@@ -244,8 +244,8 @@ export const OS_THEMES: Record<OSThemeId, OSThemeConfig> = {
   },
   light: {
     id: "light",
-    name: "Editorial Paper",
-    label: "Editorial Paper (Warm Ink)",
+    name: "Editorial Newspaper",
+    label: "Editorial Newspaper (Minimal Ink)",
     shellName: "paper-sh",
     isDark: false,
     icon: "📜",
@@ -256,24 +256,24 @@ export const OS_THEMES: Record<OSThemeId, OSThemeConfig> = {
     windowBg: "rgba(255, 255, 255, 0.98)",
     windowTitleBg: "rgba(247, 246, 242, 0.98)",
     windowBorder: "rgba(0, 0, 0, 0.08)",
-    windowActiveBorder: "#C84B31",
+    windowActiveBorder: "#121316",
     textPrimary: "#121316",
     textSecondary: "#3F3F46",
     textMuted: "#71717A",
-    accent: "#C84B31",
-    accentSecondary: "#D97706",
-    accentGlow: "rgba(200, 75, 49, 0.2)",
+    accent: "#121316",
+    accentSecondary: "#3F3F46",
+    accentGlow: "rgba(18, 19, 22, 0.12)",
     cardBg: "rgba(255, 255, 255, 0.95)",
     cardBorder: "rgba(0, 0, 0, 0.08)",
     terminalBg: "rgba(245, 244, 240, 0.98)",
-    terminalBorder: "rgba(200, 75, 49, 0.3)",
+    terminalBorder: "rgba(18, 19, 22, 0.2)",
     terminalHeader: "rgba(238, 237, 232, 0.98)",
-    terminalPrompt: "#C84B31",
+    terminalPrompt: "#121316",
     canvasBg: "#FBFBF9",
     gridColor: "rgba(0, 0, 0, 0.04)",
-    drawColor: "#C84B31",
-    tagBg: "rgba(200, 75, 49, 0.08)",
-    tagText: "#C84B31",
+    drawColor: "#121316",
+    tagBg: "rgba(18, 19, 22, 0.06)",
+    tagText: "#121316",
   },
 };
 
@@ -286,8 +286,8 @@ interface ThemeState {
 }
 
 export const useThemeStore = create<ThemeState>((set, get) => ({
-  currentThemeId: "noctalia",
-  activeTheme: OS_THEMES.noctalia,
+  currentThemeId: "light",
+  activeTheme: OS_THEMES.light,
 
   setTheme: (id: OSThemeId) => {
     const theme = OS_THEMES[id] || OS_THEMES.noctalia;

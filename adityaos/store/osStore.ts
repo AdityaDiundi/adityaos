@@ -79,7 +79,7 @@ export const useOSStore = create<OSState>((set, get) => ({
   wallpaperUrl: "https://images.unsplash.com/photo-1514565131-fce0801e5785?q=80&w=2560&auto=format&fit=crop",
   showDesktopGrid: true,
   isStickyNoteOpen: true,
-  isLocked: true,
+  isLocked: false,
 
   setWallpaper: (url: string) => set({ wallpaperUrl: url }),
   toggleDesktopGrid: () => set((state) => ({ showDesktopGrid: !state.showDesktopGrid })),
