@@ -385,17 +385,17 @@ export function BreakTheGridShowcase({ onLaunchOS }: BreakTheGridShowcaseProps) 
               <button
                 onClick={() =>
                   setModalData({
-                    title: "Pixel Engine & 2.5D Voxel Studio",
+                    title: "Pixel Engine — Grid-Locked Canvas & Studio",
                     client: "adityaos",
-                    category: "Creative Graphics & Voxel Engine",
+                    category: "Creative Graphics & Grid Matrix",
                     overview:
-                      "Interactive in-browser pixel & voxel synthesis with real-time 3D projection, procedural bitmap fonts, and cellular automata.",
+                      "Interactive in-browser pixel matrix synthesis with locked orthogonal grids, procedural bitmap fonts, cellular automata, and real-time canvas serialization.",
                     isPixelEngine: true,
                     onLaunchOS,
                     primaryImage: "/case-studies/adityaos_pixel_engine_studio.png",
                     secondaryImage: "/case-studies/adityaos_pixel_engine_desktop.png",
-                    primaryLabel: "2.5D Isometric Voxel Studio",
-                    secondaryLabel: "adityaos Desktop Environment",
+                    primaryLabel: "Normal Grid Studio",
+                    secondaryLabel: "adityaos Desktop Shell",
                     defaultMode: "pixel",
                   })
                 }
@@ -409,15 +409,15 @@ export function BreakTheGridShowcase({ onLaunchOS }: BreakTheGridShowcaseProps) 
               <button
                 onClick={() =>
                   setModalData({
-                    title: "Pixel Engine & 2.5D Voxel Studio",
+                    title: "Pixel Engine — Grid-Locked Canvas & Studio",
                     client: "adityaos",
-                    category: "Creative Graphics & Voxel Engine",
+                    category: "Creative Graphics & Grid Matrix",
                     isPixelEngine: true,
                     onLaunchOS,
                     primaryImage: "/case-studies/adityaos_pixel_engine_studio.png",
                     secondaryImage: "/case-studies/adityaos_pixel_engine_desktop.png",
-                    primaryLabel: "2.5D Isometric Voxel Studio",
-                    secondaryLabel: "adityaos Desktop Environment",
+                    primaryLabel: "Normal Grid Studio",
+                    secondaryLabel: "adityaos Desktop Shell",
                     defaultMode: "screens",
                   })
                 }
@@ -441,14 +441,14 @@ export function BreakTheGridShowcase({ onLaunchOS }: BreakTheGridShowcaseProps) 
                   isDark ? "text-white" : "text-stone-900"
                 }`}
               >
-                Pixel Engine & 2.5D Voxel Studio
+                Pixel Engine — Grid-Locked Canvas & Studio
               </h3>
               <p
                 className={`text-sm sm:text-base font-medium font-sans leading-relaxed ${
                   isDark ? "text-zinc-300" : "text-stone-700"
                 }`}
               >
-                In-browser isometric voxel synthesis, procedural bitmap fonts, and interactive canvas audio.
+                In-browser orthogonal grid pixel synthesis, procedural bitmap fonts, and interactive canvas audio.
               </p>
               <p
                 className={`text-sm font-sans leading-relaxed max-w-3xl ${
@@ -456,7 +456,7 @@ export function BreakTheGridShowcase({ onLaunchOS }: BreakTheGridShowcaseProps) 
                 }`}
               >
                 Engineered as a lightweight, zero-dependency creative studio subsystem for adityaos.
-                Features real-time 2D-to-2.5D isometric voxel projection, procedural typography stamping
+                Features true grid-locked square pixel matrix mapping, procedural typography stamping
                 with a custom 5×5 bitmap font, bilateral symmetry drawing, Conway&apos;s Game of Life
                 simulation, falling sand cellular automata, and interactive Web Audio harmonic synthesis.
               </p>
@@ -486,14 +486,14 @@ export function BreakTheGridShowcase({ onLaunchOS }: BreakTheGridShowcaseProps) 
                     isDark ? "text-white" : "text-stone-900"
                   }`}
                 >
-                  2.5D
+                  1:1 Grid
                 </div>
                 <div
                   className={`text-[11px] font-sans pt-0.5 ${
                     isDark ? "text-zinc-500" : "text-stone-500"
                   }`}
                 >
-                  Voxel Projection
+                  Pixel Lock
                 </div>
               </div>
               <div>
@@ -537,7 +537,7 @@ export function BreakTheGridShowcase({ onLaunchOS }: BreakTheGridShowcaseProps) 
                       : "text-stone-500 hover:text-stone-900"
                   }`}
                 >
-                  2.5D Voxel Studio
+                  Normal Grid Studio
                 </button>
                 <button
                   onClick={() => setPixelTab("voxel")}
@@ -551,7 +551,7 @@ export function BreakTheGridShowcase({ onLaunchOS }: BreakTheGridShowcaseProps) 
                       : "text-stone-500 hover:text-stone-900"
                   }`}
                 >
-                  adityaos Desktop
+                  adityaos Desktop Shell
                 </button>
               </div>
               <span
@@ -566,15 +566,15 @@ export function BreakTheGridShowcase({ onLaunchOS }: BreakTheGridShowcaseProps) 
             <div
               onClick={() =>
                 setModalData({
-                  title: "Pixel Engine & 2.5D Voxel Studio",
+                  title: "Pixel Engine — Grid-Locked Canvas & Studio",
                   client: "adityaos",
-                  category: "Creative Graphics & Voxel Engine",
+                  category: "Creative Graphics & Grid Matrix",
                   isPixelEngine: true,
                   onLaunchOS,
                   primaryImage: "/case-studies/adityaos_pixel_engine_studio.png",
                   secondaryImage: "/case-studies/adityaos_pixel_engine_desktop.png",
-                  primaryLabel: "2.5D Isometric Voxel Studio",
-                  secondaryLabel: "adityaos Desktop Environment",
+                  primaryLabel: "Normal Grid Studio",
+                  secondaryLabel: "adityaos Desktop Shell",
                   defaultMode: "pixel",
                 })
               }
@@ -611,7 +611,7 @@ export function BreakTheGridShowcase({ onLaunchOS }: BreakTheGridShowcaseProps) 
                       ? "/case-studies/adityaos_pixel_engine_studio.png"
                       : "/case-studies/adityaos_pixel_engine_desktop.png"
                   }
-                  alt="adityaos Pixel Engine & Voxel Studio"
+                  alt="adityaos Pixel Engine & Normal Grid Studio"
                   fill
                   className="object-cover object-top"
                   priority

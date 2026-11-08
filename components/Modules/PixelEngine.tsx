@@ -41,6 +41,7 @@ import {
   recordPixelPopped,
   GlobalCommunityStats,
 } from "@/lib/firebaseStats";
+import { createInitialPixelArt } from "./pixelArtPresets";
 
 // 5x5 and 5x3 Pixel Bitmap Font from homesec.tsx / pixel.tsx
 const PIXEL_FONT: Record<string, string[]> = {
@@ -87,29 +88,6 @@ const PIXEL_FONT: Record<string, string[]> = {
   "+": ["000", "010", "111", "010", "000"],
 };
 
-const createInitialVoxelArt = (): Map<string, string> => {
-  const map = new Map<string, string>();
-  for (let r = -5; r <= 5; r++) {
-    for (let c = -5; c <= 5; c++) {
-      const dist = Math.abs(r) + Math.abs(c);
-      if (dist <= 6) {
-        if (dist <= 1) {
-          map.set(`${r}_${c}`, "#00FFCC");
-        } else if (dist <= 3) {
-          map.set(`${r}_${c}`, "#38BDF8");
-        } else if (dist <= 4) {
-          map.set(`${r}_${c}`, "#EC4899");
-        } else if (dist <= 5) {
-          map.set(`${r}_${c}`, "#FBBF24");
-        } else {
-          map.set(`${r}_${c}`, "#A855F7");
-        }
-      }
-    }
-  }
-  return map;
-};
-
 export const PixelEngine: React.FC = () => {
   const { activeTheme } = useThemeStore();
   const { playScrollNote, isSoundEnabled } = useSoundStore();
@@ -117,9 +95,9 @@ export const PixelEngine: React.FC = () => {
   // Tool & Canvas State
   const [activeTool, setActiveTool] = useState<"pencil" | "eraser" | "bucket" | "picker" | "type">("pencil");
   const [currentColor, setCurrentColor] = useState<string>(activeTheme.drawColor || "#00FFCC");
-  const [pixelSize, setPixelSize] = useState<number>(20);
-  const [perspective, setPerspective] = useState<"square" | "isometric">("isometric");
-  const [is3D, setIs3D] = useState<boolean>(true);
+  const [pixelSize, setPixelSize] = useState<number>(16);
+  const [perspective, setPerspective] = useState<"square" | "isometric">("square");
+  const [is3D, setIs3D] = useState<boolean>(false);
   const [showGrid, setShowGrid] = useState<boolean>(true);
   const [isSymmetry, setIsSymmetry] = useState<boolean>(false);
   const [isAudioMuted, setIsAudioMuted] = useState<boolean>(!isSoundEnabled);
@@ -127,9 +105,9 @@ export const PixelEngine: React.FC = () => {
   const [isTypeModalOpen, setIsTypeModalOpen] = useState<boolean>(false);
   const [hoverCoord, setHoverCoord] = useState<{ col: number; row: number } | null>(null);
   const [stats, setStats] = useState<{ drawn: number; undos: number; score: number }>({
-    drawn: 61,
+    drawn: 639,
     undos: 0,
-    score: 305,
+    score: 3195,
   });
 
   // Global Community Stats synced via Firebase
@@ -162,8 +140,8 @@ export const PixelEngine: React.FC = () => {
   const previewCanvasRef = useRef<HTMLCanvasElement>(null);
 
   // Pixel Map State (Key: "row_col" -> hex/rgb color)
-  const pixelsRef = useRef<Map<string, string>>(createInitialVoxelArt());
-  const historyRef = useRef<Map<string, string>[]>([createInitialVoxelArt()]);
+  const pixelsRef = useRef<Map<string, string>>(createInitialPixelArt());
+  const historyRef = useRef<Map<string, string>[]>([createInitialPixelArt()]);
   const historyIndexRef = useRef<number>(0);
   const isDrawingRef = useRef<boolean>(false);
   const lastCoordRef = useRef<{ col: number; row: number } | null>(null);
