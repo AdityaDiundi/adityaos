@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useRef, useMemo, useCallback } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useThemeStore } from "@/store/themeStore";
 import { useSoundStore } from "@/store/soundStore";
 import {
@@ -11,13 +11,14 @@ import {
   Palette,
   Maximize2,
   Check,
-  RefreshCw,
-  Eye,
+  Upload,
+  Feather,
 } from "lucide-react";
 import {
   processImageToPixels,
   PixelConversionOptions,
   PixelConversionResult,
+  MASTERPIECE_PRESETS,
 } from "./pixelArtConverter";
 
 interface PixelArtImportModalProps {
@@ -40,20 +41,30 @@ export const PixelArtImportModal: React.FC<PixelArtImportModalProps> = ({
   const { activeTheme } = useThemeStore();
   const { playClickChime } = useSoundStore();
 
+  const [activeImageSrc, setActiveImageSrc] = useState<string | null>(imageSrc);
   const [paletteMode, setPaletteMode] = useState<"rplace" | "pico8" | "gameboy" | "original">("rplace");
   const [removeBg, setRemoveBg] = useState<boolean>(true);
   const [bgTolerance, setBgTolerance] = useState<number>(38);
   const [contrast, setContrast] = useState<number>(1.25);
+  const [outlineStrength, setOutlineStrength] = useState<number>(0.65);
   const [cropToSubject, setCropToSubject] = useState<boolean>(true);
   const [resolutionPreset, setResolutionPreset] = useState<number>(48);
 
   const [previewResult, setPreviewResult] = useState<PixelConversionResult | null>(null);
   const [loadedImg, setLoadedImg] = useState<HTMLImageElement | null>(null);
   const previewCanvasRef = useRef<HTMLCanvasElement>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
-  // Load Image
+  // Sync prop imageSrc
   useEffect(() => {
-    if (!imageSrc) {
+    if (imageSrc) {
+      setActiveImageSrc(imageSrc);
+    }
+  }, [imageSrc]);
+
+  // Load Image into HTMLImageElement
+  useEffect(() => {
+    if (!activeImageSrc) {
       setLoadedImg(null);
       return;
     }
@@ -62,8 +73,8 @@ export const PixelArtImportModal: React.FC<PixelArtImportModalProps> = ({
     img.onload = () => {
       setLoadedImg(img);
     };
-    img.src = imageSrc;
-  }, [imageSrc]);
+    img.src = activeImageSrc;
+  }, [activeImageSrc]);
 
   // Process image whenever settings or image changes
   useEffect(() => {
@@ -79,6 +90,7 @@ export const PixelArtImportModal: React.FC<PixelArtImportModalProps> = ({
       removeBg,
       bgTolerance,
       contrast,
+      outlineStrength,
       cropToSubject,
     };
 
@@ -90,6 +102,7 @@ export const PixelArtImportModal: React.FC<PixelArtImportModalProps> = ({
     removeBg,
     bgTolerance,
     contrast,
+    outlineStrength,
     cropToSubject,
     resolutionPreset,
     canvasCols,
@@ -148,6 +161,21 @@ export const PixelArtImportModal: React.FC<PixelArtImportModalProps> = ({
     onClose();
   };
 
+  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      const src = event.target?.result as string;
+      if (src) {
+        setActiveImageSrc(src);
+        playClickChime(700);
+      }
+    };
+    reader.readAsDataURL(file);
+    e.target.value = "";
+  };
+
   if (!isOpen) return null;
 
   return (
@@ -158,7 +186,7 @@ export const PixelArtImportModal: React.FC<PixelArtImportModalProps> = ({
           borderColor: activeTheme.cardBorder,
           color: activeTheme.textPrimary,
         }}
-        className="w-full max-w-2xl rounded-xl border shadow-2xl overflow-hidden flex flex-col max-h-[92vh] animate-in fade-in zoom-in-95 duration-150"
+        className="w-full max-w-3xl rounded-xl border shadow-2xl overflow-hidden flex flex-col max-h-[92vh] animate-in fade-in zoom-in-95 duration-150"
       >
         {/* Header */}
         <div
@@ -175,7 +203,7 @@ export const PixelArtImportModal: React.FC<PixelArtImportModalProps> = ({
             >
               <Sparkles className="w-3.5 h-3.5" />
             </div>
-            <span>PIXEL ART CONVERTER</span>
+            <span>PIXEL ART CONVERTER & QUANTIZER</span>
             <span
               className="text-[9px] px-1.5 py-0.5 rounded border uppercase tracking-wider opacity-75 hidden sm:inline"
               style={{ borderColor: activeTheme.cardBorder }}
@@ -184,22 +212,67 @@ export const PixelArtImportModal: React.FC<PixelArtImportModalProps> = ({
             </span>
           </div>
 
-          <button
-            type="button"
-            onClick={onClose}
-            className="p-1 rounded hover:bg-white/10 text-neutral-400 hover:text-white transition-colors cursor-pointer"
-          >
-            <X className="w-4 h-4" />
-          </button>
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              onClick={() => fileInputRef.current?.click()}
+              className="px-2 py-1 rounded text-[11px] font-bold border border-white/10 hover:bg-white/10 transition-colors flex items-center gap-1 cursor-pointer"
+            >
+              <Upload className="w-3 h-3 text-cyan-400" />
+              <span>Change Image</span>
+            </button>
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept="image/*"
+              className="hidden"
+              onChange={handleFileUpload}
+            />
+
+            <button
+              type="button"
+              onClick={onClose}
+              className="p-1 rounded hover:bg-white/10 text-neutral-400 hover:text-white transition-colors cursor-pointer"
+            >
+              <X className="w-4 h-4" />
+            </button>
+          </div>
+        </div>
+
+        {/* Sample Sprites Quick-Picker */}
+        <div
+          style={{ borderColor: activeTheme.cardBorder }}
+          className="px-4 py-2 border-b bg-black/20 flex items-center justify-between gap-2 overflow-x-auto text-[11px]"
+        >
+          <span className="opacity-60 text-[10px] uppercase font-bold shrink-0 flex items-center gap-1">
+            <Feather className="w-3 h-3 text-amber-400" />
+            Try Iconic Sprites:
+          </span>
+          <div className="flex items-center gap-1.5 shrink-0">
+            {MASTERPIECE_PRESETS.map((preset) => (
+              <button
+                key={preset.id}
+                type="button"
+                onClick={() => {
+                  setActiveImageSrc(preset.dataUrl);
+                  playClickChime(650);
+                }}
+                className="px-2 py-1 rounded border border-white/10 hover:border-cyan-400 hover:bg-white/5 transition-all text-[10px] flex items-center gap-1 cursor-pointer"
+              >
+                <span>{preset.emoji}</span>
+                <span className="font-semibold">{preset.name.split(" ")[0]}</span>
+              </button>
+            ))}
+          </div>
         </div>
 
         {/* Modal Body */}
         <div className="p-4 overflow-y-auto flex-1 flex flex-col md:flex-row gap-4">
           {/* Left: Pixel Preview Stage */}
-          <div className="flex-1 flex flex-col items-center justify-center bg-black/40 rounded-lg p-3 border border-white/5 relative min-h-[280px]">
+          <div className="flex-1 flex flex-col items-center justify-center bg-black/40 rounded-lg p-3 border border-white/5 relative min-h-[300px]">
             <canvas
               ref={previewCanvasRef}
-              className="rounded shadow-lg border border-white/10 max-w-full max-h-[280px] object-contain"
+              className="rounded shadow-lg border border-white/10 max-w-full max-h-[300px] object-contain"
             />
 
             {previewResult && (
@@ -215,15 +288,43 @@ export const PixelArtImportModal: React.FC<PixelArtImportModalProps> = ({
           </div>
 
           {/* Right: Fine-Tuning Controls */}
-          <div className="w-full md:w-64 flex flex-col gap-3.5 text-xs">
-            {/* 1. Background Cutout */}
+          <div className="w-full md:w-72 flex flex-col gap-3 text-xs">
+            {/* 1. Feature Anchor & Sobel Contour Sharpness */}
+            <div
+              style={{ backgroundColor: activeTheme.cardBg, borderColor: activeTheme.cardBorder }}
+              className="p-2.5 rounded-lg border space-y-1.5"
+            >
+              <div className="flex items-center justify-between text-[11px]">
+                <span className="font-bold flex items-center gap-1.5 text-amber-400">
+                  <Sparkles className="w-3.5 h-3.5" />
+                  Feature & Contour Anchor
+                </span>
+                <span className="text-[10px] font-bold text-amber-400">
+                  {outlineStrength === 0 ? "OFF" : `${Math.round(outlineStrength * 100)}%`}
+                </span>
+              </div>
+              <input
+                type="range"
+                min="0.0"
+                max="1.0"
+                step="0.05"
+                value={outlineStrength}
+                onChange={(e) => setOutlineStrength(Number(e.target.value))}
+                className="w-full h-1 bg-white/20 rounded accent-amber-400 cursor-pointer"
+              />
+              <div className="text-[9px] opacity-60 leading-tight">
+                Locks 1-pixel dark outlines around eyes, facial features & silhouette so they don&apos;t wash out.
+              </div>
+            </div>
+
+            {/* 2. Background Cutout */}
             <div
               style={{ backgroundColor: activeTheme.cardBg, borderColor: activeTheme.cardBorder }}
               className="p-2.5 rounded-lg border space-y-2"
             >
               <div className="flex items-center justify-between">
                 <span className="font-bold text-[11px] flex items-center gap-1.5">
-                  <Scissors className="w-3.5 h-3.5 text-amber-400" />
+                  <Scissors className="w-3.5 h-3.5 text-emerald-400" />
                   Auto Cutout Subject
                 </span>
                 <input
@@ -253,7 +354,7 @@ export const PixelArtImportModal: React.FC<PixelArtImportModalProps> = ({
               )}
             </div>
 
-            {/* 2. Color Palette */}
+            {/* 3. Color Palette */}
             <div
               style={{ backgroundColor: activeTheme.cardBg, borderColor: activeTheme.cardBorder }}
               className="p-2.5 rounded-lg border space-y-2"
@@ -268,7 +369,7 @@ export const PixelArtImportModal: React.FC<PixelArtImportModalProps> = ({
                   { id: "rplace", label: "r/place 32", desc: "Crisp & Punchy" },
                   { id: "pico8", label: "PICO-8", desc: "Retro 16-Color" },
                   { id: "gameboy", label: "GameBoy", desc: "4-Tone Green" },
-                  { id: "original", label: "Original", desc: "Direct TrueColor" },
+                  { id: "original", label: "Original", desc: "TrueColor" },
                 ].map((p) => (
                   <button
                     key={p.id}
@@ -290,7 +391,7 @@ export const PixelArtImportModal: React.FC<PixelArtImportModalProps> = ({
               </div>
             </div>
 
-            {/* 3. Detail & Density */}
+            {/* 4. Detail & Density */}
             <div
               style={{ backgroundColor: activeTheme.cardBg, borderColor: activeTheme.cardBorder }}
               className="p-2.5 rounded-lg border space-y-2"
@@ -321,7 +422,7 @@ export const PixelArtImportModal: React.FC<PixelArtImportModalProps> = ({
               </div>
             </div>
 
-            {/* 4. Contrast Boost */}
+            {/* 5. Contrast Boost */}
             <div
               style={{ backgroundColor: activeTheme.cardBg, borderColor: activeTheme.cardBorder }}
               className="p-2.5 rounded-lg border space-y-1.5"
@@ -329,7 +430,7 @@ export const PixelArtImportModal: React.FC<PixelArtImportModalProps> = ({
               <div className="flex items-center justify-between text-[11px]">
                 <span className="font-bold flex items-center gap-1.5">
                   <Sliders className="w-3.5 h-3.5 text-pink-400" />
-                  Line & Edge Boost
+                  Contrast & Tone Boost
                 </span>
                 <span className="text-[10px] opacity-75">{contrast.toFixed(2)}x</span>
               </div>
