@@ -29,7 +29,7 @@ export function BreakTheGridShowcase({ onLaunchOS }: BreakTheGridShowcaseProps) 
 
   const [modalData, setModalData] = useState<PrototypeModalData | null>(null);
   const [janevalTab, setJanevalTab] = useState<"live" | "architecture">("live");
-  const [pixelTab, setPixelTab] = useState<"voxel" | "canvas">("voxel");
+  const [pixelTab, setPixelTab] = useState<"voxel" | "canvas">("canvas");
   const [corpTab, setCorpTab] = useState<"cluster" | "full">("cluster");
 
   return (
@@ -526,20 +526,6 @@ export function BreakTheGridShowcase({ onLaunchOS }: BreakTheGridShowcaseProps) 
                 }`}
               >
                 <button
-                  onClick={() => setPixelTab("voxel")}
-                  className={`px-3 py-1.5 rounded-md font-medium transition-colors cursor-pointer ${
-                    pixelTab === "voxel"
-                      ? isDark
-                        ? "bg-zinc-800 text-white font-semibold"
-                        : "bg-white text-stone-900 font-semibold shadow-sm"
-                      : isDark
-                      ? "text-zinc-400 hover:text-white"
-                      : "text-stone-500 hover:text-stone-900"
-                  }`}
-                >
-                  Voxel 3D Projection
-                </button>
-                <button
                   onClick={() => setPixelTab("canvas")}
                   className={`px-3 py-1.5 rounded-md font-medium transition-colors cursor-pointer ${
                     pixelTab === "canvas"
@@ -552,6 +538,20 @@ export function BreakTheGridShowcase({ onLaunchOS }: BreakTheGridShowcaseProps) 
                   }`}
                 >
                   Pixel Canvas Studio
+                </button>
+                <button
+                  onClick={() => setPixelTab("voxel")}
+                  className={`px-3 py-1.5 rounded-md font-medium transition-colors cursor-pointer ${
+                    pixelTab === "voxel"
+                      ? isDark
+                        ? "bg-zinc-800 text-white font-semibold"
+                        : "bg-white text-stone-900 font-semibold shadow-sm"
+                      : isDark
+                      ? "text-zinc-400 hover:text-white"
+                      : "text-stone-500 hover:text-stone-900"
+                  }`}
+                >
+                  Voxel 3D Projection
                 </button>
               </div>
               <span
@@ -571,10 +571,10 @@ export function BreakTheGridShowcase({ onLaunchOS }: BreakTheGridShowcaseProps) 
                   category: "Creative Graphics & Voxel Engine",
                   isPixelEngine: true,
                   onLaunchOS,
-                  primaryImage: "/gallery/voxel_3d_projection.png",
-                  secondaryImage: "/gallery/pixel_engine_canvas.png",
-                  primaryLabel: "Voxel 3D Projection",
-                  secondaryLabel: "Pixel Canvas Specification",
+                  primaryImage: "/gallery/pixel_engine_canvas.png",
+                  secondaryImage: "/gallery/voxel_3d_projection.png",
+                  primaryLabel: "Pixel Canvas Specification",
+                  secondaryLabel: "Voxel 3D Projection",
                   defaultMode: "pixel",
                 })
               }
@@ -604,16 +604,17 @@ export function BreakTheGridShowcase({ onLaunchOS }: BreakTheGridShowcaseProps) 
                 </span>
               </div>
 
-              <div className="relative aspect-[16/9] sm:aspect-[21/10] bg-black/80 flex items-center justify-center p-2">
+              <div className="relative aspect-[16/9] sm:aspect-[21/10] bg-black/80 flex items-center justify-center overflow-hidden">
                 <Image
                   src={
-                    pixelTab === "voxel"
-                      ? "/gallery/voxel_3d_projection.png"
-                      : "/gallery/pixel_engine_canvas.png"
+                    pixelTab === "canvas"
+                      ? "/gallery/pixel_engine_canvas.png"
+                      : "/gallery/voxel_3d_projection.png"
                   }
                   alt="Pixel Engine & Voxel Studio"
                   fill
-                  className="object-contain"
+                  className="object-cover object-top"
+                  priority
                 />
               </div>
             </div>
