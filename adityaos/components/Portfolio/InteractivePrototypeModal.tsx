@@ -348,43 +348,61 @@ export function InteractivePrototypeModal({ data, onClose }: InteractivePrototyp
           {/* 4. Curated High-Res Screens Mode */}
           {viewMode === "screens" && (
             <div className="w-full h-full flex flex-col justify-between overflow-hidden">
-              {data.secondaryImage && (
-                <div
-                  className={`px-5 py-2.5 border-b flex items-center gap-2 font-mono text-xs ${
-                    isDark ? "bg-[#090a0f] border-zinc-800" : "bg-stone-50 border-stone-200"
-                  }`}
-                >
-                  <span className={isDark ? "text-zinc-500" : "text-stone-400"}>View Screen:</span>
-                  <button
-                    onClick={() => setActiveScreenTab("primary")}
-                    className={`px-3 py-1 rounded transition-colors cursor-pointer ${
-                      activeScreenTab === "primary"
-                        ? isDark
-                          ? "bg-zinc-800 text-white font-semibold"
-                          : "bg-white text-stone-900 font-semibold shadow-sm"
-                        : isDark
-                        ? "text-zinc-400 hover:text-white"
-                        : "text-stone-500 hover:text-stone-900"
-                    }`}
-                  >
-                    {data.primaryLabel || "Primary Flow"}
-                  </button>
-                  <button
-                    onClick={() => setActiveScreenTab("secondary")}
-                    className={`px-3 py-1 rounded transition-colors cursor-pointer ${
-                      activeScreenTab === "secondary"
-                        ? isDark
-                          ? "bg-zinc-800 text-white font-semibold"
-                          : "bg-white text-stone-900 font-semibold shadow-sm"
-                        : isDark
-                        ? "text-zinc-400 hover:text-white"
-                        : "text-stone-500 hover:text-stone-900"
-                    }`}
-                  >
-                    {data.secondaryLabel || "Full Specification"}
-                  </button>
+              <div
+                className={`px-5 py-2.5 border-b flex flex-wrap items-center justify-between gap-2 font-mono text-xs ${
+                  isDark ? "bg-[#090a0f] border-zinc-800" : "bg-stone-50 border-stone-200"
+                }`}
+              >
+                <div className="flex items-center gap-2">
+                  <span className={isDark ? "text-zinc-500" : "text-stone-400"}>View:</span>
+                  {data.secondaryImage ? (
+                    <>
+                      <button
+                        onClick={() => setActiveScreenTab("primary")}
+                        className={`px-3 py-1 rounded transition-colors cursor-pointer ${
+                          activeScreenTab === "primary"
+                            ? isDark
+                              ? "bg-zinc-800 text-white font-semibold"
+                              : "bg-white text-stone-900 font-semibold shadow-sm"
+                            : isDark
+                            ? "text-zinc-400 hover:text-white"
+                            : "text-stone-500 hover:text-stone-900"
+                        }`}
+                      >
+                        {data.primaryLabel || "Primary Flow"}
+                      </button>
+                      <button
+                        onClick={() => setActiveScreenTab("secondary")}
+                        className={`px-3 py-1 rounded transition-colors cursor-pointer ${
+                          activeScreenTab === "secondary"
+                            ? isDark
+                              ? "bg-zinc-800 text-white font-semibold"
+                              : "bg-white text-stone-900 font-semibold shadow-sm"
+                            : isDark
+                            ? "text-zinc-400 hover:text-white"
+                            : "text-stone-500 hover:text-stone-900"
+                        }`}
+                      >
+                        {data.secondaryLabel || "Full Specification"}
+                      </button>
+                    </>
+                  ) : (
+                    <span className={isDark ? "text-zinc-300" : "text-stone-700"}>
+                      {data.primaryLabel || "Curated Production Screen"}
+                    </span>
+                  )}
                 </div>
-              )}
+
+                {data.figmaUrl && (
+                  <button
+                    onClick={() => setViewMode("figma")}
+                    className="px-3 py-1 rounded-md bg-indigo-600/20 hover:bg-indigo-600/30 border border-indigo-500/30 text-indigo-400 font-semibold flex items-center gap-1.5 transition-colors cursor-pointer text-xs"
+                  >
+                    <Layers className="w-3.5 h-3.5" />
+                    <span>Launch Live Interactive Figma Canvas</span>
+                  </button>
+                )}
+              </div>
 
               <div className="flex-1 relative overflow-auto p-4 flex items-center justify-center">
                 <div className="relative w-full h-full min-h-[400px]">
