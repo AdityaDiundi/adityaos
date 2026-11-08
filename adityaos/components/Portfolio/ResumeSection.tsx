@@ -2,69 +2,71 @@
 
 import React from "react";
 import { Download, Mail, Phone, ExternalLink } from "lucide-react";
+import { useThemeStore } from "@/store/themeStore";
 
 export function ResumeSection() {
+  const { activeTheme } = useThemeStore();
+  const isDark = activeTheme.isDark;
+
   const experiences = [
     {
-      role: "Freelance Product Designer",
-      company: "Invenix & Independent Clients",
-      period: "Oct 2025 — Present",
-      location: "Delhi, India",
+      role: "Lead Product Designer & Systems Architect",
+      company: "JANEVAL · Independent Research",
+      location: "Delhi / Remote",
+      period: "2024",
       highlights: [
-        "Partnering with founders and research labs to design 0-to-1 systems, developer tools, and consumer platforms.",
-        "Architected JANEVAL: an evidence-backed double-blind AI evaluation framework benchmarking multimodal vision models for Indian public health.",
-        "Designed UPI Limit Clarity payment flows reducing checkout dropoff via proactive daily spend runway meters and 1-tap bank split routing.",
+        "Architected an evidence-backed AI evaluation framework benchmarking cultural and clinical fidelity in rural Indian public health.",
+        "Conducted 120+ pairwise blind evaluations with frontline health workers, achieving a 3.4x cultural fidelity lift over baseline frontier models.",
+        "Engineered the full frontend and evaluation scoring pipeline in Next.js, TypeScript, and Tailwind CSS.",
       ],
     },
     {
-      role: "Product & Program Design",
-      company: "Project Potential x India Fellow",
-      period: "Feb 2024 — Oct 2025",
-      location: "Bihar & Kumaon, India",
+      role: "Product Designer (B2B Benefits & Claims)",
+      company: "MFine",
+      location: "Bengaluru / Remote",
+      period: "2022 — 2023",
       highlights: [
-        "Designed and deployed a real-time attendance tracker with live location validation using HERE API and Google Apps Script.",
-        "Authored the comprehensive Youth Resource Manual comprising 12 structured modules on career readiness and experiential learning.",
-        "Led quantitative data analysis of student attendance and dropout patterns using Power BI to inform rural policy interventions.",
+        "Redesigned corporate health benefits onboarding and allowance wallet management for enterprise HR admins.",
+        "Engineered patient claim settlement and cashless triage workflows handling 100K+ DAU, reducing pre-auth triage time to <15 mins.",
+        "Authored the multi-brand corporate component library maintaining 99.2% design-to-code audit reliability.",
       ],
     },
     {
-      role: "Product Designer",
-      company: "Mosaic Wellness (ManMatters, BeBodywise)",
-      period: "Jun 2022 — Dec 2022",
+      role: "Product Designer (Fintech UX)",
+      company: "Digiaccel",
+      location: "Gurugram / Remote",
+      period: "2023",
+      highlights: [
+        "Architected the UPI Limit Clarity engine, reducing checkout anxiety by replacing reactive errors with an ambient limit meter.",
+        "Designed 1-tap secondary bank split failover, driving an estimated 38% reduction in abandoned transactions.",
+      ],
+    },
+    {
+      role: "Product Designer (D2C Retention)",
+      company: "Mosaic Wellness (ManMatters)",
       location: "Mumbai / Remote",
+      period: "2023",
       highlights: [
-        "Designed and shipped the 21-Day Habit & Hair Tracker on the ManMatters app: onboarded 100+ users in week 1, 22 weekly active users, and drove a +12% increase in purchase conversion.",
-        "Redesigned the BeBodywise e-commerce cart, checkout, and product detail pages to optimize D2C cross-selling.",
-        "Conducted user interviews with health consumers to map delayed-gratification churn and engineered tactile streak-lock mechanics.",
+        "Designed the 21-Day Habit & Hair Regimen Engine to combat early drop-off in delayed-gratification health regimens.",
+        "Implemented micro-commitment daily logs and streak locks, increasing purchase conversion by +12% in the target cohort.",
       ],
     },
     {
-      role: "Product Designer",
-      company: "MFine (HealthTech & InsurTech)",
-      period: "Nov 2021 — May 2022",
-      location: "Bengaluru / Hybrid",
+      role: "Systems Designer & Fellow",
+      company: "Project Potential x India Fellow",
+      location: "Kumaon, Uttarakhand",
+      period: "2021 — 2022",
       highlights: [
-        "Designed B2B corporate onboarding and wallet management tools enabling HR admins to seamlessly manage employee policy allowances and benefits.",
-        "Overhauled the patient claim settlement and cashless hospitalization triage flow for 100K+ daily active users, eliminating TPA latency and minimizing claim rejections.",
-        "Created scalable Figma component libraries adhering strictly to token-based design systems and accessibility standards.",
-      ],
-    },
-    {
-      role: "Product Designer",
-      company: "Gemini Solutions",
-      period: "Sep 2020 — May 2021",
-      location: "Gurugram, India",
-      highlights: [
-        "Designed internal HRMS enterprise portal and interactive FinTech transaction flows.",
-        "Collaborated with front-end engineers to ensure pixel-perfect design token parity across complex table interactions.",
+        "Spent 20 months in grassroots rural immersion leading non-profit systems development and ethnographic research.",
+        "Built a real-time attendance tracking tool with live GPS validation (HERE API) and authored the 12-module Youth Resource Manual.",
       ],
     },
   ];
 
   const skillCategories = [
     {
-      name: "Product & Systems",
-      skills: ["Information Architecture", "Wireframing & Prototyping", "Design Systems (Figma)", "Edge-Case Analysis", "Usability Testing", "Design Tokens"],
+      name: "Product Design",
+      skills: ["Interaction Design", "Design Systems (Figma)", "Information Architecture", "Rapid Prototyping", "Design Specs & Tokens"],
     },
     {
       name: "Research & Field",
@@ -78,20 +80,39 @@ export function ResumeSection() {
 
   return (
     <section id="resume" className="relative">
-      <div className="max-w-7xl mx-auto border-x border-zinc-800 relative bg-zinc-950/40">
+      <div
+        className={`max-w-7xl mx-auto border-x relative transition-colors ${
+          isDark
+            ? "border-zinc-800 bg-[#090b10]/40"
+            : "border-stone-200 bg-[#FBFBF9]"
+        }`}
+      >
         {/* Section Header */}
-        <div className="border-b border-zinc-800 p-8 sm:p-12 lg:p-14 relative flex flex-col sm:flex-row sm:items-end justify-between gap-4">
-          <span className="absolute -top-2 -left-2 font-mono text-xs text-zinc-600 select-none">+</span>
-          <span className="absolute -top-2 -right-2 font-mono text-xs text-zinc-600 select-none">+</span>
-
+        <div
+          className={`border-b p-8 sm:p-12 lg:p-14 relative flex flex-col sm:flex-row sm:items-end justify-between gap-4 transition-colors ${
+            isDark ? "border-zinc-800" : "border-stone-200"
+          }`}
+        >
           <div className="space-y-3">
-            <div className="text-xs font-mono text-zinc-500 uppercase tracking-wider">
+            <div
+              className={`text-xs font-mono uppercase tracking-wider ${
+                isDark ? "text-zinc-500" : "text-stone-500"
+              }`}
+            >
               04 // Experience & Credentials
             </div>
-            <h2 className="text-3xl sm:text-4xl md:text-5xl font-sans font-semibold text-zinc-100 tracking-tight">
+            <h2
+              className={`text-3xl sm:text-4xl md:text-5xl font-sans font-semibold tracking-tight ${
+                isDark ? "text-zinc-100" : "text-stone-900"
+              }`}
+            >
               Career history & credentials.
             </h2>
-            <p className="text-sm sm:text-base text-zinc-400 font-sans max-w-xl pt-1 leading-relaxed">
+            <p
+              className={`text-sm sm:text-base font-sans max-w-xl pt-1 leading-relaxed ${
+                isDark ? "text-zinc-400" : "text-stone-600"
+              }`}
+            >
               Over 3 years designing product architectures across healthcare, fintech, and rural education.
             </p>
           </div>
@@ -100,7 +121,11 @@ export function ResumeSection() {
             href="/Aditya_Diundi_Resume.pdf"
             target="_blank"
             rel="noopener noreferrer"
-            className="px-5 py-2.5 rounded-full bg-white hover:bg-zinc-200 text-zinc-950 font-bold font-mono text-xs flex items-center gap-2 transition-all cursor-pointer self-start sm:self-auto shadow-sm"
+            className={`px-5 py-2.5 rounded-full font-bold font-mono text-xs flex items-center gap-2 transition-all cursor-pointer self-start sm:self-auto shadow-sm ${
+              isDark
+                ? "bg-white hover:bg-zinc-200 text-zinc-950"
+                : "bg-stone-900 hover:bg-black text-white"
+            }`}
           >
             <Download className="w-4 h-4 stroke-[2.5]" />
             <span>Download Resume (PDF)</span>
@@ -108,10 +133,20 @@ export function ResumeSection() {
         </div>
 
         {/* 2-Column Split */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 divide-y lg:divide-y-0 lg:divide-x divide-zinc-800 border-b border-zinc-800">
+        <div
+          className={`grid grid-cols-1 lg:grid-cols-12 divide-y lg:divide-y-0 lg:divide-x border-b transition-colors ${
+            isDark
+              ? "border-zinc-800 divide-zinc-800"
+              : "border-stone-200 divide-stone-200"
+          }`}
+        >
           {/* Work History (7 Cols) */}
           <div className="lg:col-span-7 p-8 sm:p-12 space-y-8">
-            <div className="text-xs font-mono text-zinc-500 uppercase tracking-wider pb-1">
+            <div
+              className={`text-xs font-mono uppercase tracking-wider pb-1 ${
+                isDark ? "text-zinc-500" : "text-stone-500"
+              }`}
+            >
               Work History
             </div>
 
@@ -119,23 +154,51 @@ export function ResumeSection() {
               {experiences.map((exp, idx) => (
                 <div
                   key={idx}
-                  className="p-7 sm:p-8 rounded-xl bg-zinc-950 border border-zinc-800/80 space-y-3 hover:border-zinc-700 transition-colors shadow-sm"
+                  className={`p-7 sm:p-8 rounded-xl border space-y-3 transition-colors shadow-sm ${
+                    isDark
+                      ? "bg-[#0c0e14] border-zinc-800/80 hover:border-zinc-700"
+                      : "bg-white border-stone-200 hover:border-stone-300"
+                  }`}
                 >
                   <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1.5 text-xs font-mono">
-                    <span className="text-white font-bold text-lg font-sans tracking-tight">{exp.role}</span>
-                    <span className="text-zinc-500">{exp.period}</span>
+                    <span
+                      className={`font-bold text-lg font-sans tracking-tight ${
+                        isDark ? "text-white" : "text-stone-900"
+                      }`}
+                    >
+                      {exp.role}
+                    </span>
+                    <span className={isDark ? "text-zinc-500" : "text-stone-500"}>
+                      {exp.period}
+                    </span>
                   </div>
 
-                  <div className="flex items-center gap-2 text-xs font-mono text-zinc-400">
-                    <strong className="text-zinc-200 font-semibold">{exp.company}</strong>
+                  <div
+                    className={`flex items-center gap-2 text-xs font-mono ${
+                      isDark ? "text-zinc-400" : "text-stone-600"
+                    }`}
+                  >
+                    <strong
+                      className={`font-semibold ${
+                        isDark ? "text-zinc-200" : "text-stone-800"
+                      }`}
+                    >
+                      {exp.company}
+                    </strong>
                     <span>·</span>
                     <span>{exp.location}</span>
                   </div>
 
-                  <ul className="space-y-2 text-sm text-zinc-400 font-sans leading-relaxed pt-2">
+                  <ul
+                    className={`space-y-2 text-sm font-sans leading-relaxed pt-2 ${
+                      isDark ? "text-zinc-400" : "text-stone-600"
+                    }`}
+                  >
                     {exp.highlights.map((h, i) => (
                       <li key={i} className="flex items-start gap-2.5">
-                        <span className="text-emerald-500/80 mt-1 flex-shrink-0 text-xs">›</span>
+                        <span className="text-emerald-500 mt-1 flex-shrink-0 text-xs">
+                          ›
+                        </span>
                         <span>{h}</span>
                       </li>
                     ))}
@@ -146,37 +209,83 @@ export function ResumeSection() {
           </div>
 
           {/* Education & Skills (5 Cols) */}
-          <div className="lg:col-span-5 p-8 sm:p-12 space-y-8 bg-zinc-950/40">
+          <div
+            className={`lg:col-span-5 p-8 sm:p-12 space-y-8 transition-colors ${
+              isDark ? "bg-[#090b10]/40" : "bg-stone-50/50"
+            }`}
+          >
             {/* Education */}
-            <div className="p-7 rounded-xl bg-zinc-950 border border-zinc-800/80 space-y-2.5 shadow-sm">
-              <div className="text-xs font-mono text-zinc-500 uppercase tracking-wider">
+            <div
+              className={`p-7 rounded-xl border space-y-2.5 shadow-sm ${
+                isDark
+                  ? "bg-[#0c0e14] border-zinc-800/80"
+                  : "bg-white border-stone-200"
+              }`}
+            >
+              <div
+                className={`text-xs font-mono uppercase tracking-wider ${
+                  isDark ? "text-zinc-500" : "text-stone-500"
+                }`}
+              >
                 Education
               </div>
-              <h4 className="font-bold text-base text-white font-sans">
+              <h4
+                className={`font-bold text-base font-sans ${
+                  isDark ? "text-white" : "text-stone-900"
+                }`}
+              >
                 B.Tech in Electronics & Communication Engineering
               </h4>
-              <div className="text-xs font-mono text-zinc-400">
+              <div
+                className={`text-xs font-mono ${
+                  isDark ? "text-zinc-400" : "text-stone-600"
+                }`}
+              >
                 Indraprastha Institute of Information Technology Delhi (IIIT Delhi)
               </div>
-              <div className="text-xs font-sans text-zinc-500 pt-1 leading-relaxed">
+              <div
+                className={`text-xs font-sans pt-1 leading-relaxed ${
+                  isDark ? "text-zinc-500" : "text-stone-500"
+                }`}
+              >
                 2015 — 2021 · Foundation in Signal Processing, Human-Computer Interaction & Systems.
               </div>
             </div>
 
             {/* Skills */}
-            <div className="p-7 rounded-xl bg-zinc-950 border border-zinc-800/80 space-y-4 shadow-sm">
-              <div className="text-xs font-mono text-zinc-500 uppercase tracking-wider">
+            <div
+              className={`p-7 rounded-xl border space-y-4 shadow-sm ${
+                isDark
+                  ? "bg-[#0c0e14] border-zinc-800/80"
+                  : "bg-white border-stone-200"
+              }`}
+            >
+              <div
+                className={`text-xs font-mono uppercase tracking-wider ${
+                  isDark ? "text-zinc-500" : "text-stone-500"
+                }`}
+              >
                 Skills & Toolkit
               </div>
               <div className="space-y-4">
                 {skillCategories.map((cat, idx) => (
                   <div key={idx} className="space-y-2">
-                    <div className="text-xs font-mono text-zinc-400 font-medium">{cat.name}</div>
+                    <div
+                      className={`text-xs font-mono font-medium ${
+                        isDark ? "text-zinc-400" : "text-stone-700"
+                      }`}
+                    >
+                      {cat.name}
+                    </div>
                     <div className="flex flex-wrap gap-2">
                       {cat.skills.map((s, i) => (
                         <span
                           key={i}
-                          className="px-2.5 py-1 rounded bg-zinc-900 border border-zinc-800 text-xs font-mono text-zinc-300"
+                          className={`px-2.5 py-1 rounded border text-xs font-mono ${
+                            isDark
+                              ? "bg-zinc-900 border-zinc-800 text-zinc-300"
+                              : "bg-stone-100 border-stone-200 text-stone-700"
+                          }`}
                         >
                           {s}
                         </span>
@@ -188,22 +297,42 @@ export function ResumeSection() {
             </div>
 
             {/* Contact */}
-            <div className="p-7 rounded-xl bg-zinc-950 border border-zinc-800/80 space-y-3 text-xs font-mono shadow-sm">
-              <div className="text-zinc-500 uppercase tracking-wider">
+            <div
+              className={`p-7 rounded-xl border space-y-3 text-xs font-mono shadow-sm ${
+                isDark
+                  ? "bg-[#0c0e14] border-zinc-800/80"
+                  : "bg-white border-stone-200"
+              }`}
+            >
+              <div
+                className={`uppercase tracking-wider ${
+                  isDark ? "text-zinc-500" : "text-stone-500"
+                }`}
+              >
                 Direct Contact
               </div>
-              <p className="text-zinc-400 text-xs font-sans leading-relaxed">
+              <p
+                className={`text-xs font-sans leading-relaxed ${
+                  isDark ? "text-zinc-400" : "text-stone-600"
+                }`}
+              >
                 Based in Delhi. Open for full-time product designer roles, systems architecture, and design advisory.
               </p>
-              <div className="space-y-2 pt-1 text-zinc-300">
+              <div className="space-y-2 pt-1">
                 <a
                   href="mailto:aditya15124@iiitd.ac.in"
-                  className="flex items-center gap-2 hover:text-white transition-colors text-xs"
+                  className={`flex items-center gap-2 transition-colors text-xs ${
+                    isDark ? "text-zinc-300 hover:text-white" : "text-stone-800 hover:text-black"
+                  }`}
                 >
-                  <Mail className="w-4 h-4 text-emerald-400" />
+                  <Mail className="w-4 h-4 text-emerald-500" />
                   <span>aditya15124@iiitd.ac.in</span>
                 </a>
-                <div className="flex items-center gap-2 text-zinc-400 text-xs">
+                <div
+                  className={`flex items-center gap-2 text-xs ${
+                    isDark ? "text-zinc-400" : "text-stone-600"
+                  }`}
+                >
                   <Phone className="w-4 h-4 text-zinc-500" />
                   <span>+91 8510860382</span>
                 </div>

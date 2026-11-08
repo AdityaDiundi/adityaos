@@ -12,8 +12,6 @@ export function PortfolioHero({ onExploreWork, onLaunchOS }: PortfolioHeroProps)
   return (
     <section className="relative overflow-hidden">
       <div className="max-w-7xl mx-auto border-x border-zinc-800 relative">
-        <span className="absolute -top-1.5 -left-1.5 font-mono text-xs text-zinc-600 select-none z-20">+</span>
-        <span className="absolute -top-1.5 -right-1.5 font-mono text-xs text-zinc-600 select-none z-20">+</span>
 
         {/* Hero Body */}
         <div className="px-6 sm:px-10 lg:px-14 pt-14 sm:pt-20 pb-14 sm:pb-18 space-y-9">

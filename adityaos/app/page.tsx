@@ -80,8 +80,14 @@ export default function Home() {
       if (params.get("mode") === "os") {
         setViewMode("os");
       }
+      const themeParam = params.get("theme");
+      if (themeParam === "light" || themeParam === "editorial") {
+        setTheme("light");
+      } else if (themeParam && OS_THEMES[themeParam as OSThemeId]) {
+        setTheme(themeParam as OSThemeId);
+      }
     }
-  }, []);
+  }, [setTheme]);
 
   useEffect(() => {
     const updateClock = () => {
