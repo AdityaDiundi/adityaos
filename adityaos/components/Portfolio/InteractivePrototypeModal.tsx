@@ -2,8 +2,18 @@
 
 import React, { useState, useEffect } from "react";
 import Image from "next/image";
-import { X, ExternalLink, Eye, Layers, Maximize2, Sparkles, Figma } from "lucide-react";
+import {
+  X,
+  ExternalLink,
+  Eye,
+  Layers,
+  Maximize2,
+  Sparkles,
+  Gamepad2,
+  Terminal,
+} from "lucide-react";
 import { useThemeStore } from "@/store/themeStore";
+import { PixelEngine } from "@/components/Modules/PixelEngine";
 
 export interface PrototypeModalData {
   title: string;
@@ -12,11 +22,13 @@ export interface PrototypeModalData {
   overview?: string;
   figmaUrl?: string;
   liveUrl?: string;
+  isPixelEngine?: boolean;
+  onLaunchOS?: () => void;
   primaryImage: string;
   secondaryImage?: string;
   primaryLabel?: string;
   secondaryLabel?: string;
-  defaultMode?: "figma" | "screens" | "live";
+  defaultMode?: "figma" | "screens" | "live" | "pixel";
 }
 
 interface InteractivePrototypeModalProps {
@@ -28,7 +40,7 @@ export function InteractivePrototypeModal({ data, onClose }: InteractivePrototyp
   const { activeTheme } = useThemeStore();
   const isDark = activeTheme.isDark;
 
-  const [viewMode, setViewMode] = useState<"figma" | "screens" | "live">("screens");
+  const [viewMode, setViewMode] = useState<"figma" | "screens" | "live" | "pixel">("screens");
   const [activeScreenTab, setActiveScreenTab] = useState<"primary" | "secondary">("primary");
   const [iframeLoaded, setIframeLoaded] = useState(false);
 
@@ -36,6 +48,8 @@ export function InteractivePrototypeModal({ data, onClose }: InteractivePrototyp
     if (data) {
       if (data.defaultMode) {
         setViewMode(data.defaultMode);
+      } else if (data.isPixelEngine) {
+        setViewMode("pixel");
       } else if (data.figmaUrl) {
         setViewMode("figma");
       } else if (data.liveUrl) {
@@ -70,11 +84,11 @@ export function InteractivePrototypeModal({ data, onClose }: InteractivePrototyp
       role="dialog"
       aria-modal="true"
       onClick={onClose}
-      className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 md:p-8 bg-black/85 backdrop-blur-md animate-in fade-in duration-200"
+      className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4 md:p-6 bg-black/85 backdrop-blur-md animate-in fade-in duration-200"
     >
       <div
         onClick={(e) => e.stopPropagation()}
-        className={`w-full max-w-6xl max-h-[92vh] h-[88vh] rounded-2xl flex flex-col overflow-hidden shadow-2xl border transition-colors ${
+        className={`w-full max-w-6xl max-h-[94vh] h-[90vh] rounded-2xl flex flex-col overflow-hidden shadow-2xl border transition-colors ${
           isDark
             ? "bg-[#0c0e14] border-zinc-800 text-zinc-100"
             : "bg-white border-stone-200 text-stone-900"
@@ -82,12 +96,12 @@ export function InteractivePrototypeModal({ data, onClose }: InteractivePrototyp
       >
         {/* Modal Top Header Bar */}
         <div
-          className={`flex flex-col sm:flex-row sm:items-center justify-between gap-3 px-5 sm:px-7 py-4 border-b flex-shrink-0 ${
+          className={`flex flex-col sm:flex-row sm:items-center justify-between gap-3 px-5 sm:px-7 py-3.5 border-b flex-shrink-0 ${
             isDark ? "bg-[#090a0f] border-zinc-800/80" : "bg-stone-50 border-stone-200"
           }`}
         >
           {/* Identity & Title */}
-          <div className="space-y-1">
+          <div className="space-y-0.5">
             <div className="flex items-center gap-2 text-[11px] font-mono">
               <span
                 className={`font-semibold uppercase tracking-wider ${
@@ -114,6 +128,24 @@ export function InteractivePrototypeModal({ data, onClose }: InteractivePrototyp
                 isDark ? "bg-zinc-900/80 border-zinc-800" : "bg-stone-100 border-stone-200"
               }`}
             >
+              {data.isPixelEngine && (
+                <button
+                  onClick={() => setViewMode("pixel")}
+                  className={`px-3 py-1.5 rounded-md font-medium transition-colors cursor-pointer flex items-center gap-1.5 ${
+                    viewMode === "pixel"
+                      ? isDark
+                        ? "bg-zinc-800 text-white shadow-sm"
+                        : "bg-white text-stone-900 shadow-sm"
+                      : isDark
+                      ? "text-zinc-400 hover:text-white"
+                      : "text-stone-500 hover:text-stone-900"
+                  }`}
+                >
+                  <Gamepad2 className="w-3.5 h-3.5 text-cyan-400" />
+                  <span>Interactive Studio</span>
+                </button>
+              )}
+
               {data.figmaUrl && (
                 <button
                   onClick={() => setViewMode("figma")}
@@ -167,6 +199,25 @@ export function InteractivePrototypeModal({ data, onClose }: InteractivePrototyp
               </button>
             </div>
 
+            {/* Launch in OS if applicable */}
+            {data.isPixelEngine && data.onLaunchOS && (
+              <button
+                onClick={() => {
+                  onClose();
+                  data.onLaunchOS?.();
+                }}
+                className={`px-3.5 py-1.5 rounded-lg border font-medium flex items-center gap-1.5 transition-colors cursor-pointer ${
+                  isDark
+                    ? "bg-cyan-950/40 hover:bg-cyan-900/60 border-cyan-500/30 text-cyan-300"
+                    : "bg-cyan-50 hover:bg-cyan-100 border-cyan-300 text-cyan-800"
+                }`}
+                title="Open in adityaos interactive desktop"
+              >
+                <Terminal className="w-3 h-3 text-cyan-400" />
+                <span>Open in adityaos</span>
+              </button>
+            )}
+
             {/* External Links */}
             {data.figmaUrl && (
               <a
@@ -213,8 +264,17 @@ export function InteractivePrototypeModal({ data, onClose }: InteractivePrototyp
         </div>
 
         {/* Modal Main Viewport Canvas */}
-        <div className="flex-1 relative overflow-hidden flex flex-col bg-black/50">
-          {/* 1. Interactive Figma Embed Mode */}
+        <div className="flex-1 relative overflow-hidden flex flex-col bg-black/60">
+          {/* 1. Interactive Pixel Engine Mode */}
+          {viewMode === "pixel" && data.isPixelEngine && (
+            <div className="w-full h-full relative overflow-hidden flex flex-col">
+              <div className="flex-1 relative overflow-hidden">
+                <PixelEngine />
+              </div>
+            </div>
+          )}
+
+          {/* 2. Interactive Figma Embed Mode */}
           {viewMode === "figma" && figmaEmbedUrl && (
             <div className="w-full h-full relative flex flex-col">
               {!iframeLoaded && (
@@ -253,7 +313,7 @@ export function InteractivePrototypeModal({ data, onClose }: InteractivePrototyp
             </div>
           )}
 
-          {/* 2. Live Web App Mode */}
+          {/* 3. Live Web App Mode */}
           {viewMode === "live" && data.liveUrl && (
             <div className="w-full h-full relative flex flex-col">
               <iframe
@@ -285,7 +345,7 @@ export function InteractivePrototypeModal({ data, onClose }: InteractivePrototyp
             </div>
           )}
 
-          {/* 3. Curated High-Res Screens Mode */}
+          {/* 4. Curated High-Res Screens Mode */}
           {viewMode === "screens" && (
             <div className="w-full h-full flex flex-col justify-between overflow-hidden">
               {data.secondaryImage && (

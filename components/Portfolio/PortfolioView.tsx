@@ -200,7 +200,7 @@ export function PortfolioView({ onLaunchOS }: PortfolioViewProps) {
 
             {/* Feed Modules */}
             {(activeFilter === "all" || activeFilter === "work") && (
-              <BreakTheGridShowcase />
+              <BreakTheGridShowcase onLaunchOS={onLaunchOS} />
             )}
 
             {(activeFilter === "all" || activeFilter === "essays") && (

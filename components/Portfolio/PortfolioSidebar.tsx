@@ -35,8 +35,8 @@ export function PortfolioSidebar({
   const isDark = activeTheme.isDark;
 
   const feedToggles = [
-    { id: "all", label: "All Items", icon: Layers, count: "26" },
-    { id: "work", label: "Selected Works", icon: Sparkles, count: "7" },
+    { id: "all", label: "All Items", icon: Layers, count: "27" },
+    { id: "work", label: "Selected Works", icon: Sparkles, count: "8" },
     { id: "essays", label: "Writeups & Notes", icon: BookOpen, count: "12" },
     { id: "youtube", label: "YouTube Streams", icon: PlaySquare, count: "7" },
     { id: "resume", label: "Experience & Specs", icon: Briefcase, count: "5" },

@@ -10,6 +10,8 @@ import {
   Globe,
   Sparkles,
   Layers,
+  Gamepad2,
+  Terminal,
 } from "lucide-react";
 import { useThemeStore } from "@/store/themeStore";
 import {
@@ -17,12 +19,17 @@ import {
   PrototypeModalData,
 } from "./InteractivePrototypeModal";
 
-export function BreakTheGridShowcase() {
+interface BreakTheGridShowcaseProps {
+  onLaunchOS?: () => void;
+}
+
+export function BreakTheGridShowcase({ onLaunchOS }: BreakTheGridShowcaseProps) {
   const { activeTheme } = useThemeStore();
   const isDark = activeTheme.isDark;
 
   const [modalData, setModalData] = useState<PrototypeModalData | null>(null);
   const [janevalTab, setJanevalTab] = useState<"live" | "architecture">("live");
+  const [pixelTab, setPixelTab] = useState<"voxel" | "canvas">("voxel");
   const [corpTab, setCorpTab] = useState<"cluster" | "full">("cluster");
 
   return (
@@ -62,8 +69,8 @@ export function BreakTheGridShowcase() {
                 isDark ? "text-zinc-400" : "text-stone-600"
               }`}
             >
-              Proof-of-work across frontier AI evaluation, enterprise B2B health claims,
-              fintech payment flows, and grassroots field systems.
+              Proof-of-work across frontier AI evaluation, in-browser graphics engines, enterprise
+              B2B health claims, fintech payments, and grassroots systems.
             </p>
           </div>
         </div>
@@ -226,7 +233,7 @@ export function BreakTheGridShowcase() {
             </div>
           </div>
 
-          {/* Unified Showcase Window (Seamlessly integrated underneath) */}
+          {/* Unified Showcase Window */}
           <div className="space-y-3 pt-2">
             <div className="flex items-center justify-between text-xs font-mono">
               <div
@@ -340,7 +347,7 @@ export function BreakTheGridShowcase() {
         </div>
 
         {/* ========================================================================= */}
-        {/* 02: CORPORATE HEALTH BENEFITS & CLAIMS (MFINE) — UNIFIED COHESIVE SHOWCASE */}
+        {/* 02: PIXEL ENGINE & VOXEL STUDIO — UNIFIED COHESIVE SHOWCASE */}
         {/* ========================================================================= */}
         <div
           className={`border-b p-8 sm:p-12 lg:p-14 space-y-8 relative transition-colors ${
@@ -352,7 +359,281 @@ export function BreakTheGridShowcase() {
           {/* Top Project Meta & Actions Bar */}
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div className="flex flex-wrap items-center gap-2.5 text-xs font-mono">
-              <span className="text-indigo-400 font-bold">02</span>
+              <span className="text-cyan-400 font-bold">02</span>
+              <span className={isDark ? "text-zinc-600" : "text-stone-300"}>/</span>
+              <span
+                className={`font-semibold uppercase tracking-wider ${
+                  isDark ? "text-zinc-300" : "text-stone-700"
+                }`}
+              >
+                adityaos
+              </span>
+              <span className={isDark ? "text-zinc-600" : "text-stone-300"}>·</span>
+              <span className={isDark ? "text-zinc-400" : "text-stone-500"}>
+                Creative Tooling & Graphics Engine
+              </span>
+
+              {/* Live Sandbox Badge */}
+              <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-cyan-500/10 border border-cyan-500/30 text-cyan-400 font-mono text-[11px] font-semibold">
+                <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-pulse" />
+                <span>LIVE SANDBOX ENGINE</span>
+              </div>
+            </div>
+
+            {/* Quick Action Triggers */}
+            <div className="flex items-center gap-2.5 font-mono text-xs">
+              <button
+                onClick={() =>
+                  setModalData({
+                    title: "Pixel Engine & 2.5D Voxel Studio",
+                    client: "adityaos",
+                    category: "Creative Graphics & Voxel Engine",
+                    overview:
+                      "Interactive in-browser pixel & voxel synthesis with real-time 3D projection, procedural bitmap fonts, and cellular automata.",
+                    isPixelEngine: true,
+                    onLaunchOS,
+                    primaryImage: "/gallery/voxel_3d_projection.png",
+                    secondaryImage: "/gallery/pixel_engine_canvas.png",
+                    primaryLabel: "Voxel 3D Projection",
+                    secondaryLabel: "Pixel Canvas Specification",
+                    defaultMode: "pixel",
+                  })
+                }
+                className="px-4 py-2 rounded-full bg-cyan-500 hover:bg-cyan-400 text-zinc-950 font-bold flex items-center gap-1.5 shadow-sm transition-all cursor-pointer group/btn"
+              >
+                <Gamepad2 className="w-3.5 h-3.5 stroke-[2.5]" />
+                <span>Launch Interactive Studio</span>
+                <ArrowUpRight className="w-3.5 h-3.5 stroke-[2.5] group-hover/btn:translate-x-0.5 group-hover/btn:-translate-y-0.5 transition-transform" />
+              </button>
+
+              <button
+                onClick={() =>
+                  setModalData({
+                    title: "Pixel Engine & 2.5D Voxel Studio",
+                    client: "adityaos",
+                    category: "Creative Graphics & Voxel Engine",
+                    isPixelEngine: true,
+                    onLaunchOS,
+                    primaryImage: "/gallery/voxel_3d_projection.png",
+                    secondaryImage: "/gallery/pixel_engine_canvas.png",
+                    primaryLabel: "Voxel 3D Projection",
+                    secondaryLabel: "Pixel Canvas Specification",
+                    defaultMode: "screens",
+                  })
+                }
+                className={`px-3.5 py-2 rounded-full border transition-colors cursor-pointer flex items-center gap-1.5 ${
+                  isDark
+                    ? "bg-zinc-900 hover:bg-zinc-800 border-zinc-800 text-zinc-300 hover:text-white"
+                    : "bg-stone-100 hover:bg-stone-200 border-stone-200 text-stone-800"
+                }`}
+              >
+                <Eye className="w-3.5 h-3.5" />
+                <span>Inspect Specs</span>
+              </button>
+            </div>
+          </div>
+
+          {/* Project Title, Summary, and Key Proof Metrics */}
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+            <div className="lg:col-span-8 space-y-3">
+              <h3
+                className={`text-2xl sm:text-3xl lg:text-4xl font-sans font-bold tracking-tight ${
+                  isDark ? "text-white" : "text-stone-900"
+                }`}
+              >
+                Pixel Engine & 2.5D Voxel Studio
+              </h3>
+              <p
+                className={`text-sm sm:text-base font-medium font-sans leading-relaxed ${
+                  isDark ? "text-zinc-300" : "text-stone-700"
+                }`}
+              >
+                In-browser isometric voxel synthesis, procedural bitmap fonts, and interactive canvas audio.
+              </p>
+              <p
+                className={`text-sm font-sans leading-relaxed max-w-3xl ${
+                  isDark ? "text-zinc-400" : "text-stone-600"
+                }`}
+              >
+                Engineered as a lightweight, zero-dependency creative studio subsystem for adityaos.
+                Features real-time 2D-to-2.5D isometric voxel projection, procedural typography stamping
+                with a custom 5×5 bitmap font, bilateral symmetry drawing, Conway&apos;s Game of Life
+                simulation, falling sand cellular automata, and interactive Web Audio harmonic synthesis.
+              </p>
+            </div>
+
+            {/* Metrics Trio */}
+            <div
+              className={`lg:col-span-4 grid grid-cols-3 gap-3 p-4 rounded-xl border font-mono ${
+                isDark
+                  ? "bg-[#090b10] border-zinc-800/80"
+                  : "bg-stone-50 border-stone-200"
+              }`}
+            >
+              <div>
+                <div className="text-2xl font-bold text-cyan-400">60 FPS</div>
+                <div
+                  className={`text-[11px] font-sans pt-0.5 ${
+                    isDark ? "text-zinc-500" : "text-stone-500"
+                  }`}
+                >
+                  Canvas Rate
+                </div>
+              </div>
+              <div>
+                <div
+                  className={`text-2xl font-bold ${
+                    isDark ? "text-white" : "text-stone-900"
+                  }`}
+                >
+                  2.5D
+                </div>
+                <div
+                  className={`text-[11px] font-sans pt-0.5 ${
+                    isDark ? "text-zinc-500" : "text-stone-500"
+                  }`}
+                >
+                  Voxel Projection
+                </div>
+              </div>
+              <div>
+                <div
+                  className={`text-2xl font-bold ${
+                    isDark ? "text-zinc-300" : "text-stone-700"
+                  }`}
+                >
+                  5 Modes
+                </div>
+                <div
+                  className={`text-[11px] font-sans pt-0.5 ${
+                    isDark ? "text-zinc-500" : "text-stone-500"
+                  }`}
+                >
+                  Draw & Cellular
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Unified Showcase Window */}
+          <div className="space-y-3 pt-2">
+            <div className="flex items-center justify-between text-xs font-mono">
+              <div
+                className={`flex items-center gap-1.5 p-1 rounded-lg border ${
+                  isDark
+                    ? "bg-[#090a0f] border-zinc-800"
+                    : "bg-stone-100 border-stone-200"
+                }`}
+              >
+                <button
+                  onClick={() => setPixelTab("voxel")}
+                  className={`px-3 py-1.5 rounded-md font-medium transition-colors cursor-pointer ${
+                    pixelTab === "voxel"
+                      ? isDark
+                        ? "bg-zinc-800 text-white font-semibold"
+                        : "bg-white text-stone-900 font-semibold shadow-sm"
+                      : isDark
+                      ? "text-zinc-400 hover:text-white"
+                      : "text-stone-500 hover:text-stone-900"
+                  }`}
+                >
+                  Voxel 3D Projection
+                </button>
+                <button
+                  onClick={() => setPixelTab("canvas")}
+                  className={`px-3 py-1.5 rounded-md font-medium transition-colors cursor-pointer ${
+                    pixelTab === "canvas"
+                      ? isDark
+                        ? "bg-zinc-800 text-white font-semibold"
+                        : "bg-white text-stone-900 font-semibold shadow-sm"
+                      : isDark
+                      ? "text-zinc-400 hover:text-white"
+                      : "text-stone-500 hover:text-stone-900"
+                  }`}
+                >
+                  Pixel Canvas Studio
+                </button>
+              </div>
+              <span
+                className={`text-[11px] hidden sm:inline ${
+                  isDark ? "text-zinc-500" : "text-stone-400"
+                }`}
+              >
+                Click image to launch live interactive studio sandbox
+              </span>
+            </div>
+
+            <div
+              onClick={() =>
+                setModalData({
+                  title: "Pixel Engine & 2.5D Voxel Studio",
+                  client: "adityaos",
+                  category: "Creative Graphics & Voxel Engine",
+                  isPixelEngine: true,
+                  onLaunchOS,
+                  primaryImage: "/gallery/voxel_3d_projection.png",
+                  secondaryImage: "/gallery/pixel_engine_canvas.png",
+                  primaryLabel: "Voxel 3D Projection",
+                  secondaryLabel: "Pixel Canvas Specification",
+                  defaultMode: "pixel",
+                })
+              }
+              className={`group/screen relative rounded-xl overflow-hidden border cursor-pointer shadow-lg transition-all ${
+                isDark
+                  ? "bg-black border-zinc-800 hover:border-cyan-500/50"
+                  : "bg-stone-100 border-stone-200 hover:border-cyan-600/50"
+              }`}
+            >
+              <div
+                className={`px-4 py-2.5 border-b flex items-center justify-between text-xs font-mono ${
+                  isDark
+                    ? "bg-[#090b10] border-zinc-800 text-zinc-400"
+                    : "bg-stone-50 border-stone-200 text-stone-600"
+                }`}
+              >
+                <div className="flex items-center gap-2">
+                  <span className="w-2 h-2 rounded-full bg-cyan-400 animate-pulse" />
+                  <span className="font-semibold text-cyan-400">
+                    Live Interactive Studio
+                  </span>
+                  <span className={isDark ? "text-zinc-600" : "text-stone-300"}>·</span>
+                  <span>adityaos Pixel Engine</span>
+                </div>
+                <span className="flex items-center gap-1 group-hover/screen:text-cyan-400 transition-colors text-[11px]">
+                  <Maximize2 className="w-3.5 h-3.5" /> Launch Live Studio
+                </span>
+              </div>
+
+              <div className="relative aspect-[16/9] sm:aspect-[21/10] bg-black/80 flex items-center justify-center p-2">
+                <Image
+                  src={
+                    pixelTab === "voxel"
+                      ? "/gallery/voxel_3d_projection.png"
+                      : "/gallery/pixel_engine_canvas.png"
+                  }
+                  alt="Pixel Engine & Voxel Studio"
+                  fill
+                  className="object-contain"
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* ========================================================================= */}
+        {/* 03: CORPORATE HEALTH BENEFITS & CLAIMS (MFINE) — UNIFIED COHESIVE SHOWCASE */}
+        {/* ========================================================================= */}
+        <div
+          className={`border-b p-8 sm:p-12 lg:p-14 space-y-8 relative transition-colors ${
+            isDark
+              ? "border-zinc-800 bg-[#0c0e14]/50 hover:bg-[#0c0e14]/70"
+              : "border-stone-200 bg-white hover:bg-stone-50/50"
+          }`}
+        >
+          {/* Top Project Meta & Actions Bar */}
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <div className="flex flex-wrap items-center gap-2.5 text-xs font-mono">
+              <span className="text-indigo-400 font-bold">03</span>
               <span className={isDark ? "text-zinc-600" : "text-stone-300"}>/</span>
               <span
                 className={`font-semibold uppercase tracking-wider ${
@@ -609,7 +890,7 @@ export function BreakTheGridShowcase() {
               : "border-stone-200 divide-stone-200"
           }`}
         >
-          {/* 03: UPI Limit Clarity */}
+          {/* 04: UPI Limit Clarity */}
           <div
             className={`p-8 sm:p-10 lg:p-12 flex flex-col justify-between space-y-7 transition-colors ${
               isDark
@@ -619,7 +900,7 @@ export function BreakTheGridShowcase() {
           >
             <div className="space-y-4">
               <div className="flex items-center justify-between text-xs font-mono">
-                <span className="text-cyan-500 font-bold">03 / DIGIACCEL</span>
+                <span className="text-cyan-500 font-bold">04 / DIGIACCEL</span>
                 <span className="px-2.5 py-0.5 rounded-full bg-cyan-500/10 border border-cyan-500/30 text-cyan-400 font-mono text-[10px] font-semibold flex items-center gap-1.5">
                   <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-pulse" />
                   INTERACTIVE PROTOTYPE
@@ -749,7 +1030,7 @@ export function BreakTheGridShowcase() {
             </div>
           </div>
 
-          {/* 04: Habit Tracker */}
+          {/* 05: Habit Tracker */}
           <div
             className={`p-8 sm:p-10 lg:p-12 flex flex-col justify-between space-y-7 transition-colors ${
               isDark
@@ -759,7 +1040,7 @@ export function BreakTheGridShowcase() {
           >
             <div className="space-y-4">
               <div className="flex items-center justify-between text-xs font-mono">
-                <span className="text-amber-500 font-bold">04 / MOSAIC WELLNESS</span>
+                <span className="text-amber-500 font-bold">05 / MOSAIC WELLNESS</span>
                 <span className="px-2.5 py-0.5 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-400 font-mono text-[10px] font-semibold flex items-center gap-1.5">
                   <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse" />
                   PRODUCTION APP FLOW
@@ -949,7 +1230,7 @@ export function BreakTheGridShowcase() {
               : "border-stone-200 divide-stone-200"
           }`}
         >
-          {/* 05: Fieldwork */}
+          {/* 06: Fieldwork */}
           <div
             className={`p-7 sm:p-8 lg:p-9 flex flex-col justify-between space-y-6 transition-colors ${
               isDark
@@ -959,7 +1240,7 @@ export function BreakTheGridShowcase() {
           >
             <div className="space-y-3">
               <div className="flex items-center justify-between text-xs font-mono">
-                <span className="text-emerald-500 font-bold">05 / FIELDWORK</span>
+                <span className="text-emerald-500 font-bold">06 / FIELDWORK</span>
                 <span className="px-2 py-0.5 rounded bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-[10px] font-semibold">
                   Field Automation
                 </span>
@@ -1030,7 +1311,7 @@ export function BreakTheGridShowcase() {
             </div>
           </div>
 
-          {/* 06: Ketto+ */}
+          {/* 07: Ketto+ */}
           <div
             className={`p-7 sm:p-8 lg:p-9 flex flex-col justify-between space-y-6 transition-colors ${
               isDark
@@ -1040,7 +1321,7 @@ export function BreakTheGridShowcase() {
           >
             <div className="space-y-3">
               <div className="flex items-center justify-between text-xs font-mono">
-                <span className="text-pink-500 font-bold">06 / KETTO</span>
+                <span className="text-pink-500 font-bold">07 / KETTO</span>
                 <span className="px-2 py-0.5 rounded bg-pink-500/10 border border-pink-500/20 text-pink-400 text-[10px] font-semibold">
                   Recurring Giving
                 </span>
@@ -1113,7 +1394,7 @@ export function BreakTheGridShowcase() {
             </div>
           </div>
 
-          {/* 07: TuteDude */}
+          {/* 08: TuteDude */}
           <div
             className={`p-7 sm:p-8 lg:p-9 flex flex-col justify-between space-y-6 transition-colors ${
               isDark
@@ -1123,7 +1404,7 @@ export function BreakTheGridShowcase() {
           >
             <div className="space-y-3">
               <div className="flex items-center justify-between text-xs font-mono">
-                <span className="text-sky-500 font-bold">07 / TUTEDUDE</span>
+                <span className="text-sky-500 font-bold">08 / TUTEDUDE</span>
                 <span className="px-2 py-0.5 rounded bg-sky-500/10 border border-sky-500/20 text-sky-400 text-[10px] font-semibold">
                   EdTech Web
                 </span>
