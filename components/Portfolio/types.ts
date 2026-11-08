@@ -41,6 +41,7 @@ export interface EssayItem {
   excerpt: string;
   url: string;
   theme: string;
+  content?: string[];
 }
 
 export interface LearnabilityMetric {

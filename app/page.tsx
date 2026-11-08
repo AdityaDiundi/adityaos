@@ -46,6 +46,18 @@ import {
   Lock,
 } from "lucide-react";
 
+const APP_LABELS: Record<string, string> = {
+  coreIntro: "About Aditya",
+  archiveReader: "Case Studies & Essays",
+  streamFeed: "Media Feed",
+  pixelEngine: "Pixel Studio",
+  resumeViewer: "Resume (PDF)",
+  galleryViewer: "Photo Gallery",
+  fieldJournal: "Field Journal",
+  learnabilityLab: "Diagnostic Lab",
+  wallpaperManager: "Wallpaper Gallery",
+};
+
 export default function Home() {
   const desktopContainerRef = useRef<HTMLDivElement>(null);
   const {
@@ -452,7 +464,7 @@ export default function Home() {
             }}
             className="px-2 py-0.5 rounded border font-semibold"
           >
-            {activeWindow ? `twm://${activeWindow}` : "twm://root"}
+            {activeWindow ? (APP_LABELS[activeWindow] || activeWindow) : "Desktop Workspace"}
           </span>
         </div>
 
@@ -692,8 +704,8 @@ export default function Home() {
                 <Paintbrush className="w-5 h-5" style={{ color: activeTheme.accent }} />
               </div>
               <div className="space-y-0.5">
-                <div className="font-bold text-xs">PixelEngine</div>
-                <div className="text-[10px] opacity-60">2D/3D Voxel Canvas</div>
+                <div className="font-bold text-xs">Pixel Studio</div>
+                <div className="text-[10px] opacity-60">Draw & Pixel Art</div>
               </div>
             </button>
 
@@ -713,7 +725,7 @@ export default function Home() {
               </div>
               <div className="space-y-0.5">
                 <div className="font-bold text-xs">Archive</div>
-                <div className="text-[10px] opacity-60">Essays & Poetry</div>
+                <div className="text-[10px] opacity-60">Writing & Research</div>
               </div>
             </button>
 
@@ -732,8 +744,8 @@ export default function Home() {
                 <Tv className="w-5 h-5 text-amber-600 dark:text-amber-400" />
               </div>
               <div className="space-y-0.5">
-                <div className="font-bold text-xs">StreamFeed</div>
-                <div className="text-[10px] opacity-60">@falsepeek MPV</div>
+                <div className="font-bold text-xs">Media Feed</div>
+                <div className="text-[10px] opacity-60">Videos & Gameplay</div>
               </div>
             </button>
 
@@ -752,8 +764,8 @@ export default function Home() {
                 <FileText className="w-5 h-5 text-cyan-700 dark:text-cyan-400" />
               </div>
               <div className="space-y-0.5">
-                <div className="font-bold text-xs">Resume.pdf</div>
-                <div className="text-[10px] opacity-60">IIIT Delhi Designer</div>
+                <div className="font-bold text-xs">Resume (PDF)</div>
+                <div className="text-[10px] opacity-60">Background & Roles</div>
               </div>
             </button>
 
@@ -772,8 +784,8 @@ export default function Home() {
                 <ImageIcon className="w-5 h-5 text-pink-600 dark:text-pink-400" />
               </div>
               <div className="space-y-0.5">
-                <div className="font-bold text-xs">Gallery</div>
-                <div className="text-[10px] opacity-60">Feh Image Viewer</div>
+                <div className="font-bold text-xs">Photo Gallery</div>
+                <div className="text-[10px] opacity-60">Visual & Field Photos</div>
               </div>
             </button>
 
@@ -792,8 +804,8 @@ export default function Home() {
                 <Sparkles className="w-5 h-5 text-purple-700 dark:text-purple-400" />
               </div>
               <div className="space-y-0.5">
-                <div className="font-bold text-xs">CoreIntro</div>
-                <div className="text-[10px] opacity-60">Identity & Bio</div>
+                <div className="font-bold text-xs">About Aditya</div>
+                <div className="text-[10px] opacity-60">Identity & Design Bio</div>
               </div>
             </button>
 
@@ -833,8 +845,8 @@ export default function Home() {
                 <Compass className="w-5 h-5 text-amber-700 dark:text-amber-400" />
               </div>
               <div className="space-y-0.5">
-                <div className="font-bold text-xs">FieldJournal</div>
-                <div className="text-[10px] opacity-60">Rajasthan Impact</div>
+                <div className="font-bold text-xs">Field Journal</div>
+                <div className="text-[10px] opacity-60">Rural Ethnography</div>
               </div>
             </button>
 
@@ -853,8 +865,8 @@ export default function Home() {
                 <Brain className="w-5 h-5 text-cyan-700 dark:text-cyan-400" />
               </div>
               <div className="space-y-0.5">
-                <div className="font-bold text-xs">Learnability</div>
-                <div className="text-[10px] opacity-60">Aarohi Diagnostics</div>
+                <div className="font-bold text-xs">Diagnostic Lab</div>
+                <div className="text-[10px] opacity-60">Aarohi Education</div>
               </div>
             </button>
           </div>
@@ -870,18 +882,18 @@ export default function Home() {
               className="p-3 rounded-md border text-[11px] backdrop-blur-md max-w-md space-y-1 shadow-md"
             >
               <div className="flex items-center gap-2 font-bold" style={{ color: activeTheme.accent }}>
-                <Terminal className="w-3.5 h-3.5" />
-                <span>ADITYA-OS // {activeTheme.name.toUpperCase()} TWM</span>
+                <Sparkles className="w-3.5 h-3.5" />
+                <span>ADITYA-OS // Interactive Web Desktop</span>
               </div>
               <p className="text-[10px] opacity-75 leading-relaxed">
-                Riced Web OS workstation. Tactile voxel engine, dynamic shell theming, Beethoven Für Elise music box synth, and live telemetry.
+                An interactive web desktop and creative workspace. Paint in Pixel Studio, inspect real product case studies, listen to the 8-bit music box, and customize desktop themes.
               </p>
               <div className="flex items-center gap-3 text-[10px] opacity-60 pt-1">
-                <span>Kernel: 6.11.0-zen</span>
+                <span>By Aditya Diundi</span>
                 <span>•</span>
-                <span>Audio: Beethoven Für Elise</span>
+                <span>Product Designer & Technologist</span>
                 <span>•</span>
-                <span>Firebase: Live</span>
+                <span>IIIT Delhi</span>
               </div>
             </div>
 
@@ -894,10 +906,10 @@ export default function Home() {
               className="p-2.5 rounded-md border text-[10px] backdrop-blur-md text-right space-y-0.5 shadow-md"
             >
               <div className="font-semibold" style={{ color: activeTheme.accent }}>
-                Quick Keys & Help
+                Desktop Workspace
               </div>
-              <div className="opacity-70">Click top tabs [1:SYS] - [6:GALLERY] to switch</div>
-              <div className="opacity-70">Type &apos;help&apos;, &apos;feh&apos;, or &apos;theme list&apos; in dock below</div>
+              <div className="opacity-70">Click top tabs to switch active apps</div>
+              <div className="opacity-70">Press &apos;?&apos; for keyboard shortcuts</div>
             </div>
           </div>
         </div>
@@ -905,7 +917,7 @@ export default function Home() {
         {/* Module 1: CoreIntro Window */}
         <WindowFrame
           id="coreIntro"
-          title="identity // CoreIntro.tsx"
+          title="About Aditya // Design Philosophy & Bio"
           icon={<Sparkles className="w-3.5 h-3.5 text-purple-400" />}
           defaultPosition={{ x: 50, y: 30 }}
           defaultSize={{ width: 620, height: 480 }}
@@ -917,7 +929,7 @@ export default function Home() {
         {/* Module 2: PixelEngine Window */}
         <WindowFrame
           id="pixelEngine"
-          title="canvas // PixelEngine.tsx"
+          title="Pixel Studio // Creative Grid Canvas"
           icon={<Paintbrush className="w-3.5 h-3.5" style={{ color: activeTheme.accent }} />}
           defaultPosition={{ x: 140, y: 60 }}
           defaultSize={{ width: 760, height: 520 }}
@@ -929,7 +941,7 @@ export default function Home() {
         {/* Module 3: ArchiveReader Window */}
         <WindowFrame
           id="archiveReader"
-          title="nvim // ArchiveReader.tsx"
+          title="Archive // Case Studies & Essays"
           icon={<BookOpen className="w-3.5 h-3.5 text-emerald-400" />}
           defaultPosition={{ x: 340, y: 80 }}
           defaultSize={{ width: 700, height: 480 }}
@@ -941,7 +953,7 @@ export default function Home() {
         {/* Module 4: StreamFeed Window */}
         <WindowFrame
           id="streamFeed"
-          title="mpv // StreamFeed.tsx"
+          title="Media Feed // Videos & Visual Experiments"
           icon={<Tv className="w-3.5 h-3.5 text-amber-400" />}
           defaultPosition={{ x: 220, y: 130 }}
           defaultSize={{ width: 600, height: 430 }}
@@ -953,7 +965,7 @@ export default function Home() {
         {/* Module 5: ResumeViewer Window */}
         <WindowFrame
           id="resumeViewer"
-          title="pdf // ResumeViewer.tsx"
+          title="Resume // Experience & Education"
           icon={<FileText className="w-3.5 h-3.5 text-cyan-400" />}
           defaultPosition={{ x: 260, y: 70 }}
           defaultSize={{ width: 720, height: 530 }}
@@ -965,7 +977,7 @@ export default function Home() {
         {/* Module 6: GalleryViewer Window */}
         <WindowFrame
           id="galleryViewer"
-          title="feh // GalleryViewer.tsx"
+          title="Photo Gallery // Visual & Fieldwork"
           icon={<ImageIcon className="w-3.5 h-3.5 text-pink-400" />}
           defaultPosition={{ x: 180, y: 90 }}
           defaultSize={{ width: 740, height: 500 }}
@@ -977,7 +989,7 @@ export default function Home() {
         {/* Module 7: FieldJournal Window */}
         <WindowFrame
           id="fieldJournal"
-          title="field // FieldJournal.tsx"
+          title="Field Journal // Rural Immersion & Impact"
           icon={<Compass className="w-3.5 h-3.5 text-amber-400" />}
           defaultPosition={{ x: 140, y: 40 }}
           defaultSize={{ width: 780, height: 520 }}
@@ -989,7 +1001,7 @@ export default function Home() {
         {/* Module 8: LearnabilityLab Window */}
         <WindowFrame
           id="learnabilityLab"
-          title="diagnostics // LearnabilityLab.tsx"
+          title="Diagnostic Lab // Aarohi Bal Sansar"
           icon={<Brain className="w-3.5 h-3.5 text-cyan-400" />}
           defaultPosition={{ x: 220, y: 60 }}
           defaultSize={{ width: 780, height: 530 }}
@@ -1001,7 +1013,7 @@ export default function Home() {
         {/* Module 9: WallpaperManager Window */}
         <WindowFrame
           id="wallpaperManager"
-          title="wallpaper // WallpaperManager.tsx"
+          title="Wallpaper Gallery // Desktop Wallpapers"
           icon={<ImageIcon className="w-3.5 h-3.5 text-pink-400" />}
           defaultPosition={{ x: 200, y: 70 }}
           defaultSize={{ width: 760, height: 530 }}
@@ -1058,7 +1070,7 @@ export default function Home() {
             >
               <span className="flex items-center gap-2">
                 <Lock className="w-3.5 h-3.5 text-yellow-400" />
-                <span>Lock Session (Hyprlock)</span>
+                <span>Lock Screen</span>
               </span>
               <kbd className="px-1 py-0.2 rounded bg-white/10 text-[9px] text-yellow-400">Alt+L</kbd>
             </button>
@@ -1132,7 +1144,7 @@ export default function Home() {
                 ) : (
                   <VolumeX className="w-3.5 h-3.5 opacity-40" />
                 )}
-                <span>Für Elise Scroll Audio</span>
+                <span>8-Bit Music Box Audio</span>
               </span>
               <span className={`text-[10px] font-bold ${isSoundEnabled ? "text-emerald-400" : "opacity-40"}`}>
                 {isSoundEnabled ? "ACTIVE" : "MUTED"}
@@ -1152,7 +1164,7 @@ export default function Home() {
             >
               <span className="flex items-center gap-2">
                 <Sparkles className="w-3.5 h-3.5 text-purple-400" />
-                <span>Core Intro</span>
+                <span>About Aditya</span>
               </span>
               <kbd className="px-1 py-0.2 rounded bg-white/10 text-[9px] opacity-60">Alt+1</kbd>
             </button>
@@ -1167,7 +1179,7 @@ export default function Home() {
             >
               <span className="flex items-center gap-2">
                 <BookOpen className="w-3.5 h-3.5 text-emerald-400" />
-                <span>Essays & Poetry</span>
+                <span>Case Studies & Essays</span>
               </span>
               <kbd className="px-1 py-0.2 rounded bg-white/10 text-[9px] opacity-60">Alt+2</kbd>
             </button>
@@ -1182,7 +1194,7 @@ export default function Home() {
             >
               <span className="flex items-center gap-2">
                 <Paintbrush className="w-3.5 h-3.5 text-amber-400" />
-                <span>Pixel Engine (2D/3D)</span>
+                <span>Pixel Studio</span>
               </span>
               <kbd className="px-1 py-0.2 rounded bg-white/10 text-[9px] opacity-60">Alt+4</kbd>
             </button>
