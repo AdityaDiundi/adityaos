@@ -65,6 +65,7 @@ export default function Home() {
     activeWindow,
     restoreWindow,
     focusWindow,
+    maximizeWindow,
     closeWindow,
     wallpaperUrl,
     showDesktopGrid,
@@ -90,9 +91,30 @@ export default function Home() {
   useEffect(() => {
     if (typeof window !== "undefined") {
       const params = new URLSearchParams(window.location.search);
-      if (params.get("mode") === "os") {
+      const pathname = window.location.pathname;
+      const appParam = params.get("app");
+      const isPixelLink =
+        pathname === "/pixel" ||
+        pathname === "/studio" ||
+        pathname === "/pixelengine" ||
+        appParam === "pixel" ||
+        appParam === "pixelEngine" ||
+        appParam === "studio";
+
+      if (isPixelLink) {
+        setViewMode("os");
+        restoreWindow("pixelEngine");
+        focusWindow("pixelEngine");
+        maximizeWindow("pixelEngine");
+      } else if (params.get("mode") === "os") {
         setViewMode("os");
       }
+
+      if (appParam && APP_LABELS[appParam] && appParam !== "pixelEngine") {
+        restoreWindow(appParam);
+        focusWindow(appParam);
+      }
+
       const themeParam = params.get("theme");
       if (themeParam === "light" || themeParam === "editorial") {
         setTheme("light");
@@ -100,7 +122,7 @@ export default function Home() {
         setTheme(themeParam as OSThemeId);
       }
     }
-  }, [setTheme]);
+  }, [setTheme, restoreWindow, focusWindow, maximizeWindow]);
 
   useEffect(() => {
     const updateClock = () => {
