@@ -260,30 +260,31 @@ export function BreakTheGridShowcase({ onLaunchOS }: BreakTheGridShowcaseProps) 
         {/* 01: JANEVAL BENCHMARK — VIEWPORT STAGE */}
         {/* ========================================================================= */}
         <motion.article
-          initial={{ opacity: 0, y: 32 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: "-12% 0px" }}
-          transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
-          className={`border-b border-dashed p-6 sm:p-8 lg:p-12 min-h-[68vh] lg:min-h-[76vh] flex flex-col justify-center space-y-6 transition-colors ${
+          id="project-janeval"
+          data-project-id="janeval"
+          initial={{ opacity: 1, y: 0 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.4 }}
+          className={`border-b border-dashed px-6 sm:px-8 lg:px-12 py-8 sm:py-10 lg:py-10 min-h-[56vh] lg:min-h-[60vh] flex flex-col justify-center space-y-4 transition-colors ${
             isDark
               ? "border-zinc-800/80 bg-[#0c0e14]/30 hover:bg-[#0c0e14]/50"
               : "border-stone-200/80 bg-white hover:bg-stone-50/50"
           }`}
         >
-          {/* Top Meta Line: Clean unboxed metadata */}
-          <div className="flex items-center justify-between text-xs font-mono">
-            <span className={isDark ? "text-zinc-400" : "text-stone-600"}>
-              Josh Talks · 2024
+          {/* Top Meta Line: Client and Project distinct */}
+          <div className="flex items-center justify-between text-[13px] font-mono">
+            <span className={isDark ? "text-zinc-300 font-medium" : "text-stone-700 font-semibold"}>
+              Independent Research · JANEVAL (2024)
             </span>
-            <span className="text-emerald-600 dark:text-emerald-400 font-medium">
-              3.4x Cultural Fidelity Lift
+            <span className={isDark ? "text-zinc-400" : "text-stone-600"}>
+              SYS-01
             </span>
           </div>
 
-          {/* Symmetrical 12-Col Split */}
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
+          {/* Symmetrical 12-Col Split with 60% Mockup bleed */}
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10 items-center">
             {/* Left Narrative: One Single Persuasive Statement */}
-            <div className="lg:col-span-6 space-y-4 max-w-[60ch]">
+            <div className="lg:col-span-5 space-y-3.5 max-w-[52ch]">
               <h3
                 className={`text-xl sm:text-2xl font-sans font-semibold tracking-tight leading-snug ${
                   isDark ? "text-white" : "text-stone-900"
@@ -300,15 +301,6 @@ export function BreakTheGridShowcase({ onLaunchOS }: BreakTheGridShowcaseProps) 
               >
                 Benchmarked frontier vision models across 120+ clinical scenarios with frontline ASHA workers, eliminating diagnostic hallucinations prior to rural deployment.
               </p>
-
-              {/* Monospace Domain Tokens */}
-              <div
-                className={`text-xs font-mono pt-1 ${
-                  isDark ? "text-zinc-500" : "text-stone-500"
-                }`}
-              >
-                Frontier AI Eval · Pairwise Elo Arena · Next.js · TypeScript · Tailwind CSS
-              </div>
 
               {/* Action CTAs: Solid Primary + Clean Text Secondary */}
               <div className="pt-2 flex flex-wrap items-center gap-4 font-mono text-xs">
@@ -339,15 +331,15 @@ export function BreakTheGridShowcase({ onLaunchOS }: BreakTheGridShowcaseProps) 
               </div>
             </div>
 
-            {/* Right: Designed Desktop Browser Frame */}
-            <div className="lg:col-span-6">
+            {/* Right: ~60% Width Mockup bleeding slightly off the right edge */}
+            <div className="lg:col-span-7 -mr-2 sm:-mr-4 lg:-mr-6 overflow-visible">
               <StageCanvas
                 accentTint="rgba(16, 185, 129, 0.15)"
                 label="JANEVAL Pairwise Blind Elo Arena"
                 onClick={() =>
                   setModalData({
                     title: "JANEVAL — Human-Centered AI Benchmark",
-                    client: "Josh Talks",
+                    client: "Independent Research",
                     category: "Frontier AI Evaluation",
                     overview:
                       "Ground-truth AI evaluation arena for Indian public health, tested with frontline healthcare workers.",
@@ -377,30 +369,32 @@ export function BreakTheGridShowcase({ onLaunchOS }: BreakTheGridShowcaseProps) 
         {/* 02: ADITYAOS / PIXEL STUDIO — VIEWPORT STAGE */}
         {/* ========================================================================= */}
         <motion.article
+          id="project-adityaos"
+          data-project-id="adityaos"
           initial={{ opacity: 0, y: 32 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: "-12% 0px" }}
           transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
-          className={`border-b border-dashed p-6 sm:p-8 lg:p-12 min-h-[68vh] lg:min-h-[76vh] flex flex-col justify-center space-y-6 transition-colors ${
+          className={`border-b border-dashed px-6 sm:px-8 lg:px-12 py-8 sm:py-10 lg:py-10 min-h-[56vh] lg:min-h-[60vh] flex flex-col justify-center space-y-4 transition-colors ${
             isDark
               ? "border-zinc-800/80 bg-[#0c0e14]/30 hover:bg-[#0c0e14]/50"
               : "border-stone-200/80 bg-white hover:bg-stone-50/50"
           }`}
         >
           {/* Top Meta Line: Clean unboxed metadata */}
-          <div className="flex items-center justify-between text-xs font-mono">
-            <span className={isDark ? "text-zinc-400" : "text-stone-600"}>
-              adityaOS · Personal System
+          <div className="flex items-center justify-between text-[13px] font-mono">
+            <span className={isDark ? "text-zinc-300 font-medium" : "text-stone-700 font-semibold"}>
+              Personal System · AdityaOS & Pixel Engine (2024)
             </span>
-            <span className="text-cyan-600 dark:text-cyan-400 font-medium">
-              60 FPS Deterministic Canvas
+            <span className={isDark ? "text-zinc-400" : "text-stone-600"}>
+              SYS-02
             </span>
           </div>
 
           {/* Symmetrical 12-Col Split */}
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10 items-center">
             {/* Left Narrative: One Single Persuasive Statement */}
-            <div className="lg:col-span-6 space-y-4 max-w-[60ch]">
+            <div className="lg:col-span-5 space-y-3.5 max-w-[52ch]">
               <h3
                 className={`text-xl sm:text-2xl font-sans font-semibold tracking-tight leading-snug ${
                   isDark ? "text-white" : "text-stone-900"
@@ -416,14 +410,6 @@ export function BreakTheGridShowcase({ onLaunchOS }: BreakTheGridShowcaseProps) 
               >
                 Zero-dependency 60 FPS deterministic canvas with Conway&apos;s Game of Life, falling sand physics, procedural WebAudio synth, and modular windowing.
               </p>
-
-              <div
-                className={`text-xs font-mono pt-1 ${
-                  isDark ? "text-zinc-500" : "text-stone-500"
-                }`}
-              >
-                HTML5 Canvas 2D · Web Audio API · Cellular Automata · TypeScript · React
-              </div>
 
               {/* Action CTAs */}
               <div className="pt-2 flex flex-wrap items-center gap-4 font-mono text-xs">
@@ -465,7 +451,7 @@ export function BreakTheGridShowcase({ onLaunchOS }: BreakTheGridShowcaseProps) 
             </div>
 
             {/* Right: Pixel Studio Browser Frame */}
-            <div className="lg:col-span-6">
+            <div className="lg:col-span-7 -mr-2 sm:-mr-4 lg:-mr-6 overflow-visible">
               <StageCanvas
                 accentTint="rgba(6, 182, 212, 0.15)"
                 label="Pixel Engine 60 FPS Deterministic Canvas"
@@ -499,6 +485,8 @@ export function BreakTheGridShowcase({ onLaunchOS }: BreakTheGridShowcaseProps) 
         {/* 03: MFINE CORPORATE HEALTH & CLAIMS — VIEWPORT STAGE */}
         {/* ========================================================================= */}
         <motion.article
+          id="project-mfine"
+          data-project-id="mfine"
           initial={{ opacity: 0, y: 32 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: "-12% 0px" }}
@@ -623,6 +611,8 @@ export function BreakTheGridShowcase({ onLaunchOS }: BreakTheGridShowcaseProps) 
         >
           {/* 04: Digiaccel UPI Clarity */}
           <motion.article
+            id="project-digiaccel"
+            data-project-id="digiaccel"
             initial={{ opacity: 0, y: 32 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: "-12% 0px" }}
@@ -727,6 +717,8 @@ export function BreakTheGridShowcase({ onLaunchOS }: BreakTheGridShowcaseProps) 
 
           {/* 05: Mosaic Wellness / ManMatters */}
           <motion.article
+            id="project-mosaic"
+            data-project-id="mosaic"
             initial={{ opacity: 0, y: 32 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: "-12% 0px" }}
@@ -873,6 +865,8 @@ export function BreakTheGridShowcase({ onLaunchOS }: BreakTheGridShowcaseProps) 
         >
           {/* 06: Ketto Crowdfunding */}
           <motion.article
+            id="project-ketto"
+            data-project-id="ketto"
             initial={{ opacity: 0, y: 32 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: "-12% 0px" }}
@@ -1000,6 +994,8 @@ export function BreakTheGridShowcase({ onLaunchOS }: BreakTheGridShowcaseProps) 
 
           {/* 07: TuteDude EdTech Mentorship */}
           <motion.article
+            id="project-tutedude"
+            data-project-id="tutedude"
             initial={{ opacity: 0, y: 32 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: "-12% 0px" }}
@@ -1112,6 +1108,8 @@ export function BreakTheGridShowcase({ onLaunchOS }: BreakTheGridShowcaseProps) 
         {/* 08: RAJASTHAN FIELDWORK & ETHNOGRAPHY — VIEWPORT STAGE */}
         {/* ========================================================================= */}
         <motion.article
+          id="project-fieldwork"
+          data-project-id="fieldwork"
           initial={{ opacity: 0, y: 32 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: "-12% 0px" }}
