@@ -14,16 +14,16 @@ export function YouTubeSection() {
   return (
     <section id="youtube" className="relative">
       <div
-        className={`max-w-7xl mx-auto border-x relative transition-colors ${
+        className={`max-w-7xl mx-auto border-x border-dashed relative transition-colors ${
           isDark
-            ? "border-zinc-800 bg-[#090b10]/40"
-            : "border-stone-200 bg-[#FBFBF9]"
+            ? "border-zinc-800/80 bg-[#090b10]/40"
+            : "border-stone-200/80 bg-[#FBFBF9]"
         }`}
       >
         {/* Section Header */}
         <div
-          className={`border-b p-6 sm:p-8 relative flex flex-col sm:flex-row sm:items-end justify-between gap-4 transition-colors ${
-            isDark ? "border-zinc-800 bg-[#0c0e14]/70" : "border-stone-200 bg-white"
+          className={`border-b border-dashed p-6 sm:p-8 relative flex flex-col sm:flex-row sm:items-end justify-between gap-4 transition-colors ${
+            isDark ? "border-zinc-800/80 bg-[#0c0e14]/70" : "border-stone-200/80 bg-white"
           }`}
         >
           <div className="space-y-1.5">

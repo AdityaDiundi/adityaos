@@ -54,7 +54,7 @@ export function ResumeSection() {
     {
       role: "Systems Designer & Fellow",
       company: "Project Potential x India Fellow",
-      location: "Kumaon, Uttarakhand",
+      location: "Kishangarh, Rajasthan",
       period: "2021 — 2022",
       highlights: [
         "Spent 20 months in grassroots rural immersion leading non-profit systems development and ethnographic research.",
@@ -81,16 +81,16 @@ export function ResumeSection() {
   return (
     <section id="resume" className="relative">
       <div
-        className={`max-w-7xl mx-auto border-x relative transition-colors ${
+        className={`max-w-7xl mx-auto border-x border-dashed relative transition-colors ${
           isDark
-            ? "border-zinc-800 bg-[#090b10]/40"
-            : "border-stone-200 bg-[#FBFBF9]"
+            ? "border-zinc-800/80 bg-[#090b10]/40"
+            : "border-stone-200/80 bg-[#FBFBF9]"
         }`}
       >
         {/* Section Header */}
         <div
-          className={`border-b p-6 sm:p-8 relative flex flex-col sm:flex-row sm:items-end justify-between gap-4 transition-colors ${
-            isDark ? "border-zinc-800 bg-[#0c0e14]/70" : "border-stone-200 bg-white"
+          className={`border-b border-dashed p-6 sm:p-8 relative flex flex-col sm:flex-row sm:items-end justify-between gap-4 transition-colors ${
+            isDark ? "border-zinc-800/80 bg-[#0c0e14]/70" : "border-stone-200/80 bg-white"
           }`}
         >
           <div className="space-y-1.5">
@@ -134,10 +134,10 @@ export function ResumeSection() {
 
         {/* 2-Column Split */}
         <div
-          className={`grid grid-cols-1 lg:grid-cols-12 divide-y lg:divide-y-0 lg:divide-x border-b transition-colors ${
+          className={`grid grid-cols-1 lg:grid-cols-12 divide-y divide-dashed lg:divide-y-0 lg:divide-x lg:divide-dashed border-b border-dashed transition-colors ${
             isDark
-              ? "border-zinc-800 divide-zinc-800"
-              : "border-stone-200 divide-stone-200"
+              ? "border-zinc-800/80 divide-zinc-800/80"
+              : "border-stone-200/80 divide-stone-200/80"
           }`}
         >
           {/* Work History (7 Cols) */}

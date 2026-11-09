@@ -67,8 +67,8 @@ export function PortfolioView({ onLaunchOS }: PortfolioViewProps) {
     >
       {/* Outer Continuous Grid Frame */}
       <div
-        className={`max-w-[1520px] mx-auto border-x min-h-screen flex flex-col lg:flex-row relative transition-colors ${
-          isDark ? "border-zinc-800" : "border-stone-200"
+        className={`max-w-[1520px] mx-auto border-x border-dashed min-h-screen flex flex-col lg:flex-row relative transition-colors ${
+          isDark ? "border-zinc-800/80" : "border-stone-200/80"
         }`}
       >
         {/* Left Sticky Navigation & Identity Column */}
@@ -79,14 +79,22 @@ export function PortfolioView({ onLaunchOS }: PortfolioViewProps) {
         />
 
         {/* Right Scrollable Feed Column */}
-        <main className="flex-1 min-w-0 flex flex-col justify-between">
+        <main
+          className="flex-1 min-w-0 flex flex-col justify-between relative"
+          style={{
+            backgroundImage: isDark
+              ? "radial-gradient(circle, rgba(255, 255, 255, 0.035) 1px, transparent 1px)"
+              : "radial-gradient(circle, rgba(0, 0, 0, 0.03) 1px, transparent 1px)",
+            backgroundSize: "24px 24px",
+          }}
+        >
           <div>
             {/* Quick Stats Ledger Strip Snapped to Top of Feed */}
             <div
-              className={`border-b grid grid-cols-2 sm:grid-cols-4 divide-x divide-y sm:divide-y-0 font-mono text-xs transition-colors ${
+              className={`border-b border-dashed grid grid-cols-2 sm:grid-cols-4 divide-x divide-dashed divide-y sm:divide-y-0 font-mono text-xs transition-colors ${
                 isDark
-                  ? "border-zinc-800 divide-zinc-800 bg-[#0c0e14]/60"
-                  : "border-stone-200 divide-stone-200 bg-white/90"
+                  ? "border-zinc-800/80 divide-zinc-800/80 bg-[#0c0e14]/60"
+                  : "border-stone-200/80 divide-stone-200/80 bg-white/90"
               }`}
             >
               <div className="p-4 sm:p-5 space-y-0.5">

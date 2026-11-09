@@ -299,8 +299,8 @@ export function PortfolioSidebar({
 
           {/* Feed Section Toggles */}
           <div
-            className={`space-y-2 pt-3 border-t ${
-              isDark ? "border-zinc-800/80" : "border-stone-200"
+            className={`space-y-2 pt-3 border-t border-dashed ${
+              isDark ? "border-zinc-800/80" : "border-stone-200/80"
             }`}
           >
             <div
@@ -354,8 +354,8 @@ export function PortfolioSidebar({
 
         {/* Bottom Actions & Controls */}
         <div
-          className={`space-y-4 pt-6 mt-6 border-t ${
-            isDark ? "border-zinc-800/80" : "border-stone-200"
+          className={`space-y-4 pt-6 mt-6 border-t border-dashed ${
+            isDark ? "border-zinc-800/80" : "border-stone-200/80"
           }`}
         >
           {/* Launch adityaos Terminal Engine */}
