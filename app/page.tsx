@@ -61,12 +61,12 @@ const APP_LABELS: Record<string, string> = {
 };
 
 export default function Home({
-  initialViewMode,
-  defaultApp,
+  searchParams,
 }: {
-  initialViewMode?: "portfolio" | "os";
-  defaultApp?: string;
-} = {}) {
+  searchParams?: Record<string, string | string[] | undefined>;
+}) {
+  const initialViewMode = searchParams?.mode === "os" ? "os" : "portfolio";
+  const defaultApp = typeof searchParams?.app === "string" ? searchParams.app : undefined;
   const desktopContainerRef = useRef<HTMLDivElement>(null);
   const {
     openWindows,

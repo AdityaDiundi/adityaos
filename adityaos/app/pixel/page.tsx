@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import DesktopPage from "../page";
+import { AdityaOSDesktop } from "@/components/System/AdityaOSDesktop";
 
 export const metadata: Metadata = {
   title: "Pixel Studio // Retro Creative Sandbox",
@@ -36,5 +36,5 @@ export const metadata: Metadata = {
 };
 
 export default function PixelPage() {
-  return <DesktopPage initialViewMode="os" defaultApp="pixelEngine" />;
+  return <AdityaOSDesktop initialViewMode="os" defaultApp="pixelEngine" />;
 }
