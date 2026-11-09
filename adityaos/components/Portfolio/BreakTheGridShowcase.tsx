@@ -58,14 +58,14 @@ export function BreakTheGridShowcase({ onLaunchOS }: BreakTheGridShowcaseProps) 
               01 // Selected Works
             </div>
             <h2
-              className={`text-3xl sm:text-4xl md:text-5xl font-sans font-semibold tracking-tight ${
+              className={`text-xl sm:text-2xl font-sans font-semibold tracking-tight ${
                 isDark ? "text-zinc-100" : "text-stone-900"
               }`}
             >
               Case studies & shipped software.
             </h2>
             <p
-              className={`text-sm sm:text-base font-sans max-w-2xl pt-1 leading-relaxed ${
+              className={`text-xs sm:text-sm font-sans max-w-2xl pt-0.5 leading-relaxed ${
                 isDark ? "text-zinc-400" : "text-stone-600"
               }`}
             >
@@ -227,14 +227,14 @@ export function BreakTheGridShowcase({ onLaunchOS }: BreakTheGridShowcaseProps) 
           <div className="pt-2 flex flex-col md:flex-row md:items-end justify-between gap-6">
             <div className="space-y-2 max-w-3xl">
               <h3
-                className={`text-2xl sm:text-3xl font-sans font-bold tracking-tight ${
+                className={`text-lg sm:text-xl font-sans font-semibold tracking-tight ${
                   isDark ? "text-white" : "text-stone-900"
                 }`}
               >
                 Catching AI medical mistakes before they reach rural clinics.
               </h3>
               <p
-                className={`text-sm sm:text-base font-sans leading-relaxed ${
+                className={`text-xs sm:text-sm font-sans leading-relaxed ${
                   isDark ? "text-zinc-400" : "text-stone-600"
                 }`}
               >
@@ -430,14 +430,14 @@ export function BreakTheGridShowcase({ onLaunchOS }: BreakTheGridShowcaseProps) 
           <div className="pt-2 flex flex-col md:flex-row md:items-end justify-between gap-6">
             <div className="space-y-2 max-w-3xl">
               <h3
-                className={`text-2xl sm:text-3xl font-sans font-bold tracking-tight ${
+                className={`text-lg sm:text-xl font-sans font-semibold tracking-tight ${
                   isDark ? "text-white" : "text-stone-900"
                 }`}
               >
                 A retro pixel art studio and sandbox built right into the browser.
               </h3>
               <p
-                className={`text-sm sm:text-base font-sans leading-relaxed ${
+                className={`text-xs sm:text-sm font-sans leading-relaxed ${
                   isDark ? "text-zinc-400" : "text-stone-600"
                 }`}
               >
@@ -641,14 +641,14 @@ export function BreakTheGridShowcase({ onLaunchOS }: BreakTheGridShowcaseProps) 
           <div className="pt-2 flex flex-col md:flex-row md:items-end justify-between gap-6">
             <div className="space-y-2 max-w-3xl">
               <h3
-                className={`text-2xl sm:text-3xl font-sans font-bold tracking-tight ${
+                className={`text-lg sm:text-xl font-sans font-semibold tracking-tight ${
                   isDark ? "text-white" : "text-stone-900"
                 }`}
               >
                 Speeding up emergency hospital approvals to under 15 minutes.
               </h3>
               <p
-                className={`text-sm sm:text-base font-sans leading-relaxed ${
+                className={`text-xs sm:text-sm font-sans leading-relaxed ${
                   isDark ? "text-zinc-400" : "text-stone-600"
                 }`}
               >
@@ -764,14 +764,14 @@ export function BreakTheGridShowcase({ onLaunchOS }: BreakTheGridShowcaseProps) 
             <div className="space-y-4">
               <div className="space-y-2">
                 <h4
-                  className={`text-xl sm:text-2xl font-bold font-sans tracking-tight ${
+                  className={`text-base sm:text-lg font-semibold font-sans tracking-tight ${
                     isDark ? "text-white" : "text-stone-900"
                   }`}
                 >
                   Preventing failed UPI payments before users tap 'Pay'.
                 </h4>
                 <p
-                  className={`text-sm font-sans leading-relaxed ${
+                  className={`text-xs sm:text-sm font-sans leading-relaxed ${
                     isDark ? "text-zinc-400" : "text-stone-600"
                   }`}
                 >
@@ -874,14 +874,14 @@ export function BreakTheGridShowcase({ onLaunchOS }: BreakTheGridShowcaseProps) 
             <div className="space-y-4">
               <div className="space-y-2">
                 <h4
-                  className={`text-xl sm:text-2xl font-bold font-sans tracking-tight ${
+                  className={`text-base sm:text-lg font-semibold font-sans tracking-tight ${
                     isDark ? "text-white" : "text-stone-900"
                   }`}
                 >
                   Helping patients stick to medical routines during the first three weeks.
                 </h4>
                 <p
-                  className={`text-sm font-sans leading-relaxed ${
+                  className={`text-xs sm:text-sm font-sans leading-relaxed ${
                     isDark ? "text-zinc-400" : "text-stone-600"
                   }`}
                 >
@@ -1037,14 +1037,14 @@ export function BreakTheGridShowcase({ onLaunchOS }: BreakTheGridShowcaseProps) 
 
             <div className="space-y-3">
               <h4
-                className={`text-lg sm:text-xl font-bold font-sans tracking-tight ${
+                className={`text-base sm:text-lg font-semibold font-sans tracking-tight ${
                   isDark ? "text-white" : "text-stone-900"
                 }`}
               >
                 Turning one-time emergency donors into monthly patient sponsors.
               </h4>
               <p
-                className={`text-sm font-sans leading-relaxed ${
+                className={`text-xs sm:text-sm font-sans leading-relaxed ${
                   isDark ? "text-zinc-400" : "text-stone-600"
                 }`}
               >

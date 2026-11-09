@@ -89,23 +89,23 @@ export function PortfolioView({ onLaunchOS }: PortfolioViewProps) {
                   : "border-stone-200 divide-stone-200 bg-white/90"
               }`}
             >
-              <div className="p-6 sm:p-7 space-y-1">
+              <div className="p-4 sm:p-5 space-y-0.5">
                 <span
-                  className={`text-[11px] uppercase tracking-wider ${
+                  className={`text-[10px] uppercase tracking-wider ${
                     isDark ? "text-zinc-500" : "text-stone-500"
                   }`}
                 >
                   Experience
                 </span>
                 <div
-                  className={`text-2xl font-bold tracking-tight ${
+                  className={`text-lg font-semibold tracking-tight ${
                     isDark ? "text-white" : "text-stone-900"
                   }`}
                 >
                   3+ Years
                 </div>
                 <div
-                  className={`text-xs font-sans ${
+                  className={`text-[11px] font-sans ${
                     isDark ? "text-zinc-400" : "text-stone-600"
                   }`}
                 >
@@ -113,19 +113,19 @@ export function PortfolioView({ onLaunchOS }: PortfolioViewProps) {
                 </div>
               </div>
 
-              <div className="p-6 sm:p-7 space-y-1">
+              <div className="p-4 sm:p-5 space-y-0.5">
                 <span
-                  className={`text-[11px] uppercase tracking-wider ${
+                  className={`text-[10px] uppercase tracking-wider ${
                     isDark ? "text-zinc-500" : "text-stone-500"
                   }`}
                 >
                   Scale
                 </span>
-                <div className="text-2xl font-bold text-indigo-400 tracking-tight">
+                <div className="text-lg font-semibold text-indigo-400 tracking-tight">
                   100K+ DAU
                 </div>
                 <div
-                  className={`text-xs font-sans ${
+                  className={`text-[11px] font-sans ${
                     isDark ? "text-zinc-400" : "text-stone-600"
                   }`}
                 >
@@ -133,19 +133,19 @@ export function PortfolioView({ onLaunchOS }: PortfolioViewProps) {
                 </div>
               </div>
 
-              <div className="p-6 sm:p-7 space-y-1">
+              <div className="p-4 sm:p-5 space-y-0.5">
                 <span
-                  className={`text-[11px] uppercase tracking-wider ${
+                  className={`text-[10px] uppercase tracking-wider ${
                     isDark ? "text-zinc-500" : "text-stone-500"
                   }`}
                 >
                   AI Benchmark
                 </span>
-                <div className="text-2xl font-bold text-emerald-500 tracking-tight">
-                  120+ Evals
+                <div className="text-lg font-semibold text-emerald-500 tracking-tight">
+                  3.4x Lift
                 </div>
                 <div
-                  className={`text-xs font-sans ${
+                  className={`text-[11px] font-sans ${
                     isDark ? "text-zinc-400" : "text-stone-600"
                   }`}
                 >
@@ -153,19 +153,19 @@ export function PortfolioView({ onLaunchOS }: PortfolioViewProps) {
                 </div>
               </div>
 
-              <div className="p-6 sm:p-7 space-y-1">
+              <div className="p-4 sm:p-5 space-y-0.5">
                 <span
-                  className={`text-[11px] uppercase tracking-wider ${
+                  className={`text-[10px] uppercase tracking-wider ${
                     isDark ? "text-zinc-500" : "text-stone-500"
                   }`}
                 >
                   Adherence
                 </span>
-                <div className="text-2xl font-bold text-amber-500 tracking-tight">
+                <div className="text-lg font-semibold text-amber-500 tracking-tight">
                   +12% Conv
                 </div>
                 <div
-                  className={`text-xs font-sans ${
+                  className={`text-[11px] font-sans ${
                     isDark ? "text-zinc-400" : "text-stone-600"
                   }`}
                 >

@@ -193,10 +193,10 @@ export function PortfolioSidebar({
                   isDark ? "text-cyan-400" : "text-cyan-700"
                 }`}
               >
-                Product Designer & Design Technologist
+                Product Designer
               </p>
               <p
-                className={`text-[10px] font-mono opacity-60 ${
+                className={`text-[11px] font-mono opacity-70 ${
                   isDark ? "text-zinc-400" : "text-stone-500"
                 }`}
               >
@@ -205,7 +205,7 @@ export function PortfolioSidebar({
             </div>
           </div>
 
-          {/* Location & Status Pill */}
+          {/* Location & Status */}
           <div
             className={`flex items-center gap-2 text-xs font-mono ${
               isDark ? "text-zinc-400" : "text-stone-600"
@@ -219,35 +219,12 @@ export function PortfolioSidebar({
 
           {/* Systems Statement Bio */}
           <p
-            className={`text-xs sm:text-[13px] font-sans leading-relaxed ${
+            className={`text-xs font-sans leading-relaxed ${
               isDark ? "text-zinc-400" : "text-stone-600"
             }`}
           >
             Bridging engineering depth from IIIT Delhi, grassroots ethnography, and systems craft to build straightforward software.
           </p>
-
-          {/* Open To Work Target Roles Card */}
-          <div
-            className={`p-2.5 rounded-lg border text-xs font-mono space-y-1.5 shadow-sm transition-colors ${
-              isDark
-                ? "bg-zinc-900/60 border-zinc-800 text-zinc-300"
-                : "bg-stone-100/90 border-stone-200 text-stone-700"
-            }`}
-          >
-            <div className="flex items-center justify-between text-[10px] uppercase font-bold text-emerald-500">
-              <span className="flex items-center gap-1.5">
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                Open For Roles
-              </span>
-              <span className="opacity-60 text-[9px]">Immediate</span>
-            </div>
-            <div className="text-[11px] leading-snug">
-              <strong>Target:</strong> Product Designer, Design Technologist, Systems Architect
-            </div>
-            <div className="text-[10px] opacity-75">
-              <strong>Preference:</strong> Remote / Hybrid (India / US / Global)
-            </div>
-          </div>
 
           {/* Above-The-Fold High-Contrast Conversion Path for Recruiters */}
           <div className="space-y-2 pt-1 pb-1">

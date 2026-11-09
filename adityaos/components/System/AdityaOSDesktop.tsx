@@ -362,7 +362,16 @@ export function AdityaOSDesktop({
 
           <button
             type="button"
-            onClick={() => setViewMode("portfolio")}
+            onClick={() => {
+              if (typeof window !== "undefined" && window.location.pathname.startsWith("/os")) {
+                window.location.href = "/";
+              } else {
+                if (typeof window !== "undefined" && window.location.search) {
+                  window.history.pushState(null, "", window.location.pathname);
+                }
+                setViewMode("portfolio");
+              }
+            }}
             className="px-2 py-0.5 rounded border font-semibold flex items-center gap-1 hover:opacity-100 transition-all cursor-pointer text-[10px] whitespace-nowrap shrink-0"
             style={{
               backgroundColor: activeTheme.isDark ? "rgba(0, 255, 204, 0.15)" : "rgba(18, 19, 22, 0.08)",
