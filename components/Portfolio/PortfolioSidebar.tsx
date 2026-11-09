@@ -51,11 +51,11 @@ export function PortfolioSidebar({
   };
 
   const feedToggles = [
-    { id: "all", label: "All Modules", icon: Layers, count: "27" },
-    { id: "work", label: "Shipped Systems", icon: Sparkles, count: "7" },
-    { id: "essays", label: "Fieldwork & Essays", icon: BookOpen, count: "14" },
-    { id: "youtube", label: "Top Plays · Gaming", icon: PlaySquare, count: "20" },
-    { id: "resume", label: "Experience & Specs", icon: Briefcase, count: "5" },
+    { id: "all", prefix: "00", label: "All Modules", count: "27" },
+    { id: "work", prefix: "01", label: "Shipped Systems", count: "7" },
+    { id: "essays", prefix: "02", label: "Fieldwork & Essays", count: "14" },
+    { id: "youtube", prefix: "03", label: "Watch Games", count: "20" },
+    { id: "resume", prefix: "04", label: "Experience & Specs", count: "5" },
   ];
 
   const themeOptions: { id: OSThemeId; label: string; tag: string }[] = [
@@ -157,7 +157,8 @@ export function PortfolioSidebar({
       {/* 2. Desktop Full Sticky Sidebar (Screens >= 1024px) */}
       {/* ========================================================================= */}
       {/* ========================================================================= */}
-      {/* 2. Desktop Full Sticky Sidebar (Screens >= 1024px) */}
+      {/* ========================================================================= */}
+      {/* 2. Desktop Full Sticky Sidebar (Screens >= 1024px) — Concept 3 Minimalist */}
       {/* ========================================================================= */}
       <aside
         className={`hidden lg:flex w-64 xl:w-72 flex-shrink-0 sticky top-0 self-start h-screen max-h-screen border-r border-dashed p-6 flex-col justify-between z-30 overflow-y-auto transition-colors ${
@@ -171,7 +172,7 @@ export function PortfolioSidebar({
           {/* Profile Avatar & Title */}
           <div className="flex items-center gap-3">
             <div
-              className={`relative w-11 h-11 rounded-full overflow-hidden border flex-shrink-0 ${
+              className={`relative w-10 h-10 rounded-full overflow-hidden border flex-shrink-0 ${
                 isDark ? "border-zinc-700" : "border-stone-300"
               }`}
             >
@@ -208,7 +209,7 @@ export function PortfolioSidebar({
             </div>
           </div>
 
-          {/* Location & Status (No pill backgrounds) */}
+          {/* Location & Status */}
           <div
             className={`flex items-center gap-1.5 text-xs font-mono ${
               isDark ? "text-zinc-400" : "text-stone-500"
@@ -220,7 +221,7 @@ export function PortfolioSidebar({
             <span className="text-emerald-600 dark:text-emerald-400 font-medium">Full-Time Available</span>
           </div>
 
-          {/* Systems Statement Bio: Radically minified, metric-forward */}
+          {/* Systems Statement Bio */}
           <p
             className={`text-xs sm:text-[13px] font-sans leading-relaxed ${
               isDark ? "text-zinc-300" : "text-stone-700"
@@ -229,241 +230,223 @@ export function PortfolioSidebar({
             Design technologist & systems engineer. Next.js, React, Web Audio, canvas engines. 20mo grassroots field research + zero-to-one product architectures.
           </p>
 
-          {/* Primary Action Button (Solid) + Secondary Actions (Clean Text Links) */}
-          <div className="space-y-2.5 pt-1">
-            {/* Primary Resume Button */}
+          {/* Clean Monospace Action Row (No heavy container boxes) */}
+          <div className="flex flex-wrap items-center gap-x-2.5 gap-y-1 text-xs font-mono pt-1">
             <a
               href="/Aditya_Diundi_Resume.pdf"
               target="_blank"
               rel="noopener noreferrer"
-              className={`w-full py-2 px-3 rounded-lg font-bold font-mono text-xs flex items-center justify-between transition-all cursor-pointer shadow-sm ${
-                isDark
-                  ? "bg-white hover:bg-zinc-200 text-zinc-950"
-                  : "bg-stone-900 hover:bg-black text-white"
+              className={`whitespace-nowrap font-semibold transition-colors hover:underline ${
+                isDark ? "text-white hover:text-cyan-300" : "text-stone-900 hover:text-cyan-800"
               }`}
             >
-              <span className="flex items-center gap-1.5">
-                <FileText className="w-3.5 h-3.5" />
-                <span>Resume (PDF)</span>
-              </span>
-              <span className="text-[10px] opacity-70 font-normal">1.2 MB</span>
+              Resume ↗
             </a>
-
-            {/* Clean Text Links for Secondary Actions (No background boxes) */}
-            <div className="flex items-center gap-4 text-xs font-mono pt-0.5">
-              <a
-                href="https://www.linkedin.com/in/adityadiundi/"
-                target="_blank"
-                rel="noopener noreferrer"
-                className={`flex items-center gap-1 transition-colors cursor-pointer hover:underline ${
-                  isDark ? "text-zinc-400 hover:text-white" : "text-stone-600 hover:text-black"
-                }`}
-              >
-                <LinkedinIcon className="w-3.5 h-3.5 text-[#0A66C2]" />
-                <span>LinkedIn</span>
-                <span className="text-[10px] opacity-40">↗</span>
-              </a>
-
-              <button
-                type="button"
-                onClick={handleCopyEmail}
-                className={`flex items-center gap-1 transition-colors cursor-pointer hover:underline ${
-                  isDark ? "text-zinc-400 hover:text-white" : "text-stone-600 hover:text-black"
-                }`}
-              >
-                {copiedEmail ? (
-                  <>
-                    <Check className="w-3.5 h-3.5 text-emerald-400 stroke-[3]" />
-                    <span className="text-emerald-500">Copied!</span>
-                  </>
-                ) : (
-                  <>
-                    <Copy className="w-3 h-3 opacity-60" />
-                    <span>Copy Email</span>
-                  </>
-                )}
-              </button>
-            </div>
+            <span className="opacity-30">·</span>
+            <button
+              type="button"
+              onClick={handleCopyEmail}
+              className={`whitespace-nowrap transition-colors hover:underline cursor-pointer ${
+                isDark ? "text-zinc-400 hover:text-white" : "text-stone-600 hover:text-black"
+              }`}
+            >
+              {copiedEmail ? (
+                <span className="text-emerald-500 font-bold">Copied!</span>
+              ) : (
+                "Email"
+              )}
+            </button>
+            <span className="opacity-30">·</span>
+            <a
+              href="https://www.linkedin.com/in/adityadiundi/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className={`whitespace-nowrap transition-colors hover:underline ${
+                isDark ? "text-zinc-400 hover:text-white" : "text-stone-600 hover:text-black"
+              }`}
+            >
+              LinkedIn ↗
+            </a>
+            <span className="opacity-30">·</span>
+            <a
+              href="https://github.com/AdityaDiundi"
+              target="_blank"
+              rel="noopener noreferrer"
+              className={`whitespace-nowrap transition-colors hover:underline ${
+                isDark ? "text-zinc-400 hover:text-white" : "text-stone-600 hover:text-black"
+              }`}
+            >
+              GitHub ↗
+            </a>
           </div>
 
-          {/* Feed Section Toggles (Plain text on background, no box containers) */}
+          {/* Feed Section Toggles (Pure typographical index) */}
           <div
-            className={`space-y-1.5 pt-3 border-t border-dashed ${
+            className={`space-y-2 pt-5 border-t border-dashed ${
               isDark ? "border-zinc-800/80" : "border-stone-200/80"
             }`}
           >
             <div
-              className={`text-[10px] font-mono uppercase tracking-wider pb-1 ${
+              className={`text-[10px] font-mono uppercase tracking-widest ${
                 isDark ? "text-zinc-500" : "text-stone-500"
               }`}
             >
               System Index
             </div>
-            <div className="space-y-1">
+            <nav className="space-y-0.5">
               {feedToggles.map((item) => {
                 const isActive = activeFilter === item.id;
                 return (
                   <button
                     key={item.id}
                     onClick={() => onSelectFilter(item.id)}
-                    className={`w-full flex items-center justify-between py-1.5 text-xs font-mono transition-colors cursor-pointer text-left ${
+                    className={`w-full flex items-center justify-between py-1 text-xs font-mono transition-all cursor-pointer text-left ${
                       isActive
                         ? isDark
-                          ? "text-white font-semibold"
-                          : "text-stone-900 font-semibold"
+                          ? "text-cyan-400 font-semibold"
+                          : "text-stone-950 font-bold"
                         : isDark
                         ? "text-zinc-400 hover:text-zinc-200"
                         : "text-stone-500 hover:text-stone-800"
                     }`}
                   >
-                    <div className="flex items-center gap-2">
-                      {isActive ? (
-                        <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 shrink-0" />
-                      ) : (
-                        <span className="w-1.5 h-1.5 rounded-full opacity-0 shrink-0" />
-                      )}
+                    <div className="flex items-center gap-2.5">
+                      <span
+                        className={`text-[10px] font-mono transition-colors ${
+                          isActive
+                            ? isDark
+                              ? "text-cyan-400 font-bold"
+                              : "text-stone-950 font-bold"
+                            : "opacity-40"
+                        }`}
+                      >
+                        {item.prefix}
+                      </span>
                       <span>{item.label}</span>
                     </div>
-                    <span className="text-[11px] font-mono opacity-50">
+                    <span className="text-[10px] font-mono opacity-40">
                       ({item.count})
                     </span>
                   </button>
                 );
               })}
-            </div>
+            </nav>
           </div>
         </div>
 
-        {/* Bottom Actions & Controls (Clean text, no heavy container boxes) */}
+        {/* Unified Minimal Footer & Runtime Strip (Single-line hierarchy) */}
         <div
-          className={`space-y-2.5 pt-4 mt-4 border-t border-dashed ${
+          className={`space-y-2 pt-4 mt-4 border-t border-dashed ${
             isDark ? "border-zinc-800/80" : "border-stone-200/80"
           }`}
         >
-          {/* Launch adityaos Terminal Engine */}
+          {/* Launch adityaos Terminal Trigger */}
           <button
             onClick={onLaunchOS}
-            className={`w-full py-1.5 flex items-center justify-between text-xs font-mono transition-colors cursor-pointer group ${
+            className={`w-full py-1 flex items-center justify-between text-xs font-mono transition-colors cursor-pointer group ${
               isDark
-                ? "text-zinc-300 hover:text-cyan-400"
-                : "text-stone-700 hover:text-cyan-700"
+                ? "text-zinc-400 hover:text-cyan-400"
+                : "text-stone-600 hover:text-cyan-700"
             }`}
+            title="Launch interactive adityaos desktop sandbox"
           >
-            <div className="flex items-center gap-2">
-              <Terminal className="w-3.5 h-3.5 text-cyan-500" />
-              <span>adityaos Shell [Terminal]</span>
-            </div>
-            <span className="text-xs opacity-40 group-hover:opacity-100 group-hover:translate-x-0.5 transition-all">→</span>
+            <span className="flex items-center gap-1.5">
+              <span className="text-cyan-500 font-bold">&gt;_</span>
+              <span>adityaos</span>
+              <span className="text-[10px] opacity-40 font-normal">[sandbox]</span>
+            </span>
+            <span className="text-xs opacity-40 group-hover:opacity-100 group-hover:translate-x-0.5 transition-all">
+              ↵
+            </span>
           </button>
 
-          {/* Theme Selector (Clean minimal trigger) */}
-          <div className="relative">
-            <button
-              onClick={() => setThemeDropdownOpen(!themeDropdownOpen)}
-              className={`w-full flex items-center justify-between py-1 text-xs font-mono cursor-pointer transition-colors ${
-                isDark
-                  ? "text-zinc-400 hover:text-white"
-                  : "text-stone-500 hover:text-black"
-              }`}
-            >
-              <div className="flex items-center gap-1.5">
-                <Palette className="w-3 h-3 opacity-60" />
-                <span>Theme:</span>
-                <span className={`font-medium ${isDark ? "text-zinc-200" : "text-stone-800"}`}>
-                  {themeOptions.find((t) => t.id === currentThemeId)?.label.split(" ")[0] || "Editorial"}
-                </span>
-              </div>
-              <span className="text-[11px] opacity-40 hover:opacity-100">Switch ▾</span>
-            </button>
-
-            {themeDropdownOpen && (
-              <div
-                className={`absolute bottom-full mb-1.5 left-0 right-0 rounded-lg p-1 border shadow-2xl backdrop-blur-2xl z-50 text-xs font-mono ${
-                  isDark
-                    ? "border-zinc-800 bg-[#090b10] text-zinc-300"
-                    : "border-stone-200 bg-white text-stone-800"
-                }`}
-              >
-                {themeOptions.map((opt) => {
-                  const isSelected = currentThemeId === opt.id;
-                  return (
-                    <button
-                      key={opt.id}
-                      onClick={() => {
-                        setTheme(opt.id);
-                        setThemeDropdownOpen(false);
-                      }}
-                      className={`w-full text-left px-2 py-1.5 rounded flex items-center justify-between transition-colors cursor-pointer text-[11px] ${
-                        isSelected
-                          ? isDark
-                            ? "bg-zinc-800 text-white font-medium"
-                            : "bg-stone-100 text-stone-900 font-semibold"
-                          : isDark
-                          ? "text-zinc-400 hover:bg-zinc-900 hover:text-white"
-                          : "text-stone-600 hover:bg-stone-50 hover:text-stone-900"
-                      }`}
-                    >
-                      <span>{opt.label}</span>
-                      {isSelected && <Check className="w-3 h-3" />}
-                    </button>
-                  );
-                })}
-              </div>
-            )}
-          </div>
-
-          {/* Social Links & Email */}
+          {/* Theme Switcher & Secondary Channels (Single clean horizontal row) */}
           <div
-            className={`flex items-center justify-between text-xs font-mono pt-0.5 ${
-              isDark ? "text-zinc-400" : "text-stone-500"
+            className={`flex items-center justify-between text-[11px] font-mono pt-1 ${
+              isDark ? "text-zinc-500" : "text-stone-500"
             }`}
           >
-            <a
-              href="https://www.linkedin.com/in/adityadiundi/"
-              target="_blank"
-              rel="noopener noreferrer"
-              className={`transition-colors p-1 hover:text-blue-500`}
-              title="LinkedIn"
-            >
-              <LinkedinIcon className="w-3.5 h-3.5" />
-            </a>
-            <a
-              href="https://github.com/AdityaDiundi"
-              target="_blank"
-              rel="noopener noreferrer"
-              className={`transition-colors p-1 ${isDark ? "hover:text-white" : "hover:text-stone-900"}`}
-              title="GitHub"
-            >
-              <Github className="w-3.5 h-3.5" />
-            </a>
-            <a
-              href="https://youtube.com/@falsepeek"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="hover:text-red-500 transition-colors p-1"
-              title="YouTube @falsepeek"
-            >
-              <Youtube className="w-3.5 h-3.5" />
-            </a>
-            <a
-              href="https://diundi.bearblog.dev"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="hover:text-purple-500 transition-colors p-1"
-              title="Bear Blog"
-            >
-              <Globe className="w-3.5 h-3.5" />
-            </a>
-            <a
-              href="mailto:aditya15124@iiitd.ac.in"
-              className="hover:text-emerald-500 transition-colors p-1"
-              title="Email"
-            >
-              <Mail className="w-3.5 h-3.5" />
-            </a>
+            {/* Theme Trigger */}
+            <div className="relative">
+              <button
+                onClick={() => setThemeDropdownOpen(!themeDropdownOpen)}
+                className={`flex items-center gap-1 hover:underline cursor-pointer transition-colors ${
+                  isDark ? "text-zinc-400 hover:text-zinc-200" : "text-stone-600 hover:text-stone-900"
+                }`}
+              >
+                <span>theme:</span>
+                <span className={`font-medium ${isDark ? "text-zinc-300" : "text-stone-800"}`}>
+                  {themeOptions.find((t) => t.id === currentThemeId)?.label.split(" ")[0].toLowerCase() || "editorial"}
+                </span>
+                <span className="opacity-40">▾</span>
+              </button>
+
+              {themeDropdownOpen && (
+                <div
+                  className={`absolute bottom-full mb-2 left-0 w-44 rounded-lg p-1 border shadow-2xl backdrop-blur-2xl z-50 text-xs font-mono ${
+                    isDark
+                      ? "border-zinc-800 bg-[#090b10] text-zinc-300"
+                      : "border-stone-200 bg-white text-stone-800"
+                  }`}
+                >
+                  {themeOptions.map((opt) => {
+                    const isSelected = currentThemeId === opt.id;
+                    return (
+                      <button
+                        key={opt.id}
+                        onClick={() => {
+                          setTheme(opt.id);
+                          setThemeDropdownOpen(false);
+                        }}
+                        className={`w-full text-left px-2 py-1.5 rounded flex items-center justify-between transition-colors cursor-pointer text-[11px] ${
+                          isSelected
+                            ? isDark
+                              ? "bg-zinc-800 text-white font-medium"
+                              : "bg-stone-100 text-stone-900 font-semibold"
+                            : isDark
+                            ? "text-zinc-400 hover:bg-zinc-900 hover:text-white"
+                            : "text-stone-600 hover:bg-stone-50 hover:text-stone-900"
+                        }`}
+                      >
+                        <span>{opt.label}</span>
+                        {isSelected && <Check className="w-3 h-3" />}
+                      </button>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+
+            {/* Micro presence links */}
+            <div className="flex items-center gap-2">
+              <a
+                href="https://youtube.com/@falsepeek"
+                target="_blank"
+                rel="noopener noreferrer"
+                className={`hover:underline transition-colors ${
+                  isDark ? "hover:text-zinc-200" : "hover:text-stone-900"
+                }`}
+                title="YouTube @falsepeek"
+              >
+                yt ↗
+              </a>
+              <span className="opacity-30">·</span>
+              <a
+                href="https://diundi.bearblog.dev"
+                target="_blank"
+                rel="noopener noreferrer"
+                className={`hover:underline transition-colors ${
+                  isDark ? "hover:text-zinc-200" : "hover:text-stone-900"
+                }`}
+                title="Bear Blog"
+              >
+                blog ↗
+              </a>
+            </div>
           </div>
         </div>
       </aside>
+
     </>
   );
 }

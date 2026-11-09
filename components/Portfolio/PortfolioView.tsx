@@ -137,23 +137,6 @@ export function PortfolioView({ onLaunchOS }: PortfolioViewProps) {
           <PortfolioFooter onLaunchOS={onLaunchOS} />
         </main>
       </div>
-
-      {/* Floating Mode Switcher Button (Bottom Right) */}
-      <div className="fixed bottom-6 right-6 z-40 hidden md:block">
-        <button
-          onClick={onLaunchOS}
-          className={`group flex items-center gap-2 px-4 py-2.5 rounded-full border text-xs font-mono shadow-2xl transition-all cursor-pointer backdrop-blur-md ${
-            isDark
-              ? "border-zinc-800 bg-[#090b10]/90 hover:bg-zinc-900 text-zinc-300"
-              : "border-stone-200 bg-white/90 hover:bg-stone-50 text-stone-800"
-          }`}
-          title="Switch to adityaos interactive desktop sandbox"
-        >
-          <span className="w-2 h-2 rounded-full bg-cyan-400 animate-pulse" />
-          <Terminal className="w-3.5 h-3.5 text-cyan-400" />
-          <span>adityaos Shell</span>
-        </button>
-      </div>
     </div>
   );
 }
