@@ -156,19 +156,22 @@ export function PortfolioSidebar({
       {/* ========================================================================= */}
       {/* 2. Desktop Full Sticky Sidebar (Screens >= 1024px) */}
       {/* ========================================================================= */}
+      {/* ========================================================================= */}
+      {/* 2. Desktop Full Sticky Sidebar (Screens >= 1024px) */}
+      {/* ========================================================================= */}
       <aside
-        className={`hidden lg:flex w-80 xl:w-84 flex-shrink-0 sticky top-0 self-start h-screen max-h-screen border-r p-6 sm:p-7 xl:p-8 flex-col justify-between z-30 overflow-y-auto transition-colors ${
+        className={`hidden lg:flex w-64 xl:w-72 flex-shrink-0 sticky top-0 self-start h-screen max-h-screen border-r border-dashed p-6 flex-col justify-between z-30 overflow-y-auto transition-colors ${
           isDark
-            ? "bg-[#0b0d13]/95 border-zinc-800 text-zinc-100"
-            : "bg-[#FBFBF9]/95 border-stone-200 text-stone-900"
+            ? "bg-[#0b0d13]/95 border-zinc-800/80 text-zinc-100"
+            : "bg-[#FBFBF9]/95 border-stone-200/80 text-stone-900"
         }`}
       >
-        {/* Top Identity & Above-The-Fold Conversion Block */}
-        <div className="space-y-5">
+        {/* Top Identity & Navigation Block */}
+        <div className="space-y-4">
           {/* Profile Avatar & Title */}
-          <div className="flex items-center gap-3.5">
+          <div className="flex items-center gap-3">
             <div
-              className={`relative w-12 h-12 rounded-full overflow-hidden border flex-shrink-0 shadow-md ${
+              className={`relative w-11 h-11 rounded-full overflow-hidden border flex-shrink-0 ${
                 isDark ? "border-zinc-700" : "border-stone-300"
               }`}
             >
@@ -182,7 +185,7 @@ export function PortfolioSidebar({
             </div>
             <div>
               <h1
-                className={`font-sans font-bold text-lg tracking-tight ${
+                className={`font-sans font-bold text-base tracking-tight ${
                   isDark ? "text-white" : "text-stone-900"
                 }`}
               >
@@ -205,101 +208,87 @@ export function PortfolioSidebar({
             </div>
           </div>
 
-          {/* Location & Status */}
+          {/* Location & Status (No pill backgrounds) */}
           <div
-            className={`flex items-center gap-2 text-xs font-mono ${
-              isDark ? "text-zinc-400" : "text-stone-600"
+            className={`flex items-center gap-1.5 text-xs font-mono ${
+              isDark ? "text-zinc-400" : "text-stone-500"
             }`}
           >
-            <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
             <span>Delhi NCR · Bangalore</span>
-            <span className={isDark ? "text-zinc-600" : "text-stone-300"}>·</span>
-            <span className="text-emerald-500 font-medium">Available</span>
+            <span className="opacity-40">·</span>
+            <span className="text-emerald-600 dark:text-emerald-400 font-medium">Available</span>
           </div>
 
-          {/* Systems Statement Bio */}
+          {/* Systems Statement Bio: Trimmed to high-impact sentence */}
           <p
-            className={`text-xs font-sans leading-relaxed ${
-              isDark ? "text-zinc-400" : "text-stone-600"
+            className={`text-[13px] font-sans leading-relaxed ${
+              isDark ? "text-zinc-300" : "text-stone-700"
             }`}
           >
-            Bridging engineering depth from IIIT Delhi, grassroots ethnography, and systems craft to build straightforward software.
+            Product designer and design technologist bridging engineering systems with human-centered product craft.
           </p>
 
-          {/* Above-The-Fold High-Contrast Conversion Path for Recruiters */}
-          <div className="space-y-2 pt-1 pb-1">
-            <div className="flex flex-col gap-2 font-mono text-xs">
-              {/* 1. Primary Resume Button */}
+          {/* Primary Action Button (Solid) + Secondary Actions (Clean Text Links) */}
+          <div className="space-y-2.5 pt-1">
+            {/* Primary Resume Button */}
+            <a
+              href="/Aditya_Diundi_Resume.pdf"
+              target="_blank"
+              rel="noopener noreferrer"
+              className={`w-full py-2 px-3 rounded-lg font-bold font-mono text-xs flex items-center justify-between transition-all cursor-pointer shadow-sm ${
+                isDark
+                  ? "bg-white hover:bg-zinc-200 text-zinc-950"
+                  : "bg-stone-900 hover:bg-black text-white"
+              }`}
+            >
+              <span className="flex items-center gap-1.5">
+                <FileText className="w-3.5 h-3.5" />
+                <span>View Resume</span>
+              </span>
+              <span className="text-[10px] opacity-70 font-normal">PDF 1.2MB</span>
+            </a>
+
+            {/* Clean Text Links for Secondary Actions (No background boxes) */}
+            <div className="flex items-center gap-4 text-xs font-mono pt-0.5">
               <a
-                href="/Aditya_Diundi_Resume.pdf"
+                href="https://www.linkedin.com/in/adityadiundi/"
                 target="_blank"
                 rel="noopener noreferrer"
-                className={`w-full py-2.5 px-3.5 rounded-lg font-bold flex items-center justify-center gap-2 transition-all cursor-pointer group/cta shadow-sm ${
-                  isDark
-                    ? "bg-white hover:bg-zinc-200 text-zinc-950"
-                    : "bg-stone-900 hover:bg-black text-white"
+                className={`flex items-center gap-1 transition-colors cursor-pointer hover:underline ${
+                  isDark ? "text-zinc-400 hover:text-white" : "text-stone-600 hover:text-black"
                 }`}
               >
-                <FileText className="w-4 h-4" />
-                <span>View Resume (PDF)</span>
-                <span
-                  className={`text-[10px] px-1.5 py-0.5 rounded ml-auto font-medium ${
-                    isDark ? "bg-zinc-200 text-zinc-800" : "bg-stone-800 text-stone-200"
-                  }`}
-                >
-                  1.2MB
-                </span>
+                <LinkedinIcon className="w-3.5 h-3.5 text-[#0A66C2]" />
+                <span>LinkedIn</span>
+                <span className="text-[10px] opacity-40">↗</span>
               </a>
 
-              {/* 2. Dual Connect Row: LinkedIn & Copy Email */}
-              <div className="grid grid-cols-2 gap-2">
-                <a
-                  href="https://www.linkedin.com/in/adityadiundi/"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className={`py-2 px-2.5 rounded-lg border font-semibold flex items-center justify-center gap-1.5 transition-all cursor-pointer ${
-                    isDark
-                      ? "border-blue-500/30 bg-blue-950/20 hover:bg-blue-900/40 text-blue-300"
-                      : "border-blue-600/30 bg-blue-50 hover:bg-blue-100 text-blue-700"
-                  }`}
-                >
-                  <LinkedinIcon className="w-3.5 h-3.5 text-[#0A66C2]" />
-                  <span>LinkedIn</span>
-                  <ExternalLink className="w-3 h-3 opacity-60" />
-                </a>
-
-                <button
-                  type="button"
-                  onClick={handleCopyEmail}
-                  className={`py-2 px-2.5 rounded-lg border font-semibold flex items-center justify-center gap-1.5 transition-all cursor-pointer ${
-                    copiedEmail
-                      ? isDark
-                        ? "border-emerald-500 bg-emerald-950/40 text-emerald-300"
-                        : "border-emerald-600 bg-emerald-100 text-emerald-800"
-                      : isDark
-                      ? "border-emerald-500/30 bg-emerald-950/20 hover:bg-emerald-900/40 text-emerald-300"
-                      : "border-emerald-600/30 bg-emerald-50 hover:bg-emerald-100 text-emerald-700"
-                  }`}
-                >
-                  {copiedEmail ? (
-                    <>
-                      <Check className="w-3.5 h-3.5 text-emerald-400 stroke-[3]" />
-                      <span>Copied!</span>
-                    </>
-                  ) : (
-                    <>
-                      <Copy className="w-3.5 h-3.5" />
-                      <span>Copy Email</span>
-                    </>
-                  )}
-                </button>
-              </div>
+              <button
+                type="button"
+                onClick={handleCopyEmail}
+                className={`flex items-center gap-1 transition-colors cursor-pointer hover:underline ${
+                  isDark ? "text-zinc-400 hover:text-white" : "text-stone-600 hover:text-black"
+                }`}
+              >
+                {copiedEmail ? (
+                  <>
+                    <Check className="w-3.5 h-3.5 text-emerald-400 stroke-[3]" />
+                    <span className="text-emerald-500">Copied!</span>
+                  </>
+                ) : (
+                  <>
+                    <Copy className="w-3 h-3 opacity-60" />
+                    <span>Copy Email</span>
+                  </>
+                )}
+              </button>
             </div>
           </div>
 
-          {/* Feed Section Toggles */}
+          {/* Feed Section Toggles (Plain text on background, no box containers) */}
           <div
-            className={`space-y-2 pt-3 border-t border-dashed ${
+            className={`space-y-1.5 pt-3 border-t border-dashed ${
               isDark ? "border-zinc-800/80" : "border-stone-200/80"
             }`}
           >
@@ -312,38 +301,31 @@ export function PortfolioSidebar({
             </div>
             <div className="space-y-1">
               {feedToggles.map((item) => {
-                const Icon = item.icon;
                 const isActive = activeFilter === item.id;
                 return (
                   <button
                     key={item.id}
                     onClick={() => onSelectFilter(item.id)}
-                    className={`w-full flex items-center justify-between px-3 py-2 rounded-lg text-xs font-mono transition-all cursor-pointer ${
+                    className={`w-full flex items-center justify-between py-1.5 text-xs font-mono transition-colors cursor-pointer text-left ${
                       isActive
                         ? isDark
-                          ? "bg-zinc-100 text-zinc-950 font-semibold shadow-sm"
-                          : "bg-stone-900 text-white font-semibold shadow-sm"
+                          ? "text-white font-semibold"
+                          : "text-stone-900 font-semibold"
                         : isDark
-                        ? "text-zinc-400 hover:bg-zinc-900/80 hover:text-zinc-200"
-                        : "text-stone-600 hover:bg-stone-100 hover:text-stone-900"
+                        ? "text-zinc-400 hover:text-zinc-200"
+                        : "text-stone-500 hover:text-stone-800"
                     }`}
                   >
-                    <div className="flex items-center gap-2.5">
-                      <Icon className="w-3.5 h-3.5" />
+                    <div className="flex items-center gap-2">
+                      {isActive ? (
+                        <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 shrink-0" />
+                      ) : (
+                        <span className="w-1.5 h-1.5 rounded-full opacity-0 shrink-0" />
+                      )}
                       <span>{item.label}</span>
                     </div>
-                    <span
-                      className={`text-[10px] px-1.5 py-0.5 rounded font-mono ${
-                        isActive
-                          ? isDark
-                            ? "bg-zinc-200 text-zinc-900"
-                            : "bg-stone-800 text-white"
-                          : isDark
-                          ? "bg-zinc-900 text-zinc-500"
-                          : "bg-stone-200 text-stone-600"
-                      }`}
-                    >
-                      {item.count}
+                    <span className="text-[11px] font-mono opacity-50">
+                      ({item.count})
                     </span>
                   </button>
                 );
@@ -352,45 +334,46 @@ export function PortfolioSidebar({
           </div>
         </div>
 
-        {/* Bottom Actions & Controls */}
+        {/* Bottom Actions & Controls (Clean text, no heavy container boxes) */}
         <div
-          className={`space-y-4 pt-6 mt-6 border-t border-dashed ${
+          className={`space-y-2.5 pt-4 mt-4 border-t border-dashed ${
             isDark ? "border-zinc-800/80" : "border-stone-200/80"
           }`}
         >
           {/* Launch adityaos Terminal Engine */}
           <button
             onClick={onLaunchOS}
-            className={`w-full py-2.5 px-3 rounded-lg border flex items-center justify-center gap-2 transition-colors cursor-pointer text-xs font-mono ${
+            className={`w-full py-1.5 flex items-center justify-between text-xs font-mono transition-colors cursor-pointer group ${
               isDark
-                ? "border-cyan-500/30 bg-cyan-950/20 hover:bg-cyan-900/40 text-cyan-300"
-                : "border-stone-300 bg-stone-100 hover:bg-stone-200 text-stone-800"
+                ? "text-zinc-300 hover:text-cyan-400"
+                : "text-stone-700 hover:text-cyan-700"
             }`}
           >
-            <Terminal className="w-3.5 h-3.5 text-cyan-500" />
-            <span>Launch adityaos Shell</span>
+            <div className="flex items-center gap-2">
+              <Terminal className="w-3.5 h-3.5 text-cyan-500" />
+              <span>Launch adityaos Shell</span>
+            </div>
+            <span className="text-xs opacity-40 group-hover:opacity-100 group-hover:translate-x-0.5 transition-all">→</span>
           </button>
 
-          {/* Theme Selector */}
+          {/* Theme Selector (Clean minimal trigger) */}
           <div className="relative">
             <button
               onClick={() => setThemeDropdownOpen(!themeDropdownOpen)}
-              className={`w-full flex items-center justify-between px-2.5 py-1.5 rounded border font-mono text-[11px] cursor-pointer transition-colors ${
+              className={`w-full flex items-center justify-between py-1 text-xs font-mono cursor-pointer transition-colors ${
                 isDark
-                  ? "border-zinc-800 bg-zinc-900/50 hover:bg-zinc-900 text-zinc-300"
-                  : "border-stone-200 bg-stone-100 hover:bg-stone-200 text-stone-800"
+                  ? "text-zinc-400 hover:text-white"
+                  : "text-stone-500 hover:text-black"
               }`}
             >
               <div className="flex items-center gap-1.5">
-                <Palette className="w-3 h-3 text-zinc-400" />
-                <span className={isDark ? "text-zinc-500" : "text-stone-500"}>Theme:</span>
-                <span className={`font-medium ${isDark ? "text-zinc-200" : "text-stone-900"}`}>
+                <Palette className="w-3 h-3 opacity-60" />
+                <span>Theme:</span>
+                <span className={`font-medium ${isDark ? "text-zinc-200" : "text-stone-800"}`}>
                   {themeOptions.find((t) => t.id === currentThemeId)?.label.split(" ")[0] || "Editorial"}
                 </span>
               </div>
-              <span className={`text-[10px] ${isDark ? "text-zinc-500" : "text-stone-500"}`}>
-                Switch
-              </span>
+              <span className="text-[11px] opacity-40 hover:opacity-100">Switch ▾</span>
             </button>
 
             {themeDropdownOpen && (

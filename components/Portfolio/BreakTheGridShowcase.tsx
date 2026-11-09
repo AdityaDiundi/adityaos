@@ -244,34 +244,53 @@ export function BreakTheGridShowcase({ onLaunchOS }: BreakTheGridShowcaseProps) 
 
           {/* Symmetrical 12-Col Split */}
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-center">
-            {/* Left Narrative */}
-            <div className="lg:col-span-7 space-y-3">
-              <h3
-                className={`text-base sm:text-lg font-sans font-semibold tracking-tight ${
-                  isDark ? "text-white" : "text-stone-900"
-                }`}
-              >
-                Catching AI medical mistakes before they reach rural clinics.
-              </h3>
-              <p
-                className={`text-xs sm:text-sm font-sans leading-relaxed ${
+            {/* Left Narrative with Constrained Width */}
+            <div className="lg:col-span-7 space-y-3 max-w-[62ch]">
+              <div>
+                <h3
+                  className={`text-base sm:text-lg font-sans font-semibold tracking-tight ${
+                    isDark ? "text-white" : "text-stone-900"
+                  }`}
+                >
+                  Catching AI medical mistakes before they reach rural clinics.
+                </h3>
+                <p
+                  className={`text-xs sm:text-sm font-sans pt-1 ${
+                    isDark ? "text-zinc-300" : "text-stone-700"
+                  }`}
+                >
+                  Blind pairwise evaluation arena benchmarking frontier vision models against localized clinical ground-truth.
+                </p>
+              </div>
+
+              {/* Punchy Bullet Points */}
+              <ul
+                className={`space-y-1.5 text-xs font-sans leading-relaxed pt-1 ${
                   isDark ? "text-zinc-400" : "text-stone-600"
                 }`}
               >
-                A blind pairwise evaluation framework designed to benchmark frontier vision models
-                on clinical and cultural accuracy across rural Indian public health scenarios. Built
-                an arena where frontline health workers score models side-by-side with ground-truth
-                rubrics.
-              </p>
+                <li className="flex items-start gap-2">
+                  <span className="text-emerald-500 font-mono text-[11px] mt-0.5">•</span>
+                  <span><strong>120+ clinical scenarios:</strong> Benchmarked diagnostic and cultural accuracy with frontline health workers.</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <span className="text-emerald-500 font-mono text-[11px] mt-0.5">•</span>
+                  <span><strong>3.4x cultural fidelity lift:</strong> Uncovered visual hallucination failure modes across rural public health contexts.</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <span className="text-emerald-500 font-mono text-[11px] mt-0.5">•</span>
+                  <span><strong>Full scoring pipeline:</strong> Engineered evaluation scoring and interface in Next.js, TypeScript, and Tailwind.</span>
+                </li>
+              </ul>
 
-              {/* Action CTAs */}
-              <div className="pt-2 flex flex-wrap items-center gap-2.5 font-mono text-xs">
+              {/* Action CTAs: Solid Primary + Clean Text Secondary */}
+              <div className="pt-2 flex flex-wrap items-center gap-4 font-mono text-xs">
                 <Link
                   href="/work/janeval"
-                  className={`px-3.5 py-2 rounded-lg font-semibold flex items-center gap-1.5 transition-all cursor-pointer ${
+                  className={`px-3.5 py-1.5 rounded-lg font-semibold flex items-center gap-1.5 transition-all cursor-pointer shadow-sm ${
                     isDark
-                      ? "bg-white text-zinc-950 hover:bg-zinc-200 shadow-sm"
-                      : "bg-stone-900 text-white hover:bg-black shadow-sm"
+                      ? "bg-white text-zinc-950 hover:bg-zinc-200"
+                      : "bg-stone-900 text-white hover:bg-black"
                   }`}
                 >
                   <span>Read Case Study</span>
@@ -282,10 +301,8 @@ export function BreakTheGridShowcase({ onLaunchOS }: BreakTheGridShowcaseProps) 
                   href="https://janeval.vercel.app/"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className={`px-3 py-2 rounded-lg border font-medium flex items-center gap-1.5 transition-colors cursor-pointer ${
-                    isDark
-                      ? "border-zinc-800 bg-zinc-900/60 hover:bg-zinc-800 text-zinc-300"
-                      : "border-stone-200 bg-stone-100 hover:bg-stone-200 text-stone-800"
+                  className={`flex items-center gap-1 transition-colors cursor-pointer hover:underline ${
+                    isDark ? "text-zinc-400 hover:text-white" : "text-stone-600 hover:text-black"
                   }`}
                 >
                   <Globe className="w-3.5 h-3.5" />
@@ -361,33 +378,53 @@ export function BreakTheGridShowcase({ onLaunchOS }: BreakTheGridShowcaseProps) 
 
           {/* Symmetrical 12-Col Split */}
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-center">
-            {/* Left Narrative */}
-            <div className="lg:col-span-7 space-y-3">
-              <h3
-                className={`text-base sm:text-lg font-sans font-semibold tracking-tight ${
-                  isDark ? "text-white" : "text-stone-900"
-                }`}
-              >
-                A retro pixel art studio and sandbox built right into the browser.
-              </h3>
-              <p
-                className={`text-xs sm:text-sm font-sans leading-relaxed ${
+            {/* Left Narrative with Constrained Width */}
+            <div className="lg:col-span-7 space-y-3 max-w-[62ch]">
+              <div>
+                <h3
+                  className={`text-base sm:text-lg font-sans font-semibold tracking-tight ${
+                    isDark ? "text-white" : "text-stone-900"
+                  }`}
+                >
+                  A retro pixel art studio and sandbox built right into the browser.
+                </h3>
+                <p
+                  className={`text-xs sm:text-sm font-sans pt-1 ${
+                    isDark ? "text-zinc-300" : "text-stone-700"
+                  }`}
+                >
+                  Zero-dependency interactive graphics and cellular automata canvas running client-side.
+                </p>
+              </div>
+
+              {/* Punchy Bullet Points */}
+              <ul
+                className={`space-y-1.5 text-xs font-sans leading-relaxed pt-1 ${
                   isDark ? "text-zinc-400" : "text-stone-600"
                 }`}
               >
-                Interactive pixel matrix engine featuring Conway&apos;s Game of Life, falling sand
-                cellular automata, procedural bitmap fonts, and an algorithmic WebAudio synthesizer
-                running entirely client-side without external runtime dependencies.
-              </p>
+                <li className="flex items-start gap-2">
+                  <span className="text-cyan-400 font-mono text-[11px] mt-0.5">•</span>
+                  <span><strong>60 FPS deterministic canvas:</strong> Conway&apos;s Game of Life, falling sand automata, and 1:1 pixel lock.</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <span className="text-cyan-400 font-mono text-[11px] mt-0.5">•</span>
+                  <span><strong>Algorithmic WebAudio:</strong> Procedural sound synthesizer and procedural bitmap typography.</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <span className="text-cyan-400 font-mono text-[11px] mt-0.5">•</span>
+                  <span><strong>Modular systems engine:</strong> Multi-window desktop shell with zero external runtime libraries.</span>
+                </li>
+              </ul>
 
-              {/* Action CTAs */}
-              <div className="pt-2 flex flex-wrap items-center gap-2.5 font-mono text-xs">
+              {/* Action CTAs: Solid Primary + Clean Text Secondary */}
+              <div className="pt-2 flex flex-wrap items-center gap-4 font-mono text-xs">
                 <Link
                   href="/work/adityaos"
-                  className={`px-3.5 py-2 rounded-lg font-semibold flex items-center gap-1.5 transition-all cursor-pointer ${
+                  className={`px-3.5 py-1.5 rounded-lg font-semibold flex items-center gap-1.5 transition-all cursor-pointer shadow-sm ${
                     isDark
-                      ? "bg-white text-zinc-950 hover:bg-zinc-200 shadow-sm"
-                      : "bg-stone-900 text-white hover:bg-black shadow-sm"
+                      ? "bg-white text-zinc-950 hover:bg-zinc-200"
+                      : "bg-stone-900 text-white hover:bg-black"
                   }`}
                 >
                   <span>Read Case Study</span>
@@ -397,23 +434,20 @@ export function BreakTheGridShowcase({ onLaunchOS }: BreakTheGridShowcaseProps) 
                 {onLaunchOS && (
                   <button
                     onClick={onLaunchOS}
-                    className={`px-3 py-2 rounded-lg border font-medium flex items-center gap-1.5 transition-colors cursor-pointer ${
-                      isDark
-                        ? "border-cyan-500/30 bg-cyan-950/20 hover:bg-cyan-900/40 text-cyan-300"
-                        : "border-stone-300 bg-stone-100 hover:bg-stone-200 text-stone-800"
+                    className={`flex items-center gap-1 transition-colors cursor-pointer hover:underline ${
+                      isDark ? "text-cyan-400 hover:text-cyan-300" : "text-cyan-700 hover:text-cyan-900"
                     }`}
                   >
                     <Terminal className="w-3.5 h-3.5 text-cyan-400" />
-                    <span>Launch Sandbox 🕹️</span>
+                    <span>Launch Sandbox</span>
+                    <span className="text-[10px]">↗</span>
                   </button>
                 )}
 
                 <Link
                   href="/pixel"
-                  className={`px-3 py-2 rounded-lg border font-medium flex items-center gap-1.5 transition-colors cursor-pointer ${
-                    isDark
-                      ? "border-zinc-800 bg-zinc-900/60 hover:bg-zinc-800 text-zinc-300"
-                      : "border-stone-200 bg-stone-100 hover:bg-stone-200 text-stone-800"
+                  className={`flex items-center gap-1 transition-colors cursor-pointer hover:underline ${
+                    isDark ? "text-zinc-400 hover:text-white" : "text-stone-600 hover:text-black"
                   }`}
                 >
                   <span>Fullscreen Canvas</span>
@@ -487,33 +521,53 @@ export function BreakTheGridShowcase({ onLaunchOS }: BreakTheGridShowcaseProps) 
 
           {/* Symmetrical 12-Col Split */}
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-center">
-            {/* Left Narrative */}
-            <div className="lg:col-span-7 space-y-3">
-              <h3
-                className={`text-base sm:text-lg font-sans font-semibold tracking-tight ${
-                  isDark ? "text-white" : "text-stone-900"
-                }`}
-              >
-                Speeding up emergency hospital approvals to under 15 minutes.
-              </h3>
-              <p
-                className={`text-xs sm:text-sm font-sans leading-relaxed ${
+            {/* Left Narrative with Constrained Width */}
+            <div className="lg:col-span-7 space-y-3 max-w-[62ch]">
+              <div>
+                <h3
+                  className={`text-base sm:text-lg font-sans font-semibold tracking-tight ${
+                    isDark ? "text-white" : "text-stone-900"
+                  }`}
+                >
+                  Speeding up emergency hospital pre-authorizations to under 15 minutes.
+                </h3>
+                <p
+                  className={`text-xs sm:text-sm font-sans pt-1 ${
+                    isDark ? "text-zinc-300" : "text-stone-700"
+                  }`}
+                >
+                  Enterprise B2B insurance benefits platform and claim submission engine.
+                </p>
+              </div>
+
+              {/* Punchy Bullet Points */}
+              <ul
+                className={`space-y-1.5 text-xs font-sans leading-relaxed pt-1 ${
                   isDark ? "text-zinc-400" : "text-stone-600"
                 }`}
               >
-                Designed the corporate benefits wallet and claim submission flow for 100,000+
-                employees. Real-time policy validation replaced paperwork delays with instant
-                cashless triage, reducing emergency hospital approval wait times below 15 minutes.
-              </p>
+                <li className="flex items-start gap-2">
+                  <span className="text-indigo-400 font-mono text-[11px] mt-0.5">•</span>
+                  <span><strong>&lt; 15 min pre-auth triage:</strong> Instant cashless hospital clearance replacing paperwork bottlenecks.</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <span className="text-indigo-400 font-mono text-[11px] mt-0.5">•</span>
+                  <span><strong>100,000+ enterprise lives:</strong> Unified corporate wallet across inpatient, diagnostics, and OPD claims.</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <span className="text-indigo-400 font-mono text-[11px] mt-0.5">•</span>
+                  <span><strong>Enterprise design system:</strong> Multi-tenant console handling custom corporate policy matrices.</span>
+                </li>
+              </ul>
 
-              {/* Action CTAs */}
-              <div className="pt-2 flex flex-wrap items-center gap-2.5 font-mono text-xs">
+              {/* Action CTAs: Solid Primary + Clean Text Secondary */}
+              <div className="pt-2 flex flex-wrap items-center gap-4 font-mono text-xs">
                 <Link
                   href="/work/mfine"
-                  className={`px-3.5 py-2 rounded-lg font-semibold flex items-center gap-1.5 transition-all cursor-pointer ${
+                  className={`px-3.5 py-1.5 rounded-lg font-semibold flex items-center gap-1.5 transition-all cursor-pointer shadow-sm ${
                     isDark
-                      ? "bg-white text-zinc-950 hover:bg-zinc-200 shadow-sm"
-                      : "bg-stone-900 text-white hover:bg-black shadow-sm"
+                      ? "bg-white text-zinc-950 hover:bg-zinc-200"
+                      : "bg-stone-900 text-white hover:bg-black"
                   }`}
                 >
                   <span>Read Case Study</span>
@@ -524,14 +578,12 @@ export function BreakTheGridShowcase({ onLaunchOS }: BreakTheGridShowcaseProps) 
                   href="https://www.figma.com/design/pr9NQjBDkyZqALFcPkm4tJ/Corporate-S3--_-Management?node-id=704-211"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className={`px-3 py-2 rounded-lg border font-medium flex items-center gap-1.5 transition-colors cursor-pointer ${
-                    isDark
-                      ? "border-zinc-800 bg-zinc-900/60 hover:bg-zinc-800 text-zinc-300"
-                      : "border-stone-200 bg-stone-100 hover:bg-stone-200 text-stone-800"
+                  className={`flex items-center gap-1 transition-colors cursor-pointer hover:underline ${
+                    isDark ? "text-zinc-400 hover:text-white" : "text-stone-600 hover:text-black"
                   }`}
                 >
-                  <span>Figma File</span>
-                  <ExternalLink className="w-3 h-3 opacity-60" />
+                  <span>Figma Workspace</span>
+                  <ArrowUpRight className="w-3 h-3 opacity-60" />
                 </a>
               </div>
             </div>
@@ -656,7 +708,7 @@ export function BreakTheGridShowcase({ onLaunchOS }: BreakTheGridShowcaseProps) 
                 </MobileDeviceFrame>
               </StageCanvas>
 
-              <div className="space-y-2 pt-1">
+              <div className="space-y-2 pt-1 max-w-[56ch]">
                 <h4
                   className={`text-base font-semibold font-sans tracking-tight ${
                     isDark ? "text-white" : "text-stone-900"
@@ -664,29 +716,47 @@ export function BreakTheGridShowcase({ onLaunchOS }: BreakTheGridShowcaseProps) 
                 >
                   Preventing failed UPI payments before users tap &apos;Pay&apos;.
                 </h4>
-                <p
-                  className={`text-xs font-sans leading-relaxed ${
+                <ul
+                  className={`space-y-1 text-xs font-sans leading-relaxed pt-0.5 ${
                     isDark ? "text-zinc-400" : "text-stone-600"
                   }`}
                 >
-                  Proactive bank server health meters and daily spend runway indicators, cutting
-                  payment dropoffs by 38% across transaction flows.
-                </p>
+                  <li className="flex items-start gap-1.5">
+                    <span className="text-cyan-400 font-mono text-[11px] mt-0.5">•</span>
+                    <span><strong>-38% payment dropoffs:</strong> Proactive bank server health meters and real-time spend runway.</span>
+                  </li>
+                  <li className="flex items-start gap-1.5">
+                    <span className="text-cyan-400 font-mono text-[11px] mt-0.5">•</span>
+                    <span><strong>Pre-transaction triage:</strong> Dynamic limit warnings with instant 1-tap bank switch failover.</span>
+                  </li>
+                </ul>
               </div>
             </div>
 
-            <div className="pt-2 flex flex-wrap items-center gap-2 font-mono text-xs">
+            <div className="pt-2 flex flex-wrap items-center gap-4 font-mono text-xs">
               <Link
                 href="/work/digiaccel"
-                className={`px-3 py-1.5 rounded-lg font-semibold flex items-center gap-1.5 transition-all cursor-pointer ${
+                className={`px-3.5 py-1.5 rounded-lg font-semibold flex items-center gap-1.5 transition-all cursor-pointer shadow-sm ${
                   isDark
                     ? "bg-white text-zinc-950 hover:bg-zinc-200"
                     : "bg-stone-900 text-white hover:bg-black"
                 }`}
               >
                 <span>Read Case Study</span>
-                <ArrowRight className="w-3 h-3" />
+                <ArrowRight className="w-3.5 h-3.5" />
               </Link>
+
+              <a
+                href="https://www.figma.com/design/zCmxQ3KwFy0mhlFbtlApua/UPI-Limit-Clarity---digiaccel-Assignment?node-id=0-1"
+                target="_blank"
+                rel="noopener noreferrer"
+                className={`flex items-center gap-1 transition-colors cursor-pointer hover:underline ${
+                  isDark ? "text-zinc-400 hover:text-white" : "text-stone-600 hover:text-black"
+                }`}
+              >
+                <span>Figma Workspace</span>
+                <ArrowUpRight className="w-3 h-3 opacity-60" />
+              </a>
             </div>
           </article>
 
@@ -766,37 +836,55 @@ export function BreakTheGridShowcase({ onLaunchOS }: BreakTheGridShowcaseProps) 
                 </MobileDeviceFrame>
               </StageCanvas>
 
-              <div className="space-y-2 pt-1">
+              <div className="space-y-2 pt-1 max-w-[56ch]">
                 <h4
                   className={`text-base font-semibold font-sans tracking-tight ${
                     isDark ? "text-white" : "text-stone-900"
                   }`}
                 >
-                  Helping patients stick to medical routines during the first three weeks.
+                  Helping patients build daily clinical habits in their first 21 days.
                 </h4>
-                <p
-                  className={`text-xs font-sans leading-relaxed ${
+                <ul
+                  className={`space-y-1 text-xs font-sans leading-relaxed pt-0.5 ${
                     isDark ? "text-zinc-400" : "text-stone-600"
                   }`}
                 >
-                  Paired 1-tap daily habit logs with milestone streaks and doctor check-ins, driving
-                  a +12% lift in 90-day treatment continuation.
-                </p>
+                  <li className="flex items-start gap-1.5">
+                    <span className="text-amber-400 font-mono text-[11px] mt-0.5">•</span>
+                    <span><strong>+12% 90-day retention:</strong> Micro-commitment logs paired with milestone streak feedback loops.</span>
+                  </li>
+                  <li className="flex items-start gap-1.5">
+                    <span className="text-amber-400 font-mono text-[11px] mt-0.5">•</span>
+                    <span><strong>Direct care touchpoints:</strong> Scheduled doctor check-in triggers embedded directly into regimen flows.</span>
+                  </li>
+                </ul>
               </div>
             </div>
 
-            <div className="pt-2 flex flex-wrap items-center gap-2 font-mono text-xs">
+            <div className="pt-2 flex flex-wrap items-center gap-4 font-mono text-xs">
               <Link
                 href="/work/mosaic"
-                className={`px-3 py-1.5 rounded-lg font-semibold flex items-center gap-1.5 transition-all cursor-pointer ${
+                className={`px-3.5 py-1.5 rounded-lg font-semibold flex items-center gap-1.5 transition-all cursor-pointer shadow-sm ${
                   isDark
                     ? "bg-white text-zinc-950 hover:bg-zinc-200"
                     : "bg-stone-900 text-white hover:bg-black"
                 }`}
               >
                 <span>Read Case Study</span>
-                <ArrowRight className="w-3 h-3" />
+                <ArrowRight className="w-3.5 h-3.5" />
               </Link>
+
+              <a
+                href="https://www.figma.com/design/jYWIU8kR4JiRbQU6UcctXm/21-Day-Hair-Tracker?node-id=0-1"
+                target="_blank"
+                rel="noopener noreferrer"
+                className={`flex items-center gap-1 transition-colors cursor-pointer hover:underline ${
+                  isDark ? "text-zinc-400 hover:text-white" : "text-stone-600 hover:text-black"
+                }`}
+              >
+                <span>Figma Workspace</span>
+                <ArrowUpRight className="w-3 h-3 opacity-60" />
+              </a>
             </div>
           </article>
         </div>
@@ -879,7 +967,7 @@ export function BreakTheGridShowcase({ onLaunchOS }: BreakTheGridShowcaseProps) 
                 </MobileDeviceFrame>
               </StageCanvas>
 
-              <div className="space-y-2 pt-1">
+              <div className="space-y-2 pt-1 max-w-[56ch]">
                 <h4
                   className={`text-base font-semibold font-sans tracking-tight ${
                     isDark ? "text-white" : "text-stone-900"
@@ -887,29 +975,47 @@ export function BreakTheGridShowcase({ onLaunchOS }: BreakTheGridShowcaseProps) 
                 >
                   Turning one-time emergency donors into monthly patient sponsors.
                 </h4>
-                <p
-                  className={`text-xs font-sans leading-relaxed ${
+                <ul
+                  className={`space-y-1 text-xs font-sans leading-relaxed pt-0.5 ${
                     isDark ? "text-zinc-400" : "text-stone-600"
                   }`}
                 >
-                  Designed the Ketto+ recurring micro-giving subscription flow and ambient home
-                  screen recovery milestones, doubling repeat donor retention.
-                </p>
+                  <li className="flex items-start gap-1.5">
+                    <span className="text-pink-400 font-mono text-[11px] mt-0.5">•</span>
+                    <span><strong>2.3x repeat donor lift:</strong> Micro-giving onboarding with ambient monthly impact updates.</span>
+                  </li>
+                  <li className="flex items-start gap-1.5">
+                    <span className="text-pink-400 font-mono text-[11px] mt-0.5">•</span>
+                    <span><strong>UPI Autopay integration:</strong> Low-friction recurring mandate flow with transparent patient tracking.</span>
+                  </li>
+                </ul>
               </div>
             </div>
 
-            <div className="pt-2 flex flex-wrap items-center gap-2 font-mono text-xs">
+            <div className="pt-2 flex flex-wrap items-center gap-4 font-mono text-xs">
               <Link
                 href="/work/ketto"
-                className={`px-3 py-1.5 rounded-lg font-semibold flex items-center gap-1.5 transition-all cursor-pointer ${
+                className={`px-3.5 py-1.5 rounded-lg font-semibold flex items-center gap-1.5 transition-all cursor-pointer shadow-sm ${
                   isDark
                     ? "bg-white text-zinc-950 hover:bg-zinc-200"
                     : "bg-stone-900 text-white hover:bg-black"
                 }`}
               >
                 <span>Read Case Study</span>
-                <ArrowRight className="w-3 h-3" />
+                <ArrowRight className="w-3.5 h-3.5" />
               </Link>
+
+              <a
+                href="https://www.figma.com/design/zSSrngf4wlhPPxg0cHlFRE/Ketto-?node-id=29-755"
+                target="_blank"
+                rel="noopener noreferrer"
+                className={`flex items-center gap-1 transition-colors cursor-pointer hover:underline ${
+                  isDark ? "text-zinc-400 hover:text-white" : "text-stone-600 hover:text-black"
+                }`}
+              >
+                <span>Figma Workspace</span>
+                <ArrowUpRight className="w-3 h-3 opacity-60" />
+              </a>
             </div>
           </article>
 
@@ -959,7 +1065,7 @@ export function BreakTheGridShowcase({ onLaunchOS }: BreakTheGridShowcaseProps) 
                 </div>
               </StageCanvas>
 
-              <div className="space-y-2 pt-1">
+              <div className="space-y-2 pt-1 max-w-[56ch]">
                 <h4
                   className={`text-base font-semibold font-sans tracking-tight ${
                     isDark ? "text-white" : "text-stone-900"
@@ -967,36 +1073,40 @@ export function BreakTheGridShowcase({ onLaunchOS }: BreakTheGridShowcaseProps) 
                 >
                   20 months of grassroots systems & youth leadership ethnography.
                 </h4>
-                <p
-                  className={`text-xs font-sans leading-relaxed ${
+                <ul
+                  className={`space-y-1 text-xs font-sans leading-relaxed pt-0.5 ${
                     isDark ? "text-zinc-400" : "text-stone-600"
                   }`}
                 >
-                  Field immersion across 40+ panchayats in rural Rajasthan and Bihar. Authored the
-                  Youth Resource Manual for local community leadership and water commons stewardship.
-                </p>
+                  <li className="flex items-start gap-1.5">
+                    <span className="text-emerald-400 font-mono text-[11px] mt-0.5">•</span>
+                    <span><strong>40+ rural panchayats:</strong> Immersive field immersion and ethnographic research across Rajasthan and Bihar.</span>
+                  </li>
+                  <li className="flex items-start gap-1.5">
+                    <span className="text-emerald-400 font-mono text-[11px] mt-0.5">•</span>
+                    <span><strong>Youth Resource Manual:</strong> Designed community leadership curriculum and water commons stewardship tools.</span>
+                  </li>
+                </ul>
               </div>
             </div>
 
-            <div className="pt-2 flex flex-wrap items-center gap-2 font-mono text-xs">
+            <div className="pt-2 flex flex-wrap items-center gap-4 font-mono text-xs">
               <a
                 href="#essays"
-                className={`px-3 py-1.5 rounded-lg font-semibold flex items-center gap-1.5 transition-all cursor-pointer ${
+                className={`px-3.5 py-1.5 rounded-lg font-semibold flex items-center gap-1.5 transition-all cursor-pointer shadow-sm ${
                   isDark
                     ? "bg-white text-zinc-950 hover:bg-zinc-200"
                     : "bg-stone-900 text-white hover:bg-black"
                 }`}
               >
                 <span>Read Field Essays</span>
-                <ArrowRight className="w-3 h-3" />
+                <ArrowRight className="w-3.5 h-3.5" />
               </a>
 
               <Link
                 href="/work"
-                className={`px-3 py-1.5 rounded-lg border font-medium flex items-center gap-1 transition-colors ${
-                  isDark
-                    ? "border-zinc-800 bg-zinc-900/60 hover:bg-zinc-800 text-zinc-300"
-                    : "border-stone-200 bg-stone-100 hover:bg-stone-200 text-stone-800"
+                className={`flex items-center gap-1 transition-colors cursor-pointer hover:underline ${
+                  isDark ? "text-zinc-400 hover:text-white" : "text-stone-600 hover:text-black"
                 }`}
               >
                 <span>All Projects Archive</span>
