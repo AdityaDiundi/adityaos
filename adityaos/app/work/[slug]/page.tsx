@@ -389,6 +389,68 @@ const CASE_STUDIES: Record<string, CaseStudyDetail> = {
       "Add touch-gesture pinch-to-zoom support for mobile canvas manipulation.",
     ],
   },
+  ketto: {
+    slug: "ketto",
+    title: "Ketto+ — Recurring Giving & Micro-Sponsorships",
+    client: "Ketto",
+    year: "2024",
+    role: "Product Designer",
+    timeline: "8 Weeks",
+    team: "Aditya Diundi (Design) · Growth & Engineering Teams",
+    tags: ["Fintech Crowdfunding", "Recurring Giving", "Mobile App UX"],
+    summary:
+      "Transforming one-off emergency crowdfunding donors into sustained monthly subscribers through emotional continuity and transparent impact tracking.",
+    verifiedMetric: {
+      value: "2.3X",
+      label: "repeat donor retention",
+    },
+    figmaUrl: "https://www.figma.com/design/zSSrngf4wlhPPxg0cHlFRE/Ketto-?node-id=29-755",
+    theProblem: [
+      "Emergency medical crowdfunding is inherently transactional: users donate once during a crisis appeal but churn immediately after payment.",
+      "High donor acquisition costs across paid performance channels made customer lifetime value unsustainable without a recurring model.",
+      "Donors felt disconnected from long-term patient recovery updates after the initial donation transaction.",
+    ],
+    myRoleAndConstraints: {
+      roleScope: [
+        "Designed the Ketto+ recurring micro-giving subscription flow.",
+        "Created ambient progress cards and patient milestone trackers for donor home screens.",
+        "Engineered zero-friction recurring payment UPI autopay authorization flows.",
+      ],
+      constraints: [
+        "Trust & Regulatory: Strict RBI mandate rules on recurring digital mandates and recurring payment consent.",
+        "Emotional Sensitivity: Preventing donors from feeling guilt-tripped into subscriptions while preserving urgency.",
+      ],
+    },
+    processDecisions: [
+      {
+        title: "1. Post-Donation Momentum Conversion",
+        description:
+          "Rather than pitching subscription upfront, we introduced Ketto+ micro-sponsorship at peak emotional resonance immediately following a verified donation.",
+        imageSrc: "/case-studies/ketto_curated_flow.png",
+        imageAlt: "Ketto+ Recurring Giving Onboarding Flow",
+        tradeoffCaption:
+          "Tradeoff: Post-transaction upsells have lower exposure than pre-checkout, but convert at 3x higher intent without adding checkout friction.",
+      },
+      {
+        title: "2. Transparent Patient Health Milestones",
+        description:
+          "Built a live recovery timeline showing monthly donors exactly how their recurring contributions funded chemotherapy cycles, ICU stays, and medicines.",
+        imageSrc: "/case-studies/ketto_plus.png",
+        imageAlt: "Ketto+ Patient Milestone Tracker",
+      },
+    ],
+    outcomeAndImpact: {
+      metrics: [
+        { value: "2.3X", label: "repeat donor conversion lift" },
+        { value: "+34%", label: "recurring monthly pledge volume" },
+        { value: "92%", label: "mandate authorization success rate" },
+      ],
+      impactNarrative:
+        "The introduction of transparent milestone tracking turned transactional emergency relief into an ongoing community of care.",
+    },
+    whatIWouldDoDifferently:
+      "I would integrate direct audio/video voice notes from healthcare liaisons directly into monthly donor reports.",
+  },
 };
 
 export async function generateStaticParams() {

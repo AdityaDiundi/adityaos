@@ -89,27 +89,27 @@ export function ResumeSection() {
       >
         {/* Section Header */}
         <div
-          className={`border-b p-8 sm:p-12 lg:p-14 relative flex flex-col sm:flex-row sm:items-end justify-between gap-4 transition-colors ${
-            isDark ? "border-zinc-800" : "border-stone-200"
+          className={`border-b p-6 sm:p-8 relative flex flex-col sm:flex-row sm:items-end justify-between gap-4 transition-colors ${
+            isDark ? "border-zinc-800 bg-[#0c0e14]/70" : "border-stone-200 bg-white"
           }`}
         >
-          <div className="space-y-3">
+          <div className="space-y-1.5">
             <div
-              className={`text-xs font-mono uppercase tracking-wider ${
+              className={`text-[11px] font-mono uppercase tracking-wider ${
                 isDark ? "text-zinc-500" : "text-stone-500"
               }`}
             >
               04 // Experience & Credentials
             </div>
             <h2
-              className={`text-3xl sm:text-4xl md:text-5xl font-sans font-semibold tracking-tight ${
+              className={`text-xl sm:text-2xl font-sans font-semibold tracking-tight ${
                 isDark ? "text-zinc-100" : "text-stone-900"
               }`}
             >
               Career history & credentials.
             </h2>
             <p
-              className={`text-sm sm:text-base font-sans max-w-xl pt-1 leading-relaxed ${
+              className={`text-xs sm:text-sm font-sans max-w-xl leading-relaxed ${
                 isDark ? "text-zinc-400" : "text-stone-600"
               }`}
             >
