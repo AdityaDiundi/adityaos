@@ -32,10 +32,10 @@ const ARCHIVE_PROJECTS: ArchiveProject[] = [
     client: "Ketto",
     year: "2024",
     role: "Product Designer",
-    tags: ["Fintech Crowdfunding", "Recurring Giving", "Mobile App"],
+    tags: ["Fintech Crowdfunding", "Recurring Giving", "UPI Autopay"],
     summary:
-      "Transforming one-off emergency crowdfunding donors into sustained monthly subscribers. Designed the Ketto+ onboarding flow and ambient home screen nudges to establish emotional continuity and transparent impact tracking.",
-    metric: "2.3X repeat donor conversion",
+      "Engineered UPI Autopay micro-giving mandates and transparent recovery timelines, converting one-off crisis donors into recurring monthly sponsors.",
+    metric: "2.3x Repeat Donor Conversion",
     imageSrc: "/case-studies/ketto_curated_flow.png",
     imageAlt: "Ketto+ Mobile App Flow in Figma",
     link: "https://www.figma.com/design/zSSrngf4wlhPPxg0cHlFRE/Ketto-?node-id=29-755",
@@ -44,11 +44,11 @@ const ARCHIVE_PROJECTS: ArchiveProject[] = [
     title: "Grassroots Fieldwork & Youth Manual",
     client: "Project Potential x India Fellow",
     year: "2023–2024",
-    role: "Design Lead & Social Innovator",
+    role: "Systems Designer & Fellow",
     tags: ["Fieldwork Ethnography", "Rural Systems", "Youth Manual"],
     summary:
-      "20 months of immersive grassroots fieldwork in rural Rajasthan and Bihar. Conducted ethnographic research across 40+ panchayats and authored the Youth Resource Manual for local community leadership.",
-    metric: "20 months field ethnography",
+      "20 months of grassroots field immersion across 40+ panchayats in Rajasthan and Bihar. Authored the 12-module Youth Resource Manual for rural community governance.",
+    metric: "20mo Field Immersion · 40+ Panchayats",
     imageSrc: "/aditya_field_full.jpg",
     imageAlt: "Aditya Diundi Grassroots Fieldwork in Rajasthan",
   },
@@ -59,20 +59,20 @@ const ARCHIVE_PROJECTS: ArchiveProject[] = [
     role: "Field Researcher & Systems Designer",
     tags: ["Pedagogical Analytics", "Cognitive Matrix", "Himalayan Schools"],
     summary:
-      "Designed a non-verbal 4-vector cognitive diagnostic framework (pattern, logic, spatial, linguistic) to evaluate aptitude in first-generation Himalayan rural learners without English language bias.",
-    metric: "100+ students evaluated across 4 cognitive vectors",
+      "Designed a non-verbal 4-vector cognitive diagnostic framework (pattern, logic, spatial, linguistic) to evaluate aptitude in first-generation Himalayan learners without English language bias.",
+    metric: "100+ Students · 4 Cognitive Vectors",
     imageSrc: "/case-studies/janeval_evidence.png",
     imageAlt: "Aarohi Bal Sansar Learnability Diagnostic Matrix",
   },
   {
-    title: "Tutedude Course Architecture & Onboarding",
-    client: "Tutedude",
-    year: "2022",
-    role: "UI/UX Designer",
-    tags: ["EdTech", "Onboarding", "Course Navigation"],
+    title: "TuteDude Course Architecture & Mentorship",
+    client: "TuteDude",
+    year: "2023",
+    role: "Product Designer",
+    tags: ["EdTech UX", "Interactive Video", "Mentorship Queue"],
     summary:
-      "Redesigned course selection and onboarding flows for an emerging Indian EdTech platform, replacing scattered lesson catalogs with guided skill paths.",
-    metric: "Interactive enrollment flow across 15+ disciplines",
+      "Integrated instant 1-on-1 mentor queues and progress-based refund runways directly into video lectures to eliminate student syntax drop-offs.",
+    metric: "+34% Course Completion · <3m Queue",
   },
 ];
 
@@ -92,10 +92,10 @@ export default function WorkArchivePage() {
 
         <header className="space-y-3 border-b border-stone-200 dark:border-stone-800 pb-6">
           <h1 className="text-3xl font-bold tracking-tight text-stone-900 dark:text-stone-100">
-            Work Archive
+            Project Archive
           </h1>
           <p className="text-stone-600 dark:text-stone-400 text-base leading-relaxed">
-            Additional shipped projects, design consultations, and field research initiatives.
+            Shipped systems, enterprise products, and field research initiatives.
           </p>
         </header>
 

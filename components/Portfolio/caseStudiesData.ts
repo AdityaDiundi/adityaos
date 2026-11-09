@@ -237,7 +237,7 @@ export const FEATURED_CASE_STUDIES: CaseStudy[] = [
       { label: "Teacher Adoption", value: "100%", detail: "Adopted for personalized curricula" },
     ],
     overview:
-      "During my grassroots work in Peora, Uttarakhand, I conducted a deep ethnographic study of how first-generation rural learners process complex information. Traditional standardized tests failed to reflect true student aptitude. I designed the Learnability Diagnostic Framework to decouple intrinsic cognitive aptitude from formal English language barriers.",
+      "Conducted ethnographic research in Peora, Uttarakhand analyzing cognitive processing in first-generation rural learners. Designed the Learnability Diagnostic Framework to decouple intrinsic cognitive aptitude from formal English language barriers across Grades 4 through 8.",
     theProblem: {
       friction:
         "Rote examination metrics misclassify rural students with high spatial and logical reasoning as 'underperforming' simply due to vernacular language test hurdles.",

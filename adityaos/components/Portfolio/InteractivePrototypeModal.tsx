@@ -162,7 +162,7 @@ export function InteractivePrototypeModal({ data, onClose }: InteractivePrototyp
                   }`}
                 >
                   <span className="w-1.5 h-1.5 rounded-full bg-cyan-400" />
-                  <span>Interactive Figma</span>
+                  <span>Figma Prototype</span>
                 </button>
               )}
 
@@ -180,7 +180,7 @@ export function InteractivePrototypeModal({ data, onClose }: InteractivePrototyp
                   }`}
                 >
                   <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-                  <span>Live App Build</span>
+                  <span>Production Build</span>
                 </button>
               )}
 
@@ -216,7 +216,7 @@ export function InteractivePrototypeModal({ data, onClose }: InteractivePrototyp
                 title="Open in adityaos interactive desktop"
               >
                 <Terminal className="w-3 h-3 text-cyan-400" />
-                <span>Open in adityaos</span>
+                <span>adityaos Shell</span>
               </button>
             )}
 
@@ -233,7 +233,7 @@ export function InteractivePrototypeModal({ data, onClose }: InteractivePrototyp
                 }`}
                 title="Open directly in Figma in a new tab"
               >
-                <span>Figma</span>
+                <span>Figma Specs</span>
                 <ExternalLink className="w-3 h-3" />
               </a>
             )}
@@ -245,7 +245,7 @@ export function InteractivePrototypeModal({ data, onClose }: InteractivePrototyp
                 rel="noopener noreferrer"
                 className="px-3.5 py-1.5 rounded-lg bg-emerald-500 hover:bg-emerald-400 text-zinc-950 font-bold flex items-center gap-1.5 transition-colors cursor-pointer shadow-sm"
               >
-                <span>Open Live</span>
+                <span>Launch Live</span>
                 <ExternalLink className="w-3 h-3" />
               </a>
             )}

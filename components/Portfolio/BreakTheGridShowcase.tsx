@@ -241,18 +241,18 @@ export function BreakTheGridShowcase({ onLaunchOS }: BreakTheGridShowcaseProps) 
                 isDark ? "text-zinc-100" : "text-stone-900"
               }`}
             >
-              Selected Works
+              Shipped Systems
             </h2>
             <span
               className={`text-xs font-mono hidden sm:inline ${
                 isDark ? "text-zinc-500" : "text-stone-400"
               }`}
             >
-              — Case studies & shipped software
+              — Production architectures & verifiable metrics
             </span>
           </div>
           <span className="text-xs font-mono text-stone-400 dark:text-zinc-500">
-            7 Projects
+            7 Systems
           </span>
         </div>
 
@@ -276,7 +276,7 @@ export function BreakTheGridShowcase({ onLaunchOS }: BreakTheGridShowcaseProps) 
               Josh Talks · 2024
             </span>
             <span className="text-emerald-600 dark:text-emerald-400 font-medium">
-              3.4x Accuracy Lift
+              3.4x Cultural Fidelity Lift
             </span>
           </div>
 
@@ -289,7 +289,7 @@ export function BreakTheGridShowcase({ onLaunchOS }: BreakTheGridShowcaseProps) 
                   isDark ? "text-white" : "text-stone-900"
                 }`}
               >
-                Catching AI medical mistakes before they reach rural clinics.
+                Frontier AI medical evaluation framework for rural Indian healthcare.
               </h3>
 
               {/* Single High-Impact Persuasive Statement */}
@@ -298,7 +298,7 @@ export function BreakTheGridShowcase({ onLaunchOS }: BreakTheGridShowcaseProps) 
                   isDark ? "text-zinc-300" : "text-stone-700"
                 }`}
               >
-                Benchmarked frontier vision models across 120+ localized clinical scenarios with frontline healthcare workers, eliminating diagnostic hallucinations before grassroots deployment.
+                Benchmarked frontier vision models across 120+ clinical scenarios with frontline ASHA workers, eliminating diagnostic hallucinations prior to rural deployment.
               </p>
 
               {/* Monospace Domain Tokens */}
@@ -307,7 +307,7 @@ export function BreakTheGridShowcase({ onLaunchOS }: BreakTheGridShowcaseProps) 
                   isDark ? "text-zinc-500" : "text-stone-500"
                 }`}
               >
-                Frontier AI Eval · LLM Benchmarks · Next.js · TypeScript
+                Frontier AI Eval · Pairwise Elo Arena · Next.js · TypeScript · Tailwind CSS
               </div>
 
               {/* Action CTAs: Solid Primary + Clean Text Secondary */}
@@ -320,7 +320,7 @@ export function BreakTheGridShowcase({ onLaunchOS }: BreakTheGridShowcaseProps) 
                       : "bg-stone-900 text-white hover:bg-black"
                   }`}
                 >
-                  <span>Read Case Study</span>
+                  <span>Case Study</span>
                   <ArrowRight className="w-3.5 h-3.5" />
                 </Link>
 
@@ -406,7 +406,7 @@ export function BreakTheGridShowcase({ onLaunchOS }: BreakTheGridShowcaseProps) 
                   isDark ? "text-white" : "text-stone-900"
                 }`}
               >
-                A retro pixel art studio and sandbox built directly in the browser.
+                In-browser retro operating system & creative pixel engine.
               </h3>
 
               <p
@@ -414,7 +414,7 @@ export function BreakTheGridShowcase({ onLaunchOS }: BreakTheGridShowcaseProps) 
                   isDark ? "text-zinc-300" : "text-stone-700"
                 }`}
               >
-                Engineered a zero-dependency 60 FPS deterministic canvas with cellular automata, procedural WebAudio synthesis, and modular windowing.
+                Zero-dependency 60 FPS deterministic canvas with Conway&apos;s Game of Life, falling sand physics, procedural WebAudio synth, and modular windowing.
               </p>
 
               <div
@@ -422,7 +422,7 @@ export function BreakTheGridShowcase({ onLaunchOS }: BreakTheGridShowcaseProps) 
                   isDark ? "text-zinc-500" : "text-stone-500"
                 }`}
               >
-                Interactive Graphics · Cellular Automata · WebAudio · Canvas API
+                HTML5 Canvas 2D · Web Audio API · Cellular Automata · TypeScript · React
               </div>
 
               {/* Action CTAs */}
@@ -435,7 +435,7 @@ export function BreakTheGridShowcase({ onLaunchOS }: BreakTheGridShowcaseProps) 
                       : "bg-stone-900 text-white hover:bg-black"
                   }`}
                 >
-                  <span>Read Case Study</span>
+                  <span>Case Study</span>
                   <ArrowRight className="w-3.5 h-3.5" />
                 </Link>
 
@@ -447,7 +447,7 @@ export function BreakTheGridShowcase({ onLaunchOS }: BreakTheGridShowcaseProps) 
                     }`}
                   >
                     <Terminal className="w-3.5 h-3.5 text-cyan-400" />
-                    <span>Launch Sandbox</span>
+                    <span>Launch Shell</span>
                     <span className="text-[10px]">↗</span>
                   </button>
                 )}
@@ -528,7 +528,7 @@ export function BreakTheGridShowcase({ onLaunchOS }: BreakTheGridShowcaseProps) 
                   isDark ? "text-white" : "text-stone-900"
                 }`}
               >
-                Speeding up emergency hospital pre-authorizations to under 15 minutes.
+                Unified B2B healthcare benefits console & cashless claim engine.
               </h3>
 
               <p
@@ -536,7 +536,7 @@ export function BreakTheGridShowcase({ onLaunchOS }: BreakTheGridShowcaseProps) 
                   isDark ? "text-zinc-300" : "text-stone-700"
                 }`}
               >
-                Architected a unified B2B benefits console and cashless claim engine for 100,000+ enterprise lives, slashing emergency clearance delays by 85%.
+                Architected enterprise claims orchestration and employee census engines for 100K+ lives, slashing hospital pre-authorization delays by 85%.
               </p>
 
               <div
@@ -544,7 +544,7 @@ export function BreakTheGridShowcase({ onLaunchOS }: BreakTheGridShowcaseProps) 
                   isDark ? "text-zinc-500" : "text-stone-500"
                 }`}
               >
-                Enterprise InsurTech · Design Systems · B2B Console · Cashless OPD
+                InsurTech · Design Systems (Figma) · B2B Console · Cashless OPD
               </div>
 
               {/* Action CTAs */}
@@ -557,7 +557,7 @@ export function BreakTheGridShowcase({ onLaunchOS }: BreakTheGridShowcaseProps) 
                       : "bg-stone-900 text-white hover:bg-black"
                   }`}
                 >
-                  <span>Read Case Study</span>
+                  <span>Case Study</span>
                   <ArrowRight className="w-3.5 h-3.5" />
                 </Link>
 
@@ -569,7 +569,7 @@ export function BreakTheGridShowcase({ onLaunchOS }: BreakTheGridShowcaseProps) 
                     isDark ? "text-zinc-400 hover:text-white" : "text-stone-600 hover:text-black"
                   }`}
                 >
-                  <span>Figma Workspace</span>
+                  <span>Figma Specs</span>
                   <ArrowUpRight className="w-3 h-3 opacity-60" />
                 </a>
               </div>
@@ -679,21 +679,21 @@ export function BreakTheGridShowcase({ onLaunchOS }: BreakTheGridShowcaseProps) 
                     isDark ? "text-white" : "text-stone-900"
                   }`}
                 >
-                  Preventing failed UPI payments before users tap &apos;Pay&apos;.
+                  Ambient UPI spend runway & proactive error recovery.
                 </h4>
                 <p
                   className={`text-xs sm:text-sm font-sans leading-relaxed ${
                     isDark ? "text-zinc-400" : "text-stone-600"
                   }`}
                 >
-                  Designed dynamic bank server health meters and real-time spend runways, rescuing high-intent fintech checkouts from silent gateway failures.
+                  Designed real-time bank limit meters and 1-tap split-payment failovers, eliminating cryptic checkout errors for high-intent fintech checkouts.
                 </p>
                 <div
                   className={`text-[11px] font-mono pt-1 ${
                     isDark ? "text-zinc-500" : "text-stone-500"
                   }`}
                 >
-                  Fintech UX · Payments · UPI · Error Prevention
+                  Fintech UX · UPI Payments · Ambient Feedback · Error Recovery
                 </div>
               </div>
             </div>
@@ -707,7 +707,7 @@ export function BreakTheGridShowcase({ onLaunchOS }: BreakTheGridShowcaseProps) 
                     : "bg-stone-900 text-white hover:bg-black"
                 }`}
               >
-                <span>Read Case Study</span>
+                <span>Case Study</span>
                 <ArrowRight className="w-3.5 h-3.5" />
               </Link>
 
@@ -719,7 +719,7 @@ export function BreakTheGridShowcase({ onLaunchOS }: BreakTheGridShowcaseProps) 
                   isDark ? "text-zinc-400 hover:text-white" : "text-stone-600 hover:text-black"
                 }`}
               >
-                <span>Figma Workspace</span>
+                <span>Figma Specs</span>
                 <ArrowUpRight className="w-3 h-3 opacity-60" />
               </a>
             </div>
@@ -814,21 +814,21 @@ export function BreakTheGridShowcase({ onLaunchOS }: BreakTheGridShowcaseProps) 
                     isDark ? "text-white" : "text-stone-900"
                   }`}
                 >
-                  Helping patients build daily clinical habits in their first 21 days.
+                  Behavioral retention engine for delayed-gratification health regimens.
                 </h4>
                 <p
                   className={`text-xs sm:text-sm font-sans leading-relaxed ${
                     isDark ? "text-zinc-400" : "text-stone-600"
                   }`}
                 >
-                  Created a friction-free regimen engine pairing micro-commitment habit logs with milestone streaks and embedded doctor touchpoints.
+                  Paired 1-tap micro-commitment habit logs with milestone streaks and embedded doctor WhatsApp check-ins to halt early patient drop-off.
                 </p>
                 <div
                   className={`text-[11px] font-mono pt-1 ${
                     isDark ? "text-zinc-500" : "text-stone-500"
                   }`}
                 >
-                  HealthTech D2C · Habit Loops · Behavioral UX · Patient Retention
+                  HealthTech D2C · Habit Loops · Behavioral UX · Regimen Adherence
                 </div>
               </div>
             </div>
@@ -842,7 +842,7 @@ export function BreakTheGridShowcase({ onLaunchOS }: BreakTheGridShowcaseProps) 
                     : "bg-stone-900 text-white hover:bg-black"
                 }`}
               >
-                <span>Read Case Study</span>
+                <span>Case Study</span>
                 <ArrowRight className="w-3.5 h-3.5" />
               </Link>
 
@@ -854,7 +854,7 @@ export function BreakTheGridShowcase({ onLaunchOS }: BreakTheGridShowcaseProps) 
                   isDark ? "text-zinc-400 hover:text-white" : "text-stone-600 hover:text-black"
                 }`}
               >
-                <span>Figma Workspace</span>
+                <span>Figma Specs</span>
                 <ArrowUpRight className="w-3 h-3 opacity-60" />
               </a>
             </div>
@@ -952,21 +952,21 @@ export function BreakTheGridShowcase({ onLaunchOS }: BreakTheGridShowcaseProps) 
                     isDark ? "text-white" : "text-stone-900"
                   }`}
                 >
-                  Turning one-time emergency donors into monthly patient sponsors.
+                  Recurring medical crowdfunding & recovery milestones.
                 </h4>
                 <p
                   className={`text-xs sm:text-sm font-sans leading-relaxed ${
                     isDark ? "text-zinc-400" : "text-stone-600"
                   }`}
                 >
-                  Re-engineered medical crowdfunding with UPI Autopay micro-giving mandates and transparent recovery milestone tracking.
+                  Engineered UPI Autopay micro-giving mandates and transparent recovery timelines, converting one-off crisis donors into recurring monthly sponsors.
                 </p>
                 <div
                   className={`text-[11px] font-mono pt-1 ${
                     isDark ? "text-zinc-500" : "text-stone-500"
                   }`}
                 >
-                  Fintech Philanthropy · Recurring Mandates · Trust UX · UPI Autopay
+                  Fintech Philanthropy · Recurring Mandates · Trust Architecture · UPI Autopay
                 </div>
               </div>
             </div>
@@ -980,7 +980,7 @@ export function BreakTheGridShowcase({ onLaunchOS }: BreakTheGridShowcaseProps) 
                     : "bg-stone-900 text-white hover:bg-black"
                 }`}
               >
-                <span>Read Case Study</span>
+                <span>Case Study</span>
                 <ArrowRight className="w-3.5 h-3.5" />
               </Link>
 
@@ -992,7 +992,7 @@ export function BreakTheGridShowcase({ onLaunchOS }: BreakTheGridShowcaseProps) 
                   isDark ? "text-zinc-400 hover:text-white" : "text-stone-600 hover:text-black"
                 }`}
               >
-                <span>Figma Workspace</span>
+                <span>Figma Specs</span>
                 <ArrowUpRight className="w-3 h-3 opacity-60" />
               </a>
             </div>
@@ -1061,14 +1061,14 @@ export function BreakTheGridShowcase({ onLaunchOS }: BreakTheGridShowcaseProps) 
                     isDark ? "text-white" : "text-stone-900"
                   }`}
                 >
-                  Connecting stuck coding students to live mentors in under 3 minutes.
+                  Interactive video lecture player with instant mentor triage.
                 </h4>
                 <p
                   className={`text-xs sm:text-sm font-sans leading-relaxed ${
                     isDark ? "text-zinc-400" : "text-stone-600"
                   }`}
                 >
-                  Integrated instant 1-on-1 mentor queues and gamified refund runways directly into the video player, preventing drop-offs during core blockers.
+                  Embedded sub-3-minute 1-on-1 mentor queues and progress-backed refund runways directly into video lectures to eliminate student syntax drop-offs.
                 </p>
                 <div
                   className={`text-[11px] font-mono pt-1 ${
@@ -1089,35 +1089,9 @@ export function BreakTheGridShowcase({ onLaunchOS }: BreakTheGridShowcaseProps) 
                     : "bg-stone-900 text-white hover:bg-black"
                 }`}
               >
-                <span>Read Case Study</span>
+                <span>Case Study</span>
                 <ArrowRight className="w-3.5 h-3.5" />
               </Link>
-
-              <button
-                type="button"
-                onClick={() =>
-                  setModalData({
-                    title: "TuteDude Course Architecture & 1-on-1 Mentorship",
-                    client: "TuteDude",
-                    category: "EdTech Learning Experience",
-                    figmaUrl:
-                      "https://www.figma.com/design/hOmOAB7mZGXb8HBAy9TpHw/Tutedude-Assignment?node-id=220-1386",
-                    primaryImage: "/case-studies/tutedude_course_player.png",
-                    secondaryImage: "/case-studies/tutedude_study_resources.png",
-                    tertiaryImage: "/case-studies/tutedude_mentor_support.png",
-                    primaryLabel: "1. Lecture & Refund Runway",
-                    secondaryLabel: "2. Study Resources",
-                    tertiaryLabel: "3. Live Mentor Queue",
-                    defaultMode: "screens",
-                  })
-                }
-                className={`flex items-center gap-1 transition-colors cursor-pointer hover:underline ${
-                  isDark ? "text-cyan-400 hover:text-cyan-300" : "text-cyan-700 hover:text-cyan-900"
-                }`}
-              >
-                <span>Interactive Preview</span>
-                <span className="text-[10px]">↗</span>
-              </button>
 
               <a
                 href="https://www.figma.com/design/hOmOAB7mZGXb8HBAy9TpHw/Tutedude-Assignment?node-id=220-1386"
@@ -1127,7 +1101,7 @@ export function BreakTheGridShowcase({ onLaunchOS }: BreakTheGridShowcaseProps) 
                   isDark ? "text-zinc-400 hover:text-white" : "text-stone-600 hover:text-black"
                 }`}
               >
-                <span>Figma Workspace</span>
+                <span>Figma Specs</span>
                 <ArrowUpRight className="w-3 h-3 opacity-60" />
               </a>
             </div>
@@ -1196,7 +1170,7 @@ export function BreakTheGridShowcase({ onLaunchOS }: BreakTheGridShowcaseProps) 
                       : "bg-stone-900 text-white hover:bg-black"
                   }`}
                 >
-                  <span>Read Field Essays</span>
+                  <span>Field Essays</span>
                   <ArrowRight className="w-3.5 h-3.5" />
                 </a>
 
@@ -1206,7 +1180,7 @@ export function BreakTheGridShowcase({ onLaunchOS }: BreakTheGridShowcaseProps) 
                     isDark ? "text-zinc-400 hover:text-white" : "text-stone-600 hover:text-black"
                   }`}
                 >
-                  <span>All Projects Archive</span>
+                  <span>Project Archive</span>
                   <ArrowUpRight className="w-3 h-3 opacity-60" />
                 </Link>
               </div>

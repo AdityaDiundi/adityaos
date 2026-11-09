@@ -45,14 +45,14 @@ export function EssaysSection() {
                 isDark ? "text-zinc-100" : "text-stone-900"
               }`}
             >
-              Writing & Fieldwork
+              Fieldwork & Essays
             </h2>
             <span
               className={`text-xs font-mono hidden sm:inline ${
                 isDark ? "text-zinc-500" : "text-stone-400"
               }`}
             >
-              — Grassroots governance & behavioral essays
+              — Grassroots governance & behavioral inquiries
             </span>
           </div>
 
@@ -118,7 +118,7 @@ export function EssaysSection() {
               {/* Filter Switcher */}
               <div className="space-y-2.5">
                 <div className="text-[11px] font-mono uppercase tracking-wider text-stone-400 dark:text-zinc-500">
-                  Filter Catalog
+                  Index Filter
                 </div>
                 <div className="flex flex-col gap-1 text-xs font-mono">
                   <button
@@ -133,7 +133,7 @@ export function EssaysSection() {
                         : "text-stone-500 hover:text-stone-900 hover:bg-stone-100"
                     }`}
                   >
-                    <span>All Writeups</span>
+                    <span>All Entries</span>
                     <span className="opacity-60">{FEATURED_ESSAYS.length}</span>
                   </button>
 
@@ -174,12 +174,12 @@ export function EssaysSection() {
               {/* Research Vectors */}
               <div className="space-y-2 pt-4 border-t border-dashed border-stone-200/80 dark:border-zinc-800/80">
                 <div className="text-[11px] font-mono uppercase tracking-wider text-stone-400 dark:text-zinc-500">
-                  Core Inquiries
+                  Inquiry Vectors
                 </div>
                 <div className="space-y-1.5 text-xs font-mono text-stone-500 dark:text-zinc-400">
                   <div>· Water Commons & Drought Resilience</div>
-                  <div>· First-Gen Rural Aptitude & Logic</div>
-                  <div>· Community Motivation in Youth Clubs</div>
+                  <div>· First-Gen Rural Cognitive Aptitude</div>
+                  <div>· Intrinsic Motivation in Youth Clubs</div>
                   <div>· ISABS Experiential Human Process</div>
                 </div>
               </div>

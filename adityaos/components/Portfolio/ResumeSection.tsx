@@ -18,7 +18,7 @@ export function ResumeSection() {
       highlights: [
         "Architected an evidence-backed AI evaluation framework benchmarking cultural and clinical fidelity in rural Indian public health.",
         "Conducted 120+ pairwise blind evaluations with frontline health workers, achieving a 3.4x cultural fidelity lift over baseline frontier models.",
-        "Engineered the full frontend and evaluation scoring pipeline in Next.js, TypeScript, and Tailwind CSS.",
+        "Engineered full frontend and evaluation scoring pipeline in Next.js, TypeScript, and Tailwind CSS.",
       ],
     },
     {
@@ -27,9 +27,9 @@ export function ResumeSection() {
       location: "Bengaluru / Remote",
       period: "2022 — 2023",
       highlights: [
-        "Redesigned corporate health benefits onboarding and allowance wallet management for enterprise HR admins.",
         "Engineered patient claim settlement and cashless triage workflows handling 100K+ DAU, reducing pre-auth triage time to <15 mins.",
-        "Authored the multi-brand corporate component library maintaining 99.2% design-to-code audit reliability.",
+        "Redesigned corporate health benefits onboarding and allowance wallet management for enterprise HR admins.",
+        "Authored multi-brand corporate component library maintaining 99.2% design-to-code audit reliability.",
       ],
     },
     {
@@ -38,8 +38,8 @@ export function ResumeSection() {
       location: "Gurugram / Remote",
       period: "2023",
       highlights: [
-        "Architected the UPI Limit Clarity engine, reducing checkout anxiety by replacing reactive errors with an ambient limit meter.",
-        "Designed 1-tap secondary bank split failover, driving an estimated 38% reduction in abandoned transactions.",
+        "Architected ambient UPI limit runway meter and 1-tap split-payment failover, driving a 38% reduction in checkout drop-offs.",
+        "Formulated proactive error recovery patterns across Tier-1 and PSU bank daily transaction counters.",
       ],
     },
     {
@@ -48,8 +48,8 @@ export function ResumeSection() {
       location: "Mumbai / Remote",
       period: "2023",
       highlights: [
-        "Designed the 21-Day Habit & Hair Regimen Engine to combat early drop-off in delayed-gratification health regimens.",
-        "Implemented micro-commitment daily logs and streak locks, increasing purchase conversion by +12% in the target cohort.",
+        "Architected 21-Day Habit & Hair Regimen Engine to combat drop-off in delayed-gratification health regimens.",
+        "Implemented 1-tap micro-commitment logs, milestone streaks, and WhatsApp doctor hotline, lifting cohort continuation by +12%.",
       ],
     },
     {
@@ -58,24 +58,24 @@ export function ResumeSection() {
       location: "Kishangarh, Rajasthan",
       period: "2021 — 2022",
       highlights: [
-        "Spent 20 months in grassroots rural immersion leading non-profit systems development and ethnographic research.",
-        "Built a real-time attendance tracking tool with live GPS validation (HERE API) and authored the 12-module Youth Resource Manual.",
+        "Completed 20 months of grassroots rural immersion leading community systems development and ethnographic research across 40+ panchayats.",
+        "Built real-time attendance tracking tool with live GPS validation (HERE API) and authored 12-module Youth Resource Manual.",
       ],
     },
   ];
 
   const skillCategories = [
     {
-      name: "Product Design",
-      skills: ["Interaction Design", "Design Systems (Figma)", "Information Architecture", "Rapid Prototyping", "Design Specs & Tokens"],
+      name: "Product Design & Systems",
+      skills: ["Interaction Design", "Figma Design Tokens", "Information Architecture", "Rapid Prototyping", "Design Specifications"],
     },
     {
-      name: "Research & Field",
-      skills: ["Grassroots Fieldwork", "Qualitative Synthesis", "Cognitive Walkthroughs", "Behavioral Nudges", "Power BI Analysis", "A/B Testing"],
+      name: "Research & Behavioral Analytics",
+      skills: ["Grassroots Ethnography", "Qualitative Synthesis", "Cognitive Walkthroughs", "Behavioral Nudges", "Power BI", "A/B Testing"],
     },
     {
-      name: "Technical Depth",
-      skills: ["B.Tech ECE (IIIT Delhi)", "React & Next.js", "TypeScript", "Tailwind CSS", "Python (Data/Scraping)", "REST APIs"],
+      name: "Engineering & Stack",
+      skills: ["Next.js & React", "TypeScript", "HTML5 Canvas 2D", "Web Audio API", "Tailwind CSS", "REST APIs", "Python"],
     },
   ];
 
@@ -291,7 +291,7 @@ export function ResumeSection() {
                   isDark ? "text-zinc-400" : "text-stone-600"
                 }`}
               >
-                Based in Delhi NCR. Open for full-time Product Designer, Design Technologist, and Systems Architect roles (Remote / Hybrid / Relocation).
+                Delhi NCR. Available for full-time Product Designer & Design Technologist roles (Remote / Hybrid / Relocation).
               </p>
               <div className="space-y-1.5 pt-1 font-mono">
                 <a

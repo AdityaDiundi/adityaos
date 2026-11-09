@@ -108,7 +108,7 @@ export function PortfolioFooter({ onLaunchOS }: PortfolioFooterProps) {
             }`}
           >
             <Terminal className="w-3 h-3 text-cyan-500" />
-            <span>Launch OS</span>
+            <span>adityaos Shell</span>
           </button>
 
           <button

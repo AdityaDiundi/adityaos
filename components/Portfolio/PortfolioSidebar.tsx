@@ -51,10 +51,10 @@ export function PortfolioSidebar({
   };
 
   const feedToggles = [
-    { id: "all", label: "All Items", icon: Layers, count: "27" },
-    { id: "work", label: "Selected Works", icon: Sparkles, count: "8" },
-    { id: "essays", label: "Writeups & Notes", icon: BookOpen, count: "12" },
-    { id: "youtube", label: "YouTube Streams", icon: PlaySquare, count: "7" },
+    { id: "all", label: "All Modules", icon: Layers, count: "27" },
+    { id: "work", label: "Shipped Systems", icon: Sparkles, count: "7" },
+    { id: "essays", label: "Fieldwork & Essays", icon: BookOpen, count: "14" },
+    { id: "youtube", label: "Top Plays · Gaming", icon: PlaySquare, count: "20" },
     { id: "resume", label: "Experience & Specs", icon: Briefcase, count: "5" },
   ];
 
@@ -196,7 +196,7 @@ export function PortfolioSidebar({
                   isDark ? "text-cyan-400" : "text-cyan-700"
                 }`}
               >
-                Product Designer
+                Product Designer & Design Technologist
               </p>
               <p
                 className={`text-[11px] font-mono opacity-70 ${
@@ -215,18 +215,18 @@ export function PortfolioSidebar({
             }`}
           >
             <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
-            <span>Delhi NCR · Bangalore</span>
+            <span>Delhi NCR</span>
             <span className="opacity-40">·</span>
-            <span className="text-emerald-600 dark:text-emerald-400 font-medium">Available</span>
+            <span className="text-emerald-600 dark:text-emerald-400 font-medium">Full-Time Available</span>
           </div>
 
-          {/* Systems Statement Bio: Trimmed to high-impact sentence */}
+          {/* Systems Statement Bio: Radically minified, metric-forward */}
           <p
-            className={`text-[13px] font-sans leading-relaxed ${
+            className={`text-xs sm:text-[13px] font-sans leading-relaxed ${
               isDark ? "text-zinc-300" : "text-stone-700"
             }`}
           >
-            Product designer and design technologist bridging engineering systems with human-centered product craft.
+            Design technologist & systems engineer. Next.js, React, Web Audio, canvas engines. 20mo grassroots field research + zero-to-one product architectures.
           </p>
 
           {/* Primary Action Button (Solid) + Secondary Actions (Clean Text Links) */}
@@ -244,9 +244,9 @@ export function PortfolioSidebar({
             >
               <span className="flex items-center gap-1.5">
                 <FileText className="w-3.5 h-3.5" />
-                <span>View Resume</span>
+                <span>Resume (PDF)</span>
               </span>
-              <span className="text-[10px] opacity-70 font-normal">PDF 1.2MB</span>
+              <span className="text-[10px] opacity-70 font-normal">1.2 MB</span>
             </a>
 
             {/* Clean Text Links for Secondary Actions (No background boxes) */}
@@ -297,7 +297,7 @@ export function PortfolioSidebar({
                 isDark ? "text-zinc-500" : "text-stone-500"
               }`}
             >
-              Site Architecture
+              System Index
             </div>
             <div className="space-y-1">
               {feedToggles.map((item) => {
@@ -351,7 +351,7 @@ export function PortfolioSidebar({
           >
             <div className="flex items-center gap-2">
               <Terminal className="w-3.5 h-3.5 text-cyan-500" />
-              <span>Launch adityaos Shell</span>
+              <span>adityaos Shell [Terminal]</span>
             </div>
             <span className="text-xs opacity-40 group-hover:opacity-100 group-hover:translate-x-0.5 transition-all">→</span>
           </button>

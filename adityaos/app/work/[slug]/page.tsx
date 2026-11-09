@@ -425,7 +425,7 @@ const CASE_STUDIES: Record<string, CaseStudyDetail> = {
       {
         title: "1. Post-Donation Momentum Conversion",
         description:
-          "Rather than pitching subscription upfront, we introduced Ketto+ micro-sponsorship at peak emotional resonance immediately following a verified donation.",
+          "Rather than pitching subscription upfront, introduced Ketto+ micro-sponsorship at peak emotional resonance immediately following a verified donation.",
         imageSrc: "/case-studies/ketto_curated_flow.png",
         imageAlt: "Ketto+ Recurring Giving Onboarding Flow",
         tradeoffCaption:
@@ -626,13 +626,13 @@ export default function CaseStudyPage({ params }: { params: { slug: string } }) 
           </div>
         </header>
 
-        {/* 2. The Problem */}
+        {/* 2. The Bottleneck */}
         <section aria-labelledby="problem-heading" className="space-y-4">
           <h2
             id="problem-heading"
-            className="text-xl font-bold tracking-tight text-stone-900 dark:text-stone-100"
+            className="text-xl font-bold tracking-tight text-stone-900 dark:text-stone-100 font-sans"
           >
-            The Problem
+            The Bottleneck
           </h2>
           <div className="space-y-3 text-stone-700 dark:text-stone-300 leading-relaxed text-base">
             {study.theProblem.map((paragraph, idx) => (
@@ -641,18 +641,18 @@ export default function CaseStudyPage({ params }: { params: { slug: string } }) 
           </div>
         </section>
 
-        {/* 3. My Role & Constraints */}
+        {/* 3. The Architecture & Constraints */}
         <section aria-labelledby="role-heading" className="space-y-6">
           <h2
             id="role-heading"
-            className="text-xl font-bold tracking-tight text-stone-900 dark:text-stone-100"
+            className="text-xl font-bold tracking-tight text-stone-900 dark:text-stone-100 font-sans"
           >
-            My Role & Constraints
+            The Architecture & Scope
           </h2>
 
           <div className="space-y-3">
-            <h3 className="text-sm font-semibold uppercase tracking-wider text-stone-500 dark:text-stone-400 font-mono text-xs">
-              What I Specifically Owned
+            <h3 className="text-xs font-semibold uppercase tracking-wider text-stone-500 dark:text-stone-400 font-mono">
+              Core Architecture & Ownership
             </h3>
             <ul className="list-disc list-inside space-y-1.5 text-stone-700 dark:text-stone-300 text-base">
               {study.myRoleAndConstraints.roleScope.map((item, idx) => (
@@ -662,8 +662,8 @@ export default function CaseStudyPage({ params }: { params: { slug: string } }) 
           </div>
 
           <div className="space-y-3 pt-2">
-            <h3 className="text-sm font-semibold uppercase tracking-wider text-stone-500 dark:text-stone-400 font-mono text-xs">
-              Operational & Technical Constraints
+            <h3 className="text-xs font-semibold uppercase tracking-wider text-stone-500 dark:text-stone-400 font-mono">
+              Technical & Operational Constraints
             </h3>
             <ul className="list-disc list-inside space-y-1.5 text-stone-700 dark:text-stone-300 text-base">
               {study.myRoleAndConstraints.constraints.map((item, idx) => (
@@ -677,9 +677,9 @@ export default function CaseStudyPage({ params }: { params: { slug: string } }) 
         <section aria-labelledby="process-heading" className="space-y-8">
           <h2
             id="process-heading"
-            className="text-xl font-bold tracking-tight text-stone-900 dark:text-stone-100"
+            className="text-xl font-bold tracking-tight text-stone-900 dark:text-stone-100 font-sans"
           >
-            Process & Key Decisions
+            Process & Engineering Decisions
           </h2>
 
           <div className="space-y-12">
@@ -715,13 +715,13 @@ export default function CaseStudyPage({ params }: { params: { slug: string } }) 
           </div>
         </section>
 
-        {/* 5. Outcome & Impact */}
+        {/* 5. The Impact */}
         <section aria-labelledby="outcome-heading" className="space-y-6">
           <h2
             id="outcome-heading"
-            className="text-xl font-bold tracking-tight text-stone-900 dark:text-stone-100"
+            className="text-xl font-bold tracking-tight text-stone-900 dark:text-stone-100 font-sans"
           >
-            Outcome & Impact
+            The Impact
           </h2>
 
           <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 border border-stone-200 dark:border-stone-800 rounded-lg p-5 bg-stone-100/50 dark:bg-stone-900/50">
@@ -742,13 +742,13 @@ export default function CaseStudyPage({ params }: { params: { slug: string } }) 
           </p>
         </section>
 
-        {/* 6. What I Would Do Differently */}
+        {/* 6. Retrospective */}
         <section aria-labelledby="reflection-heading" className="space-y-4">
           <h2
             id="reflection-heading"
-            className="text-xl font-bold tracking-tight text-stone-900 dark:text-stone-100"
+            className="text-xl font-bold tracking-tight text-stone-900 dark:text-stone-100 font-sans"
           >
-            What I Would Do Differently
+            Design Technologist Retrospective
           </h2>
           <p className="text-stone-700 dark:text-stone-300 leading-relaxed text-base italic border-l-2 border-stone-300 dark:border-stone-700 pl-4 py-1">
             "{study.whatIWouldDoDifferently}"
