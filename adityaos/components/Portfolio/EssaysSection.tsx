@@ -34,71 +34,65 @@ export function EssaysSection() {
             : "bg-[#FBFBF9]"
         }`}
       >
-        {/* Section Header: Minimal Single Persuasive Statement */}
+        {/* Section Header: Minimal Single-Tier Editorial Header */}
         <div
-          className={`border-b border-dashed p-6 sm:p-8 lg:p-12 relative flex flex-col sm:flex-row sm:items-end justify-between gap-4 transition-colors ${
+          className={`border-b border-dashed px-6 sm:px-8 lg:px-12 py-5 flex flex-col sm:flex-row sm:items-baseline justify-between gap-3 transition-colors ${
             isDark ? "border-zinc-800/80 bg-[#0c0e14]/70" : "border-stone-200/80 bg-white"
           }`}
         >
-          <div className="space-y-2 max-w-2xl">
-            <div
-              className={`text-[11px] font-mono uppercase tracking-wider ${
-                isDark ? "text-zinc-500" : "text-stone-500"
-              }`}
-            >
-              02 // Writing & Reflections
-            </div>
+          <div className="flex items-baseline gap-3">
+            <span className="text-xs font-mono font-semibold text-emerald-500">02</span>
             <h2
-              className={`text-2xl sm:text-3xl font-sans font-semibold tracking-tight ${
+              className={`text-lg sm:text-xl font-sans font-semibold tracking-tight ${
                 isDark ? "text-zinc-100" : "text-stone-900"
               }`}
             >
-              Essays, fieldwork & poetry.
+              Writing & Fieldwork
             </h2>
-            <p
-              className={`text-sm sm:text-base font-sans leading-relaxed ${
-                isDark ? "text-zinc-400" : "text-stone-600"
+            <span
+              className={`text-xs font-mono hidden sm:inline ${
+                isDark ? "text-zinc-500" : "text-stone-400"
               }`}
             >
-              20 months of grassroots governance and behavioral research across Rajasthan and Bihar, translated into systemic design frameworks.
-            </p>
+              — Grassroots governance & behavioral essays
+            </span>
           </div>
 
-          <div className="flex flex-wrap items-center gap-3 sm:gap-4 text-xs font-mono">
+          <div className="flex items-center gap-4 text-xs font-mono">
             <a
               href="https://indiafellow.org/blog/all-posts/author/adityadiundi/"
               target="_blank"
               rel="noopener noreferrer"
-              className={`flex items-center gap-1.5 hover:underline py-1 ${
+              className={`flex items-center gap-1 hover:underline ${
                 isDark ? "text-zinc-400 hover:text-white" : "text-stone-600 hover:text-stone-900"
               }`}
             >
               <span>indiafellow.org</span>
-              <ArrowUpRight className="w-3.5 h-3.5" />
+              <ArrowUpRight className="w-3 h-3 opacity-60" />
             </a>
-            <span className={isDark ? "text-zinc-700" : "text-stone-300"}>•</span>
+            <span className={isDark ? "text-zinc-700" : "text-stone-300"}>·</span>
             <a
               href="https://adityadiundi.medium.com/"
               target="_blank"
               rel="noopener noreferrer"
-              className={`flex items-center gap-1.5 hover:underline py-1 ${
+              className={`flex items-center gap-1 hover:underline ${
                 isDark ? "text-zinc-400 hover:text-white" : "text-stone-600 hover:text-stone-900"
               }`}
             >
               <span>medium.com</span>
-              <ArrowUpRight className="w-3.5 h-3.5" />
+              <ArrowUpRight className="w-3 h-3 opacity-60" />
             </a>
-            <span className={isDark ? "text-zinc-700" : "text-stone-300"}>•</span>
+            <span className={isDark ? "text-zinc-700" : "text-stone-300"}>·</span>
             <a
               href="https://diundi.bearblog.dev"
               target="_blank"
               rel="noopener noreferrer"
-              className={`flex items-center gap-1.5 hover:underline py-1 ${
+              className={`flex items-center gap-1 hover:underline ${
                 isDark ? "text-zinc-400 hover:text-white" : "text-stone-600 hover:text-stone-900"
               }`}
             >
-              <span>diundi.bearblog.dev</span>
-              <ArrowUpRight className="w-3.5 h-3.5" />
+              <span>bearblog.dev</span>
+              <ArrowUpRight className="w-3 h-3 opacity-60" />
             </a>
           </div>
         </div>
@@ -179,7 +173,7 @@ export function EssaysSection() {
             const cardContent = (
               <article className="p-6 sm:p-8 space-y-2.5 transition-colors group">
                 {/* Top Metadata: Flat monospace, category & reading time/year */}
-                <div className="flex items-center justify-between text-xs font-mono max-w-4xl">
+                <div className="flex items-center justify-between text-xs font-mono max-w-3xl">
                   <span className={isDark ? "text-zinc-400" : "text-stone-500"}>
                     {essay.theme}
                   </span>
@@ -188,16 +182,16 @@ export function EssaysSection() {
                   </span>
                 </div>
 
-                {/* Title with Arrow indicator */}
+                {/* Title with Inline Arrow */}
                 <h3
-                  className={`text-lg sm:text-xl font-serif font-medium transition-colors flex items-center justify-between gap-4 leading-snug max-w-4xl ${
+                  className={`text-lg sm:text-xl font-serif font-medium transition-colors leading-snug max-w-3xl ${
                     isDark
                       ? "text-white group-hover:text-emerald-400"
                       : "text-stone-900 group-hover:text-emerald-600"
                   }`}
                 >
                   <span>{essay.title}</span>
-                  <ArrowUpRight className="w-4 h-4 text-zinc-400 group-hover:text-emerald-500 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5 flex-shrink-0 opacity-60 group-hover:opacity-100" />
+                  <ArrowUpRight className="inline-block w-4 h-4 ml-1.5 align-middle text-zinc-400 group-hover:text-emerald-500 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5 opacity-40 group-hover:opacity-100" />
                 </h3>
 
                 {/* Excerpt with optimal measure */}
@@ -237,7 +231,7 @@ export function EssaysSection() {
                   viewport={{ once: true }}
                   transition={{ duration: 0.4 }}
                   onClick={() => setReadingEssay(essay)}
-                  className="block cursor-pointer hover:bg-stone-50/40 dark:hover:bg-zinc-900/30 transition-colors"
+                  className="block cursor-pointer transition-colors"
                 >
                   {cardContent}
                 </motion.div>
@@ -254,7 +248,7 @@ export function EssaysSection() {
                 href={essay.url}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="block hover:bg-stone-50/40 dark:hover:bg-zinc-900/30 transition-colors"
+                className="block transition-colors"
               >
                 {cardContent}
               </motion.a>

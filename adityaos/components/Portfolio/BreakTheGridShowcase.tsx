@@ -207,15 +207,6 @@ function StageCanvas({
         <div className="w-full relative z-10 flex items-center justify-center">
           {children}
         </div>
-
-        {label && (
-          <div className="w-full mt-3 pt-2 border-t border-dashed border-stone-200 dark:border-zinc-800/80 flex items-center justify-between text-[11px] font-mono text-stone-500 dark:text-zinc-500">
-            <span className="truncate">{label}</span>
-            <span className="flex items-center gap-1 group-hover/stage:text-stone-900 dark:group-hover/stage:text-zinc-200 transition-colors shrink-0">
-              <Maximize2 className="w-3 h-3" /> Interactive Sandbox ↗
-            </span>
-          </div>
-        )}
       </motion.div>
     </div>
   );
@@ -227,9 +218,6 @@ export function BreakTheGridShowcase({ onLaunchOS }: BreakTheGridShowcaseProps) 
 
   const [modalData, setModalData] = useState<PrototypeModalData | null>(null);
 
-  // Fluid hover-driven mockup states (no rigid button clicking required)
-  const [mfineHoverState, setMfineHoverState] = useState<"admin" | "claim">("admin");
-  const [tutedudeHoverState, setTutedudeHoverState] = useState<"learn" | "resources" | "support">("learn");
 
   return (
     <section id="work" className="relative w-full">
@@ -239,36 +227,33 @@ export function BreakTheGridShowcase({ onLaunchOS }: BreakTheGridShowcaseProps) 
         }`}
       >
         {/* ========================================================================= */}
-        {/* Section Header: Minimal One Single Persuasive Thesis */}
+        {/* Section Header: Minimal Single-Tier Editorial Header */}
         {/* ========================================================================= */}
         <div
-          className={`border-b border-dashed p-6 sm:p-8 lg:p-12 transition-colors ${
+          className={`border-b border-dashed px-6 sm:px-8 lg:px-12 py-5 flex items-baseline justify-between transition-colors ${
             isDark ? "border-zinc-800/80 bg-[#0c0e14]/70" : "border-stone-200/80 bg-white"
           }`}
         >
-          <div className="space-y-2 max-w-3xl">
-            <div
-              className={`text-[11px] font-mono uppercase tracking-wider ${
-                isDark ? "text-zinc-500" : "text-stone-500"
-              }`}
-            >
-              01 // Selected Works
-            </div>
+          <div className="flex items-baseline gap-3">
+            <span className="text-xs font-mono font-semibold text-emerald-500">01</span>
             <h2
-              className={`text-2xl sm:text-3xl font-sans font-semibold tracking-tight ${
+              className={`text-lg sm:text-xl font-sans font-semibold tracking-tight ${
                 isDark ? "text-zinc-100" : "text-stone-900"
               }`}
             >
-              Case studies & shipped software.
+              Selected Works
             </h2>
-            <p
-              className={`text-sm sm:text-base font-sans leading-relaxed ${
-                isDark ? "text-zinc-400" : "text-stone-600"
+            <span
+              className={`text-xs font-mono hidden sm:inline ${
+                isDark ? "text-zinc-500" : "text-stone-400"
               }`}
             >
-              Seven production systems spanning frontier AI benchmarks, low-level browser graphics engines, and high-stakes healthcare infrastructure.
-            </p>
+              — Case studies & shipped software
+            </span>
           </div>
+          <span className="text-xs font-mono text-stone-400 dark:text-zinc-500">
+            7 Projects
+          </span>
         </div>
 
         {/* ========================================================================= */}
@@ -285,22 +270,12 @@ export function BreakTheGridShowcase({ onLaunchOS }: BreakTheGridShowcaseProps) 
               : "border-stone-200/80 bg-white hover:bg-stone-50/50"
           }`}
         >
-          {/* Top Meta Line */}
-          <div className="flex flex-wrap items-center justify-between gap-2 text-xs font-mono">
-            <div className="flex items-center gap-2">
-              <span className="font-bold text-emerald-500">01</span>
-              <span className={isDark ? "text-zinc-600" : "text-stone-300"}>/</span>
-              <span className={isDark ? "text-zinc-300" : "text-stone-700"}>Josh Talks</span>
-              <span className={isDark ? "text-zinc-600" : "text-stone-300"}>·</span>
-              <span className={isDark ? "text-zinc-400" : "text-stone-500"}>2024 · AI Healthcare Benchmark</span>
-            </div>
-            <span
-              className={`text-[11px] font-mono font-medium px-2 py-0.5 rounded border ${
-                isDark
-                  ? "text-emerald-400 border-emerald-900/40 bg-emerald-950/20"
-                  : "text-emerald-700 border-emerald-200 bg-emerald-50"
-              }`}
-            >
+          {/* Top Meta Line: Clean unboxed metadata */}
+          <div className="flex items-center justify-between text-xs font-mono">
+            <span className={isDark ? "text-zinc-400" : "text-stone-600"}>
+              Josh Talks · 2024
+            </span>
+            <span className="text-emerald-600 dark:text-emerald-400 font-medium">
               3.4x Accuracy Lift
             </span>
           </div>
@@ -412,23 +387,13 @@ export function BreakTheGridShowcase({ onLaunchOS }: BreakTheGridShowcaseProps) 
               : "border-stone-200/80 bg-white hover:bg-stone-50/50"
           }`}
         >
-          {/* Top Meta Line */}
-          <div className="flex flex-wrap items-center justify-between gap-2 text-xs font-mono">
-            <div className="flex items-center gap-2">
-              <span className="font-bold text-cyan-400">02</span>
-              <span className={isDark ? "text-zinc-600" : "text-stone-300"}>/</span>
-              <span className={isDark ? "text-zinc-300" : "text-stone-700"}>adityaos</span>
-              <span className={isDark ? "text-zinc-600" : "text-stone-300"}>·</span>
-              <span className={isDark ? "text-zinc-400" : "text-stone-500"}>In-Browser Creative Studio & Canvas</span>
-            </div>
-            <span
-              className={`text-[11px] font-mono font-medium px-2 py-0.5 rounded border ${
-                isDark
-                  ? "text-cyan-400 border-cyan-900/40 bg-cyan-950/20"
-                  : "text-cyan-700 border-cyan-200 bg-cyan-50"
-              }`}
-            >
-              60 FPS Canvas · 1:1 Pixel Lock
+          {/* Top Meta Line: Clean unboxed metadata */}
+          <div className="flex items-center justify-between text-xs font-mono">
+            <span className={isDark ? "text-zinc-400" : "text-stone-600"}>
+              adityaOS · Personal System
+            </span>
+            <span className="text-cyan-600 dark:text-cyan-400 font-medium">
+              60 FPS Deterministic Canvas
             </span>
           </div>
 
@@ -544,22 +509,12 @@ export function BreakTheGridShowcase({ onLaunchOS }: BreakTheGridShowcaseProps) 
               : "border-stone-200/80 bg-white hover:bg-stone-50/50"
           }`}
         >
-          {/* Top Meta Line */}
-          <div className="flex flex-wrap items-center justify-between gap-2 text-xs font-mono">
-            <div className="flex items-center gap-2">
-              <span className="font-bold text-indigo-400">03</span>
-              <span className={isDark ? "text-zinc-600" : "text-stone-300"}>/</span>
-              <span className={isDark ? "text-zinc-300" : "text-stone-700"}>MFine</span>
-              <span className={isDark ? "text-zinc-600" : "text-stone-300"}>·</span>
-              <span className={isDark ? "text-zinc-400" : "text-stone-500"}>B2B Benefits & Claims Architecture</span>
-            </div>
-            <span
-              className={`text-[11px] font-mono font-medium px-2 py-0.5 rounded border ${
-                isDark
-                  ? "text-indigo-400 border-indigo-900/40 bg-indigo-950/20"
-                  : "text-indigo-700 border-indigo-200 bg-indigo-50"
-              }`}
-            >
+          {/* Top Meta Line: Clean unboxed metadata */}
+          <div className="flex items-center justify-between text-xs font-mono">
+            <span className={isDark ? "text-zinc-400" : "text-stone-600"}>
+              MFine · 2022—2023
+            </span>
+            <span className="text-indigo-600 dark:text-indigo-400 font-medium">
               100K+ DAU · &lt;15m Approvals
             </span>
           </div>
@@ -620,49 +575,10 @@ export function BreakTheGridShowcase({ onLaunchOS }: BreakTheGridShowcaseProps) 
               </div>
             </div>
 
-            {/* Right: Tactile Dual-Screen Stage with Fluid Hover Peek (No Click Toggles) */}
-            <div className="lg:col-span-6 space-y-2">
-              {/* Minimal Hover Scrubber Pills */}
-              <div className="flex items-center justify-between text-[11px] font-mono">
-                <div className="flex items-center gap-2">
-                  <span
-                    onMouseEnter={() => setMfineHoverState("admin")}
-                    className={`cursor-pointer transition-colors ${
-                      mfineHoverState === "admin"
-                        ? isDark
-                          ? "text-indigo-400 font-semibold"
-                          : "text-indigo-700 font-semibold"
-                        : "opacity-50 hover:opacity-100"
-                    }`}
-                  >
-                    ✦ B2B Admin Console
-                  </span>
-                  <span className="opacity-30">/</span>
-                  <span
-                    onMouseEnter={() => setMfineHoverState("claim")}
-                    className={`cursor-pointer transition-colors ${
-                      mfineHoverState === "claim"
-                        ? isDark
-                          ? "text-indigo-400 font-semibold"
-                          : "text-indigo-700 font-semibold"
-                        : "opacity-50 hover:opacity-100"
-                    }`}
-                  >
-                    ✦ Cashless Claim Dispute
-                  </span>
-                </div>
-                <span className={`text-[10px] hidden sm:inline ${isDark ? "text-zinc-500" : "text-stone-400"}`}>
-                  Hover to preview state
-                </span>
-              </div>
-
+            {/* Right: Tactile Browser Frame Stage */}
+            <div className="lg:col-span-6">
               <StageCanvas
                 accentTint="rgba(99, 102, 241, 0.15)"
-                label={
-                  mfineHoverState === "admin"
-                    ? "MFine Corporate B2B Policy Console · BHEL"
-                    : "Cashless Claim Dispute & Triage · Kini's Clinic"
-                }
                 onClick={() =>
                   setModalData({
                     title: "Corporate Health Benefits & Claim Settlement",
@@ -680,49 +596,16 @@ export function BreakTheGridShowcase({ onLaunchOS }: BreakTheGridShowcaseProps) 
                   })
                 }
               >
-                <AnimatePresence mode="wait">
-                  {mfineHoverState === "admin" ? (
-                    <motion.div
-                      key="admin"
-                      initial={{ opacity: 0, scale: 0.98 }}
-                      animate={{ opacity: 1, scale: 1 }}
-                      exit={{ opacity: 0, scale: 0.98 }}
-                      transition={{ duration: 0.2 }}
-                      className="w-full"
-                    >
-                      <BrowserFrame url="mfine.co/admin/bhel/contacts">
-                        <Image
-                          src="/case-studies/mfine_bhel_admin_contacts.png"
-                          alt="MFine Corporate B2B Admin Console"
-                          fill
-                          priority
-                          unoptimized
-                          className="object-cover object-top"
-                        />
-                      </BrowserFrame>
-                    </motion.div>
-                  ) : (
-                    <motion.div
-                      key="claim"
-                      initial={{ opacity: 0, scale: 0.98 }}
-                      animate={{ opacity: 1, scale: 1 }}
-                      exit={{ opacity: 0, scale: 0.98 }}
-                      transition={{ duration: 0.2 }}
-                      className="w-full"
-                    >
-                      <MobileDeviceFrame>
-                        <Image
-                          src="/case-studies/mfine_rejected_transaction.png"
-                          alt="MFine Cashless Claim Dispute Interface"
-                          fill
-                          priority
-                          unoptimized
-                          className="object-cover object-top"
-                        />
-                      </MobileDeviceFrame>
-                    </motion.div>
-                  )}
-                </AnimatePresence>
+                <BrowserFrame url="mfine.co/admin/bhel/contacts">
+                  <Image
+                    src="/case-studies/mfine_bhel_admin_contacts.png"
+                    alt="MFine Corporate B2B Admin Console"
+                    fill
+                    priority
+                    unoptimized
+                    className="object-cover object-top"
+                  />
+                </BrowserFrame>
               </StageCanvas>
             </div>
           </div>
@@ -751,16 +634,13 @@ export function BreakTheGridShowcase({ onLaunchOS }: BreakTheGridShowcaseProps) 
             }`}
           >
             <div className="space-y-4">
+              {/* Top Meta Line: Clean unboxed metadata */}
               <div className="flex items-center justify-between text-xs font-mono">
-                <span className="text-cyan-500 font-bold">04 / DIGIACCEL · FINTECH</span>
-                <span
-                  className={`text-[11px] font-mono px-2 py-0.5 rounded border ${
-                    isDark
-                      ? "text-cyan-400 border-cyan-900/40 bg-cyan-950/20"
-                      : "text-cyan-700 border-cyan-200 bg-cyan-50"
-                  }`}
-                >
-                  -38% DROPOFFS
+                <span className={isDark ? "text-zinc-400" : "text-stone-600"}>
+                  Digiaccel · 2023
+                </span>
+                <span className="text-cyan-600 dark:text-cyan-400 font-medium">
+                  -38% Drop-Offs
                 </span>
               </div>
 
@@ -858,16 +738,13 @@ export function BreakTheGridShowcase({ onLaunchOS }: BreakTheGridShowcaseProps) 
             }`}
           >
             <div className="space-y-4">
+              {/* Top Meta Line: Clean unboxed metadata */}
               <div className="flex items-center justify-between text-xs font-mono">
-                <span className="text-amber-500 font-bold">05 / MOSAIC WELLNESS</span>
-                <span
-                  className={`text-[11px] font-mono px-2 py-0.5 rounded border ${
-                    isDark
-                      ? "text-amber-400 border-amber-900/40 bg-amber-950/20"
-                      : "text-amber-700 border-amber-200 bg-amber-50"
-                  }`}
-                >
-                  +12% RETENTION
+                <span className={isDark ? "text-zinc-400" : "text-stone-600"}>
+                  Mosaic Wellness · 2023
+                </span>
+                <span className="text-amber-600 dark:text-amber-400 font-medium">
+                  +12% Retention Lift
                 </span>
               </div>
 
@@ -1007,16 +884,13 @@ export function BreakTheGridShowcase({ onLaunchOS }: BreakTheGridShowcaseProps) 
             }`}
           >
             <div className="space-y-4">
+              {/* Top Meta Line: Clean unboxed metadata */}
               <div className="flex items-center justify-between text-xs font-mono">
-                <span className="text-pink-500 font-bold">06 / KETTO · PHILANTHROPY</span>
-                <span
-                  className={`text-[11px] font-mono px-2 py-0.5 rounded border ${
-                    isDark
-                      ? "text-pink-400 border-pink-900/40 bg-pink-950/20"
-                      : "text-pink-700 border-pink-200 bg-pink-50"
-                  }`}
-                >
-                  2.3x REPEAT LIFT
+                <span className={isDark ? "text-zinc-400" : "text-stone-600"}>
+                  Ketto · 2023
+                </span>
+                <span className="text-pink-600 dark:text-pink-400 font-medium">
+                  2.3x Repeat Giving Lift
                 </span>
               </div>
 
@@ -1137,76 +1011,19 @@ export function BreakTheGridShowcase({ onLaunchOS }: BreakTheGridShowcaseProps) 
             }`}
           >
             <div className="space-y-4">
+              {/* Top Meta Line: Clean unboxed metadata */}
               <div className="flex items-center justify-between text-xs font-mono">
-                <span className="text-sky-500 font-bold">07 / TUTEDUDE · EDTECH</span>
-                <span
-                  className={`text-[11px] font-mono px-2 py-0.5 rounded border ${
-                    isDark
-                      ? "text-sky-400 border-sky-900/40 bg-sky-950/20"
-                      : "text-sky-700 border-sky-200 bg-sky-50"
-                  }`}
-                >
-                  +34% COMPLETION · &lt;3m MENTOR
+                <span className={isDark ? "text-zinc-400" : "text-stone-600"}>
+                  TuteDude · 2023
+                </span>
+                <span className="text-sky-600 dark:text-sky-400 font-medium">
+                  +34% Completion · &lt;3m Mentor Queue
                 </span>
               </div>
 
-              {/* Minimal Hover Scrubber Pills (Fluid preview without click toggles) */}
-              <div className="flex items-center justify-between text-[11px] font-mono">
-                <div className="flex items-center gap-1.5 sm:gap-2 text-[10px] sm:text-[11px]">
-                  <span
-                    onMouseEnter={() => setTutedudeHoverState("learn")}
-                    className={`cursor-pointer transition-colors ${
-                      tutedudeHoverState === "learn"
-                        ? isDark
-                          ? "text-sky-400 font-semibold"
-                          : "text-sky-700 font-semibold"
-                        : "opacity-50 hover:opacity-100"
-                    }`}
-                  >
-                    ✦ IDE
-                  </span>
-                  <span className="opacity-30">/</span>
-                  <span
-                    onMouseEnter={() => setTutedudeHoverState("resources")}
-                    className={`cursor-pointer transition-colors ${
-                      tutedudeHoverState === "resources"
-                        ? isDark
-                          ? "text-sky-400 font-semibold"
-                          : "text-sky-700 font-semibold"
-                        : "opacity-50 hover:opacity-100"
-                    }`}
-                  >
-                    ✦ Notes
-                  </span>
-                  <span className="opacity-30">/</span>
-                  <span
-                    onMouseEnter={() => setTutedudeHoverState("support")}
-                    className={`cursor-pointer transition-colors ${
-                      tutedudeHoverState === "support"
-                        ? isDark
-                          ? "text-sky-400 font-semibold"
-                          : "text-sky-700 font-semibold"
-                        : "opacity-50 hover:opacity-100"
-                    }`}
-                  >
-                    ✦ Mentor (3m)
-                  </span>
-                </div>
-                <span className={`text-[10px] hidden sm:inline ${isDark ? "text-zinc-500" : "text-stone-400"}`}>
-                  Hover to scrub
-                </span>
-              </div>
-
-              {/* Designed Smartphone Mockup with Fluid AnimatePresence Hover */}
+              {/* Designed Smartphone Mockup */}
               <StageCanvas
                 accentTint="rgba(14, 165, 233, 0.12)"
-                label={
-                  tutedudeHoverState === "learn"
-                    ? "Lecture Player & Progress Runway"
-                    : tutedudeHoverState === "resources"
-                    ? "Course Resources & Modular Cheat Sheets"
-                    : "Live 1-on-1 Mentor Queue (<3m Wait)"
-                }
                 onClick={() =>
                   setModalData({
                     title: "TuteDude Course Architecture & 1-on-1 Mentorship",
@@ -1226,31 +1043,14 @@ export function BreakTheGridShowcase({ onLaunchOS }: BreakTheGridShowcaseProps) 
               >
                 <MobileDeviceFrame>
                   <div className="relative w-full h-full bg-[#120a1f]">
-                    <AnimatePresence mode="wait">
-                      <motion.div
-                        key={tutedudeHoverState}
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        exit={{ opacity: 0 }}
-                        transition={{ duration: 0.15 }}
-                        className="relative w-full h-full"
-                      >
-                        <Image
-                          src={
-                            tutedudeHoverState === "learn"
-                              ? "/case-studies/tutedude_course_player.png"
-                              : tutedudeHoverState === "resources"
-                              ? "/case-studies/tutedude_study_resources.png"
-                              : "/case-studies/tutedude_mentor_support.png"
-                          }
-                          alt="TuteDude Learning Experience Screen"
-                          fill
-                          priority
-                          unoptimized
-                          className="object-cover object-top"
-                        />
-                      </motion.div>
-                    </AnimatePresence>
+                    <Image
+                      src="/case-studies/tutedude_course_player.png"
+                      alt="TuteDude Learning Experience Screen"
+                      fill
+                      priority
+                      unoptimized
+                      className="object-cover object-top"
+                    />
                   </div>
                 </MobileDeviceFrame>
               </StageCanvas>
@@ -1348,23 +1148,13 @@ export function BreakTheGridShowcase({ onLaunchOS }: BreakTheGridShowcaseProps) 
               : "border-stone-200/80 bg-white hover:bg-stone-50/50"
           }`}
         >
-          {/* Top Meta Line */}
-          <div className="flex flex-wrap items-center justify-between gap-2 text-xs font-mono">
-            <div className="flex items-center gap-2">
-              <span className="font-bold text-emerald-500">08</span>
-              <span className={isDark ? "text-zinc-600" : "text-stone-300"}>/</span>
-              <span className={isDark ? "text-zinc-300" : "text-stone-700"}>Project Potential x India Fellow</span>
-              <span className={isDark ? "text-zinc-600" : "text-stone-300"}>·</span>
-              <span className={isDark ? "text-zinc-400" : "text-stone-500"}>20 Months Grassroots Fieldwork</span>
-            </div>
-            <span
-              className={`text-[11px] font-mono font-medium px-2 py-0.5 rounded border ${
-                isDark
-                  ? "text-emerald-400 border-emerald-900/40 bg-emerald-950/20"
-                  : "text-emerald-700 border-emerald-200 bg-emerald-50"
-              }`}
-            >
-              40+ Panchayats · Rural Rajasthan & Bihar
+          {/* Top Meta Line: Clean unboxed metadata */}
+          <div className="flex items-center justify-between text-xs font-mono">
+            <span className={isDark ? "text-zinc-400" : "text-stone-600"}>
+              Project Potential x India Fellow · 2021—2022
+            </span>
+            <span className="text-emerald-600 dark:text-emerald-400 font-medium">
+              40+ Panchayats · Rajasthan & Bihar
             </span>
           </div>
 

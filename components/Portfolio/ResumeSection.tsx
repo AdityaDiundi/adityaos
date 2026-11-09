@@ -88,47 +88,39 @@ export function ResumeSection() {
             : "bg-[#FBFBF9]"
         }`}
       >
-        {/* Section Header: Minimal Single Persuasive Statement */}
+        {/* Section Header: Minimal Single-Tier Editorial Header */}
         <div
-          className={`border-b border-dashed p-6 sm:p-8 lg:p-12 relative flex flex-col sm:flex-row sm:items-end justify-between gap-4 transition-colors ${
+          className={`border-b border-dashed px-6 sm:px-8 lg:px-12 py-5 flex items-baseline justify-between transition-colors ${
             isDark ? "border-zinc-800/80 bg-[#0c0e14]/70" : "border-stone-200/80 bg-white"
           }`}
         >
-          <div className="space-y-2 max-w-2xl">
-            <div
-              className={`text-[11px] font-mono uppercase tracking-wider ${
-                isDark ? "text-zinc-500" : "text-stone-500"
-              }`}
-            >
-              04 // Experience & Credentials
-            </div>
+          <div className="flex items-baseline gap-3">
+            <span className="text-xs font-mono font-semibold text-emerald-500">04</span>
             <h2
-              className={`text-2xl sm:text-3xl font-sans font-semibold tracking-tight ${
+              className={`text-lg sm:text-xl font-sans font-semibold tracking-tight ${
                 isDark ? "text-zinc-100" : "text-stone-900"
               }`}
             >
-              Career history & credentials.
+              Experience
             </h2>
-            <p
-              className={`text-sm sm:text-base font-sans leading-relaxed ${
-                isDark ? "text-zinc-400" : "text-stone-600"
+            <span
+              className={`text-xs font-mono hidden sm:inline ${
+                isDark ? "text-zinc-500" : "text-stone-400"
               }`}
             >
-              Product design and front-end engineering leadership for high-complexity, mission-critical software systems.
-            </p>
+              — Career history & credentials
+            </span>
           </div>
 
           <a
             href="/Aditya_Diundi_Resume.pdf"
             target="_blank"
             rel="noopener noreferrer"
-            className={`px-3.5 py-1.5 rounded-lg font-bold font-mono text-xs flex items-center gap-1.5 transition-all cursor-pointer self-start sm:self-auto shadow-sm ${
-              isDark
-                ? "bg-white hover:bg-zinc-200 text-zinc-950"
-                : "bg-stone-900 hover:bg-black text-white"
+            className={`flex items-center gap-1.5 text-xs font-mono hover:underline ${
+              isDark ? "text-zinc-300 hover:text-white" : "text-stone-700 hover:text-stone-900"
             }`}
           >
-            <Download className="w-3.5 h-3.5 stroke-[2.5]" />
+            <Download className="w-3.5 h-3.5" />
             <span>Download Resume (PDF)</span>
           </a>
         </div>
