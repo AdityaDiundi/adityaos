@@ -291,6 +291,16 @@ export const useThemeStore = create<ThemeState>((set, get) => ({
 
   setTheme: (id: OSThemeId) => {
     const theme = OS_THEMES[id] || OS_THEMES.noctalia;
+    if (typeof document !== "undefined") {
+      if (theme.isDark) {
+        document.documentElement.classList.add("dark");
+      } else {
+        document.documentElement.classList.remove("dark");
+      }
+      try {
+        localStorage.setItem("adityaos-theme", theme.id);
+      } catch {}
+    }
     set({
       currentThemeId: theme.id,
       activeTheme: theme,

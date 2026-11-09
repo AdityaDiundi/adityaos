@@ -246,6 +246,18 @@ export default function Home({
     return () => window.removeEventListener("pointerdown", handleGlobalPointerDown);
   }, [contextMenu]);
 
+  // Dismiss theme menu whenever clicking outside the theme selector
+  useEffect(() => {
+    if (!isThemeMenuOpen) return;
+    const handleOutsideClick = (e: PointerEvent | MouseEvent) => {
+      const target = e.target as HTMLElement | null;
+      if (target?.closest("#theme-selector-container")) return;
+      setIsThemeMenuOpen(false);
+    };
+    window.addEventListener("pointerdown", handleOutsideClick);
+    return () => window.removeEventListener("pointerdown", handleOutsideClick);
+  }, [isThemeMenuOpen]);
+
   const handleContextMenu = (e: React.MouseEvent) => {
     const target = e.target as HTMLElement;
     // Don't intercept right clicks if inside an active window frame, canvas, header, or interactive controls
@@ -331,7 +343,7 @@ export default function Home({
           borderColor: activeTheme.headerBorder,
           color: activeTheme.textPrimary,
         }}
-        className="h-8 border-b px-3 flex items-center justify-between text-xs z-[1000] backdrop-blur-md relative whitespace-nowrap select-none overflow-hidden"
+        className="h-8 border-b px-3 flex items-center justify-between text-xs z-[1000] backdrop-blur-md relative whitespace-nowrap select-none overflow-visible"
       >
         {/* Left: OS Branding & Clickable Workspace Tags */}
         <div className="flex items-center gap-2 sm:gap-3 shrink-0 whitespace-nowrap">
@@ -592,33 +604,37 @@ export default function Home({
             className="h-3 w-px"
           />
 
-          {/* Theme Selector Dropdown Menu with z-[1100] */}
-          <div className="relative">
+          {/* Theme Selector Dropdown Menu with z-[1200] */}
+          <div className="relative" id="theme-selector-container">
             <button
               type="button"
-              onClick={() => setIsThemeMenuOpen(!isThemeMenuOpen)}
+              onClick={(e) => {
+                e.stopPropagation();
+                setIsThemeMenuOpen((prev) => !prev);
+              }}
               title="Change OS Theme"
               style={{
                 backgroundColor: activeTheme.cardBg,
                 borderColor: activeTheme.cardBorder,
                 color: activeTheme.textPrimary,
               }}
-              className="flex items-center gap-1.5 px-2 py-0.5 rounded border text-[11px] font-semibold hover:opacity-80 transition-opacity"
+              className="flex items-center gap-1.5 px-2 py-0.5 rounded border text-[11px] font-semibold hover:opacity-80 transition-opacity cursor-pointer"
             >
               <span>{activeTheme.icon}</span>
               <span className="hidden sm:inline">{activeTheme.name}</span>
               <ChevronDown className="w-3 h-3 opacity-60" />
             </button>
 
-            {/* Dropdown Popover - Elevated z-[1100] to always overlay active windows */}
+            {/* Dropdown Popover - Elevated z-[1200] to always overlay active windows and canvas */}
             {isThemeMenuOpen && (
               <div
+                onClick={(e) => e.stopPropagation()}
                 style={{
                   backgroundColor: activeTheme.windowBg,
                   borderColor: activeTheme.windowBorder,
                   color: activeTheme.textPrimary,
                 }}
-                className="absolute right-0 top-7 w-52 rounded-md border shadow-2xl p-1.5 z-[1100] flex flex-col gap-1 backdrop-blur-xl"
+                className="absolute right-0 top-full mt-1.5 w-56 rounded-md border shadow-2xl p-1.5 z-[1200] flex flex-col gap-1 backdrop-blur-xl animate-in fade-in zoom-in-95 duration-100"
               >
                 <div
                   style={{ color: activeTheme.textMuted }}
