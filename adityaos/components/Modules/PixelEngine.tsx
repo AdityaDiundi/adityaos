@@ -2233,13 +2233,19 @@ export const PixelEngine: React.FC = () => {
                 onClick={isShowcasePlaying ? stopShowcase : runShowcaseTour}
                 title="Automated Interactive Showcase Tour (Virtual Animated Cursor)"
                 style={{
-                  backgroundColor: isShowcasePlaying ? "rgba(0,255,204,0.2)" : activeTheme.cardBg,
-                  borderColor: isShowcasePlaying ? "#00FFCC" : activeTheme.cardBorder,
-                  color: isShowcasePlaying ? "#00FFCC" : activeTheme.textPrimary,
+                  backgroundColor: isShowcasePlaying
+                    ? (activeTheme.isDark ? "rgba(0,255,204,0.2)" : "#ccfbf1")
+                    : activeTheme.cardBg,
+                  borderColor: isShowcasePlaying
+                    ? (activeTheme.isDark ? "#00FFCC" : "#0f766e")
+                    : activeTheme.cardBorder,
+                  color: isShowcasePlaying
+                    ? (activeTheme.isDark ? "#00FFCC" : "#0f766e")
+                    : activeTheme.textPrimary,
                 }}
                 className="px-2 py-0.5 rounded border font-semibold flex items-center gap-1 hover:opacity-85 transition-all cursor-pointer shadow-sm"
               >
-                <Sparkles className={`w-3 h-3 ${isShowcasePlaying ? "text-cyan-300 animate-spin" : "text-amber-400"}`} />
+                <Sparkles className={`w-3 h-3 ${isShowcasePlaying ? (activeTheme.isDark ? "text-cyan-300" : "text-teal-700") + " animate-spin" : "text-amber-500"}`} />
                 <span>{isShowcasePlaying ? "STOP TOUR" : "🎬 SHOWCASE TOUR"}</span>
               </button>
 
@@ -2326,22 +2332,27 @@ export const PixelEngine: React.FC = () => {
                   setIsLifeRunning(!isLifeRunning);
                   playPopSound(isLifeRunning ? 400 : 700);
                 }}
-                className={`px-2 py-0.5 rounded border font-bold flex items-center gap-1 transition-all ${
-                  isLifeRunning
-                    ? "bg-emerald-500/25 text-emerald-300 border-emerald-400 shadow-[0_0_10px_rgba(16,185,129,0.3)]"
-                    : "bg-white/10 text-white hover:bg-white/15 border-white/20"
-                }`}
+                style={{
+                  backgroundColor: isLifeRunning
+                    ? (activeTheme.isDark ? "#065f46" : "#047857")
+                    : (activeTheme.isDark ? "rgba(255,255,255,0.08)" : "#f3f4f6"),
+                  borderColor: isLifeRunning
+                    ? (activeTheme.isDark ? "#10b981" : "#065f46")
+                    : activeTheme.cardBorder,
+                  color: isLifeRunning ? "#ffffff" : activeTheme.textPrimary,
+                }}
+                className="px-2.5 py-0.5 rounded border font-bold flex items-center gap-1.5 transition-all shadow-sm"
               >
                 {isLifeRunning ? (
                   <>
-                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping inline-block" />
-                    <Pause className="w-3 h-3 text-emerald-400" />
-                    <span>PAUSE</span>
+                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-300 animate-ping inline-block" />
+                    <Pause className="w-3 h-3 text-white" />
+                    <span className="text-[10px] font-bold tracking-wide">PAUSE</span>
                   </>
                 ) : (
                   <>
-                    <Play className="w-3 h-3 text-cyan-400" />
-                    <span>AUTOPLAY (EVOLVE)</span>
+                    <Play className={`w-3 h-3 ${activeTheme.isDark ? "text-cyan-400" : "text-cyan-700"}`} />
+                    <span className="text-[10px] font-bold tracking-wide">AUTOPLAY (EVOLVE)</span>
                   </>
                 )}
               </button>
@@ -2350,7 +2361,12 @@ export const PixelEngine: React.FC = () => {
                 type="button"
                 onClick={stepConwayLife}
                 title="Advance 1 Generation manually"
-                className="px-1.5 py-0.5 rounded border border-white/10 bg-white/5 hover:bg-white/10 flex items-center gap-1 font-semibold"
+                style={{
+                  backgroundColor: activeTheme.isDark ? "rgba(255,255,255,0.06)" : "#f3f4f6",
+                  borderColor: activeTheme.cardBorder,
+                  color: activeTheme.textPrimary,
+                }}
+                className="px-2 py-0.5 rounded border flex items-center gap-1 font-semibold hover:opacity-85 transition-colors"
               >
                 <StepForward className="w-3 h-3" />
                 <span>STEP</span>
@@ -2364,16 +2380,26 @@ export const PixelEngine: React.FC = () => {
                   playPopSound(600);
                 }}
                 title="Toggle Evolution Speed"
-                className="px-1.5 py-0.5 rounded border border-white/10 bg-white/5 hover:bg-white/10 flex items-center gap-1 text-[9px] font-mono font-bold"
+                style={{
+                  backgroundColor: activeTheme.isDark ? "rgba(255,255,255,0.06)" : "#f3f4f6",
+                  borderColor: activeTheme.cardBorder,
+                  color: activeTheme.textPrimary,
+                }}
+                className="px-2 py-0.5 rounded border flex items-center gap-1 text-[9px] font-mono font-bold hover:opacity-85 transition-colors"
               >
-                <Zap className="w-2.5 h-2.5 text-amber-400" />
+                <Zap className={`w-2.5 h-2.5 ${activeTheme.isDark ? "text-amber-400" : "text-amber-600"}`} />
                 <span>{lifeSpeed === 70 ? "3x" : lifeSpeed === 140 ? "1x" : "0.5x"}</span>
               </button>
 
               <button
                 type="button"
                 onClick={() => seedConwayPreset("glider")}
-                className="px-1.5 py-0.5 rounded border border-white/10 bg-white/5 hover:bg-white/10"
+                style={{
+                  backgroundColor: activeTheme.isDark ? "rgba(255,255,255,0.06)" : "#f3f4f6",
+                  borderColor: activeTheme.cardBorder,
+                  color: activeTheme.textPrimary,
+                }}
+                className="px-1.5 py-0.5 rounded border hover:opacity-85 transition-colors font-medium"
               >
                 Glider
               </button>
@@ -2381,7 +2407,12 @@ export const PixelEngine: React.FC = () => {
               <button
                 type="button"
                 onClick={() => seedConwayPreset("pulsar")}
-                className="px-1.5 py-0.5 rounded border border-white/10 bg-white/5 hover:bg-white/10"
+                style={{
+                  backgroundColor: activeTheme.isDark ? "rgba(255,255,255,0.06)" : "#f3f4f6",
+                  borderColor: activeTheme.cardBorder,
+                  color: activeTheme.textPrimary,
+                }}
+                className="px-1.5 py-0.5 rounded border hover:opacity-85 transition-colors font-medium"
               >
                 Pulsar
               </button>
@@ -2389,12 +2420,24 @@ export const PixelEngine: React.FC = () => {
               <button
                 type="button"
                 onClick={() => seedConwayPreset("random")}
-                className="px-1.5 py-0.5 rounded border border-white/10 bg-white/5 hover:bg-white/10 hidden sm:inline"
+                style={{
+                  backgroundColor: activeTheme.isDark ? "rgba(255,255,255,0.06)" : "#f3f4f6",
+                  borderColor: activeTheme.cardBorder,
+                  color: activeTheme.textPrimary,
+                }}
+                className="px-1.5 py-0.5 rounded border hover:opacity-85 transition-colors font-medium hidden sm:inline"
               >
                 Random
               </button>
 
-              <span className="font-mono opacity-80 text-[9px] bg-white/5 px-1.5 py-0.5 rounded border border-white/5">
+              <span
+                style={{
+                  backgroundColor: activeTheme.isDark ? "rgba(255,255,255,0.06)" : "#e5e7eb",
+                  borderColor: activeTheme.cardBorder,
+                  color: activeTheme.textPrimary,
+                }}
+                className="font-mono font-semibold text-[9px] px-1.5 py-0.5 rounded border"
+              >
                 GEN: {lifeGeneration}
               </span>
             </div>
@@ -2402,26 +2445,31 @@ export const PixelEngine: React.FC = () => {
 
           {engineMode === "snake" && (
             <div className="flex items-center gap-2">
-              <span className="font-mono text-amber-400 font-bold">
+              <span className={`font-mono font-bold ${activeTheme.isDark ? "text-amber-400" : "text-amber-700"}`}>
                 SCORE: {snakeScore}
               </span>
-              <span className="font-mono opacity-60 hidden sm:inline">
+              <span className={`font-mono text-[9px] ${activeTheme.isDark ? "text-zinc-400" : "text-stone-500"} hidden sm:inline`}>
                 HIGH: {snakeHighScore}
               </span>
               {isSnakeGameOver && (
-                <span className="text-red-400 font-bold animate-pulse">
+                <span className="text-red-500 font-bold animate-pulse text-[10px]">
                   GAME OVER!
                 </span>
               )}
               <button
                 type="button"
                 onClick={initSnakeGame}
-                className="px-2 py-0.5 rounded border border-amber-400/40 bg-amber-400/10 text-amber-300 font-bold flex items-center gap-1"
+                style={{
+                  backgroundColor: activeTheme.isDark ? "rgba(245,158,11,0.15)" : "#fef3c7",
+                  borderColor: activeTheme.isDark ? "rgba(245,158,11,0.4)" : "#f59e0b",
+                  color: activeTheme.isDark ? "#fbbf24" : "#92400e",
+                }}
+                className="px-2 py-0.5 rounded border font-bold flex items-center gap-1 hover:opacity-90 transition-colors"
               >
                 <RotateCcw className="w-3 h-3" />
                 <span>RESTART</span>
               </button>
-              <span className="opacity-50 text-[9px] hidden md:inline">
+              <span className={`text-[9px] ${activeTheme.isDark ? "text-zinc-500" : "text-stone-400"} hidden md:inline`}>
                 WASD / Arrow Keys
               </span>
             </div>
@@ -2435,9 +2483,12 @@ export const PixelEngine: React.FC = () => {
                   setSandElement("sand");
                   setCurrentColor("#F59E0B");
                 }}
-                className={`px-1.5 py-0.5 rounded border text-[10px] font-bold ${
-                  sandElement === "sand" ? "bg-amber-400 text-black border-amber-400" : "bg-white/5 border-white/10 text-amber-300"
-                }`}
+                style={{
+                  backgroundColor: sandElement === "sand" ? "#d97706" : (activeTheme.isDark ? "rgba(255,255,255,0.06)" : "#f3f4f6"),
+                  borderColor: sandElement === "sand" ? "#b45309" : activeTheme.cardBorder,
+                  color: sandElement === "sand" ? "#ffffff" : (activeTheme.isDark ? "#fbbf24" : "#b45309"),
+                }}
+                className="px-2 py-0.5 rounded border text-[10px] font-bold transition-colors"
               >
                 Sand
               </button>
@@ -2447,9 +2498,12 @@ export const PixelEngine: React.FC = () => {
                   setSandElement("water");
                   setCurrentColor("#06B6D4");
                 }}
-                className={`px-1.5 py-0.5 rounded border text-[10px] font-bold ${
-                  sandElement === "water" ? "bg-cyan-400 text-black border-cyan-400" : "bg-white/5 border-white/10 text-cyan-300"
-                }`}
+                style={{
+                  backgroundColor: sandElement === "water" ? "#0284c7" : (activeTheme.isDark ? "rgba(255,255,255,0.06)" : "#f3f4f6"),
+                  borderColor: sandElement === "water" ? "#0369a1" : activeTheme.cardBorder,
+                  color: sandElement === "water" ? "#ffffff" : (activeTheme.isDark ? "#38bdf8" : "#0369a1"),
+                }}
+                className="px-2 py-0.5 rounded border text-[10px] font-bold transition-colors"
               >
                 Water
               </button>
@@ -2459,9 +2513,12 @@ export const PixelEngine: React.FC = () => {
                   setSandElement("wood");
                   setCurrentColor("#854D0E");
                 }}
-                className={`px-1.5 py-0.5 rounded border text-[10px] font-bold ${
-                  sandElement === "wood" ? "bg-amber-800 text-white border-amber-700" : "bg-white/5 border-white/10 text-amber-600"
-                }`}
+                style={{
+                  backgroundColor: sandElement === "wood" ? "#78350f" : (activeTheme.isDark ? "rgba(255,255,255,0.06)" : "#f3f4f6"),
+                  borderColor: sandElement === "wood" ? "#451a03" : activeTheme.cardBorder,
+                  color: sandElement === "wood" ? "#ffffff" : (activeTheme.isDark ? "#d97706" : "#78350f"),
+                }}
+                className="px-2 py-0.5 rounded border text-[10px] font-bold transition-colors"
               >
                 Wood
               </button>
@@ -2471,9 +2528,12 @@ export const PixelEngine: React.FC = () => {
                   setSandElement("acid");
                   setCurrentColor("#10B981");
                 }}
-                className={`px-1.5 py-0.5 rounded border text-[10px] font-bold ${
-                  sandElement === "acid" ? "bg-emerald-400 text-black border-emerald-400" : "bg-white/5 border-white/10 text-emerald-300"
-                }`}
+                style={{
+                  backgroundColor: sandElement === "acid" ? "#047857" : (activeTheme.isDark ? "rgba(255,255,255,0.06)" : "#f3f4f6"),
+                  borderColor: sandElement === "acid" ? "#065f46" : activeTheme.cardBorder,
+                  color: sandElement === "acid" ? "#ffffff" : (activeTheme.isDark ? "#34d399" : "#047857"),
+                }}
+                className="px-2 py-0.5 rounded border text-[10px] font-bold transition-colors"
               >
                 Acid
               </button>
@@ -2481,7 +2541,14 @@ export const PixelEngine: React.FC = () => {
               <button
                 type="button"
                 onClick={() => setIsSandSimRunning(!isSandSimRunning)}
-                className="px-1.5 py-0.5 rounded border border-white/10 bg-white/5 font-semibold"
+                style={{
+                  backgroundColor: isSandSimRunning
+                    ? (activeTheme.isDark ? "#065f46" : "#047857")
+                    : (activeTheme.isDark ? "rgba(255,255,255,0.06)" : "#f3f4f6"),
+                  borderColor: isSandSimRunning ? "#10b981" : activeTheme.cardBorder,
+                  color: isSandSimRunning ? "#ffffff" : activeTheme.textPrimary,
+                }}
+                className="px-2 py-0.5 rounded border font-bold text-[10px] tracking-wide transition-colors"
               >
                 {isSandSimRunning ? "PAUSE" : "RESUME"}
               </button>
@@ -2730,29 +2797,29 @@ export const PixelEngine: React.FC = () => {
                 }}
                 className="p-2.5 rounded border space-y-1.5"
               >
-                <div className="text-[10px] opacity-60 uppercase font-semibold flex items-center justify-between">
+                <div className="text-[10px] opacity-70 uppercase font-semibold flex items-center justify-between">
                   <span className="flex items-center gap-1.5">
-                    <Globe className="w-3 h-3 text-cyan-400" />
+                    <Globe className={`w-3 h-3 ${activeTheme.isDark ? "text-cyan-400" : "text-cyan-700"}`} />
                     COMMUNITY TELEMETRY
                   </span>
-                  <span className="text-[9px] text-emerald-400 font-mono flex items-center gap-1 font-bold">
-                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                  <span className={`text-[9px] ${activeTheme.isDark ? "text-emerald-400" : "text-emerald-700"} font-mono flex items-center gap-1 font-bold`}>
+                    <span className={`w-1.5 h-1.5 rounded-full ${activeTheme.isDark ? "bg-emerald-400" : "bg-emerald-600"} animate-pulse`} />
                     LIVE
                   </span>
                 </div>
                 <div className="flex justify-between font-mono text-[11px]">
                   <span className="opacity-70">PIXELS PAINTED:</span>
-                  <span className="font-bold text-emerald-400">
+                  <span className={`font-bold ${activeTheme.isDark ? "text-emerald-400" : "text-emerald-800"}`}>
                     {(globalStats.totalPixelsDrawn + stats.drawn).toLocaleString()} PX
                   </span>
                 </div>
                 <div className="flex justify-between font-mono text-[11px]">
                   <span className="opacity-70">CANVAS EDITS:</span>
-                  <span className="font-bold text-cyan-400">
+                  <span className={`font-bold ${activeTheme.isDark ? "text-cyan-400" : "text-cyan-800"}`}>
                     {(globalStats.totalCanvasEdits + stats.undos + (stats.drawn > 0 ? 1 : 0)).toLocaleString()} EDITS
                   </span>
                 </div>
-                <div className="text-[9px] opacity-50 pt-0.5">
+                <div className="text-[9px] opacity-60 pt-0.5">
                   Synchronized via Realtime Database
                 </div>
               </div>
@@ -2765,14 +2832,14 @@ export const PixelEngine: React.FC = () => {
                 }}
                 className="p-2.5 rounded border space-y-1"
               >
-                <div className="text-[10px] opacity-60 uppercase font-semibold">BUFFER MEMORY</div>
+                <div className="text-[10px] opacity-70 uppercase font-semibold">BUFFER MEMORY</div>
                 <div className="flex justify-between font-mono">
                   <span className="opacity-70">VOXEL CACHE:</span>
-                  <span>{(stats.drawn * 0.12).toFixed(1)} KB</span>
+                  <span className="font-semibold">{(stats.drawn * 0.12).toFixed(1)} KB</span>
                 </div>
                 <div className="flex justify-between font-mono">
                   <span className="opacity-70">RENDER RATE:</span>
-                  <span className="text-emerald-400">60 FPS</span>
+                  <span className={`font-bold ${activeTheme.isDark ? "text-emerald-400" : "text-emerald-800"}`}>60 FPS</span>
                 </div>
               </div>
 
