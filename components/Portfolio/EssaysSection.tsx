@@ -34,7 +34,7 @@ export function EssaysSection() {
       >
         {/* Section Header: Minimal Single-Tier Editorial Header */}
         <div
-          className={`border-b border-dashed px-6 sm:px-8 lg:px-12 py-5 flex flex-col sm:flex-row sm:items-baseline justify-between gap-3 transition-colors ${
+          className={`border-b border-solid border-stone-200/60 dark:border-zinc-800/60 px-6 sm:px-8 lg:px-12 py-5 flex flex-col sm:flex-row sm:items-baseline justify-between gap-3 transition-colors ${
             isDark ? "border-zinc-800/80 bg-[#0c0e14]/70" : "border-stone-200/80 bg-white"
           }`}
         >
@@ -96,11 +96,11 @@ export function EssaysSection() {
         </div>
 
         {/* 12-Column Balanced Editorial Split (Eliminates Right-Side Empty White Space) */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 border-b border-dashed border-stone-200/80 dark:border-zinc-800/80">
+        <div className="grid grid-cols-1 lg:grid-cols-12 border-b border-solid border-stone-200/60 dark:border-zinc-800/60 border-stone-200/80 dark:border-zinc-800/80">
           
           {/* LEFT: Fieldwork Context & Catalog Filters (Col Span 4) */}
           <div
-            className={`lg:col-span-4 p-6 sm:p-8 lg:p-10 border-b lg:border-b-0 lg:border-r border-dashed transition-colors ${
+            className={`lg:col-span-4 p-6 sm:p-8 lg:p-10 border-b lg:border-b-0 lg:border-r border-solid border-stone-200/60 dark:border-zinc-800/60 transition-colors ${
               isDark ? "border-zinc-800/80" : "border-stone-200/80"
             }`}
           >
@@ -172,7 +172,7 @@ export function EssaysSection() {
               </div>
 
               {/* Research Vectors */}
-              <div className="space-y-2 pt-4 border-t border-dashed border-stone-200/80 dark:border-zinc-800/80">
+              <div className="space-y-2 pt-4 border-t border-solid border-stone-200/60 dark:border-zinc-800/60 border-stone-200/80 dark:border-zinc-800/80">
                 <div className="text-[11px] font-mono uppercase tracking-wider text-stone-400 dark:text-zinc-500">
                   Inquiry Vectors
                 </div>

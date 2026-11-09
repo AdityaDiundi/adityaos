@@ -177,7 +177,7 @@ function StageCanvas({
         }}
         whileHover={{ y: -4 }}
         transition={{ duration: 0.2 }}
-        className={`group/stage relative rounded-2xl p-4 sm:p-5 lg:p-6 flex flex-col items-center justify-center border border-dashed cursor-pointer transition-all duration-300 overflow-hidden ${
+        className={`group/stage relative rounded-2xl p-4 sm:p-5 lg:p-6 flex flex-col items-center justify-center border border-solid border-stone-200/60 dark:border-zinc-800/60 cursor-pointer transition-all duration-300 overflow-hidden ${
           isDark
             ? "bg-gradient-to-b from-[#11131a] to-[#0a0b0f] border-zinc-800 hover:border-zinc-600"
             : "bg-gradient-to-b from-stone-100/90 to-stone-50/50 border-stone-200 hover:border-stone-300"
@@ -229,16 +229,19 @@ export function BreakTheGridShowcase({ onLaunchOS }: BreakTheGridShowcaseProps) 
         {/* ========================================================================= */}
         {/* Section Header: Minimal Single-Tier Editorial Header */}
         {/* ========================================================================= */}
+        {/* ========================================================================= */}
+        {/* Section Header: Minimal Single-Tier Editorial Header */}
+        {/* ========================================================================= */}
         <div
-          className={`border-b border-dashed px-6 sm:px-8 lg:px-12 py-5 flex items-baseline justify-between transition-colors ${
-            isDark ? "border-zinc-800/80 bg-[#0c0e14]/70" : "border-stone-200/80 bg-white"
+          className={`border-b px-6 sm:px-8 lg:px-12 py-5 flex items-baseline justify-between transition-colors ${
+            isDark ? "border-zinc-800/60 bg-[#0E1015]" : "border-stone-200/60 bg-[#FAF7F2]"
           }`}
         >
           <div className="flex items-baseline gap-3">
             <span className="text-xs font-mono font-semibold text-emerald-500">01</span>
             <h2
               className={`text-lg sm:text-xl font-sans font-semibold tracking-tight ${
-                isDark ? "text-zinc-100" : "text-stone-900"
+                isDark ? "text-zinc-100" : "text-[#1A1814]"
               }`}
             >
               Shipped Systems
@@ -257,7 +260,7 @@ export function BreakTheGridShowcase({ onLaunchOS }: BreakTheGridShowcaseProps) 
         </div>
 
         {/* ========================================================================= */}
-        {/* 01: JANEVAL BENCHMARK — VIEWPORT STAGE */}
+        {/* 01: JANEVAL BENCHMARK — VIEWPORT HERO CARD */}
         {/* ========================================================================= */}
         <motion.article
           id="project-janeval"
@@ -265,35 +268,40 @@ export function BreakTheGridShowcase({ onLaunchOS }: BreakTheGridShowcaseProps) 
           initial={{ opacity: 1, y: 0 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.4 }}
-          className={`border-b border-dashed px-6 sm:px-8 lg:px-12 py-8 sm:py-10 lg:py-10 min-h-[56vh] lg:min-h-[60vh] flex flex-col justify-center space-y-4 transition-colors ${
+          className={`border-b px-6 sm:px-8 lg:px-12 py-10 sm:py-12 lg:py-14 min-h-[60vh] lg:min-h-[64vh] flex flex-col justify-center transition-colors ${
             isDark
-              ? "border-zinc-800/80 bg-[#0c0e14]/30 hover:bg-[#0c0e14]/50"
-              : "border-stone-200/80 bg-white hover:bg-stone-50/50"
+              ? "border-zinc-800/60 bg-[#0E1015]"
+              : "border-stone-200/60 bg-[#FAF7F2]"
           }`}
         >
-          {/* Top Meta Line: Client and Project distinct */}
-          <div className="flex items-center justify-between text-[13px] font-mono">
-            <span className={isDark ? "text-zinc-300 font-medium" : "text-stone-700 font-semibold"}>
-              Independent Research · JANEVAL (2024)
-            </span>
-            <span className={isDark ? "text-zinc-400" : "text-stone-600"}>
-              SYS-01
-            </span>
-          </div>
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
+            {/* Left Column (40%): Metric + Display Serif Title + Meta + Statement + CTAs */}
+            <div className="lg:col-span-5 space-y-4">
+              {/* Headline Metric as large number (64px+) with 13px label */}
+              <div className="flex items-baseline gap-3">
+                <span className="text-[64px] lg:text-[72px] font-mono font-bold leading-none text-emerald-600 dark:text-emerald-400 tracking-tight">
+                  3.4x
+                </span>
+                <span className="text-[13px] font-mono uppercase tracking-wider text-stone-500 dark:text-zinc-400 font-medium">
+                  Cultural Fidelity Lift
+                </span>
+              </div>
 
-          {/* Symmetrical 12-Col Split with 60% Mockup bleed */}
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10 items-center">
-            {/* Left Narrative: One Single Persuasive Statement */}
-            <div className="lg:col-span-5 space-y-3.5 max-w-[52ch]">
+              {/* Project title in a display serif, 48 to 56px, max 2 lines */}
               <h3
-                className={`text-xl sm:text-2xl font-sans font-semibold tracking-tight leading-snug ${
-                  isDark ? "text-white" : "text-stone-900"
+                className={`font-serif text-[42px] sm:text-[48px] lg:text-[52px] font-normal leading-[1.08] tracking-tight ${
+                  isDark ? "text-[#F4F4F5]" : "text-[#1A1814]"
                 }`}
               >
-                Frontier AI medical evaluation framework for rural Indian healthcare.
+                Frontier AI medical evaluation framework.
               </h3>
 
-              {/* Single High-Impact Persuasive Statement */}
+              {/* One quiet meta line: Client or type · Role · Timeline */}
+              <p className="text-[13px] font-mono text-stone-500 dark:text-zinc-400">
+                Independent Research · Lead Product Designer &amp; System Architect · 6 Weeks
+              </p>
+
+              {/* Persuasive Statement */}
               <p
                 className={`text-sm sm:text-base font-sans leading-relaxed ${
                   isDark ? "text-zinc-300" : "text-stone-700"
@@ -303,13 +311,13 @@ export function BreakTheGridShowcase({ onLaunchOS }: BreakTheGridShowcaseProps) 
               </p>
 
               {/* Action CTAs: Solid Primary + Clean Text Secondary */}
-              <div className="pt-2 flex flex-wrap items-center gap-4 font-mono text-xs">
+              <div className="pt-2 flex items-center gap-5 font-mono text-[13px]">
                 <Link
                   href="/work/janeval"
-                  className={`px-4 py-2 rounded-lg font-semibold flex items-center gap-2 transition-all cursor-pointer shadow-sm ${
+                  className={`px-5 py-2.5 rounded font-medium flex items-center gap-2 transition-colors cursor-pointer shadow-sm ${
                     isDark
                       ? "bg-white text-zinc-950 hover:bg-zinc-200"
-                      : "bg-stone-900 text-white hover:bg-black"
+                      : "bg-[#1A1814] text-white hover:bg-black"
                   }`}
                 >
                   <span>Case Study</span>
@@ -320,22 +328,19 @@ export function BreakTheGridShowcase({ onLaunchOS }: BreakTheGridShowcaseProps) 
                   href="https://janeval.vercel.app/"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className={`flex items-center gap-1.5 transition-colors cursor-pointer hover:underline ${
-                    isDark ? "text-zinc-400 hover:text-white" : "text-stone-600 hover:text-black"
+                  className={`underline underline-offset-4 transition-colors cursor-pointer ${
+                    isDark ? "text-zinc-400 hover:text-white" : "text-stone-600 hover:text-[#1A1814]"
                   }`}
                 >
-                  <Globe className="w-3.5 h-3.5" />
-                  <span>Live Arena</span>
-                  <ArrowUpRight className="w-3 h-3 opacity-60" />
+                  Live Arena ↗
                 </a>
               </div>
             </div>
 
-            {/* Right: ~60% Width Mockup bleeding slightly off the right edge */}
-            <div className="lg:col-span-7 -mr-2 sm:-mr-4 lg:-mr-6 overflow-visible">
-              <StageCanvas
-                accentTint="rgba(16, 185, 129, 0.15)"
-                label="JANEVAL Pairwise Blind Elo Arena"
+            {/* Right: Mockup ~60% width bleeding off right edge, soft shadow, no extra card border */}
+            <div className="lg:col-span-7 -mr-6 sm:-mr-8 lg:-mr-12 overflow-visible">
+              <div
+                className="rounded-xl overflow-hidden shadow-[0_20px_50px_rgba(0,0,0,0.08)] dark:shadow-[0_20px_50px_rgba(0,0,0,0.35)] cursor-pointer"
                 onClick={() =>
                   setModalData({
                     title: "JANEVAL — Human-Centered AI Benchmark",
@@ -356,11 +361,13 @@ export function BreakTheGridShowcase({ onLaunchOS }: BreakTheGridShowcaseProps) 
                   <Image
                     src="/case-studies/janeval_live.png"
                     alt="JANEVAL AI Healthcare Evaluation Arena"
-                    fill
-                    className="object-cover object-top"
+                    width={1200}
+                    height={800}
+                    className="w-full h-auto object-cover object-top"
+                    priority
                   />
                 </BrowserFrame>
-              </StageCanvas>
+              </div>
             </div>
           </div>
         </motion.article>
@@ -375,7 +382,7 @@ export function BreakTheGridShowcase({ onLaunchOS }: BreakTheGridShowcaseProps) 
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: "-12% 0px" }}
           transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
-          className={`border-b border-dashed px-6 sm:px-8 lg:px-12 py-8 sm:py-10 lg:py-10 min-h-[56vh] lg:min-h-[60vh] flex flex-col justify-center space-y-4 transition-colors ${
+          className={`border-b border-stone-200/60 dark:border-zinc-800/60 px-6 sm:px-8 lg:px-12 py-8 sm:py-10 lg:py-10 min-h-[56vh] lg:min-h-[60vh] flex flex-col justify-center space-y-4 transition-colors ${
             isDark
               ? "border-zinc-800/80 bg-[#0c0e14]/30 hover:bg-[#0c0e14]/50"
               : "border-stone-200/80 bg-white hover:bg-stone-50/50"
@@ -491,7 +498,7 @@ export function BreakTheGridShowcase({ onLaunchOS }: BreakTheGridShowcaseProps) 
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: "-12% 0px" }}
           transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
-          className={`border-b border-dashed p-6 sm:p-8 lg:p-12 min-h-[68vh] lg:min-h-[76vh] flex flex-col justify-center space-y-6 transition-colors ${
+          className={`border-b border-stone-200/60 dark:border-zinc-800/60 p-6 sm:p-8 lg:p-12 min-h-[68vh] lg:min-h-[76vh] flex flex-col justify-center space-y-6 transition-colors ${
             isDark
               ? "border-zinc-800/80 bg-[#0c0e14]/30 hover:bg-[#0c0e14]/50"
               : "border-stone-200/80 bg-white hover:bg-stone-50/50"
@@ -603,7 +610,7 @@ export function BreakTheGridShowcase({ onLaunchOS }: BreakTheGridShowcaseProps) 
         {/* ROW: 2-COLUMN MINIFIED MOBILE PRODUCTS (DIGIACCEL + MOSAIC) */}
         {/* ========================================================================= */}
         <div
-          className={`border-b border-dashed grid grid-cols-1 md:grid-cols-2 divide-y md:divide-y-0 md:divide-x divide-dashed relative ${
+          className={`border-b border-stone-200/60 dark:border-zinc-800/60 grid grid-cols-1 md:grid-cols-2 divide-y md:divide-y-0 md:divide-x divide-stone-200/60 dark:divide-zinc-800/60 relative ${
             isDark
               ? "border-zinc-800/80 divide-zinc-800/80"
               : "border-stone-200/80 divide-stone-200/80"
@@ -857,7 +864,7 @@ export function BreakTheGridShowcase({ onLaunchOS }: BreakTheGridShowcaseProps) 
         {/* ROW: 2-COLUMN MINIFIED MOBILE PRODUCTS (KETTO + TUTEDUDE) */}
         {/* ========================================================================= */}
         <div
-          className={`border-b border-dashed grid grid-cols-1 md:grid-cols-2 divide-y md:divide-y-0 md:divide-x divide-dashed relative ${
+          className={`border-b border-stone-200/60 dark:border-zinc-800/60 grid grid-cols-1 md:grid-cols-2 divide-y md:divide-y-0 md:divide-x divide-stone-200/60 dark:divide-zinc-800/60 relative ${
             isDark
               ? "border-zinc-800/80 divide-zinc-800/80"
               : "border-stone-200/80 divide-stone-200/80"
@@ -1114,7 +1121,7 @@ export function BreakTheGridShowcase({ onLaunchOS }: BreakTheGridShowcaseProps) 
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: "-12% 0px" }}
           transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
-          className={`border-b border-dashed p-6 sm:p-8 lg:p-12 min-h-[68vh] lg:min-h-[76vh] flex flex-col justify-center space-y-6 transition-colors ${
+          className={`border-b border-stone-200/60 dark:border-zinc-800/60 p-6 sm:p-8 lg:p-12 min-h-[68vh] lg:min-h-[76vh] flex flex-col justify-center space-y-6 transition-colors ${
             isDark
               ? "border-zinc-800/80 bg-[#0c0e14]/30 hover:bg-[#0c0e14]/50"
               : "border-stone-200/80 bg-white hover:bg-stone-50/50"

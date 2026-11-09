@@ -90,7 +90,7 @@ export function ResumeSection() {
       >
         {/* Section Header: Minimal Single-Tier Editorial Header */}
         <div
-          className={`border-b border-dashed px-6 sm:px-8 lg:px-12 py-5 flex items-baseline justify-between transition-colors ${
+          className={`border-b border-solid border-stone-200/60 dark:border-zinc-800/60 px-6 sm:px-8 lg:px-12 py-5 flex items-baseline justify-between transition-colors ${
             isDark ? "border-zinc-800/80 bg-[#0c0e14]/70" : "border-stone-200/80 bg-white"
           }`}
         >
@@ -131,7 +131,7 @@ export function ResumeSection() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.5 }}
-          className={`grid grid-cols-1 lg:grid-cols-12 divide-y divide-dashed lg:divide-y-0 lg:divide-x lg:divide-dashed border-b border-dashed transition-colors ${
+          className={`grid grid-cols-1 lg:grid-cols-12 divide-y divide-stone-200/60 dark:divide-zinc-800/60 lg:divide-y-0 lg:divide-x lg:divide-stone-200/60 dark:divide-zinc-800/60 border-b border-solid border-stone-200/60 dark:border-zinc-800/60 transition-colors ${
             isDark
               ? "border-zinc-800/80 divide-zinc-800/80"
               : "border-stone-200/80 divide-stone-200/80"
@@ -151,7 +151,7 @@ export function ResumeSection() {
               {experiences.map((exp, idx) => (
                 <div
                   key={idx}
-                  className="pb-6 border-b border-dashed border-stone-200/70 dark:border-zinc-800/70 last:border-b-0 space-y-2.5"
+                  className="pb-6 border-b border-solid border-stone-200/60 dark:border-zinc-800/60 border-stone-200/70 dark:border-zinc-800/70 last:border-b-0 space-y-2.5"
                 >
                   <div className="flex flex-col sm:flex-row sm:items-baseline justify-between gap-1 text-xs font-mono">
                     <span
@@ -208,7 +208,7 @@ export function ResumeSection() {
             }`}
           >
             {/* Education */}
-            <div className="pb-6 border-b border-dashed border-stone-200/70 dark:border-zinc-800/70 space-y-2">
+            <div className="pb-6 border-b border-solid border-stone-200/60 dark:border-zinc-800/60 border-stone-200/70 dark:border-zinc-800/70 space-y-2">
               <div
                 className={`text-xs font-mono uppercase tracking-wider ${
                   isDark ? "text-zinc-500" : "text-stone-500"
@@ -240,7 +240,7 @@ export function ResumeSection() {
             </div>
 
             {/* Skills & Toolkit */}
-            <div className="pb-6 border-b border-dashed border-stone-200/70 dark:border-zinc-800/70 space-y-3">
+            <div className="pb-6 border-b border-solid border-stone-200/60 dark:border-zinc-800/60 border-stone-200/70 dark:border-zinc-800/70 space-y-3">
               <div
                 className={`text-xs font-mono uppercase tracking-wider ${
                   isDark ? "text-zinc-500" : "text-stone-500"

@@ -67,8 +67,8 @@ export function PortfolioView({ onLaunchOS }: PortfolioViewProps) {
     >
       {/* Outer Continuous Grid Frame */}
       <div
-        className={`max-w-[1520px] mx-auto border-x border-dashed min-h-screen flex flex-col lg:flex-row relative transition-colors ${
-          isDark ? "border-zinc-800/80" : "border-stone-200/80"
+        className={`max-w-[1520px] mx-auto border-x min-h-screen flex flex-col lg:flex-row relative transition-colors ${
+          isDark ? "border-zinc-800/60" : "border-stone-200/60"
         }`}
       >
         {/* Left Sticky Navigation & Identity Column */}

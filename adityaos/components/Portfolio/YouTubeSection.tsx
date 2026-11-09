@@ -24,7 +24,7 @@ export function YouTubeSection() {
       >
         {/* Section Header: Minimal Single-Tier Editorial Header */}
         <div
-          className={`border-b border-dashed px-6 sm:px-8 lg:px-12 py-5 flex items-baseline justify-between transition-colors ${
+          className={`border-b border-solid border-stone-200/60 dark:border-zinc-800/60 px-6 sm:px-8 lg:px-12 py-5 flex items-baseline justify-between transition-colors ${
             isDark ? "border-zinc-800/80 bg-[#0c0e14]/70" : "border-stone-200/80 bg-white"
           }`}
         >
@@ -61,7 +61,7 @@ export function YouTubeSection() {
         </div>
 
         {/* Minimal TV Player & Clean Medal.tv Style Clips List */}
-        <div className="p-6 sm:p-8 lg:p-12 border-b border-dashed border-stone-200/80 dark:border-zinc-800/80">
+        <div className="p-6 sm:p-8 lg:p-12 border-b border-solid border-stone-200/60 dark:border-zinc-800/60 border-stone-200/80 dark:border-zinc-800/80">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-start">
             
             {/* Left: Minimal TV / Video Player (Pure video frame, zero button/pill clutter) */}
@@ -122,7 +122,7 @@ export function YouTubeSection() {
               </div>
 
               <div
-                className={`divide-y divide-dashed border border-dashed rounded-xl max-h-[460px] overflow-y-auto transition-colors ${
+                className={`divide-y divide-stone-200/60 dark:divide-zinc-800/60 border border-solid border-stone-200/60 dark:border-zinc-800/60 rounded-xl max-h-[460px] overflow-y-auto transition-colors ${
                   isDark
                     ? "divide-zinc-800/80 border-zinc-800/80 bg-[#0c0e14]/40"
                     : "divide-stone-200/80 border-stone-200/80 bg-white"

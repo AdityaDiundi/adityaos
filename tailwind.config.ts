@@ -1,6 +1,7 @@
 import type { Config } from "tailwindcss";
 
 const config: Config = {
+  darkMode: "class",
   content: [
     "./pages/**/*.{js,ts,jsx,tsx,mdx}",
     "./components/**/*.{js,ts,jsx,tsx,mdx}",
@@ -29,6 +30,14 @@ const config: Config = {
         },
       },
       fontFamily: {
+        serif: [
+          "Newsreader",
+          "Noto Serif Devanagari",
+          "Tiro Devanagari Hindi",
+          "Georgia",
+          "Cambria",
+          "serif",
+        ],
         mono: [
           "JetBrains Mono",
           "Fira Code",
