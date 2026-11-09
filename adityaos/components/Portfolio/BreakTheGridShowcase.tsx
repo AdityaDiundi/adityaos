@@ -168,6 +168,8 @@ export function BreakTheGridShowcase({ onLaunchOS }: BreakTheGridShowcaseProps) 
   const isDark = activeTheme.isDark;
 
   const [modalData, setModalData] = useState<PrototypeModalData | null>(null);
+  const [mfineView, setMfineView] = useState<"admin" | "claim">("admin");
+  const [tutedudeTab, setTutedudeTab] = useState<"learn" | "resources" | "support">("learn");
 
   return (
     <section id="work" className="relative">
@@ -589,10 +591,55 @@ export function BreakTheGridShowcase({ onLaunchOS }: BreakTheGridShowcaseProps) 
             </div>
 
             {/* Right: Designed Desktop Browser Frame with Clean Claims UI */}
-            <div className="lg:col-span-5">
+            <div className="lg:col-span-5 space-y-2">
+              {/* Interactive Viewport Switcher */}
+              <div className="flex items-center justify-between">
+                <div
+                  className={`p-0.5 rounded-lg border flex items-center gap-1 font-mono text-[10px] ${
+                    isDark ? "bg-zinc-900/80 border-zinc-800" : "bg-stone-100 border-stone-200"
+                  }`}
+                >
+                  <button
+                    onClick={() => setMfineView("admin")}
+                    className={`px-2.5 py-1 rounded transition-colors cursor-pointer ${
+                      mfineView === "admin"
+                        ? isDark
+                          ? "bg-zinc-800 text-white font-semibold shadow-sm"
+                          : "bg-white text-stone-900 font-semibold shadow-sm"
+                        : isDark
+                        ? "text-zinc-400 hover:text-white"
+                        : "text-stone-500 hover:text-stone-900"
+                    }`}
+                  >
+                    B2B Admin Console
+                  </button>
+                  <button
+                    onClick={() => setMfineView("claim")}
+                    className={`px-2.5 py-1 rounded transition-colors cursor-pointer ${
+                      mfineView === "claim"
+                        ? isDark
+                          ? "bg-zinc-800 text-white font-semibold shadow-sm"
+                          : "bg-white text-stone-900 font-semibold shadow-sm"
+                        : isDark
+                        ? "text-zinc-400 hover:text-white"
+                        : "text-stone-500 hover:text-stone-900"
+                    }`}
+                  >
+                    Employee Claim Dispute
+                  </button>
+                </div>
+                <span className={`text-[10px] font-mono ${isDark ? "text-indigo-400" : "text-indigo-600"}`}>
+                  Interactive Mockup
+                </span>
+              </div>
+
               <StageCanvas
                 accentTint="rgba(99, 102, 241, 0.15)"
-                label="MFine Corporate Benefits & Claims Triage"
+                label={
+                  mfineView === "admin"
+                    ? "MFine Corporate B2B Policy Console · BHEL"
+                    : "Cashless Claim Dispute & Triage · Kini's Clinic"
+                }
                 onClick={() =>
                   setModalData({
                     title: "Corporate Health Benefits & Claim Settlement",
@@ -600,54 +647,39 @@ export function BreakTheGridShowcase({ onLaunchOS }: BreakTheGridShowcaseProps) 
                     category: "B2B InsurTech & Enterprise Design System",
                     figmaUrl:
                       "https://www.figma.com/design/pr9NQjBDkyZqALFcPkm4tJ/Corporate-S3--_-Management?node-id=704-211",
-                    primaryImage: "/case-studies/corporate_claims_cluster.png",
-                    secondaryImage: "/case-studies/corporate_claims.png",
-                    primaryLabel: "Wallet Policy Matrix",
-                    secondaryLabel: "Full Canvas Architecture",
-                    defaultMode: "figma",
+                    primaryImage: "/case-studies/mfine_bhel_admin_contacts.png",
+                    secondaryImage: "/case-studies/mfine_rejected_transaction.png",
+                    tertiaryImage: "/case-studies/mfine_patient_offerings.jpg",
+                    primaryLabel: "B2B Admin Console (BHEL)",
+                    secondaryLabel: "Cashless Dispute Resolution",
+                    tertiaryLabel: "Patient Offerings Flow",
+                    defaultMode: "screens",
                   })
                 }
               >
-                <BrowserFrame url="mfine.co/claims/triage">
-                  <div className="w-full h-full bg-[#0d1017] p-3 flex flex-col justify-between text-white font-sans text-xs">
-                    <div className="flex items-center justify-between border-b border-zinc-800 pb-2">
-                      <div className="flex items-center gap-2">
-                        <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-                        <span className="font-semibold text-zinc-200 text-[11px]">Cashless Claims Triage</span>
-                      </div>
-                      <span className="text-[10px] font-mono text-emerald-400 bg-emerald-950/60 px-2 py-0.5 rounded border border-emerald-800/40">
-                        &lt; 15 min SLA
-                      </span>
-                    </div>
-
-                    <div className="space-y-1.5 py-1">
-                      <div className="bg-zinc-900/80 p-2 rounded border border-zinc-800 text-[11px] flex justify-between items-center">
-                        <div>
-                          <div className="font-medium text-zinc-200">Apollo Hospitals · Pre-Auth</div>
-                          <div className="text-[10px] text-zinc-400">Cardiology Admission (₹45,000)</div>
-                        </div>
-                        <span className="px-2 py-0.5 rounded text-[10px] font-mono bg-emerald-500/20 text-emerald-300 font-semibold">
-                          Approved (12m)
-                        </span>
-                      </div>
-
-                      <div className="bg-zinc-900/80 p-2 rounded border border-zinc-800 text-[11px] flex justify-between items-center opacity-85">
-                        <div>
-                          <div className="font-medium text-zinc-200">Fortis Healthcare · OPD Claim</div>
-                          <div className="text-[10px] text-zinc-400">Diagnostics Wallet Triage</div>
-                        </div>
-                        <span className="px-2 py-0.5 rounded text-[10px] font-mono bg-blue-500/20 text-blue-300">
-                          Auto-Validated
-                        </span>
-                      </div>
-                    </div>
-
-                    <div className="pt-1.5 border-t border-zinc-800 flex items-center justify-between text-[10px] font-mono text-zinc-500">
-                      <span>Live Census: 100K+ Lives</span>
-                      <span className="text-zinc-400">Policy Rules: Active</span>
-                    </div>
-                  </div>
-                </BrowserFrame>
+                {mfineView === "admin" ? (
+                  <BrowserFrame url="mfine.co/admin/bhel/contacts">
+                    <Image
+                      src="/case-studies/mfine_bhel_admin_contacts.png"
+                      alt="MFine Corporate B2B Admin Console"
+                      fill
+                      priority
+                      unoptimized
+                      className="object-cover object-top"
+                    />
+                  </BrowserFrame>
+                ) : (
+                  <MobileDeviceFrame>
+                    <Image
+                      src="/case-studies/mfine_rejected_transaction.png"
+                      alt="MFine Cashless Claim Dispute Interface"
+                      fill
+                      priority
+                      unoptimized
+                      className="object-cover object-top"
+                    />
+                  </MobileDeviceFrame>
+                )}
               </StageCanvas>
             </div>
           </div>
@@ -1019,7 +1051,7 @@ export function BreakTheGridShowcase({ onLaunchOS }: BreakTheGridShowcaseProps) 
             </div>
           </article>
 
-          {/* 07: Rajasthan Fieldwork */}
+          {/* 07: TuteDude EdTech Mentorship */}
           <article
             className={`p-6 sm:p-8 flex flex-col justify-between space-y-5 transition-colors ${
               isDark
@@ -1029,16 +1061,284 @@ export function BreakTheGridShowcase({ onLaunchOS }: BreakTheGridShowcaseProps) 
           >
             <div className="space-y-4">
               <div className="flex items-center justify-between text-xs font-mono">
-                <span className="text-emerald-500 font-bold">07 / PROJECT POTENTIAL</span>
-                <span className={`text-[11px] font-mono ${isDark ? "text-emerald-400" : "text-emerald-700"}`}>
-                  20 MOS FIELDWORK
+                <span className="text-sky-500 font-bold">07 / TUTEDUDE · EDTECH</span>
+                <span className={`text-[11px] font-mono ${isDark ? "text-sky-400" : "text-sky-700"}`}>
+                  +34% COMPLETION · &lt;3m MENTOR
                 </span>
               </div>
 
-              {/* Designed Photo Frame */}
+              {/* Interactive Viewport Switcher */}
+              <div className="flex items-center justify-between">
+                <div
+                  className={`p-0.5 rounded-lg border flex items-center gap-1 font-mono text-[10px] ${
+                    isDark ? "bg-zinc-900/80 border-zinc-800" : "bg-stone-100 border-stone-200"
+                  }`}
+                >
+                  <button
+                    onClick={() => setTutedudeTab("learn")}
+                    className={`px-2 py-0.5 rounded transition-colors cursor-pointer ${
+                      tutedudeTab === "learn"
+                        ? isDark
+                          ? "bg-zinc-800 text-white font-semibold shadow-sm"
+                          : "bg-white text-stone-900 font-semibold shadow-sm"
+                        : isDark
+                        ? "text-zinc-400 hover:text-white"
+                        : "text-stone-500 hover:text-stone-900"
+                    }`}
+                  >
+                    1. Learn
+                  </button>
+                  <button
+                    onClick={() => setTutedudeTab("resources")}
+                    className={`px-2 py-0.5 rounded transition-colors cursor-pointer ${
+                      tutedudeTab === "resources"
+                        ? isDark
+                          ? "bg-zinc-800 text-white font-semibold shadow-sm"
+                          : "bg-white text-stone-900 font-semibold shadow-sm"
+                        : isDark
+                        ? "text-zinc-400 hover:text-white"
+                        : "text-stone-500 hover:text-stone-900"
+                    }`}
+                  >
+                    2. Resources
+                  </button>
+                  <button
+                    onClick={() => setTutedudeTab("support")}
+                    className={`px-2 py-0.5 rounded transition-colors cursor-pointer ${
+                      tutedudeTab === "support"
+                        ? isDark
+                          ? "bg-zinc-800 text-white font-semibold shadow-sm"
+                          : "bg-white text-stone-900 font-semibold shadow-sm"
+                        : isDark
+                        ? "text-zinc-400 hover:text-white"
+                        : "text-stone-500 hover:text-stone-900"
+                    }`}
+                  >
+                    3. Live Mentor
+                  </button>
+                </div>
+                <span className={`text-[10px] font-mono ${isDark ? "text-sky-400" : "text-sky-600"}`}>
+                  Interactive Mockup
+                </span>
+              </div>
+
+              {/* Designed Smartphone Mockup with Dynamic State */}
+              <StageCanvas
+                accentTint="rgba(14, 165, 233, 0.12)"
+                label={
+                  tutedudeTab === "learn"
+                    ? "Lecture Player & Progress/Refund Runway"
+                    : tutedudeTab === "resources"
+                    ? "Course Resources & Modular Cheat Sheets"
+                    : "Live 1-on-1 Mentor Queue (Avg Wait: 3m)"
+                }
+                onClick={() =>
+                  setModalData({
+                    title: "TuteDude Course Architecture & 1-on-1 Mentorship",
+                    client: "TuteDude",
+                    category: "EdTech Learning Experience",
+                    figmaUrl:
+                      "https://www.figma.com/design/hOmOAB7mZGXb8HBAy9TpHw/Tutedude-Assignment?node-id=220-1386",
+                    primaryImage: "/case-studies/tutedude_course_player.png",
+                    secondaryImage: "/case-studies/tutedude_study_resources.png",
+                    tertiaryImage: "/case-studies/tutedude_mentor_support.png",
+                    primaryLabel: "1. Lecture & Refund Runway",
+                    secondaryLabel: "2. Study Resources",
+                    tertiaryLabel: "3. Live Mentor Queue",
+                    defaultMode: "screens",
+                  })
+                }
+              >
+                <MobileDeviceFrame>
+                  <div className="relative w-full h-full bg-[#120a1f]">
+                    <Image
+                      src={
+                        tutedudeTab === "learn"
+                          ? "/case-studies/tutedude_course_player.png"
+                          : tutedudeTab === "resources"
+                          ? "/case-studies/tutedude_study_resources.png"
+                          : "/case-studies/tutedude_mentor_support.png"
+                      }
+                      alt="TuteDude Learning Experience Screen"
+                      fill
+                      priority
+                      unoptimized
+                      className="object-cover object-top transition-opacity duration-200"
+                    />
+                  </div>
+                </MobileDeviceFrame>
+              </StageCanvas>
+
+              <div className="space-y-2 pt-1 max-w-[56ch]">
+                <h4
+                  className={`text-base font-semibold font-sans tracking-tight ${
+                    isDark ? "text-white" : "text-stone-900"
+                  }`}
+                >
+                  Connecting stuck coding students to live mentors in under 3 minutes.
+                </h4>
+                <ul
+                  className={`space-y-1 text-xs font-sans leading-relaxed pt-0.5 ${
+                    isDark ? "text-zinc-400" : "text-stone-600"
+                  }`}
+                >
+                  <li className="flex items-start gap-1.5">
+                    <span className="text-sky-400 font-mono text-[11px] mt-0.5">•</span>
+                    <span><strong>+34% completion lift:</strong> In-lecture 1-on-1 mentor queues resolving syntax blockers before students abandon.</span>
+                  </li>
+                  <li className="flex items-start gap-1.5">
+                    <span className="text-sky-400 font-mono text-[11px] mt-0.5">•</span>
+                    <span><strong>Progress & refund tracker:</strong> Gamified milestone runway tying course progress to transparent refund guarantees.</span>
+                  </li>
+                </ul>
+              </div>
+            </div>
+
+            <div className="pt-2 flex flex-wrap items-center gap-4 font-mono text-xs">
+              <button
+                onClick={() =>
+                  setModalData({
+                    title: "TuteDude Course Architecture & 1-on-1 Mentorship",
+                    client: "TuteDude",
+                    category: "EdTech Learning Experience",
+                    figmaUrl:
+                      "https://www.figma.com/design/hOmOAB7mZGXb8HBAy9TpHw/Tutedude-Assignment?node-id=220-1386",
+                    primaryImage: "/case-studies/tutedude_course_player.png",
+                    secondaryImage: "/case-studies/tutedude_study_resources.png",
+                    tertiaryImage: "/case-studies/tutedude_mentor_support.png",
+                    primaryLabel: "1. Lecture & Refund Runway",
+                    secondaryLabel: "2. Study Resources",
+                    tertiaryLabel: "3. Live Mentor Queue",
+                    defaultMode: "screens",
+                  })
+                }
+                className={`px-3.5 py-1.5 rounded-lg font-semibold flex items-center gap-1.5 transition-all cursor-pointer shadow-sm ${
+                  isDark
+                    ? "bg-white text-zinc-950 hover:bg-zinc-200"
+                    : "bg-stone-900 text-white hover:bg-black"
+                }`}
+              >
+                <span>Read Case Study</span>
+                <ArrowRight className="w-3.5 h-3.5" />
+              </button>
+
+              <a
+                href="https://www.figma.com/design/hOmOAB7mZGXb8HBAy9TpHw/Tutedude-Assignment?node-id=220-1386"
+                target="_blank"
+                rel="noopener noreferrer"
+                className={`flex items-center gap-1 transition-colors cursor-pointer hover:underline ${
+                  isDark ? "text-zinc-400 hover:text-white" : "text-stone-600 hover:text-black"
+                }`}
+              >
+                <span>Figma Workspace</span>
+                <ArrowUpRight className="w-3 h-3 opacity-60" />
+              </a>
+            </div>
+          </article>
+        </div>
+
+        {/* ========================================================================= */}
+        {/* 08: RAJASTHAN FIELDWORK & ETHNOGRAPHY — CLOSING 12-COL FEATURE */}
+        {/* ========================================================================= */}
+        <article
+          className={`border-b border-dashed p-6 sm:p-8 space-y-5 transition-colors ${
+            isDark
+              ? "border-zinc-800/80 bg-[#0c0e14]/30 hover:bg-[#0c0e14]/50"
+              : "border-stone-200/80 bg-white hover:bg-stone-50/50"
+          }`}
+        >
+          {/* Top Meta Line */}
+          <div className="flex flex-wrap items-center justify-between gap-2 text-xs font-mono">
+            <div className="flex items-center gap-2">
+              <span className="font-bold text-emerald-500">08</span>
+              <span className={isDark ? "text-zinc-600" : "text-stone-300"}>/</span>
+              <span className={isDark ? "text-zinc-300" : "text-stone-700"}>Project Potential x India Fellow</span>
+              <span className={isDark ? "text-zinc-600" : "text-stone-300"}>·</span>
+              <span className={isDark ? "text-zinc-400" : "text-stone-500"}>
+                20 Months Grassroots Fieldwork
+              </span>
+            </div>
+            <span
+              className={`text-[11px] font-mono font-medium ${
+                isDark ? "text-emerald-400" : "text-emerald-700"
+              }`}
+            >
+              40+ Panchayats · Rural Rajasthan & Bihar
+            </span>
+          </div>
+
+          {/* Symmetrical 12-Col Split */}
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-center">
+            {/* Left Narrative */}
+            <div className="lg:col-span-7 space-y-3 max-w-[62ch]">
+              <div>
+                <h3
+                  className={`text-base sm:text-lg font-sans font-semibold tracking-tight ${
+                    isDark ? "text-white" : "text-stone-900"
+                  }`}
+                >
+                  20 months of grassroots systems and rural youth ethnography.
+                </h3>
+                <p
+                  className={`text-xs sm:text-sm font-sans pt-1 ${
+                    isDark ? "text-zinc-300" : "text-stone-700"
+                  }`}
+                >
+                  Field immersion examining youth empowerment networks, leadership incentives, and water commons.
+                </p>
+              </div>
+
+              {/* Punchy Bullet Points */}
+              <ul
+                className={`space-y-1.5 text-xs font-sans leading-relaxed pt-1 ${
+                  isDark ? "text-zinc-400" : "text-stone-600"
+                }`}
+              >
+                <li className="flex items-start gap-2">
+                  <span className="text-emerald-400 font-mono text-[11px] mt-0.5">•</span>
+                  <span><strong>40+ rural panchayats:</strong> Deep ethnographic research across Rajasthan and Bihar investigating community leadership structures.</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <span className="text-emerald-400 font-mono text-[11px] mt-0.5">•</span>
+                  <span><strong>Youth Resource Manual:</strong> Co-designed experiential community curriculum and stewardship tools for water commons.</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <span className="text-emerald-400 font-mono text-[11px] mt-0.5">•</span>
+                  <span><strong>Pedagogical field tools:</strong> Ground-level diagnostics to measure intrinsic motivation in 39°C unventilated community spaces.</span>
+                </li>
+              </ul>
+
+              {/* Action CTAs */}
+              <div className="pt-2 flex flex-wrap items-center gap-4 font-mono text-xs">
+                <a
+                  href="#essays"
+                  className={`px-3.5 py-1.5 rounded-lg font-semibold flex items-center gap-1.5 transition-all cursor-pointer shadow-sm ${
+                    isDark
+                      ? "bg-white text-zinc-950 hover:bg-zinc-200"
+                      : "bg-stone-900 text-white hover:bg-black"
+                  }`}
+                >
+                  <span>Read Field Essays</span>
+                  <ArrowRight className="w-3.5 h-3.5" />
+                </a>
+
+                <Link
+                  href="/work"
+                  className={`flex items-center gap-1 transition-colors cursor-pointer hover:underline ${
+                    isDark ? "text-zinc-400 hover:text-white" : "text-stone-600 hover:text-black"
+                  }`}
+                >
+                  <span>All Projects Archive</span>
+                  <ArrowUpRight className="w-3 h-3 opacity-60" />
+                </Link>
+              </div>
+            </div>
+
+            {/* Right: Fieldwork Photo Frame */}
+            <div className="lg:col-span-5">
               <StageCanvas
                 accentTint="rgba(16, 185, 129, 0.12)"
-                label="Grassroots Ethnography · Rural Rajasthan"
+                label="Grassroots Ethnography · Mewar Belt, Rural Rajasthan"
                 onClick={() =>
                   setModalData({
                     title: "Grassroots Fieldwork & Ethnography",
@@ -1050,71 +1350,25 @@ export function BreakTheGridShowcase({ onLaunchOS }: BreakTheGridShowcaseProps) 
                   })
                 }
               >
-                <div className="w-full max-w-[280px] rounded-xl overflow-hidden border border-stone-200/80 dark:border-zinc-700/60 shadow-xl aspect-[4/3] relative">
+                <div className="w-full max-w-[340px] rounded-xl overflow-hidden border border-stone-200/80 dark:border-zinc-700/60 shadow-xl aspect-[4/3] relative">
                   <Image
                     src="/aditya_field_full.jpg"
                     alt="Rural Fieldwork Photo in Rajasthan"
                     fill
+                    priority
+                    unoptimized
                     className="object-cover object-top"
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent flex items-end p-2.5">
-                    <span className="text-[10px] font-mono text-emerald-300 font-medium">
-                      Mewar Belt · Water Commons
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent flex items-end p-3">
+                    <span className="text-[11px] font-mono text-emerald-300 font-medium">
+                      Mewar Belt · Water Commons Stewardship
                     </span>
                   </div>
                 </div>
               </StageCanvas>
-
-              <div className="space-y-2 pt-1 max-w-[56ch]">
-                <h4
-                  className={`text-base font-semibold font-sans tracking-tight ${
-                    isDark ? "text-white" : "text-stone-900"
-                  }`}
-                >
-                  20 months of grassroots systems & youth leadership ethnography.
-                </h4>
-                <ul
-                  className={`space-y-1 text-xs font-sans leading-relaxed pt-0.5 ${
-                    isDark ? "text-zinc-400" : "text-stone-600"
-                  }`}
-                >
-                  <li className="flex items-start gap-1.5">
-                    <span className="text-emerald-400 font-mono text-[11px] mt-0.5">•</span>
-                    <span><strong>40+ rural panchayats:</strong> Immersive field immersion and ethnographic research across Rajasthan and Bihar.</span>
-                  </li>
-                  <li className="flex items-start gap-1.5">
-                    <span className="text-emerald-400 font-mono text-[11px] mt-0.5">•</span>
-                    <span><strong>Youth Resource Manual:</strong> Designed community leadership curriculum and water commons stewardship tools.</span>
-                  </li>
-                </ul>
-              </div>
             </div>
-
-            <div className="pt-2 flex flex-wrap items-center gap-4 font-mono text-xs">
-              <a
-                href="#essays"
-                className={`px-3.5 py-1.5 rounded-lg font-semibold flex items-center gap-1.5 transition-all cursor-pointer shadow-sm ${
-                  isDark
-                    ? "bg-white text-zinc-950 hover:bg-zinc-200"
-                    : "bg-stone-900 text-white hover:bg-black"
-                }`}
-              >
-                <span>Read Field Essays</span>
-                <ArrowRight className="w-3.5 h-3.5" />
-              </a>
-
-              <Link
-                href="/work"
-                className={`flex items-center gap-1 transition-colors cursor-pointer hover:underline ${
-                  isDark ? "text-zinc-400 hover:text-white" : "text-stone-600 hover:text-black"
-                }`}
-              >
-                <span>All Projects Archive</span>
-                <ArrowUpRight className="w-3 h-3 opacity-60" />
-              </Link>
-            </div>
-          </article>
-        </div>
+          </div>
+        </article>
       </div>
 
       {/* Interactive Prototype Modal */}

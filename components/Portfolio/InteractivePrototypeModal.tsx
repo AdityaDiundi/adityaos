@@ -26,8 +26,10 @@ export interface PrototypeModalData {
   onLaunchOS?: () => void;
   primaryImage: string;
   secondaryImage?: string;
+  tertiaryImage?: string;
   primaryLabel?: string;
   secondaryLabel?: string;
+  tertiaryLabel?: string;
   defaultMode?: "figma" | "screens" | "live" | "pixel";
 }
 
@@ -41,7 +43,7 @@ export function InteractivePrototypeModal({ data, onClose }: InteractivePrototyp
   const isDark = activeTheme.isDark;
 
   const [viewMode, setViewMode] = useState<"figma" | "screens" | "live" | "pixel">("screens");
-  const [activeScreenTab, setActiveScreenTab] = useState<"primary" | "secondary">("primary");
+  const [activeScreenTab, setActiveScreenTab] = useState<"primary" | "secondary" | "tertiary">("primary");
   const [iframeLoaded, setIframeLoaded] = useState(false);
 
   useEffect(() => {
@@ -385,6 +387,22 @@ export function InteractivePrototypeModal({ data, onClose }: InteractivePrototyp
                       >
                         {data.secondaryLabel || "Full Specification"}
                       </button>
+                      {data.tertiaryImage && (
+                        <button
+                          onClick={() => setActiveScreenTab("tertiary")}
+                          className={`px-3 py-1 rounded transition-colors cursor-pointer ${
+                            activeScreenTab === "tertiary"
+                              ? isDark
+                                ? "bg-zinc-800 text-white font-semibold"
+                                : "bg-white text-stone-900 font-semibold shadow-sm"
+                              : isDark
+                              ? "text-zinc-400 hover:text-white"
+                              : "text-stone-500 hover:text-stone-900"
+                          }`}
+                        >
+                          {data.tertiaryLabel || "Detail Flow"}
+                        </button>
+                      )}
                     </>
                   ) : (
                     <span className={isDark ? "text-zinc-300" : "text-stone-700"}>
@@ -410,7 +428,9 @@ export function InteractivePrototypeModal({ data, onClose }: InteractivePrototyp
                     src={
                       activeScreenTab === "primary"
                         ? data.primaryImage
-                        : data.secondaryImage || data.primaryImage
+                        : activeScreenTab === "secondary"
+                        ? data.secondaryImage || data.primaryImage
+                        : data.tertiaryImage || data.primaryImage
                     }
                     alt={data.title}
                     fill
