@@ -944,7 +944,7 @@ export function BreakTheGridShowcase({ onLaunchOS }: BreakTheGridShowcaseProps) 
                     client: "Project Potential x India Fellow",
                     category: "Rural Systems & Youth Manual",
                     primaryImage: "/aditya_field_full.jpg",
-                    primaryLabel: "Kumaon Fieldwork (2,100m MSL)",
+                    primaryLabel: "Rajasthan Fieldwork",
                     defaultMode: "screens",
                   })
                 }
@@ -956,13 +956,13 @@ export function BreakTheGridShowcase({ onLaunchOS }: BreakTheGridShowcaseProps) 
               >
                 <Image
                   src="/aditya_field_full.jpg"
-                  alt="Rural Fieldwork Photo"
+                  alt="Rural Fieldwork Photo in Rajasthan"
                   fill
                   className="object-cover object-top"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent flex items-end p-3">
                   <span className="text-xs font-mono text-white flex items-center gap-1.5 font-medium">
-                    <Eye className="w-3.5 h-3.5 text-emerald-400" /> Kumaon (2,100m MSL)
+                    <Eye className="w-3.5 h-3.5 text-emerald-400" /> Rajasthan Fieldwork
                   </span>
                 </div>
               </div>
@@ -974,7 +974,7 @@ export function BreakTheGridShowcase({ onLaunchOS }: BreakTheGridShowcaseProps) 
                   isDark ? "text-white" : "text-stone-900"
                 }`}
               >
-                Offline GPS check-ins for field teams in the remote Himalayas.
+                Offline GPS check-ins for field teams in rural operations.
               </h4>
               <p
                 className={`text-sm font-sans leading-relaxed ${
