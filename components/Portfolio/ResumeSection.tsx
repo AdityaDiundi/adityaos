@@ -121,13 +121,13 @@ export function ResumeSection() {
             href="/Aditya_Diundi_Resume.pdf"
             target="_blank"
             rel="noopener noreferrer"
-            className={`px-5 py-2.5 rounded-full font-bold font-mono text-xs flex items-center gap-2 transition-all cursor-pointer self-start sm:self-auto shadow-sm ${
+            className={`px-3.5 py-1.5 rounded-lg font-bold font-mono text-xs flex items-center gap-1.5 transition-all cursor-pointer self-start sm:self-auto shadow-sm ${
               isDark
                 ? "bg-white hover:bg-zinc-200 text-zinc-950"
                 : "bg-stone-900 hover:bg-black text-white"
             }`}
           >
-            <Download className="w-4 h-4 stroke-[2.5]" />
+            <Download className="w-3.5 h-3.5 stroke-[2.5]" />
             <span>Download Resume (PDF)</span>
           </a>
         </div>
@@ -141,7 +141,7 @@ export function ResumeSection() {
           }`}
         >
           {/* Work History (7 Cols) */}
-          <div className="lg:col-span-7 p-8 sm:p-12 space-y-8">
+          <div className="lg:col-span-7 p-6 sm:p-8 space-y-6">
             <div
               className={`text-xs font-mono uppercase tracking-wider pb-1 ${
                 isDark ? "text-zinc-500" : "text-stone-500"
@@ -154,21 +154,17 @@ export function ResumeSection() {
               {experiences.map((exp, idx) => (
                 <div
                   key={idx}
-                  className={`p-7 sm:p-8 rounded-xl border space-y-3 transition-colors shadow-sm ${
-                    isDark
-                      ? "bg-[#0c0e14] border-zinc-800/80 hover:border-zinc-700"
-                      : "bg-white border-stone-200 hover:border-stone-300"
-                  }`}
+                  className="pb-6 border-b border-dashed border-stone-200/70 dark:border-zinc-800/70 last:border-b-0 space-y-2.5"
                 >
-                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1.5 text-xs font-mono">
+                  <div className="flex flex-col sm:flex-row sm:items-baseline justify-between gap-1 text-xs font-mono">
                     <span
-                      className={`font-bold text-lg font-sans tracking-tight ${
+                      className={`font-bold text-base font-sans tracking-tight ${
                         isDark ? "text-white" : "text-stone-900"
                       }`}
                     >
                       {exp.role}
                     </span>
-                    <span className={isDark ? "text-zinc-500" : "text-stone-500"}>
+                    <span className={isDark ? "text-zinc-500" : "text-stone-400"}>
                       {exp.period}
                     </span>
                   </div>
@@ -190,12 +186,12 @@ export function ResumeSection() {
                   </div>
 
                   <ul
-                    className={`space-y-2 text-sm font-sans leading-relaxed pt-2 ${
+                    className={`space-y-1.5 text-xs sm:text-sm font-sans leading-relaxed pt-1 ${
                       isDark ? "text-zinc-400" : "text-stone-600"
                     }`}
                   >
                     {exp.highlights.map((h, i) => (
-                      <li key={i} className="flex items-start gap-2.5">
+                      <li key={i} className="flex items-start gap-2">
                         <span className="text-emerald-500 mt-1 flex-shrink-0 text-xs">
                           ›
                         </span>
@@ -210,18 +206,12 @@ export function ResumeSection() {
 
           {/* Education & Skills (5 Cols) */}
           <div
-            className={`lg:col-span-5 p-8 sm:p-12 space-y-8 transition-colors ${
+            className={`lg:col-span-5 p-6 sm:p-8 space-y-7 transition-colors ${
               isDark ? "bg-[#090b10]/40" : "bg-stone-50/50"
             }`}
           >
             {/* Education */}
-            <div
-              className={`p-7 rounded-xl border space-y-2.5 shadow-sm ${
-                isDark
-                  ? "bg-[#0c0e14] border-zinc-800/80"
-                  : "bg-white border-stone-200"
-              }`}
-            >
+            <div className="pb-6 border-b border-dashed border-stone-200/70 dark:border-zinc-800/70 space-y-2">
               <div
                 className={`text-xs font-mono uppercase tracking-wider ${
                   isDark ? "text-zinc-500" : "text-stone-500"
@@ -244,7 +234,7 @@ export function ResumeSection() {
                 Indraprastha Institute of Information Technology Delhi (IIIT Delhi)
               </div>
               <div
-                className={`text-xs font-sans pt-1 leading-relaxed ${
+                className={`text-xs font-sans pt-0.5 leading-relaxed ${
                   isDark ? "text-zinc-500" : "text-stone-500"
                 }`}
               >
@@ -252,14 +242,8 @@ export function ResumeSection() {
               </div>
             </div>
 
-            {/* Skills */}
-            <div
-              className={`p-7 rounded-xl border space-y-4 shadow-sm ${
-                isDark
-                  ? "bg-[#0c0e14] border-zinc-800/80"
-                  : "bg-white border-stone-200"
-              }`}
-            >
+            {/* Skills & Toolkit */}
+            <div className="pb-6 border-b border-dashed border-stone-200/70 dark:border-zinc-800/70 space-y-3">
               <div
                 className={`text-xs font-mono uppercase tracking-wider ${
                   isDark ? "text-zinc-500" : "text-stone-500"
@@ -267,27 +251,27 @@ export function ResumeSection() {
               >
                 Skills & Toolkit
               </div>
-              <div className="space-y-4">
+              <div className="space-y-3">
                 {skillCategories.map((cat, idx) => (
-                  <div key={idx} className="space-y-2">
+                  <div key={idx} className="space-y-1">
                     <div
                       className={`text-xs font-mono font-medium ${
-                        isDark ? "text-zinc-400" : "text-stone-700"
+                        isDark ? "text-zinc-300" : "text-stone-700"
                       }`}
                     >
                       {cat.name}
                     </div>
-                    <div className="flex flex-wrap gap-2">
+                    <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-xs font-mono">
                       {cat.skills.map((s, i) => (
-                        <span
-                          key={i}
-                          className={`px-2.5 py-1 rounded border text-xs font-mono ${
-                            isDark
-                              ? "bg-zinc-900 border-zinc-800 text-zinc-300"
-                              : "bg-stone-100 border-stone-200 text-stone-700"
-                          }`}
-                        >
-                          {s}
+                        <span key={i} className="flex items-center gap-2">
+                          <span className={isDark ? "text-zinc-400" : "text-stone-600"}>
+                            {s}
+                          </span>
+                          {i < cat.skills.length - 1 && (
+                            <span className={isDark ? "text-zinc-600" : "text-stone-300"}>
+                              ·
+                            </span>
+                          )}
                         </span>
                       ))}
                     </div>
@@ -296,14 +280,8 @@ export function ResumeSection() {
               </div>
             </div>
 
-            {/* Contact */}
-            <div
-              className={`p-7 rounded-xl border space-y-3 text-xs font-mono shadow-sm ${
-                isDark
-                  ? "bg-[#0c0e14] border-zinc-800/80"
-                  : "bg-white border-stone-200"
-              }`}
-            >
+            {/* Direct Contact */}
+            <div className="space-y-2.5 text-xs font-mono">
               <div
                 className={`uppercase tracking-wider ${
                   isDark ? "text-zinc-500" : "text-stone-500"
@@ -318,12 +296,12 @@ export function ResumeSection() {
               >
                 Based in Delhi NCR. Open for full-time Product Designer, Design Technologist, and Systems Architect roles (Remote / Hybrid / Relocation).
               </p>
-              <div className="space-y-2 pt-1 font-mono">
+              <div className="space-y-1.5 pt-1 font-mono">
                 <a
                   href="https://www.linkedin.com/in/adityadiundi/"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className={`flex items-center gap-2 transition-colors text-xs ${
+                  className={`flex items-center gap-2 transition-colors text-xs hover:underline ${
                     isDark ? "text-blue-400 hover:text-blue-300" : "text-blue-700 hover:text-blue-900"
                   }`}
                 >
@@ -332,7 +310,7 @@ export function ResumeSection() {
                 </a>
                 <a
                   href="mailto:aditya15124@iiitd.ac.in"
-                  className={`flex items-center gap-2 transition-colors text-xs ${
+                  className={`flex items-center gap-2 transition-colors text-xs hover:underline ${
                     isDark ? "text-zinc-300 hover:text-white" : "text-stone-800 hover:text-black"
                   }`}
                 >

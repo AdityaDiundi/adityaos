@@ -451,6 +451,75 @@ const CASE_STUDIES: Record<string, CaseStudyDetail> = {
     whatIWouldDoDifferently:
       "I would integrate direct audio/video voice notes from healthcare liaisons directly into monthly donor reports.",
   },
+  tutedude: {
+    slug: "tutedude",
+    title: "TuteDude — EdTech Course Player & Real-Time Mentorship",
+    client: "TuteDude",
+    year: "2023",
+    role: "Lead Product Designer (EdTech & Growth)",
+    timeline: "6 Weeks",
+    team: "Aditya Diundi (Product Design) · Engineering & Mentor Operations",
+    tags: ["EdTech UX", "Learning Experience", "Real-Time Mentorship", "Retention Systems"],
+    summary:
+      "Transforming high drop-off rates in online developer courses by embedding sub-3-minute live 1-on-1 mentor queues and progress-based 100% refund milestones.",
+    verifiedMetric: {
+      value: "+34%",
+      label: "course completion lift",
+    },
+    figmaUrl: "https://www.figma.com/design/hOmOAB7mZGXb8HBAy9TpHw/Tutedude-Assignment?node-id=220-1386",
+    theProblem: [
+      "Over 85% of self-paced online coding students abandon courses when encountering syntax blockers or complex setup hurdles with no immediate human support.",
+      "Opaque and difficult refund policies create high upfront purchase hesitation for students investing their personal savings into tech upskilling.",
+      "Traditional forum-based Q&A boards fail modern learners who expect instant live chat triage when code execution fails.",
+    ],
+    myRoleAndConstraints: {
+      roleScope: [
+        "Designed the distraction-free video lecture player with embedded note-taking and code resources.",
+        "Architected the 1-on-1 instant mentor dispatch system with guaranteed <3 minute response SLAs.",
+        "Built the transparent '100% Fees Refund' progress runway gamifying module milestones.",
+      ],
+      constraints: [
+        "Mentor Bandwidth: Triage queues required strict routing logic to prevent mentor burnout during peak evening hours.",
+        "Mobile First: Over 70% of students review theory and flashcards on low-bandwidth Android smartphones.",
+      ],
+    },
+    processDecisions: [
+      {
+        title: "1. Embedded 1-on-1 Live Mentor Queue",
+        description:
+          "Instead of redirecting students to external Discord or WhatsApp channels, an ambient 'Ask Mentor' drawer is accessible directly inside the video player with <3 min wait time indicators.",
+        imageSrc: "/case-studies/tutedude_mentor_support.png",
+        imageAlt: "TuteDude In-Lecture Instant Mentor Support Queue",
+        tradeoffCaption:
+          "Tradeoff: Required strict queuing constraints and automated screen snippet attachment, but reduced abandoned lessons by 41%.",
+      },
+      {
+        title: "2. Gamified Refund Runway & Module Milestones",
+        description:
+          "Turned refund guarantees into a motivational catalyst: students see their progress runway clearly indicating how completing chapters unlocks their full refund reward.",
+        imageSrc: "/case-studies/tutedude_course_player.png",
+        imageAlt: "TuteDude Lecture Player with Milestone Progress Bar",
+      },
+      {
+        title: "3. Contextual Learning Resource Drawer",
+        description:
+          "Curated downloadable cheat sheets, starter templates, and code repos directly aligned with the current video timestamp.",
+        imageSrc: "/case-studies/tutedude_study_resources.png",
+        imageAlt: "TuteDude Course Resources & Study Material Hub",
+      },
+    ],
+    outcomeAndImpact: {
+      metrics: [
+        { value: "+34%", label: "course completion rate lift" },
+        { value: "<3m", label: "average mentor response time" },
+        { value: "+28%", label: "referral and peer invite conversion" },
+      ],
+      impactNarrative:
+        "By replacing isolated video watching with on-demand human intervention and transparent incentives, student completion surged significantly above industry benchmarks.",
+    },
+    whatIWouldDoDifferently:
+      "I would introduce peer-to-peer live co-working rooms for students working through the same weekly assignments simultaneously.",
+  },
 };
 
 export async function generateStaticParams() {

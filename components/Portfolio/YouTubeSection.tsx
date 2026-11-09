@@ -54,33 +54,33 @@ export function YouTubeSection() {
             href="https://youtube.com/@falsepeek"
             target="_blank"
             rel="noopener noreferrer"
-            className={`px-4 py-2 rounded-full border font-mono text-xs flex items-center gap-2 transition-all self-start sm:self-auto cursor-pointer group/ytlink ${
+            className={`px-3.5 py-1.5 rounded-lg border font-mono text-xs flex items-center gap-1.5 transition-all self-start sm:self-auto cursor-pointer group/ytlink shadow-sm ${
               isDark
                 ? "bg-zinc-900 hover:bg-zinc-800 border-zinc-800 hover:border-red-500/50 text-zinc-300 hover:text-white"
                 : "bg-stone-100 hover:bg-stone-200 border-stone-200 hover:border-red-500/50 text-stone-800"
             }`}
           >
-            <Youtube className="w-4 h-4 text-red-500" />
+            <Youtube className="w-3.5 h-3.5 text-red-500" />
             <span>@falsepeek Channel</span>
-            <ExternalLink className="w-3 h-3 ml-0.5 text-zinc-500" />
+            <ExternalLink className="w-3 h-3 ml-0.5 opacity-60" />
           </a>
         </div>
 
         {/* Video Grid */}
         <div
-          className={`p-8 sm:p-12 lg:p-14 border-b ${
-            isDark ? "border-zinc-800" : "border-stone-200"
+          className={`p-6 sm:p-8 lg:p-10 border-b border-dashed ${
+            isDark ? "border-zinc-800/80" : "border-stone-200/80"
           }`}
         >
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
             {FEATURED_YOUTUBE_VIDEOS.map((video) => (
               <div
                 key={video.id}
                 onClick={() => setActiveVideo(video)}
                 className={`group rounded-xl border overflow-hidden transition-all cursor-pointer shadow-sm flex flex-col justify-between ${
                   isDark
-                    ? "border-zinc-800 bg-[#0c0e14] hover:border-zinc-700 hover:bg-[#10131b]"
-                    : "border-stone-200 bg-white hover:border-stone-400 hover:bg-stone-50"
+                    ? "border-zinc-800/80 bg-[#0c0e14] hover:border-zinc-700 hover:bg-[#10131b]"
+                    : "border-stone-200/90 bg-white hover:border-stone-300 hover:bg-stone-50/50"
                 }`}
               >
                 {/* Muted Monochrome Video Thumbnail Frame (Reveals brand color only on hover) */}
@@ -103,19 +103,13 @@ export function YouTubeSection() {
                 </div>
 
                 {/* Details */}
-                <div className="p-5 space-y-2.5">
+                <div className="p-4 sm:p-5 space-y-2">
                   <div
                     className={`flex items-center justify-between text-xs font-mono ${
                       isDark ? "text-zinc-500" : "text-stone-500"
                     }`}
                   >
-                    <span
-                      className={`px-2 py-0.5 rounded border text-[11px] ${
-                        isDark
-                          ? "bg-zinc-900 border-zinc-800 text-zinc-300"
-                          : "bg-stone-100 border-stone-200 text-stone-700"
-                      }`}
-                    >
+                    <span className={isDark ? "text-zinc-400 font-medium" : "text-stone-600 font-medium"}>
                       {video.category}
                     </span>
                     <span>@falsepeek</span>

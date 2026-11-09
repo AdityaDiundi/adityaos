@@ -1195,7 +1195,20 @@ export function BreakTheGridShowcase({ onLaunchOS }: BreakTheGridShowcaseProps) 
             </div>
 
             <div className="pt-2 flex flex-wrap items-center gap-4 font-mono text-xs">
+              <Link
+                href="/work/tutedude"
+                className={`px-3.5 py-1.5 rounded-lg font-semibold flex items-center gap-1.5 transition-all cursor-pointer shadow-sm ${
+                  isDark
+                    ? "bg-white text-zinc-950 hover:bg-zinc-200"
+                    : "bg-stone-900 text-white hover:bg-black"
+                }`}
+              >
+                <span>Read Case Study</span>
+                <ArrowRight className="w-3.5 h-3.5" />
+              </Link>
+
               <button
+                type="button"
                 onClick={() =>
                   setModalData({
                     title: "TuteDude Course Architecture & 1-on-1 Mentorship",
@@ -1212,14 +1225,12 @@ export function BreakTheGridShowcase({ onLaunchOS }: BreakTheGridShowcaseProps) 
                     defaultMode: "screens",
                   })
                 }
-                className={`px-3.5 py-1.5 rounded-lg font-semibold flex items-center gap-1.5 transition-all cursor-pointer shadow-sm ${
-                  isDark
-                    ? "bg-white text-zinc-950 hover:bg-zinc-200"
-                    : "bg-stone-900 text-white hover:bg-black"
+                className={`flex items-center gap-1 transition-colors cursor-pointer hover:underline ${
+                  isDark ? "text-cyan-400 hover:text-cyan-300" : "text-cyan-700 hover:text-cyan-900"
                 }`}
               >
-                <span>Read Case Study</span>
-                <ArrowRight className="w-3.5 h-3.5" />
+                <span>Interactive Preview</span>
+                <span className="text-[10px]">↗</span>
               </button>
 
               <a

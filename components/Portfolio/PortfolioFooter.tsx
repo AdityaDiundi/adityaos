@@ -23,8 +23,8 @@ export function PortfolioFooter({ onLaunchOS }: PortfolioFooterProps) {
       }`}
     >
       <div
-        className={`max-w-7xl mx-auto border-x border-b p-6 sm:p-10 flex flex-col md:flex-row items-center justify-between gap-6 relative transition-colors ${
-          isDark ? "border-zinc-800" : "border-stone-200"
+        className={`max-w-7xl mx-auto border-x border-b border-dashed p-6 sm:p-10 flex flex-col md:flex-row items-center justify-between gap-6 relative transition-colors ${
+          isDark ? "border-zinc-800/80" : "border-stone-200/80"
         }`}
       >
         <div className="flex flex-col sm:flex-row items-center gap-3 text-center sm:text-left">
