@@ -40,29 +40,29 @@ function BrowserFrame({
 
   return (
     <div
-      className={`w-full rounded-xl overflow-hidden border shadow-lg transition-all duration-300 group-hover/stage:shadow-2xl group-hover/stage:-translate-y-1 ${
+      className={`w-full rounded-xl overflow-hidden border shadow-sm transition-all duration-300 group-hover/stage:shadow-md ${
         isDark
-          ? "bg-[#111318] border-zinc-700/60 shadow-black/80"
-          : "bg-white border-stone-200/90 shadow-stone-300/40"
+          ? "bg-[#111318] border-zinc-800 shadow-black/40"
+          : "bg-white border-stone-200/90 shadow-stone-200/50"
       }`}
     >
       {/* Top Browser Bar */}
       <div
-        className={`px-3 py-2 border-b flex items-center justify-between gap-3 text-xs font-mono select-none ${
+        className={`px-3 py-1.5 border-b flex items-center justify-between gap-3 text-xs font-mono select-none ${
           isDark
-            ? "bg-[#181a20] border-zinc-800 text-zinc-400"
-            : "bg-stone-100 border-stone-200 text-stone-500"
+            ? "bg-[#14171f] border-zinc-800 text-zinc-400"
+            : "bg-stone-50 border-stone-200 text-stone-500"
         }`}
       >
-        <div className="flex items-center gap-1.5 shrink-0">
-          <span className="w-2.5 h-2.5 rounded-full bg-rose-400/80" />
-          <span className="w-2.5 h-2.5 rounded-full bg-amber-400/80" />
-          <span className="w-2.5 h-2.5 rounded-full bg-emerald-400/80" />
+        <div className="flex items-center gap-1.5 shrink-0 opacity-60">
+          <span className="w-2 h-2 rounded-full bg-current" />
+          <span className="w-2 h-2 rounded-full bg-current" />
+          <span className="w-2 h-2 rounded-full bg-current" />
         </div>
 
         {/* Minimalist Address Pill */}
         <div
-          className={`flex-1 max-w-[220px] mx-auto px-2.5 py-0.5 rounded-md text-[10px] flex items-center justify-center gap-1.5 truncate border ${
+          className={`px-2.5 py-0.5 rounded text-[10px] flex items-center justify-center gap-1.5 truncate border ${
             isDark
               ? "bg-[#0d0e12] border-zinc-800 text-zinc-300"
               : "bg-white border-stone-200 text-stone-700"
@@ -72,13 +72,11 @@ function BrowserFrame({
           <span className="truncate">{url}</span>
         </div>
 
-        <div className="w-10 shrink-0 flex justify-end">
-          <span className="w-1.5 h-1.5 rounded-full opacity-40 bg-current" />
-        </div>
+        <div className="w-6 shrink-0" />
       </div>
 
       {/* Frame Body */}
-      <div className="relative overflow-hidden bg-black/40 aspect-[16/10]">
+      <div className="relative overflow-hidden bg-stone-900/5 dark:bg-black/30 aspect-[16/10]">
         {children}
       </div>
     </div>
@@ -86,7 +84,7 @@ function BrowserFrame({
 }
 
 /* ========================================================================= */
-/* 2. Sleek Floating Mobile Device Frame */
+/* 2. Minimal Border-Contained Mobile Viewport */
 /* ========================================================================= */
 function MobileDeviceFrame({
   children,
@@ -98,23 +96,14 @@ function MobileDeviceFrame({
 
   return (
     <div
-      className={`w-full max-w-[210px] sm:max-w-[230px] mx-auto rounded-[28px] p-2 border-2 shadow-xl transition-all duration-300 group-hover/stage:-translate-y-1.5 group-hover/stage:shadow-2xl ${
+      className={`w-full max-w-[210px] sm:max-w-[230px] mx-auto rounded-2xl overflow-hidden border shadow-sm transition-all duration-300 group-hover/stage:shadow-md ${
         isDark
-          ? "bg-[#181a22] border-zinc-700/70 shadow-black/90"
-          : "bg-stone-200 border-stone-300 shadow-stone-300/50"
+          ? "bg-[#0f1117] border-zinc-800 shadow-black/50"
+          : "bg-stone-100 border-stone-200 shadow-stone-200/60"
       }`}
     >
-      <div className="relative rounded-[20px] overflow-hidden bg-black border border-black/40 aspect-[9/18]">
-        {/* Dynamic Island Pill */}
-        <div className="absolute top-2 left-1/2 -translate-x-1/2 w-14 h-3.5 bg-black rounded-full z-20 flex items-center justify-center">
-          <div className="w-2 h-2 rounded-full bg-zinc-900 border border-zinc-800 mr-1.5" />
-          <div className="w-1.5 h-1.5 rounded-full bg-blue-900/40" />
-        </div>
-
-        {/* Screen Content */}
-        <div className="w-full h-full overflow-hidden flex flex-col">
-          {children}
-        </div>
+      <div className="relative overflow-hidden aspect-[9/18] w-full">
+        {children}
       </div>
     </div>
   );
