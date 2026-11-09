@@ -60,8 +60,8 @@ function computeNextZ(map: Record<string, number>, targetId: string) {
 }
 
 export const useOSStore = create<OSState>((set, get) => ({
-  activeWindow: "coreIntro",
-  openWindows: ["coreIntro", "pixelEngine"],
+  activeWindow: null,
+  openWindows: [],
   minimizedWindows: [],
   maximizedWindows: [],
   zIndexMap: {

@@ -36,6 +36,17 @@ export const TerminalDesktop: React.FC = () => {
     }
   }, [isExpanded, history]);
 
+  useEffect(() => {
+    const handleToggleTerminal = () => {
+      setIsExpanded((prev) => {
+        if (!prev) setTimeout(() => inputRef.current?.focus(), 60);
+        return !prev;
+      });
+    };
+    window.addEventListener("open-terminal", handleToggleTerminal);
+    return () => window.removeEventListener("open-terminal", handleToggleTerminal);
+  }, []);
+
   const executeCommand = (cmd: string) => {
     const trimmed = cmd.trim();
     if (!trimmed) return;

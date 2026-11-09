@@ -44,6 +44,8 @@ import {
   MessageSquare,
   StickyNote,
   Lock,
+  Folder,
+  FileCode,
 } from "lucide-react";
 
 const APP_LABELS: Record<string, string> = {
@@ -271,7 +273,14 @@ export default function Home({
   };
 
   if (viewMode === "portfolio") {
-    return <PortfolioView onLaunchOS={() => setViewMode("os")} />;
+    return (
+      <PortfolioView
+        onLaunchOS={() => {
+          closeAllWindows();
+          setViewMode("os");
+        }}
+      />
+    );
   }
 
   return (
@@ -755,232 +764,217 @@ export default function Home({
       <div className="relative flex-1 w-full h-[calc(100vh-72px)] overflow-hidden">
         {/* Desktop Background Shortcuts & Widgets (Visible on empty canvas) */}
         <div className="absolute inset-0 p-6 pb-16 pointer-events-none flex flex-col justify-between z-0">
-          {/* Top-Left Desktop App Icons Grid */}
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-9 gap-3 max-w-6xl pointer-events-auto">
-            {/* Shortcut 1: Pixel Engine */}
+          {/* Left Desktop App Icons Column - Ultra-clean minimalistic squircle form */}
+          <div className="flex flex-col flex-wrap max-h-[calc(100vh-140px)] gap-y-5 gap-x-6 pointer-events-auto w-fit z-10">
+            {/* 1: PixelStudio */}
             <button
               type="button"
-              onClick={() => openAndFocus("pixelEngine")}
-              style={{
-                backgroundColor: activeTheme.cardBg,
-                borderColor: activeTheme.cardBorder,
-                color: activeTheme.textPrimary,
+              onClick={() => {
+                playClickChime(500);
+                openAndFocus("pixelEngine");
               }}
-              className="p-3 rounded-lg border backdrop-blur-sm flex flex-col items-center gap-2 text-center group hover:scale-[1.03] hover:border-cyan-400/60 transition-all shadow-sm"
+              title="Launch PixelStudio"
+              className="group flex flex-col items-center gap-1.5 focus:outline-none cursor-pointer transition-transform active:scale-95 w-16"
             >
               <div
-                style={{ backgroundColor: `${activeTheme.accent}20` }}
-                className="w-10 h-10 rounded-md flex items-center justify-center group-hover:bg-cyan-500/30 transition-colors"
+                style={{
+                  backgroundColor: activeTheme.isDark ? "rgba(255, 255, 255, 0.08)" : "rgba(240, 240, 243, 0.9)",
+                  borderColor: activeTheme.isDark ? "rgba(255, 255, 255, 0.12)" : "rgba(0, 0, 0, 0.08)",
+                }}
+                className="w-13 h-13 sm:w-14 sm:h-14 rounded-2xl border flex items-center justify-center shadow-sm backdrop-blur-md group-hover:scale-105 group-hover:shadow-md transition-all duration-150"
               >
-                <Paintbrush className="w-5 h-5" style={{ color: activeTheme.accent }} />
+                <Paintbrush className="w-6 h-6 text-sky-400 group-hover:scale-110 transition-transform -rotate-12 stroke-[1.8]" />
               </div>
-              <div className="space-y-0.5">
-                <div className="font-bold text-xs">Pixel Studio</div>
-                <div className="text-[10px] opacity-60">Draw & Pixel Art</div>
-              </div>
+              <span
+                style={{ color: activeTheme.textPrimary }}
+                className="font-mono text-[11px] font-medium tracking-tight text-center select-none truncate max-w-[76px] opacity-85 group-hover:opacity-100 transition-opacity"
+              >
+                PixelStudio
+              </span>
             </button>
 
-            {/* Shortcut 2: Essays & Poetry Archive */}
+            {/* 2: Terminal */}
             <button
               type="button"
-              onClick={() => openAndFocus("archiveReader")}
-              style={{
-                backgroundColor: activeTheme.cardBg,
-                borderColor: activeTheme.cardBorder,
-                color: activeTheme.textPrimary,
+              onClick={() => {
+                playClickChime(420);
+                window.dispatchEvent(new CustomEvent("open-terminal"));
               }}
-              className="p-3 rounded-lg border backdrop-blur-sm flex flex-col items-center gap-2 text-center group hover:scale-[1.03] hover:border-emerald-400/60 transition-all shadow-sm"
+              title="Toggle Noctalia Shell Terminal"
+              className="group flex flex-col items-center gap-1.5 focus:outline-none cursor-pointer transition-transform active:scale-95 w-16"
             >
-              <div className="w-10 h-10 rounded-md bg-emerald-500/20 flex items-center justify-center group-hover:bg-emerald-500/30 transition-colors">
-                <BookOpen className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
+              <div
+                style={{
+                  backgroundColor: activeTheme.isDark ? "rgba(255, 255, 255, 0.08)" : "rgba(240, 240, 243, 0.9)",
+                  borderColor: activeTheme.isDark ? "rgba(255, 255, 255, 0.12)" : "rgba(0, 0, 0, 0.08)",
+                }}
+                className="w-13 h-13 sm:w-14 sm:h-14 rounded-2xl border flex items-center justify-center shadow-sm backdrop-blur-md group-hover:scale-105 group-hover:shadow-md transition-all duration-150"
+              >
+                <span className="font-mono text-base font-bold text-neutral-800 dark:text-neutral-200 tracking-tighter select-none group-hover:scale-110 transition-transform">
+                  &gt;_
+                </span>
               </div>
-              <div className="space-y-0.5">
-                <div className="font-bold text-xs">Archive</div>
-                <div className="text-[10px] opacity-60">Writing & Research</div>
-              </div>
+              <span
+                style={{ color: activeTheme.textPrimary }}
+                className="font-mono text-[11px] font-medium tracking-tight text-center select-none truncate max-w-[76px] opacity-85 group-hover:opacity-100 transition-opacity"
+              >
+                Terminal
+              </span>
             </button>
 
-            {/* Shortcut 3: @falsepeek Media Feed */}
+            {/* 3: Projects */}
             <button
               type="button"
-              onClick={() => openAndFocus("streamFeed")}
-              style={{
-                backgroundColor: activeTheme.cardBg,
-                borderColor: activeTheme.cardBorder,
-                color: activeTheme.textPrimary,
+              onClick={() => {
+                playClickChime(450);
+                openAndFocus("archiveReader");
               }}
-              className="p-3 rounded-lg border backdrop-blur-sm flex flex-col items-center gap-2 text-center group hover:scale-[1.03] hover:border-amber-400/60 transition-all shadow-sm"
+              title="Open Case Studies & Engineering Projects"
+              className="group flex flex-col items-center gap-1.5 focus:outline-none cursor-pointer transition-transform active:scale-95 w-16"
             >
-              <div className="w-10 h-10 rounded-md bg-amber-500/20 flex items-center justify-center group-hover:bg-amber-500/30 transition-colors">
-                <Tv className="w-5 h-5 text-amber-600 dark:text-amber-400" />
+              <div
+                style={{
+                  backgroundColor: activeTheme.isDark ? "rgba(255, 255, 255, 0.08)" : "rgba(240, 240, 243, 0.9)",
+                  borderColor: activeTheme.isDark ? "rgba(255, 255, 255, 0.12)" : "rgba(0, 0, 0, 0.08)",
+                }}
+                className="w-13 h-13 sm:w-14 sm:h-14 rounded-2xl border flex items-center justify-center shadow-sm backdrop-blur-md group-hover:scale-105 group-hover:shadow-md transition-all duration-150"
+              >
+                <Folder className="w-6 h-6 text-neutral-700 dark:text-neutral-200 stroke-[1.6] group-hover:scale-110 transition-transform" />
               </div>
-              <div className="space-y-0.5">
-                <div className="font-bold text-xs">Media Feed</div>
-                <div className="text-[10px] opacity-60">Videos & Gameplay</div>
-              </div>
+              <span
+                style={{ color: activeTheme.textPrimary }}
+                className="font-mono text-[11px] font-medium tracking-tight text-center select-none truncate max-w-[76px] opacity-85 group-hover:opacity-100 transition-opacity"
+              >
+                Projects
+              </span>
             </button>
 
-            {/* Shortcut 4: Resume Viewer */}
+            {/* 4: Writings */}
             <button
               type="button"
-              onClick={() => openAndFocus("resumeViewer")}
-              style={{
-                backgroundColor: activeTheme.cardBg,
-                borderColor: activeTheme.cardBorder,
-                color: activeTheme.textPrimary,
+              onClick={() => {
+                playClickChime(450);
+                openAndFocus("archiveReader");
               }}
-              className="p-3 rounded-lg border backdrop-blur-sm flex flex-col items-center gap-2 text-center group hover:scale-[1.03] hover:border-cyan-400/60 transition-all shadow-sm"
+              title="Open Essays & Poetry Archive"
+              className="group flex flex-col items-center gap-1.5 focus:outline-none cursor-pointer transition-transform active:scale-95 w-16"
             >
-              <div className="w-10 h-10 rounded-md bg-cyan-500/20 flex items-center justify-center group-hover:bg-cyan-500/30 transition-colors">
-                <FileText className="w-5 h-5 text-cyan-700 dark:text-cyan-400" />
+              <div
+                style={{
+                  backgroundColor: activeTheme.isDark ? "rgba(255, 255, 255, 0.08)" : "rgba(240, 240, 243, 0.9)",
+                  borderColor: activeTheme.isDark ? "rgba(255, 255, 255, 0.12)" : "rgba(0, 0, 0, 0.08)",
+                }}
+                className="w-13 h-13 sm:w-14 sm:h-14 rounded-2xl border flex items-center justify-center shadow-sm backdrop-blur-md group-hover:scale-105 group-hover:shadow-md transition-all duration-150"
+              >
+                <FileText className="w-6 h-6 text-neutral-700 dark:text-neutral-200 stroke-[1.6] group-hover:scale-110 transition-transform" />
               </div>
-              <div className="space-y-0.5">
-                <div className="font-bold text-xs">Resume (PDF)</div>
-                <div className="text-[10px] opacity-60">Background & Roles</div>
-              </div>
+              <span
+                style={{ color: activeTheme.textPrimary }}
+                className="font-mono text-[11px] font-medium tracking-tight text-center select-none truncate max-w-[76px] opacity-85 group-hover:opacity-100 transition-opacity"
+              >
+                Writings
+              </span>
             </button>
 
-            {/* Shortcut 5: Gallery Viewer */}
+            {/* 5: Resume */}
             <button
               type="button"
-              onClick={() => openAndFocus("galleryViewer")}
-              style={{
-                backgroundColor: activeTheme.cardBg,
-                borderColor: activeTheme.cardBorder,
-                color: activeTheme.textPrimary,
+              onClick={() => {
+                playClickChime(400);
+                openAndFocus("resumeViewer");
               }}
-              className="p-3 rounded-lg border backdrop-blur-sm flex flex-col items-center gap-2 text-center group hover:scale-[1.03] hover:border-pink-400/60 transition-all shadow-sm"
+              title="Open Resume & Experience"
+              className="group flex flex-col items-center gap-1.5 focus:outline-none cursor-pointer transition-transform active:scale-95 w-16"
             >
-              <div className="w-10 h-10 rounded-md bg-pink-500/20 flex items-center justify-center group-hover:bg-pink-500/30 transition-colors">
-                <ImageIcon className="w-5 h-5 text-pink-600 dark:text-pink-400" />
+              <div
+                style={{
+                  backgroundColor: activeTheme.isDark ? "rgba(255, 255, 255, 0.08)" : "rgba(240, 240, 243, 0.9)",
+                  borderColor: activeTheme.isDark ? "rgba(255, 255, 255, 0.12)" : "rgba(0, 0, 0, 0.08)",
+                }}
+                className="w-13 h-13 sm:w-14 sm:h-14 rounded-2xl border flex items-center justify-center shadow-sm backdrop-blur-md group-hover:scale-105 group-hover:shadow-md transition-all duration-150"
+              >
+                <FileCode className="w-6 h-6 text-neutral-700 dark:text-neutral-200 stroke-[1.6] group-hover:scale-110 transition-transform" />
               </div>
-              <div className="space-y-0.5">
-                <div className="font-bold text-xs">Photo Gallery</div>
-                <div className="text-[10px] opacity-60">Visual & Field Photos</div>
-              </div>
+              <span
+                style={{ color: activeTheme.textPrimary }}
+                className="font-mono text-[11px] font-medium tracking-tight text-center select-none truncate max-w-[76px] opacity-85 group-hover:opacity-100 transition-opacity"
+              >
+                Resume
+              </span>
             </button>
 
-            {/* Shortcut 6: System Core Intro */}
+            {/* 6: Gallery */}
             <button
               type="button"
-              onClick={() => openAndFocus("coreIntro")}
-              style={{
-                backgroundColor: activeTheme.cardBg,
-                borderColor: activeTheme.cardBorder,
-                color: activeTheme.textPrimary,
+              onClick={() => {
+                playClickChime(480);
+                openAndFocus("galleryViewer");
               }}
-              className="p-3 rounded-lg border backdrop-blur-sm flex flex-col items-center gap-2 text-center group hover:scale-[1.03] hover:border-purple-400/60 transition-all shadow-sm"
+              title="Open Visual Photo Gallery"
+              className="group flex flex-col items-center gap-1.5 focus:outline-none cursor-pointer transition-transform active:scale-95 w-16"
             >
-              <div className="w-10 h-10 rounded-md bg-purple-500/20 flex items-center justify-center group-hover:bg-purple-500/30 transition-colors">
-                <Sparkles className="w-5 h-5 text-purple-700 dark:text-purple-400" />
+              <div
+                style={{
+                  backgroundColor: activeTheme.isDark ? "rgba(255, 255, 255, 0.08)" : "rgba(240, 240, 243, 0.9)",
+                  borderColor: activeTheme.isDark ? "rgba(255, 255, 255, 0.12)" : "rgba(0, 0, 0, 0.08)",
+                }}
+                className="w-13 h-13 sm:w-14 sm:h-14 rounded-2xl border flex items-center justify-center shadow-sm backdrop-blur-md group-hover:scale-105 group-hover:shadow-md transition-all duration-150"
+              >
+                <ImageIcon className="w-6 h-6 text-neutral-700 dark:text-neutral-200 stroke-[1.6] group-hover:scale-110 transition-transform" />
               </div>
-              <div className="space-y-0.5">
-                <div className="font-bold text-xs">About Aditya</div>
-                <div className="text-[10px] opacity-60">Identity & Design Bio</div>
-              </div>
+              <span
+                style={{ color: activeTheme.textPrimary }}
+                className="font-mono text-[11px] font-medium tracking-tight text-center select-none truncate max-w-[76px] opacity-85 group-hover:opacity-100 transition-opacity"
+              >
+                Gallery
+              </span>
             </button>
 
-            {/* Shortcut 7: YouTube Channel Link */}
-            <a
-              href="https://www.youtube.com/@falsepeek"
-              target="_blank"
-              rel="noopener noreferrer"
-              style={{
-                backgroundColor: activeTheme.cardBg,
-                borderColor: activeTheme.cardBorder,
-                color: activeTheme.textPrimary,
-              }}
-              className="p-3 rounded-lg border backdrop-blur-sm flex flex-col items-center gap-2 text-center group hover:scale-[1.03] hover:border-red-400/60 transition-all shadow-sm"
-            >
-              <div className="w-10 h-10 rounded-md bg-red-500/20 flex items-center justify-center group-hover:bg-red-500/30 transition-colors">
-                <ExternalLink className="w-5 h-5 text-red-600 dark:text-red-400" />
-              </div>
-              <div className="space-y-0.5">
-                <div className="font-bold text-xs text-red-600 dark:text-red-400">@falsepeek</div>
-                <div className="text-[10px] opacity-60">YouTube Channel ↗</div>
-              </div>
-            </a>
-
-            {/* Shortcut 8: Field Journal */}
+            {/* 7: AboutMe */}
             <button
               type="button"
-              onClick={() => openAndFocus("fieldJournal")}
-              style={{
-                backgroundColor: activeTheme.cardBg,
-                borderColor: activeTheme.cardBorder,
-                color: activeTheme.textPrimary,
+              onClick={() => {
+                playClickChime(460);
+                openAndFocus("coreIntro");
               }}
-              className="p-3 rounded-lg border backdrop-blur-sm flex flex-col items-center gap-2 text-center group hover:scale-[1.03] hover:border-amber-400/60 transition-all shadow-sm"
+              title="About Aditya Diundi"
+              className="group flex flex-col items-center gap-1.5 focus:outline-none cursor-pointer transition-transform active:scale-95 w-16"
             >
-              <div className="w-10 h-10 rounded-md bg-amber-500/20 flex items-center justify-center group-hover:bg-amber-500/30 transition-colors">
-                <Compass className="w-5 h-5 text-amber-700 dark:text-amber-400" />
+              <div
+                style={{
+                  backgroundColor: activeTheme.isDark ? "rgba(255, 255, 255, 0.08)" : "rgba(240, 240, 243, 0.9)",
+                  borderColor: activeTheme.isDark ? "rgba(255, 255, 255, 0.12)" : "rgba(0, 0, 0, 0.08)",
+                }}
+                className="w-13 h-13 sm:w-14 sm:h-14 rounded-2xl border flex items-center justify-center shadow-sm backdrop-blur-md group-hover:scale-105 group-hover:shadow-md transition-all duration-150"
+              >
+                <Sparkles className="w-6 h-6 text-neutral-700 dark:text-neutral-200 stroke-[1.6] group-hover:scale-110 transition-transform" />
               </div>
-              <div className="space-y-0.5">
-                <div className="font-bold text-xs">Field Journal</div>
-                <div className="text-[10px] opacity-60">Rural Ethnography</div>
-              </div>
-            </button>
-
-            {/* Shortcut 9: LearnabilityLab */}
-            <button
-              type="button"
-              onClick={() => openAndFocus("learnabilityLab")}
-              style={{
-                backgroundColor: activeTheme.cardBg,
-                borderColor: activeTheme.cardBorder,
-                color: activeTheme.textPrimary,
-              }}
-              className="p-3 rounded-lg border backdrop-blur-sm flex flex-col items-center gap-2 text-center group hover:scale-[1.03] hover:border-cyan-400/60 transition-all shadow-sm"
-            >
-              <div className="w-10 h-10 rounded-md bg-cyan-500/20 flex items-center justify-center group-hover:bg-cyan-500/30 transition-colors">
-                <Brain className="w-5 h-5 text-cyan-700 dark:text-cyan-400" />
-              </div>
-              <div className="space-y-0.5">
-                <div className="font-bold text-xs">Diagnostic Lab</div>
-                <div className="text-[10px] opacity-60">Aarohi Education</div>
-              </div>
+              <span
+                style={{ color: activeTheme.textPrimary }}
+                className="font-mono text-[11px] font-medium tracking-tight text-center select-none truncate max-w-[76px] opacity-85 group-hover:opacity-100 transition-opacity"
+              >
+                AboutMe
+              </span>
             </button>
           </div>
 
-          {/* Bottom Desktop System Info Widget */}
-          <div className="hidden md:flex items-end justify-between pointer-events-auto">
+          {/* Bottom Desktop System Info Widget (Right Aligned) */}
+          <div className="hidden md:flex items-end justify-end pointer-events-auto">
             <div
               style={{
                 backgroundColor: activeTheme.cardBg,
                 borderColor: activeTheme.cardBorder,
                 color: activeTheme.textPrimary,
               }}
-              className="p-3 rounded-md border text-[11px] backdrop-blur-md max-w-md space-y-1 shadow-md"
+              className="p-3 rounded-md border text-[11px] backdrop-blur-md max-w-sm space-y-1 shadow-md opacity-75 hover:opacity-100 transition-opacity"
             >
               <div className="flex items-center gap-2 font-bold" style={{ color: activeTheme.accent }}>
                 <Sparkles className="w-3.5 h-3.5" />
                 <span>ADITYA-OS // Interactive Web Desktop</span>
               </div>
               <p className="text-[10px] opacity-75 leading-relaxed">
-                An interactive web desktop and creative workspace. Paint in Pixel Studio, inspect real product case studies, listen to the 8-bit music box, and customize desktop themes.
+                Click any desktop icon or shell chip to launch windows. Press &apos;?&apos; for keyboard shortcuts.
               </p>
-              <div className="flex items-center gap-3 text-[10px] opacity-60 pt-1">
-                <span>By Aditya Diundi</span>
-                <span>•</span>
-                <span>Product Designer & Technologist</span>
-                <span>•</span>
-                <span>IIIT Delhi</span>
-              </div>
-            </div>
-
-            <div
-              style={{
-                backgroundColor: activeTheme.cardBg,
-                borderColor: activeTheme.cardBorder,
-                color: activeTheme.textPrimary,
-              }}
-              className="p-2.5 rounded-md border text-[10px] backdrop-blur-md text-right space-y-0.5 shadow-md"
-            >
-              <div className="font-semibold" style={{ color: activeTheme.accent }}>
-                Desktop Workspace
-              </div>
-              <div className="opacity-70">Click top tabs to switch active apps</div>
-              <div className="opacity-70">Press &apos;?&apos; for keyboard shortcuts</div>
             </div>
           </div>
         </div>
