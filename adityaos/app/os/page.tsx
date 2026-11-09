@@ -6,13 +6,13 @@ export const metadata: Metadata = {
   description:
     "An interactive browser-based operating system featuring pixel art engine, Conway's Game of Life, falling sand physics, terminal, and window manager.",
   alternates: {
-    canonical: "https://adityaos-delta.vercel.app/os",
+    canonical: "https://diundi.space/os",
   },
   openGraph: {
     title: "AdityaOS - Interactive Web Desktop & Creative Sandbox",
     description:
       "Interactive browser desktop shell with pixel art canvas, physics engines, and custom window manager.",
-    url: "https://adityaos-delta.vercel.app/os",
+    url: "https://diundi.space/os",
     siteName: "AdityaOS",
     images: [
       {

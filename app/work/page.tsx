@@ -9,7 +9,7 @@ export const metadata: Metadata = {
   description:
     "Comprehensive archive of product design, systems architecture, and fieldwork projects by Aditya Diundi.",
   alternates: {
-    canonical: "https://adityaos-delta.vercel.app/work",
+    canonical: "https://diundi.space/work",
   },
 };
 

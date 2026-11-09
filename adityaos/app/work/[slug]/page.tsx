@@ -538,12 +538,12 @@ export async function generateMetadata({
     title: `${caseStudy.title} - Aditya Diundi`,
     description: caseStudy.summary,
     alternates: {
-      canonical: `https://adityaos-delta.vercel.app/work/${caseStudy.slug}`,
+      canonical: `https://diundi.space/work/${caseStudy.slug}`,
     },
     openGraph: {
       title: `${caseStudy.title} - Aditya Diundi`,
       description: caseStudy.summary,
-      url: `https://adityaos-delta.vercel.app/work/${caseStudy.slug}`,
+      url: `https://diundi.space/work/${caseStudy.slug}`,
       siteName: "Aditya Diundi",
       images: [
         {

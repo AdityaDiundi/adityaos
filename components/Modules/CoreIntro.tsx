@@ -185,7 +185,7 @@ export const CoreIntro: React.FC = () => {
             </button>
 
             <a
-              href="https://adityaos-delta.vercel.app/"
+              href="https://diundi.space/"
               target="_blank"
               rel="noopener noreferrer"
               style={{
@@ -196,7 +196,7 @@ export const CoreIntro: React.FC = () => {
               className="px-3 py-1.5 rounded font-semibold text-xs border flex items-center gap-1.5 hover:opacity-80 transition-opacity"
             >
               <Globe className="w-3.5 h-3.5" />
-              <span>adityaos-delta.vercel.app</span>
+              <span>diundi.space</span>
               <ExternalLink className="w-3 h-3 opacity-60" />
             </a>
           </div>

@@ -6,6 +6,6 @@ export default function robots(): MetadataRoute.Robots {
       userAgent: "*",
       allow: "/",
     },
-    sitemap: "https://adityaos-delta.vercel.app/sitemap.xml",
+    sitemap: "https://diundi.space/sitemap.xml",
   };
 }

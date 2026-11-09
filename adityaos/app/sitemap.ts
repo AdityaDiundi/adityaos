@@ -1,7 +1,7 @@
 import { MetadataRoute } from "next";
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const baseUrl = "https://adityaos-delta.vercel.app";
+  const baseUrl = "https://diundi.space";
   const lastModified = new Date();
 
   return [

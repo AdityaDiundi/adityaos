@@ -8,7 +8,7 @@ export const metadata: Metadata = {
   description:
     "Essays on rural leadership, cognitive ethnography, digital culture, and personal reflections by Aditya Diundi.",
   alternates: {
-    canonical: "https://adityaos-delta.vercel.app/writing",
+    canonical: "https://diundi.space/writing",
   },
 };
 

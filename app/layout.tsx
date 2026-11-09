@@ -65,7 +65,7 @@ export async function generateMetadata(): Promise<Metadata> {
   const title = "Aditya Diundi - Product Designer";
   const description =
     "Aditya Diundi is a Product Designer designing evidence-first health systems, AI evaluation benchmarks, and software tools.";
-  const url = "https://adityaos-delta.vercel.app";
+  const url = "https://diundi.space";
 
   return {
     title,
@@ -113,7 +113,7 @@ export default function RootLayout({
     "@type": "Person",
     name: "Aditya Diundi",
     jobTitle: "Product Designer",
-    url: "https://adityaos-delta.vercel.app",
+    url: "https://diundi.space",
     sameAs: [
       "https://www.linkedin.com/in/adityadiundi/",
       "https://github.com/AdityaDiundi",

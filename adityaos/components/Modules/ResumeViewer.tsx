@@ -187,12 +187,12 @@ export const ResumeViewer: React.FC = () => {
                   <div className="flex items-center gap-1.5">
                     <Globe className="w-3 h-3 text-cyan-400" />
                     <a
-                      href="https://adityaos-delta.vercel.app/"
+                      href="https://diundi.space/"
                       target="_blank"
                       rel="noopener noreferrer"
                       className="hover:underline flex items-center gap-0.5 text-cyan-400 font-semibold"
                     >
-                      adityaos-delta.vercel.app <ExternalLink className="w-2.5 h-2.5" />
+                      diundi.space <ExternalLink className="w-2.5 h-2.5" />
                     </a>
                   </div>
                   <div className="flex items-center gap-1.5">
@@ -460,7 +460,7 @@ export const ResumeViewer: React.FC = () => {
             <pre className="text-xs whitespace-pre-wrap leading-relaxed opacity-90 select-text font-mono">
 {`# ADITYA DIUNDI
 Product Designer & Systems Thinker
-Portfolio: https://adityaos-delta.vercel.app/ | Email: aditya15124@iiitd.ac.in | Phone: +91 8510860382
+Portfolio: https://diundi.space/ | Email: aditya15124@iiitd.ac.in | Phone: +91 8510860382
 YouTube: @falsepeek | Education: B.Tech in Electronics & Communication Engineering — IIIT Delhi (2015 – 2021)
 Status: Immediately Available
 

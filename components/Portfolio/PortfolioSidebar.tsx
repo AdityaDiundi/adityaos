@@ -437,7 +437,7 @@ export function PortfolioSidebar({
                 <FileText className="w-3.5 h-3.5" />
                 <span>Resume (PDF)</span>
               </span>
-              <span className="text-[10px] opacity-70 font-normal">1.2 MB ↗</span>
+              <span className="text-[10px] opacity-70 font-normal">47 KB ↗</span>
             </a>
 
             {/* Secondary Action Links below Resume */}
