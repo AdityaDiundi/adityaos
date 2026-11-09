@@ -104,79 +104,81 @@ export function EssaysSection() {
 
         {/* Filter Bar */}
         <div
-          className={`p-6 sm:p-8 border-b border-dashed flex flex-wrap items-center justify-between gap-4 text-xs font-mono transition-colors ${
+          className={`p-6 sm:p-8 border-b border-dashed transition-colors ${
             isDark ? "border-zinc-800/80" : "border-stone-200/80"
           }`}
         >
-          <div className="flex items-center gap-6">
-            <button
-              onClick={() => setFilter("all")}
-              className={`flex items-center gap-1.5 transition-colors cursor-pointer ${
-                filter === "all"
-                  ? isDark
-                    ? "text-white font-semibold underline underline-offset-8 decoration-emerald-500 decoration-2"
-                    : "text-stone-900 font-semibold underline underline-offset-8 decoration-emerald-600 decoration-2"
-                  : isDark
-                  ? "text-zinc-500 hover:text-zinc-200"
-                  : "text-stone-500 hover:text-stone-900"
+          <div className="max-w-3xl mx-auto flex flex-wrap items-center justify-between gap-4 text-xs font-mono">
+            <div className="flex items-center gap-6">
+              <button
+                onClick={() => setFilter("all")}
+                className={`flex items-center gap-1.5 transition-colors cursor-pointer ${
+                  filter === "all"
+                    ? isDark
+                      ? "text-white font-semibold underline underline-offset-8 decoration-emerald-500 decoration-2"
+                      : "text-stone-900 font-semibold underline underline-offset-8 decoration-emerald-600 decoration-2"
+                    : isDark
+                    ? "text-zinc-500 hover:text-zinc-200"
+                    : "text-stone-500 hover:text-stone-900"
+                }`}
+              >
+                <span>All Writeups</span>
+                <span className="opacity-60 text-[11px]">({FEATURED_ESSAYS.length})</span>
+              </button>
+              <button
+                onClick={() => setFilter("essay")}
+                className={`flex items-center gap-1.5 transition-colors cursor-pointer ${
+                  filter === "essay"
+                    ? isDark
+                      ? "text-white font-semibold underline underline-offset-8 decoration-emerald-500 decoration-2"
+                      : "text-stone-900 font-semibold underline underline-offset-8 decoration-emerald-600 decoration-2"
+                    : isDark
+                    ? "text-zinc-500 hover:text-zinc-200"
+                    : "text-stone-500 hover:text-stone-900"
+                }`}
+              >
+                <span>Essays</span>
+                <span className="opacity-60 text-[11px]">({essayCount})</span>
+              </button>
+              <button
+                onClick={() => setFilter("poem")}
+                className={`flex items-center gap-1.5 transition-colors cursor-pointer ${
+                  filter === "poem"
+                    ? isDark
+                      ? "text-white font-semibold underline underline-offset-8 decoration-emerald-500 decoration-2"
+                      : "text-stone-900 font-semibold underline underline-offset-8 decoration-emerald-600 decoration-2"
+                    : isDark
+                    ? "text-zinc-500 hover:text-zinc-200"
+                    : "text-stone-500 hover:text-stone-900"
+                }`}
+              >
+                <span>Poetics & Notes</span>
+                <span className="opacity-60 text-[11px]">({poemCount})</span>
+              </button>
+            </div>
+            <span
+              className={`text-[11px] hidden sm:inline ${
+                isDark ? "text-zinc-500" : "text-stone-400"
               }`}
             >
-              <span>All Writeups</span>
-              <span className="opacity-60 text-[11px]">({FEATURED_ESSAYS.length})</span>
-            </button>
-            <button
-              onClick={() => setFilter("essay")}
-              className={`flex items-center gap-1.5 transition-colors cursor-pointer ${
-                filter === "essay"
-                  ? isDark
-                    ? "text-white font-semibold underline underline-offset-8 decoration-emerald-500 decoration-2"
-                    : "text-stone-900 font-semibold underline underline-offset-8 decoration-emerald-600 decoration-2"
-                  : isDark
-                  ? "text-zinc-500 hover:text-zinc-200"
-                  : "text-stone-500 hover:text-stone-900"
-              }`}
-            >
-              <span>Essays</span>
-              <span className="opacity-60 text-[11px]">({essayCount})</span>
-            </button>
-            <button
-              onClick={() => setFilter("poem")}
-              className={`flex items-center gap-1.5 transition-colors cursor-pointer ${
-                filter === "poem"
-                  ? isDark
-                    ? "text-white font-semibold underline underline-offset-8 decoration-emerald-500 decoration-2"
-                    : "text-stone-900 font-semibold underline underline-offset-8 decoration-emerald-600 decoration-2"
-                  : isDark
-                  ? "text-zinc-500 hover:text-zinc-200"
-                  : "text-stone-500 hover:text-stone-900"
-              }`}
-            >
-              <span>Poetics & Notes</span>
-              <span className="opacity-60 text-[11px]">({poemCount})</span>
-            </button>
+              India Fellow · Medium · Bear Blog
+            </span>
           </div>
-          <span
-            className={`text-[11px] hidden sm:inline ${
-              isDark ? "text-zinc-500" : "text-stone-400"
-            }`}
-          >
-            India Fellow · Medium · Bear Blog
-          </span>
         </div>
 
-        {/* Articles Feed */}
+        {/* Articles Feed - Clean Single Column Blog Stream */}
         <div
-          className={`p-6 sm:p-8 border-b border-dashed ${
+          className={`px-6 sm:px-8 py-4 border-b border-dashed ${
             isDark ? "border-zinc-800/80" : "border-stone-200/80"
           }`}
         >
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-10">
+          <div className="max-w-3xl mx-auto divide-y divide-dashed divide-stone-200/70 dark:divide-zinc-800/70">
             {essays.map((essay) => {
               const hasContent = Boolean(essay.content && essay.content.length > 0);
 
               const cardContent = (
-                <div className="space-y-3 pb-8 border-b border-dashed border-stone-200/70 dark:border-zinc-800/70">
-                  {/* Top Metadata: Flat monospace, no boxes or fills */}
+                <article className="py-7 sm:py-9 space-y-3 transition-colors">
+                  {/* Top Metadata: Flat monospace, category & reading time/year */}
                   <div className="flex items-center justify-between text-xs font-mono">
                     <span className={isDark ? "text-zinc-400" : "text-stone-500"}>
                       {essay.theme}
@@ -188,34 +190,42 @@ export function EssaysSection() {
 
                   {/* Title with Arrow indicator */}
                   <h3
-                    className={`text-base sm:text-lg font-semibold font-sans transition-colors flex items-center justify-between gap-3 leading-snug ${
+                    className={`text-lg sm:text-xl md:text-2xl font-serif font-medium transition-colors flex items-center justify-between gap-4 leading-snug ${
                       isDark
                         ? "text-white group-hover:text-emerald-400"
                         : "text-stone-900 group-hover:text-emerald-600"
                     }`}
                   >
                     <span>{essay.title}</span>
-                    <ArrowUpRight className="w-4 h-4 text-zinc-400 group-hover:text-emerald-500 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5 flex-shrink-0 opacity-70 group-hover:opacity-100" />
+                    <ArrowUpRight className="w-4 h-4 text-zinc-400 group-hover:text-emerald-500 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5 flex-shrink-0 opacity-60 group-hover:opacity-100" />
                   </h3>
 
                   {/* Excerpt with optimal measure */}
                   <p
-                    className={`text-xs sm:text-sm font-sans leading-relaxed max-w-[60ch] ${
+                    className={`text-sm sm:text-base font-sans leading-relaxed ${
                       isDark ? "text-zinc-400" : "text-stone-600"
                     }`}
                   >
                     {essay.excerpt}
                   </p>
 
-                  {/* Bottom: Clean Source only (no repetitive 'Read on...') */}
+                  {/* Bottom: Clean Source */}
                   <div
-                    className={`pt-1 text-xs font-mono ${
+                    className={`pt-1 text-xs font-mono flex items-center gap-2.5 ${
                       isDark ? "text-zinc-500" : "text-stone-400"
                     }`}
                   >
                     <span>{essay.source}</span>
+                    {hasContent && (
+                      <>
+                        <span>·</span>
+                        <span className="text-emerald-600 dark:text-emerald-400 font-mono text-[11px] font-medium">
+                          Read in modal
+                        </span>
+                      </>
+                    )}
                   </div>
-                </div>
+                </article>
               );
 
               if (hasContent) {
