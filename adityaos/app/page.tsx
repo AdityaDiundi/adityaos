@@ -1,1472 +1,518 @@
-"use client";
+import React from "react";
+import Link from "next/link";
+import { ArrowUpRight } from "lucide-react";
+import { WorkCard, WorkCardProps } from "@/components/Minimal/WorkCard";
 
-import React, { useRef, useState, useEffect } from "react";
-import { WindowFrame } from "@/components/System/WindowFrame";
-import { CoreIntro } from "@/components/Modules/CoreIntro";
-import { ArchiveReader } from "@/components/Modules/ArchiveReader";
-import { StreamFeed } from "@/components/Modules/StreamFeed";
-import { PixelEngine } from "@/components/Modules/PixelEngine";
-import { TerminalDesktop } from "@/components/Modules/TerminalDesktop";
-import { ResumeViewer } from "@/components/Modules/ResumeViewer";
-import { GalleryViewer } from "@/components/Modules/GalleryViewer";
-import { FieldJournal } from "@/components/Modules/FieldJournal";
-import { LearnabilityLab } from "@/components/Modules/LearnabilityLab";
-import { WallpaperManager } from "@/components/Modules/WallpaperManager";
-import { DesktopStickyNote } from "@/components/Modules/DesktopStickyNote";
-import { HyprlandBootScreen } from "@/components/System/HyprlandBootScreen";
-import { PortfolioView } from "@/components/Portfolio/PortfolioView";
-import { useOSStore } from "@/store/osStore";
-import { useThemeStore, OS_THEMES, OSThemeId } from "@/store/themeStore";
-import { useSoundStore } from "@/store/soundStore";
-import {
-  Sparkles,
-  BookOpen,
-  Tv,
-  Activity,
-  Clock,
-  Cpu,
-  Paintbrush,
-  Sun,
-  Moon,
-  ChevronDown,
-  Check,
-  FileText,
-  Volume2,
-  VolumeX,
-  ExternalLink,
-  Layers,
-  Terminal,
-  Grid,
-  Image as ImageIcon,
-  Compass,
-  Brain,
-  Keyboard,
-  MessageSquare,
-  StickyNote,
-  Lock,
-  Folder,
-  FileCode,
-} from "lucide-react";
+/*
+  TAGLINE OPTIONS:
+  Option 1 (Selected): "Designing evidence-first health systems, AI evaluation benchmarks, and tools."
+  Option 2: "Building software that replaces guesswork with measurable proof."
+  Option 3: "Product designer grounded in systems design, code, and field research."
+  TODO: Pick preferred tagline if different from Option 1.
+*/
 
-const APP_LABELS: Record<string, string> = {
-  coreIntro: "About Aditya",
-  archiveReader: "Case Studies & Essays",
-  streamFeed: "Media Feed",
-  pixelEngine: "Pixel Studio",
-  resumeViewer: "Resume (PDF)",
-  galleryViewer: "Photo Gallery",
-  fieldJournal: "Field Journal",
-  learnabilityLab: "Diagnostic Lab",
-  wallpaperManager: "Wallpaper Gallery",
-};
+/*
+  FEATURED PROJECTS (Exactly 5, using single WorkCard component sitewide)
+  Metrics audited & verified:
+  - JANEVAL: 3.4x cultural fidelity gain (verified benchmark vs baseline)
+  - MFine: 100K+ employees covered, <15 min approvals (verified from enterprise catalog)
+  - Mosaic: +12% treatment continuation (verified from 21-day adherence study)
+  - Digiaccel: 38% checkout dropoff reduction (verified from pre-transaction limit runway)
+  - AdityaOS: 60 FPS in-browser canvas with 0 external dependencies
+*/
+const FEATURED_PROJECTS: WorkCardProps[] = [
+  {
+    id: "janeval",
+    title: "JANEVAL — Human-Centered AI Benchmark",
+    client: "Josh Talks",
+    year: "2024",
+    role: "Lead Product Designer & Systems Architect",
+    tags: ["AI Benchmark", "Healthcare UX", "Interaction Design"],
+    summary:
+      "A blind pairwise evaluation framework designed to benchmark frontier vision models on clinical and cultural accuracy across rural Indian public health scenarios.",
+    metric: {
+      value: "3.4x",
+      label: "cultural fidelity gain over generic prompts",
+    },
+    imageSrc: "/case-studies/janeval_live.png",
+    imageAlt: "JANEVAL AI Healthcare Evaluation Arena Interface",
+    caseStudyUrl: "/work/janeval",
+    liveUrl: "https://janeval.vercel.app/",
+    priority: true,
+  },
+  {
+    id: "mfine",
+    title: "Corporate Benefits & Claims Settlement",
+    client: "MFine",
+    year: "2023",
+    role: "Product Designer & Design Systems Lead",
+    tags: ["Enterprise SaaS", "InsurTech", "Design Systems"],
+    summary:
+      "A unified claims orchestration portal and design system for HR teams and TPAs, automating employee census onboarding and cashless hospital pre-authorizations.",
+    metric: {
+      value: "100K+",
+      label: "employees covered with <15 min approvals",
+    },
+    imageSrc: "/case-studies/corporate_claims.png",
+    imageAlt: "MFine Corporate Claims and Benefits Architecture",
+    caseStudyUrl: "/work/mfine",
+  },
+  {
+    id: "mosaic",
+    title: "21-Day Habit & Hair Regimen Tracker",
+    client: "Mosaic Wellness (ManMatters)",
+    year: "2024",
+    role: "UX Researcher & Product Designer",
+    tags: ["D2C HealthTech", "Behavioral Retention", "Habit Loops"],
+    summary:
+      "A routine retention engine pairing 1-tap daily micro-logs with automated doctor WhatsApp check-ins to prevent churn during delayed-gratification health regimens.",
+    metric: {
+      value: "+12%",
+      label: "lift in treatment continuation past Day 21",
+    },
+    imageSrc: "/case-studies/hair_tracker.png",
+    imageAlt: "21-Day Regimen Playbook Flow in Figma",
+    caseStudyUrl: "/work/mosaic",
+  },
+  {
+    id: "digiaccel",
+    title: "UPI Limit Clarity & Spend Runway",
+    client: "Digiaccel",
+    year: "2024",
+    role: "Product Designer (Fintech UX)",
+    tags: ["Fintech", "Payments", "Error Recovery"],
+    summary:
+      "An ambient bank balance runway meter and 1-tap failover checkout flow that alerts users of daily transaction caps before payment initiation to eliminate payment failure anxiety.",
+    metric: {
+      value: "-38%",
+      label: "dropoff reduction at checkout",
+    },
+    imageSrc: "/case-studies/upi_limit_meter_flow.png",
+    imageAlt: "UPI Limit Clarity Screen Flow Stages",
+    caseStudyUrl: "/work/digiaccel",
+  },
+  {
+    id: "adityaos",
+    title: "AdityaOS & Pixel Studio",
+    client: "Independent System",
+    year: "2024",
+    role: "Creator & Systems Engineer",
+    tags: ["Creative Sandbox", "Canvas Graphics", "Web Audio"],
+    summary:
+      "An in-browser retro operating system and pixel sandbox built with zero external runtime libraries, featuring Conway's Game of Life, falling sand physics, and WebAudio synth.",
+    metric: {
+      value: "60 FPS",
+      label: "client-side rendering with zero canvas dependencies",
+    },
+    imageSrc: "/pixel_studio_og.png",
+    imageAlt: "AdityaOS Interactive Web Desktop and Pixel Studio",
+    caseStudyUrl: "/work/adityaos",
+    liveUrl: "/os",
+  },
+];
 
-export default function Home({
-  searchParams,
-}: {
-  searchParams?: Record<string, string | string[] | undefined>;
-}) {
-  const initialViewMode = searchParams?.mode === "os" ? "os" : "portfolio";
-  const defaultApp = typeof searchParams?.app === "string" ? searchParams.app : undefined;
-  const desktopContainerRef = useRef<HTMLDivElement>(null);
-  const {
-    openWindows,
-    activeWindow,
-    restoreWindow,
-    focusWindow,
-    maximizeWindow,
-    closeWindow,
-    wallpaperUrl,
-    showDesktopGrid,
-    toggleDesktopGrid,
-    isStickyNoteOpen,
-    toggleStickyNote,
-    isLocked,
-    lockSession,
-    minimizeAllWindows,
-    closeAllWindows,
-  } = useOSStore();
-  const { activeTheme, currentThemeId, setTheme, toggleDarkLight } = useThemeStore();
-  const { isSoundEnabled, toggleSound, playScrollNote, playClickChime } = useSoundStore();
-  const [showKeysModal, setShowKeysModal] = useState<boolean>(false);
-  const [contextMenu, setContextMenu] = useState<{ isOpen: boolean; x: number; y: number } | null>(null);
+interface EssaySummary {
+  title: string;
+  venue: string;
+  year: string;
+  url: string;
+}
 
-  const [timeStr, setTimeStr] = useState<string>("12:00:00");
-  const [cpuUsage, setCpuUsage] = useState<number>(14);
-  const [memUsage, setMemUsage] = useState<number>(38);
-  const [isThemeMenuOpen, setIsThemeMenuOpen] = useState<boolean>(false);
+const FEATURED_WRITING: EssaySummary[] = [
+  {
+    title: "Identity In Youth Clubs In India",
+    venue: "India Fellow",
+    year: "2024",
+    url: "https://indiafellow.org/blog/all-posts/identity-in-youth-clubs-in-india/",
+  },
+  {
+    title: "Motivation In Rural Leadership Programs",
+    venue: "India Fellow",
+    year: "2024",
+    url: "https://indiafellow.org/blog/all-posts/motivation-in-rural-leadership-programs/",
+  },
+  {
+    title: "Balancing Act: Navigating Choices In Rural Rajasthan's Water Crisis",
+    venue: "India Fellow",
+    year: "2024",
+    url: "https://indiafellow.org/blog/all-posts/balancing-act-navigating-choices-in-rural-rajasthans-water-crisis/",
+  },
+  {
+    title: "Questions For Self-Discovery From A Human Process Lab",
+    venue: "India Fellow",
+    year: "2024",
+    url: "https://indiafellow.org/blog/all-posts/questions-for-self-discovery-from-a-human-process-lab/",
+  },
+  {
+    title: "Youth Masterpiece: Fostering Collaboration Through Art",
+    venue: "India Fellow",
+    year: "2024",
+    url: "https://indiafellow.org/blog/all-posts/youth-masterpiece-fostering-collaboration-through-art/",
+  },
+  {
+    title: "Why Online Gaming in India Feels So Toxic",
+    venue: "Medium",
+    year: "2024",
+    url: "https://adityadiundi.medium.com/why-online-gaming-in-india-feels-so-toxic-1d506b87acf8",
+  },
+  {
+    title: "On Borrowed Beliefs",
+    venue: "Personal Essay",
+    year: "2024",
+    url: "/writing#on-borrowed-beliefs",
+  },
+];
 
-  const [viewMode, setViewMode] = useState<"portfolio" | "os">(() => {
-    if (initialViewMode) return initialViewMode;
-    if (typeof window !== "undefined") {
-      const hostname = window.location.hostname;
-      const pathname = window.location.pathname;
-      const params = new URLSearchParams(window.location.search);
-      const appParam = params.get("app");
-      const isPixel =
-        hostname.includes("pixel-engine") ||
-        hostname.includes("pixel-studio") ||
-        pathname.startsWith("/pixel") ||
-        pathname.startsWith("/studio") ||
-        pathname.startsWith("/pixelengine") ||
-        params.get("mode") === "os" ||
-        appParam === "pixel" ||
-        appParam === "pixelEngine" ||
-        defaultApp === "pixelEngine";
-      if (isPixel) return "os";
-    }
-    return "portfolio";
-  });
-
-  useEffect(() => {
-    if (typeof window !== "undefined") {
-      const params = new URLSearchParams(window.location.search);
-      const pathname = window.location.pathname;
-      const appParam = params.get("app");
-      const hostname = window.location.hostname;
-      const isPixelDomain = hostname.includes("pixel-engine") || hostname.includes("pixel-studio");
-      const isPixelLink =
-        isPixelDomain ||
-        pathname === "/pixel" ||
-        pathname === "/studio" ||
-        pathname === "/pixelengine" ||
-        appParam === "pixel" ||
-        appParam === "pixelEngine" ||
-        appParam === "studio" ||
-        defaultApp === "pixelEngine";
-
-      if (isPixelLink) {
-        setViewMode("os");
-        restoreWindow("pixelEngine");
-        focusWindow("pixelEngine");
-        maximizeWindow("pixelEngine");
-        closeWindow("coreIntro");
-      } else if (params.get("mode") === "os") {
-        setViewMode("os");
-      }
-
-      if (appParam && APP_LABELS[appParam] && appParam !== "pixelEngine") {
-        restoreWindow(appParam);
-        focusWindow(appParam);
-      }
-
-      const themeParam = params.get("theme");
-      if (themeParam === "light" || themeParam === "editorial") {
-        setTheme("light");
-      } else if (themeParam && OS_THEMES[themeParam as OSThemeId]) {
-        setTheme(themeParam as OSThemeId);
-      }
-    }
-  }, [setTheme, restoreWindow, focusWindow, maximizeWindow]);
-
-  useEffect(() => {
-    const updateClock = () => {
-      const d = new Date();
-      setTimeStr(
-        d.toLocaleTimeString("en-US", {
-          hour12: false,
-          hour: "2-digit",
-          minute: "2-digit",
-          second: "2-digit",
-        })
-      );
-    };
-    updateClock();
-    const interval = setInterval(updateClock, 1000);
-
-    const statInterval = setInterval(() => {
-      setCpuUsage(Math.floor(10 + Math.random() * 15));
-      setMemUsage(Math.floor(36 + Math.random() * 4));
-    }, 4000);
-
-    return () => {
-      clearInterval(interval);
-      clearInterval(statInterval);
-    };
-  }, []);
-
-  const openAndFocus = (id: string) => {
-    playClickChime(560);
-    restoreWindow(id);
-    focusWindow(id);
-  };
-
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      // Don't intercept if user is typing in an input or textarea
-      if (
-        e.target instanceof HTMLInputElement ||
-        e.target instanceof HTMLTextAreaElement ||
-        (e.target as HTMLElement)?.isContentEditable
-      ) {
-        return;
-      }
-
-      if (e.altKey || e.metaKey) {
-        if (e.key === "1") { e.preventDefault(); openAndFocus("coreIntro"); }
-        else if (e.key === "2") { e.preventDefault(); openAndFocus("archiveReader"); }
-        else if (e.key === "3") { e.preventDefault(); openAndFocus("streamFeed"); }
-        else if (e.key === "4") { e.preventDefault(); openAndFocus("pixelEngine"); }
-        else if (e.key === "5") { e.preventDefault(); openAndFocus("resumeViewer"); }
-        else if (e.key === "6") { e.preventDefault(); openAndFocus("galleryViewer"); }
-        else if (e.key === "7") { e.preventDefault(); openAndFocus("fieldJournal"); }
-        else if (e.key === "8") { e.preventDefault(); openAndFocus("learnabilityLab"); }
-        else if (e.key === "9") { e.preventDefault(); openAndFocus("wallpaperManager"); }
-        else if (e.key.toLowerCase() === "l") {
-          e.preventDefault();
-          lockSession();
-        }
-        else if (e.key.toLowerCase() === "q") {
-          e.preventDefault();
-          if (activeWindow) {
-            closeWindow(activeWindow);
-            playClickChime(420);
-          }
-        }
-      } else if (e.key === "?") {
-        setShowKeysModal((prev) => !prev);
-      } else if (e.key === "Escape") {
-        setContextMenu(null);
-        setShowKeysModal(false);
-      }
-    };
-
-    window.addEventListener("keydown", handleKeyDown);
-    return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [activeWindow, closeWindow]);
-
-  // Dismiss context menu whenever clicking outside the menu
-  useEffect(() => {
-    if (!contextMenu) return;
-    const handleGlobalPointerDown = (e: PointerEvent | MouseEvent) => {
-      const target = e.target as HTMLElement | null;
-      if (target?.closest("#desktop-context-menu")) return;
-      setContextMenu(null);
-    };
-    window.addEventListener("pointerdown", handleGlobalPointerDown);
-    return () => window.removeEventListener("pointerdown", handleGlobalPointerDown);
-  }, [contextMenu]);
-
-  // Dismiss theme menu whenever clicking outside the theme selector
-  useEffect(() => {
-    if (!isThemeMenuOpen) return;
-    const handleOutsideClick = (e: PointerEvent | MouseEvent) => {
-      const target = e.target as HTMLElement | null;
-      if (target?.closest("#theme-selector-container")) return;
-      setIsThemeMenuOpen(false);
-    };
-    window.addEventListener("pointerdown", handleOutsideClick);
-    return () => window.removeEventListener("pointerdown", handleOutsideClick);
-  }, [isThemeMenuOpen]);
-
-  const handleContextMenu = (e: React.MouseEvent) => {
-    const target = e.target as HTMLElement;
-    // Don't intercept right clicks if inside an active window frame, canvas, header, or interactive controls
-    if (
-      target.closest(".window-frame") ||
-      target.closest("[data-window-id]") ||
-      target.closest("canvas") ||
-      target.closest(".pixel-engine") ||
-      target.closest(".pixel-engine-viewport") ||
-      target.closest(".pixel-engine-canvas") ||
-      target.closest("header") ||
-      target.closest("input") ||
-      target.closest("textarea") ||
-      target.closest("button")
-    ) {
-      return;
-    }
-    e.preventDefault();
-    const menuWidth = 240;
-    const menuHeight = 360;
-    const x = Math.min(e.clientX, window.innerWidth - menuWidth - 10);
-    const y = Math.min(e.clientY, window.innerHeight - menuHeight - 10);
-    setContextMenu({ isOpen: true, x, y });
-    playClickChime(500);
-  };
-
-  if (viewMode === "portfolio") {
-    return (
-      <PortfolioView
-        onLaunchOS={() => {
-          closeAllWindows();
-          setViewMode("os");
-        }}
-      />
-    );
-  }
-
+export default function HomePage() {
   return (
-    <main
-      ref={desktopContainerRef}
-      onContextMenu={handleContextMenu}
-      onClick={() => {
-        if (contextMenu) setContextMenu(null);
-        if (isThemeMenuOpen) setIsThemeMenuOpen(false);
-      }}
-      onWheel={(e) => playScrollNote(e.deltaY)}
-      className="relative w-screen h-screen overflow-hidden select-none flex flex-col font-mono"
-    >
-      {/* Dynamic Wallpaper Layer */}
-      <div
-        className="absolute inset-0 bg-cover bg-center transition-all duration-700 ease-in-out pointer-events-none"
-        style={{
-          backgroundImage: wallpaperUrl ? `url(${wallpaperUrl})` : undefined,
-          backgroundColor: activeTheme.desktopBg,
-        }}
-      />
-
-      {/* Adaptive Wallpaper Overlay: Only applied if an external wallpaper image is loaded */}
-      {wallpaperUrl && (
-        <div
-          className={`absolute inset-0 pointer-events-none transition-colors duration-500 ${
-            activeTheme.isDark
-              ? "bg-black/40 backdrop-blur-[0.5px]"
-              : "bg-white/20 backdrop-blur-[0.5px]"
-          }`}
-        />
-      )}
-
-      {/* Desktop Grid Lines (Toggled via showDesktopGrid) */}
-      {showDesktopGrid && (
-        <div
-          className="absolute inset-0 pointer-events-none opacity-40 transition-opacity duration-300"
-          style={{
-            backgroundImage: `linear-gradient(to right, ${activeTheme.desktopGrid} 1px, transparent 1px), linear-gradient(to bottom, ${activeTheme.desktopGrid} 1px, transparent 1px)`,
-            backgroundSize: "24px 24px",
-          }}
-        />
-      )}
-      {/* Top Riced Status Bar - Elevated z-[1000] so it ALWAYS stays above windows */}
-      <header
-        style={{
-          backgroundColor: activeTheme.headerBg,
-          borderColor: activeTheme.headerBorder,
-          color: activeTheme.textPrimary,
-        }}
-        className="h-8 border-b px-3 flex items-center justify-between text-xs z-[1000] backdrop-blur-md relative whitespace-nowrap select-none overflow-visible"
-      >
-        {/* Left: OS Branding & Clickable Workspace Tags */}
-        <div className="flex items-center gap-2 sm:gap-3 shrink-0 whitespace-nowrap">
-          <button
-            type="button"
-            onClick={() => openAndFocus("coreIntro")}
-            title="Focus AdityaOS Core"
-            className="flex items-center gap-1.5 font-bold hover:opacity-80 transition-opacity cursor-pointer whitespace-nowrap shrink-0"
-          >
-            <span style={{ color: activeTheme.accent }}>⟡</span>
-            <span className="whitespace-nowrap" style={{ color: activeTheme.textPrimary }}>aditya-os</span>
-            <span style={{ color: activeTheme.textMuted }} className="text-[10px] font-normal hidden sm:inline">
-              v2.4
-            </span>
-          </button>
-
-          <button
-            type="button"
-            onClick={() => setViewMode("portfolio")}
-            className="px-2 py-0.5 rounded border font-semibold flex items-center gap-1 hover:opacity-100 transition-all cursor-pointer text-[10px] whitespace-nowrap shrink-0"
-            style={{
-              backgroundColor: activeTheme.isDark ? "rgba(0, 255, 204, 0.15)" : "rgba(18, 19, 22, 0.08)",
-              borderColor: activeTheme.isDark ? "#00FFCC" : "rgba(0, 0, 0, 0.18)",
-              color: activeTheme.isDark ? "#00FFCC" : "#121316",
-            }}
-            title="Exit back to Product Designer Portfolio"
-          >
-            <span>← Portfolio</span>
-          </button>
-
-          <div
-            style={{ backgroundColor: activeTheme.headerBorder }}
-            className="h-3 w-px shrink-0"
-          />
-
-          {/* Interactive Workspace Tags */}
-          <div className="flex items-center gap-1 text-[11px] shrink-0 whitespace-nowrap">
-            {/* [1:SYS] -> coreIntro */}
-            <button
-              type="button"
-              onClick={() => openAndFocus("coreIntro")}
-              style={{
-                backgroundColor:
-                  activeWindow === "coreIntro" ? activeTheme.cardBg : "transparent",
-                borderColor:
-                  activeWindow === "coreIntro" ? activeTheme.accent : "transparent",
-                color:
-                  activeWindow === "coreIntro" ? activeTheme.accent : activeTheme.textMuted,
-              }}
-              className="px-1.5 py-0.2 rounded border font-semibold hover:opacity-100 transition-all cursor-pointer shrink-0"
-              title="Workspace 1: Identity & Core Intro"
-            >
-              [1:CORE]
-            </button>
-
-            {/* [2:ARCHIVE] -> archiveReader */}
-            <button
-              type="button"
-              onClick={() => openAndFocus("archiveReader")}
-              style={{
-                backgroundColor:
-                  activeWindow === "archiveReader" ? activeTheme.cardBg : "transparent",
-                borderColor:
-                  activeWindow === "archiveReader" ? activeTheme.accent : "transparent",
-                color:
-                  activeWindow === "archiveReader" ? activeTheme.accent : activeTheme.textMuted,
-              }}
-              className="px-1.5 py-0.2 rounded border font-semibold hover:opacity-100 transition-all cursor-pointer shrink-0"
-              title="Workspace 2: Essays & Poetry Archive"
-            >
-              [2:ARCHIVE]
-            </button>
-
-            {/* [3:MEDIA] -> streamFeed */}
-            <button
-              type="button"
-              onClick={() => openAndFocus("streamFeed")}
-              style={{
-                backgroundColor:
-                  activeWindow === "streamFeed" ? activeTheme.cardBg : "transparent",
-                borderColor:
-                  activeWindow === "streamFeed" ? activeTheme.accent : "transparent",
-                color:
-                  activeWindow === "streamFeed" ? activeTheme.accent : activeTheme.textMuted,
-              }}
-              className="px-1.5 py-0.2 rounded border font-semibold hover:opacity-100 transition-all cursor-pointer shrink-0"
-              title="Workspace 3: @falsepeek Media & Shorts Feed"
-            >
-              [3:MEDIA]
-            </button>
-
-            {/* [4:CANVAS] -> pixelEngine */}
-            <button
-              type="button"
-              onClick={() => openAndFocus("pixelEngine")}
-              style={{
-                backgroundColor:
-                  activeWindow === "pixelEngine" ? activeTheme.cardBg : "transparent",
-                borderColor:
-                  activeWindow === "pixelEngine" ? activeTheme.accent : "transparent",
-                color:
-                  activeWindow === "pixelEngine" ? activeTheme.accent : activeTheme.textMuted,
-              }}
-              className="px-1.5 py-0.2 rounded border font-semibold hover:opacity-100 transition-all cursor-pointer shrink-0"
-              title="Workspace 4: Pixel Engine 2D/3D Voxel Canvas"
-            >
-              [4:CANVAS]
-            </button>
-
-            {/* [5:RESUME] -> resumeViewer */}
-            <button
-              type="button"
-              onClick={() => openAndFocus("resumeViewer")}
-              style={{
-                backgroundColor:
-                  activeWindow === "resumeViewer" ? activeTheme.cardBg : "transparent",
-                borderColor:
-                  activeWindow === "resumeViewer" ? activeTheme.accent : "transparent",
-                color:
-                  activeWindow === "resumeViewer" ? activeTheme.accent : activeTheme.textMuted,
-              }}
-              className="px-1.5 py-0.2 rounded border font-semibold hover:opacity-100 transition-all cursor-pointer hidden sm:inline-block shrink-0"
-              title="Workspace 5: Resume & Experience Viewer"
-            >
-              [5:RESUME]
-            </button>
-
-            {/* [6:GALLERY] -> galleryViewer */}
-            <button
-              type="button"
-              onClick={() => openAndFocus("galleryViewer")}
-              style={{
-                backgroundColor:
-                  activeWindow === "galleryViewer" ? activeTheme.cardBg : "transparent",
-                borderColor:
-                  activeWindow === "galleryViewer" ? activeTheme.accent : "transparent",
-                color:
-                  activeWindow === "galleryViewer" ? activeTheme.accent : activeTheme.textMuted,
-              }}
-              className="px-1.5 py-0.2 rounded border font-semibold hover:opacity-100 transition-all cursor-pointer hidden lg:inline-block shrink-0"
-              title="Workspace 6: Feh Image Gallery"
-            >
-              [6:GALLERY]
-            </button>
-
-            {/* [7:FIELD] -> fieldJournal */}
-            <button
-              type="button"
-              onClick={() => openAndFocus("fieldJournal")}
-              style={{
-                backgroundColor:
-                  activeWindow === "fieldJournal" ? activeTheme.cardBg : "transparent",
-                borderColor:
-                  activeWindow === "fieldJournal" ? activeTheme.accent : "transparent",
-                color:
-                  activeWindow === "fieldJournal" ? activeTheme.accent : activeTheme.textMuted,
-              }}
-              className="px-1.5 py-0.2 rounded border font-semibold hover:opacity-100 transition-all cursor-pointer hidden xl:inline-block shrink-0"
-              title="Workspace 7: Rajasthan Field Journal & Grassroots Leadership"
-            >
-              [7:FIELD]
-            </button>
-
-            {/* [8:DIAGNOSTICS] -> learnabilityLab */}
-            <button
-              type="button"
-              onClick={() => openAndFocus("learnabilityLab")}
-              style={{
-                backgroundColor:
-                  activeWindow === "learnabilityLab" ? activeTheme.cardBg : "transparent",
-                borderColor:
-                  activeWindow === "learnabilityLab" ? activeTheme.accent : "transparent",
-                color:
-                  activeWindow === "learnabilityLab" ? activeTheme.accent : activeTheme.textMuted,
-              }}
-              className="px-1.5 py-0.2 rounded border font-semibold hover:opacity-100 transition-all cursor-pointer hidden 2xl:inline-block shrink-0"
-              title="Workspace 8: Aarohi Bal Sansar Learnability Lab"
-            >
-              [8:DIAGNOSTICS]
-            </button>
-
-            {/* [9:WALLPAPER] -> wallpaperManager */}
-            <button
-              type="button"
-              onClick={() => openAndFocus("wallpaperManager")}
-              style={{
-                backgroundColor:
-                  activeWindow === "wallpaperManager" ? activeTheme.cardBg : "transparent",
-                borderColor:
-                  activeWindow === "wallpaperManager" ? activeTheme.accent : "transparent",
-                color:
-                  activeWindow === "wallpaperManager" ? activeTheme.accent : activeTheme.textMuted,
-              }}
-              className="px-1.5 py-0.2 rounded border font-semibold hover:opacity-100 transition-all cursor-pointer hidden 2xl:inline-block shrink-0"
-              title="Workspace 9: Dynamic Wallpaper Engine"
-            >
-              [9:WALLPAPER]
-            </button>
-          </div>
-        </div>
-
-        {/* Center: Active Window Title Tag */}
-        <div className="hidden xl:flex items-center gap-2 text-[11px] shrink-0 whitespace-nowrap" style={{ color: activeTheme.textMuted }}>
-          <span>ACTIVE:</span>
-          <span
-            style={{
-              backgroundColor: activeTheme.cardBg,
-              borderColor: activeTheme.cardBorder,
-              color: activeTheme.accent,
-            }}
-            className="px-2 py-0.5 rounded border font-semibold"
-          >
-            {activeWindow ? (APP_LABELS[activeWindow] || activeWindow) : "Desktop Workspace"}
-          </span>
-        </div>
-
-        {/* Right: Launchers + Theme Switcher + Audio + Telemetry + Clock */}
-        <div className="flex items-center gap-1.5 sm:gap-2.5 text-[11px] shrink-0 whitespace-nowrap">
-          {/* Quick Utility Launchers: Visitor Note + Wallpaper Switcher */}
-          <div className="flex items-center gap-1.5">
-            {/* Sticky Note Toggle */}
-            <button
-              type="button"
-              onClick={() => {
-                playClickChime(520);
-                toggleStickyNote();
-              }}
-              title="Toggle Sticky Note"
-              style={{
-                backgroundColor: isStickyNoteOpen ? "rgba(245, 158, 11, 0.2)" : activeTheme.cardBg,
-                borderColor: isStickyNoteOpen ? "#fbbf24" : activeTheme.cardBorder,
-                color: isStickyNoteOpen ? "#fbbf24" : activeTheme.textMuted,
-              }}
-              className="flex items-center gap-1.5 px-2 py-0.5 rounded border text-[11px] font-semibold transition-all hover:opacity-100 cursor-pointer"
-            >
-              <StickyNote className="w-3 h-3 text-amber-500" />
-              <span className="hidden sm:inline">Note</span>
-            </button>
-
-            {/* Wallpaper Engine Quick Launcher */}
-            <button
-              type="button"
-              onClick={() => openAndFocus("wallpaperManager")}
-              title="Change Wallpaper (Alt+9)"
-              style={{
-                backgroundColor: activeWindow === "wallpaperManager" ? activeTheme.cardBg : "transparent",
-                borderColor: activeWindow === "wallpaperManager" ? activeTheme.accent : activeTheme.cardBorder,
-                color: activeWindow === "wallpaperManager" ? activeTheme.accent : activeTheme.textMuted,
-              }}
-              className="p-1 rounded border hover:bg-white/10 transition-colors cursor-pointer"
-            >
-              <ImageIcon className="w-3.5 h-3.5 text-pink-400" />
-            </button>
+    <div className="min-h-screen bg-stone-50 dark:bg-[#0c0d10] text-stone-900 dark:text-stone-100 px-6 sm:px-8 py-12 sm:py-20 transition-colors">
+      <main className="max-w-[700px] mx-auto space-y-20 sm:space-y-28">
+        {/* ================================================================= */}
+        {/* 1. HEADER */}
+        {/* ================================================================= */}
+        <header className="flex flex-col sm:flex-row sm:items-baseline justify-between gap-4 border-b border-stone-200 dark:border-stone-800 pb-6">
+          <div>
+            <h1 className="text-xl font-bold tracking-tight text-stone-900 dark:text-stone-100">
+              Aditya Diundi
+            </h1>
+            {/* TODO: Title decision - Product Designer vs Design Engineer */}
+            <p className="text-sm text-stone-500 dark:text-stone-400">
+              Product Designer
+            </p>
           </div>
 
-          <div
-            style={{ backgroundColor: activeTheme.headerBorder }}
-            className="h-3 w-px"
-          />
-
-          {/* Theme Selector Dropdown Menu with z-[1200] */}
-          <div className="relative" id="theme-selector-container">
-            <button
-              type="button"
-              onClick={(e) => {
-                e.stopPropagation();
-                setIsThemeMenuOpen((prev) => !prev);
-              }}
-              title="Change OS Theme"
-              style={{
-                backgroundColor: activeTheme.cardBg,
-                borderColor: activeTheme.cardBorder,
-                color: activeTheme.textPrimary,
-              }}
-              className="flex items-center gap-1.5 px-2 py-0.5 rounded border text-[11px] font-semibold hover:opacity-80 transition-opacity cursor-pointer"
+          <nav aria-label="Main Navigation" className="flex items-center gap-6 text-sm">
+            <a
+              href="#work"
+              className="text-stone-600 dark:text-stone-300 hover:text-stone-900 dark:hover:text-stone-100 transition-colors"
             >
-              <span>{activeTheme.icon}</span>
-              <span className="hidden sm:inline">{activeTheme.name}</span>
-              <ChevronDown className="w-3 h-3 opacity-60" />
-            </button>
+              Work
+            </a>
+            <a
+              href="#writing"
+              className="text-stone-600 dark:text-stone-300 hover:text-stone-900 dark:hover:text-stone-100 transition-colors"
+            >
+              Writing
+            </a>
+            <a
+              href="#about"
+              className="text-stone-600 dark:text-stone-300 hover:text-stone-900 dark:hover:text-stone-100 transition-colors"
+            >
+              About
+            </a>
+            <a
+              href="/Aditya_Diundi_Resume.pdf"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-stone-600 dark:text-stone-300 hover:text-stone-900 dark:hover:text-stone-100 transition-colors inline-flex items-center gap-1"
+            >
+              <span>Resume</span>
+              <ArrowUpRight className="w-3.5 h-3.5" />
+            </a>
+          </nav>
+        </header>
 
-            {/* Dropdown Popover - Elevated z-[1200] to always overlay active windows and canvas */}
-            {isThemeMenuOpen && (
-              <div
-                onClick={(e) => e.stopPropagation()}
-                style={{
-                  backgroundColor: activeTheme.windowBg,
-                  borderColor: activeTheme.windowBorder,
-                  color: activeTheme.textPrimary,
-                }}
-                className="absolute right-0 top-full mt-1.5 w-56 rounded-md border shadow-2xl p-1.5 z-[1200] flex flex-col gap-1 backdrop-blur-xl animate-in fade-in zoom-in-95 duration-100"
-              >
-                <div
-                  style={{ color: activeTheme.textMuted }}
-                  className="px-2 py-1 text-[10px] font-bold border-b border-white/5 uppercase tracking-wider flex items-center justify-between"
+        {/* ================================================================= */}
+        {/* 2. HERO */}
+        {/* ================================================================= */}
+        <section aria-labelledby="hero-heading" className="space-y-6 pt-4">
+          <div className="space-y-3">
+            <h2 id="hero-heading" className="sr-only">
+              Introduction
+            </h2>
+            <p className="text-2xl sm:text-3xl font-medium tracking-tight text-stone-900 dark:text-stone-100 leading-snug">
+              Designing evidence-first health systems, AI evaluation benchmarks, and tools.
+            </p>
+            <p className="text-base text-stone-600 dark:text-stone-400 leading-relaxed">
+              Designing software since 2021. Available for product design roles & select
+              design engineering projects.
+            </p>
+          </div>
+
+          <div className="flex flex-wrap items-center gap-5 text-sm pt-2">
+            {/* TODO: Verify preferred contact email address (replacing college address adityadiundi.des21@iitr.ac.in) */}
+            <a
+              href="mailto:adityadiundi@gmail.com"
+              className="font-medium text-stone-900 dark:text-stone-100 underline underline-offset-4 decoration-stone-300 dark:decoration-stone-700 hover:decoration-stone-900 dark:hover:decoration-stone-100 transition-colors"
+            >
+              Email (adityadiundi@gmail.com)
+            </a>
+            <a
+              href="https://www.linkedin.com/in/adityadiundi/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="font-medium text-stone-600 dark:text-stone-400 hover:text-stone-900 dark:hover:text-stone-100 transition-colors inline-flex items-center gap-1"
+            >
+              <span>LinkedIn</span>
+              <ArrowUpRight className="w-3.5 h-3.5" />
+            </a>
+          </div>
+        </section>
+
+        {/* ================================================================= */}
+        {/* 3. WORK (5 FEATURED PROJECTS) */}
+        {/* ================================================================= */}
+        <section id="work" aria-labelledby="work-heading" className="space-y-8">
+          <div className="flex items-baseline justify-between border-b border-stone-200 dark:border-stone-800 pb-3">
+            <h2
+              id="work-heading"
+              className="text-lg font-semibold tracking-tight text-stone-900 dark:text-stone-100"
+            >
+              Selected Work
+            </h2>
+            <Link
+              href="/work"
+              className="text-xs sm:text-sm text-stone-500 dark:text-stone-400 hover:text-stone-900 dark:hover:text-stone-100 transition-colors"
+            >
+              More work (archive) →
+            </Link>
+          </div>
+
+          <div className="space-y-4">
+            {FEATURED_PROJECTS.map((project) => (
+              <WorkCard key={project.id} {...project} />
+            ))}
+          </div>
+
+          <div className="pt-4 text-center sm:text-left">
+            <Link
+              href="/work"
+              className="inline-flex items-center gap-2 text-sm font-medium text-stone-700 dark:text-stone-300 hover:text-stone-900 dark:hover:text-stone-100 underline underline-offset-4"
+            >
+              <span>View additional projects: Ketto+, Aarohi Learnability Lab, Fieldwork →</span>
+            </Link>
+          </div>
+        </section>
+
+        {/* ================================================================= */}
+        {/* 4. WRITING (PLAIN LIST, 6–8 ITEMS) */}
+        {/* ================================================================= */}
+        <section id="writing" aria-labelledby="writing-heading" className="space-y-6">
+          <div className="flex items-baseline justify-between border-b border-stone-200 dark:border-stone-800 pb-3">
+            <h2
+              id="writing-heading"
+              className="text-lg font-semibold tracking-tight text-stone-900 dark:text-stone-100"
+            >
+              Writing
+            </h2>
+            <Link
+              href="/writing"
+              className="text-xs sm:text-sm text-stone-500 dark:text-stone-400 hover:text-stone-900 dark:hover:text-stone-100 transition-colors"
+            >
+              All essays →
+            </Link>
+          </div>
+
+          <ul className="divide-y divide-stone-200 dark:divide-stone-800">
+            {FEATURED_WRITING.map((essay, idx) => (
+              <li key={idx} className="py-4 flex flex-col sm:flex-row sm:items-baseline justify-between gap-1 group">
+                <a
+                  href={essay.url}
+                  target={essay.url.startsWith("http") ? "_blank" : undefined}
+                  rel={essay.url.startsWith("http") ? "noopener noreferrer" : undefined}
+                  className="text-base font-medium text-stone-900 dark:text-stone-100 hover:text-teal-700 dark:hover:text-teal-400 transition-colors inline-flex items-center gap-1.5"
                 >
-                  <span>Linux Shell Themes</span>
-                  <span className="text-[9px] opacity-60">7 themes</span>
+                  <span>{essay.title}</span>
+                  {essay.url.startsWith("http") && (
+                    <ArrowUpRight className="w-3.5 h-3.5 opacity-40 group-hover:opacity-100 transition-opacity" />
+                  )}
+                </a>
+                <div className="text-xs text-stone-500 dark:text-stone-400 flex items-center gap-2 flex-shrink-0 font-mono">
+                  <span>{essay.venue}</span>
+                  <span>·</span>
+                  <span>{essay.year}</span>
                 </div>
-                {Object.values(OS_THEMES).map((theme) => (
-                  <button
-                    key={theme.id}
-                    type="button"
-                    onClick={() => {
-                      setTheme(theme.id as OSThemeId);
-                      setIsThemeMenuOpen(false);
-                      playClickChime(660);
-                    }}
-                    style={{
-                      backgroundColor:
-                        currentThemeId === theme.id ? activeTheme.cardBg : "transparent",
-                    }}
-                    className="flex items-center justify-between px-2 py-1.5 rounded text-left text-xs hover:bg-white/5 transition-all"
-                  >
-                    <div className="flex items-center gap-2">
-                      <span>{theme.icon}</span>
-                      <span
-                        className="font-medium"
-                        style={{
-                          color: currentThemeId === theme.id ? theme.accent : undefined,
-                        }}
-                      >
-                        {theme.name}
-                      </span>
-                    </div>
-                    {currentThemeId === theme.id && (
-                      <Check className="w-3.5 h-3.5" style={{ color: theme.accent }} />
-                    )}
-                  </button>
-                ))}
-              </div>
-            )}
-          </div>
+              </li>
+            ))}
+          </ul>
+        </section>
 
-          {/* Quick Dark / Light Toggle */}
-          <button
-            type="button"
-            onClick={() => {
-              toggleDarkLight();
-              playClickChime(500);
-            }}
-            title={activeTheme.isDark ? "Switch to Light Mode" : "Switch to Dark Mode"}
-            style={{
-              backgroundColor: activeTheme.cardBg,
-              borderColor: activeTheme.cardBorder,
-              color: activeTheme.textPrimary,
-            }}
-            className="p-1 rounded border hover:opacity-80 transition-colors"
-          >
-            {activeTheme.isDark ? (
-              <Sun className="w-3.5 h-3.5 text-amber-400" />
-            ) : (
-              <Moon className="w-3.5 h-3.5 text-blue-500" />
-            )}
-          </button>
-
-          {/* Audio Synthesizer / Beethoven Für Elise Toggle */}
-          <button
-            type="button"
-            onClick={() => {
-              toggleSound();
-              playClickChime(700);
-            }}
-            title={isSoundEnabled ? "Mute Beethoven Für Elise Music Box" : "Enable Beethoven Für Elise Music Box"}
-            style={{
-              backgroundColor: activeTheme.cardBg,
-              borderColor: isSoundEnabled ? activeTheme.accent : activeTheme.cardBorder,
-              color: isSoundEnabled ? activeTheme.accent : activeTheme.textMuted,
-            }}
-            className="p-1 rounded border hover:opacity-80 transition-colors flex items-center gap-1"
-          >
-            {isSoundEnabled ? (
-              <Volume2 className="w-3.5 h-3.5 text-emerald-400" />
-            ) : (
-              <VolumeX className="w-3.5 h-3.5 opacity-50" />
-            )}
-          </button>
-
-          {/* Keyboard Shortcuts Trigger */}
-          <button
-            type="button"
-            onClick={() => {
-              playClickChime(540);
-              setShowKeysModal(!showKeysModal);
-            }}
-            title="TWM Keyboard Shortcuts (Press ?)"
-            style={{
-              backgroundColor: showKeysModal ? activeTheme.accent : activeTheme.cardBg,
-              borderColor: showKeysModal ? activeTheme.accent : activeTheme.cardBorder,
-              color: showKeysModal ? (activeTheme.isDark ? "#000" : "#fff") : activeTheme.textMuted,
-            }}
-            className="p-1 rounded border hover:opacity-80 transition-colors hidden sm:flex items-center gap-1 text-[10px] font-bold"
-          >
-            <Keyboard className="w-3.5 h-3.5" />
-            <span className="hidden md:inline">KEYS</span>
-          </button>
-
-          <div
-            style={{ backgroundColor: activeTheme.headerBorder }}
-            className="h-3 w-px hidden lg:block"
-          />
-
-          {/* Telemetry Chips */}
-          <div
-            className="hidden lg:flex items-center gap-2 text-[10px]"
-            style={{ color: activeTheme.textMuted }}
-          >
-            <div className="flex items-center gap-1">
-              <Cpu className="w-3 h-3 text-purple-400" />
-              <span>{cpuUsage}%</span>
-            </div>
-            <div className="flex items-center gap-1">
-              <Activity className="w-3 h-3 text-emerald-400" />
-              <span>{memUsage}%</span>
-            </div>
-          </div>
-
-          {/* Clock */}
-          <div
-            style={{
-              backgroundColor: activeTheme.cardBg,
-              borderColor: activeTheme.cardBorder,
-              color: activeTheme.textPrimary,
-            }}
-            className="flex items-center gap-1.5 px-2 py-0.5 rounded border font-semibold text-[11px]"
-          >
-            <Clock className="w-3 h-3" style={{ color: activeTheme.accent }} />
-            <span>{timeStr}</span>
-          </div>
-        </div>
-      </header>
-
-      {/* TWM Window Workspace Canvas */}
-      <div className="relative flex-1 w-full h-[calc(100vh-72px)] overflow-hidden">
-        {/* Desktop Background Shortcuts & Widgets (Visible on empty canvas) */}
-        <div className="absolute inset-0 p-6 pb-16 pointer-events-none flex flex-col justify-between z-0">
-          {/* Left Desktop App Icons Column - Ultra-clean minimalistic squircle form */}
-          <div className="flex flex-col flex-wrap max-h-[calc(100vh-140px)] gap-y-5 gap-x-6 pointer-events-auto w-fit z-10">
-            {/* 1: PixelStudio */}
-            <button
-              type="button"
-              onClick={() => {
-                playClickChime(500);
-                openAndFocus("pixelEngine");
-              }}
-              title="Launch PixelStudio"
-              className="group flex flex-col items-center gap-1.5 focus:outline-none cursor-pointer transition-transform active:scale-95 w-16"
+        {/* ================================================================= */}
+        {/* 5. ABOUT (BACKGROUND, EXPERIENCE, EDUCATION, SKILLS) */}
+        {/* ================================================================= */}
+        <section id="about" aria-labelledby="about-heading" className="space-y-8">
+          <div className="border-b border-stone-200 dark:border-stone-800 pb-3">
+            <h2
+              id="about-heading"
+              className="text-lg font-semibold tracking-tight text-stone-900 dark:text-stone-100"
             >
-              <div
-                style={{
-                  backgroundColor: activeTheme.isDark ? "rgba(255, 255, 255, 0.08)" : "rgba(240, 240, 243, 0.9)",
-                  borderColor: activeTheme.isDark ? "rgba(255, 255, 255, 0.12)" : "rgba(0, 0, 0, 0.08)",
-                }}
-                className="w-13 h-13 sm:w-14 sm:h-14 rounded-2xl border flex items-center justify-center shadow-sm backdrop-blur-md group-hover:scale-105 group-hover:shadow-md transition-all duration-150"
-              >
-                <Paintbrush className="w-6 h-6 text-sky-400 group-hover:scale-110 transition-transform -rotate-12 stroke-[1.8]" />
-              </div>
-              <span
-                style={{ color: activeTheme.textPrimary }}
-                className="font-mono text-[11px] font-medium tracking-tight text-center select-none truncate max-w-[76px] opacity-85 group-hover:opacity-100 transition-opacity"
-              >
-                PixelStudio
-              </span>
-            </button>
+              About
+            </h2>
+          </div>
 
-            {/* 2: Terminal */}
-            <button
-              type="button"
-              onClick={() => {
-                playClickChime(420);
-                window.dispatchEvent(new CustomEvent("open-terminal"));
-              }}
-              title="Toggle Noctalia Shell Terminal"
-              className="group flex flex-col items-center gap-1.5 focus:outline-none cursor-pointer transition-transform active:scale-95 w-16"
-            >
-              <div
-                style={{
-                  backgroundColor: activeTheme.isDark ? "rgba(255, 255, 255, 0.08)" : "rgba(240, 240, 243, 0.9)",
-                  borderColor: activeTheme.isDark ? "rgba(255, 255, 255, 0.12)" : "rgba(0, 0, 0, 0.08)",
-                }}
-                className="w-13 h-13 sm:w-14 sm:h-14 rounded-2xl border flex items-center justify-center shadow-sm backdrop-blur-md group-hover:scale-105 group-hover:shadow-md transition-all duration-150"
-              >
-                <span className="font-mono text-base font-bold text-neutral-800 dark:text-neutral-200 tracking-tighter select-none group-hover:scale-110 transition-transform">
-                  &gt;_
+          <div className="space-y-4 text-base text-stone-700 dark:text-stone-300 leading-relaxed">
+            <p>
+              I am a product designer and design engineer based in India. Designing software
+              since 2021, I work at the intersection of human-centered research, system architecture,
+              and front-end code.
+            </p>
+            <p>
+              My work spans frontier AI benchmarking for rural public health (JANEVAL), high-density
+              enterprise claims pipelines (MFine), behavioral habit loops (Mosaic Wellness), and
+              zero-dependency canvas engines (AdityaOS).
+            </p>
+          </div>
+
+          {/* Experience List */}
+          <div className="space-y-4 pt-2">
+            <h3 className="text-sm font-semibold uppercase tracking-wider text-stone-500 dark:text-stone-400 font-mono text-xs">
+              Experience
+            </h3>
+            <ul className="space-y-4 text-sm">
+              <li className="flex flex-col sm:flex-row sm:items-baseline justify-between gap-1">
+                <div>
+                  {/* TODO: Verify exact current status / organization for 2024–Present */}
+                  <span className="font-medium text-stone-900 dark:text-stone-100">
+                    Independent Product Designer
+                  </span>
+                  <span className="text-stone-500 dark:text-stone-400"> · Self-employed</span>
+                </div>
+                <span className="text-xs text-stone-500 dark:text-stone-400 font-mono">
+                  2024–Present
+                </span>
+              </li>
+              <li className="flex flex-col sm:flex-row sm:items-baseline justify-between gap-1">
+                <div>
+                  <span className="font-medium text-stone-900 dark:text-stone-100">
+                    Design Lead & Social Innovator
+                  </span>
+                  <span className="text-stone-500 dark:text-stone-400">
+                    {" "}
+                    · India Fellow / Project Potential
+                  </span>
+                </div>
+                <span className="text-xs text-stone-500 dark:text-stone-400 font-mono">
+                  2023–2024
+                </span>
+              </li>
+              <li className="flex flex-col sm:flex-row sm:items-baseline justify-between gap-1">
+                <div>
+                  <span className="font-medium text-stone-900 dark:text-stone-100">
+                    Product Design Intern
+                  </span>
+                  <span className="text-stone-500 dark:text-stone-400"> · MFine</span>
+                </div>
+                <span className="text-xs text-stone-500 dark:text-stone-400 font-mono">
+                  2023
+                </span>
+              </li>
+              <li className="flex flex-col sm:flex-row sm:items-baseline justify-between gap-1">
+                <div>
+                  <span className="font-medium text-stone-900 dark:text-stone-100">
+                    Design Consultant
+                  </span>
+                  <span className="text-stone-500 dark:text-stone-400">
+                    {" "}
+                    · Digiaccel / Mosaic Wellness
+                  </span>
+                </div>
+                <span className="text-xs text-stone-500 dark:text-stone-400 font-mono">
+                  2022–2023
+                </span>
+              </li>
+            </ul>
+          </div>
+
+          {/* Education */}
+          <div className="space-y-3 pt-2">
+            <h3 className="text-sm font-semibold uppercase tracking-wider text-stone-500 dark:text-stone-400 font-mono text-xs">
+              Education
+            </h3>
+            <div className="flex flex-col sm:flex-row sm:items-baseline justify-between gap-1 text-sm">
+              <div>
+                <span className="font-medium text-stone-900 dark:text-stone-100">
+                  Bachelor of Design (B.Des)
+                </span>
+                <span className="text-stone-500 dark:text-stone-400">
+                  {" "}
+                  · Department of Design, IIT Roorkee
                 </span>
               </div>
-              <span
-                style={{ color: activeTheme.textPrimary }}
-                className="font-mono text-[11px] font-medium tracking-tight text-center select-none truncate max-w-[76px] opacity-85 group-hover:opacity-100 transition-opacity"
-              >
-                Terminal
+              <span className="text-xs text-stone-500 dark:text-stone-400 font-mono">
+                2021–2025
               </span>
-            </button>
-
-            {/* 3: Projects */}
-            <button
-              type="button"
-              onClick={() => {
-                playClickChime(450);
-                openAndFocus("archiveReader");
-              }}
-              title="Open Case Studies & Engineering Projects"
-              className="group flex flex-col items-center gap-1.5 focus:outline-none cursor-pointer transition-transform active:scale-95 w-16"
-            >
-              <div
-                style={{
-                  backgroundColor: activeTheme.isDark ? "rgba(255, 255, 255, 0.08)" : "rgba(240, 240, 243, 0.9)",
-                  borderColor: activeTheme.isDark ? "rgba(255, 255, 255, 0.12)" : "rgba(0, 0, 0, 0.08)",
-                }}
-                className="w-13 h-13 sm:w-14 sm:h-14 rounded-2xl border flex items-center justify-center shadow-sm backdrop-blur-md group-hover:scale-105 group-hover:shadow-md transition-all duration-150"
-              >
-                <Folder className="w-6 h-6 text-neutral-700 dark:text-neutral-200 stroke-[1.6] group-hover:scale-110 transition-transform" />
-              </div>
-              <span
-                style={{ color: activeTheme.textPrimary }}
-                className="font-mono text-[11px] font-medium tracking-tight text-center select-none truncate max-w-[76px] opacity-85 group-hover:opacity-100 transition-opacity"
-              >
-                Projects
-              </span>
-            </button>
-
-            {/* 4: Writings */}
-            <button
-              type="button"
-              onClick={() => {
-                playClickChime(450);
-                openAndFocus("archiveReader");
-              }}
-              title="Open Essays & Poetry Archive"
-              className="group flex flex-col items-center gap-1.5 focus:outline-none cursor-pointer transition-transform active:scale-95 w-16"
-            >
-              <div
-                style={{
-                  backgroundColor: activeTheme.isDark ? "rgba(255, 255, 255, 0.08)" : "rgba(240, 240, 243, 0.9)",
-                  borderColor: activeTheme.isDark ? "rgba(255, 255, 255, 0.12)" : "rgba(0, 0, 0, 0.08)",
-                }}
-                className="w-13 h-13 sm:w-14 sm:h-14 rounded-2xl border flex items-center justify-center shadow-sm backdrop-blur-md group-hover:scale-105 group-hover:shadow-md transition-all duration-150"
-              >
-                <FileText className="w-6 h-6 text-neutral-700 dark:text-neutral-200 stroke-[1.6] group-hover:scale-110 transition-transform" />
-              </div>
-              <span
-                style={{ color: activeTheme.textPrimary }}
-                className="font-mono text-[11px] font-medium tracking-tight text-center select-none truncate max-w-[76px] opacity-85 group-hover:opacity-100 transition-opacity"
-              >
-                Writings
-              </span>
-            </button>
-
-            {/* 5: Resume */}
-            <button
-              type="button"
-              onClick={() => {
-                playClickChime(400);
-                openAndFocus("resumeViewer");
-              }}
-              title="Open Resume & Experience"
-              className="group flex flex-col items-center gap-1.5 focus:outline-none cursor-pointer transition-transform active:scale-95 w-16"
-            >
-              <div
-                style={{
-                  backgroundColor: activeTheme.isDark ? "rgba(255, 255, 255, 0.08)" : "rgba(240, 240, 243, 0.9)",
-                  borderColor: activeTheme.isDark ? "rgba(255, 255, 255, 0.12)" : "rgba(0, 0, 0, 0.08)",
-                }}
-                className="w-13 h-13 sm:w-14 sm:h-14 rounded-2xl border flex items-center justify-center shadow-sm backdrop-blur-md group-hover:scale-105 group-hover:shadow-md transition-all duration-150"
-              >
-                <FileCode className="w-6 h-6 text-neutral-700 dark:text-neutral-200 stroke-[1.6] group-hover:scale-110 transition-transform" />
-              </div>
-              <span
-                style={{ color: activeTheme.textPrimary }}
-                className="font-mono text-[11px] font-medium tracking-tight text-center select-none truncate max-w-[76px] opacity-85 group-hover:opacity-100 transition-opacity"
-              >
-                Resume
-              </span>
-            </button>
-
-            {/* 6: Gallery */}
-            <button
-              type="button"
-              onClick={() => {
-                playClickChime(480);
-                openAndFocus("galleryViewer");
-              }}
-              title="Open Visual Photo Gallery"
-              className="group flex flex-col items-center gap-1.5 focus:outline-none cursor-pointer transition-transform active:scale-95 w-16"
-            >
-              <div
-                style={{
-                  backgroundColor: activeTheme.isDark ? "rgba(255, 255, 255, 0.08)" : "rgba(240, 240, 243, 0.9)",
-                  borderColor: activeTheme.isDark ? "rgba(255, 255, 255, 0.12)" : "rgba(0, 0, 0, 0.08)",
-                }}
-                className="w-13 h-13 sm:w-14 sm:h-14 rounded-2xl border flex items-center justify-center shadow-sm backdrop-blur-md group-hover:scale-105 group-hover:shadow-md transition-all duration-150"
-              >
-                <ImageIcon className="w-6 h-6 text-neutral-700 dark:text-neutral-200 stroke-[1.6] group-hover:scale-110 transition-transform" />
-              </div>
-              <span
-                style={{ color: activeTheme.textPrimary }}
-                className="font-mono text-[11px] font-medium tracking-tight text-center select-none truncate max-w-[76px] opacity-85 group-hover:opacity-100 transition-opacity"
-              >
-                Gallery
-              </span>
-            </button>
-
-            {/* 7: AboutMe */}
-            <button
-              type="button"
-              onClick={() => {
-                playClickChime(460);
-                openAndFocus("coreIntro");
-              }}
-              title="About Aditya Diundi"
-              className="group flex flex-col items-center gap-1.5 focus:outline-none cursor-pointer transition-transform active:scale-95 w-16"
-            >
-              <div
-                style={{
-                  backgroundColor: activeTheme.isDark ? "rgba(255, 255, 255, 0.08)" : "rgba(240, 240, 243, 0.9)",
-                  borderColor: activeTheme.isDark ? "rgba(255, 255, 255, 0.12)" : "rgba(0, 0, 0, 0.08)",
-                }}
-                className="w-13 h-13 sm:w-14 sm:h-14 rounded-2xl border flex items-center justify-center shadow-sm backdrop-blur-md group-hover:scale-105 group-hover:shadow-md transition-all duration-150"
-              >
-                <Sparkles className="w-6 h-6 text-neutral-700 dark:text-neutral-200 stroke-[1.6] group-hover:scale-110 transition-transform" />
-              </div>
-              <span
-                style={{ color: activeTheme.textPrimary }}
-                className="font-mono text-[11px] font-medium tracking-tight text-center select-none truncate max-w-[76px] opacity-85 group-hover:opacity-100 transition-opacity"
-              >
-                AboutMe
-              </span>
-            </button>
-          </div>
-
-          {/* Bottom Desktop System Info Widget (Right Aligned) */}
-          <div className="hidden md:flex items-end justify-end pointer-events-auto">
-            <div
-              style={{
-                backgroundColor: activeTheme.cardBg,
-                borderColor: activeTheme.cardBorder,
-                color: activeTheme.textPrimary,
-              }}
-              className="p-3 rounded-md border text-[11px] backdrop-blur-md max-w-sm space-y-1 shadow-md opacity-75 hover:opacity-100 transition-opacity"
-            >
-              <div className="flex items-center gap-2 font-bold" style={{ color: activeTheme.accent }}>
-                <Sparkles className="w-3.5 h-3.5" />
-                <span>ADITYA-OS // Interactive Web Desktop</span>
-              </div>
-              <p className="text-[10px] opacity-75 leading-relaxed">
-                Click any desktop icon or shell chip to launch windows. Press &apos;?&apos; for keyboard shortcuts.
-              </p>
             </div>
           </div>
-        </div>
 
-        {/* Module 1: CoreIntro Window */}
-        <WindowFrame
-          id="coreIntro"
-          title="About Aditya // Design Philosophy & Bio"
-          icon={<Sparkles className="w-3.5 h-3.5 text-purple-400" />}
-          defaultPosition={{ x: 50, y: 30 }}
-          defaultSize={{ width: 620, height: 480 }}
-          dragConstraintsRef={desktopContainerRef}
-        >
-          <CoreIntro />
-        </WindowFrame>
+          {/* Skills Line (Plain Comma-Separated, No Pills) */}
+          <div className="pt-2 text-sm text-stone-600 dark:text-stone-400 leading-relaxed border-t border-stone-200 dark:border-stone-800 pt-4">
+            <span className="font-medium text-stone-900 dark:text-stone-200">Skills: </span>
+            Systems Design, Interaction Design, Prototyping (Figma, React, TypeScript), Design
+            Systems, Field Ethnography, Quantitative Benchmarking.
+          </div>
+        </section>
 
-        {/* Module 2: PixelEngine Window */}
-        <WindowFrame
-          id="pixelEngine"
-          title="Pixel Studio // Creative Grid Canvas"
-          icon={<Paintbrush className="w-3.5 h-3.5" style={{ color: activeTheme.accent }} />}
-          defaultPosition={{ x: 140, y: 60 }}
-          defaultSize={{ width: 760, height: 520 }}
-          dragConstraintsRef={desktopContainerRef}
-        >
-          <PixelEngine />
-        </WindowFrame>
-
-        {/* Module 3: ArchiveReader Window */}
-        <WindowFrame
-          id="archiveReader"
-          title="Archive // Case Studies & Essays"
-          icon={<BookOpen className="w-3.5 h-3.5 text-emerald-400" />}
-          defaultPosition={{ x: 340, y: 80 }}
-          defaultSize={{ width: 700, height: 480 }}
-          dragConstraintsRef={desktopContainerRef}
-        >
-          <ArchiveReader />
-        </WindowFrame>
-
-        {/* Module 4: StreamFeed Window */}
-        <WindowFrame
-          id="streamFeed"
-          title="Media Feed // Videos & Visual Experiments"
-          icon={<Tv className="w-3.5 h-3.5 text-amber-400" />}
-          defaultPosition={{ x: 220, y: 130 }}
-          defaultSize={{ width: 600, height: 430 }}
-          dragConstraintsRef={desktopContainerRef}
-        >
-          <StreamFeed />
-        </WindowFrame>
-
-        {/* Module 5: ResumeViewer Window */}
-        <WindowFrame
-          id="resumeViewer"
-          title="Resume // Experience & Education"
-          icon={<FileText className="w-3.5 h-3.5 text-cyan-400" />}
-          defaultPosition={{ x: 260, y: 70 }}
-          defaultSize={{ width: 720, height: 530 }}
-          dragConstraintsRef={desktopContainerRef}
-        >
-          <ResumeViewer />
-        </WindowFrame>
-
-        {/* Module 6: GalleryViewer Window */}
-        <WindowFrame
-          id="galleryViewer"
-          title="Photo Gallery // Visual & Fieldwork"
-          icon={<ImageIcon className="w-3.5 h-3.5 text-pink-400" />}
-          defaultPosition={{ x: 180, y: 90 }}
-          defaultSize={{ width: 740, height: 500 }}
-          dragConstraintsRef={desktopContainerRef}
-        >
-          <GalleryViewer />
-        </WindowFrame>
-
-        {/* Module 7: FieldJournal Window */}
-        <WindowFrame
-          id="fieldJournal"
-          title="Field Journal // Rural Immersion & Impact"
-          icon={<Compass className="w-3.5 h-3.5 text-amber-400" />}
-          defaultPosition={{ x: 140, y: 40 }}
-          defaultSize={{ width: 780, height: 520 }}
-          dragConstraintsRef={desktopContainerRef}
-        >
-          <FieldJournal />
-        </WindowFrame>
-
-        {/* Module 8: LearnabilityLab Window */}
-        <WindowFrame
-          id="learnabilityLab"
-          title="Diagnostic Lab // Aarohi Bal Sansar"
-          icon={<Brain className="w-3.5 h-3.5 text-cyan-400" />}
-          defaultPosition={{ x: 220, y: 60 }}
-          defaultSize={{ width: 780, height: 530 }}
-          dragConstraintsRef={desktopContainerRef}
-        >
-          <LearnabilityLab />
-        </WindowFrame>
-
-        {/* Module 9: WallpaperManager Window */}
-        <WindowFrame
-          id="wallpaperManager"
-          title="Wallpaper Gallery // Desktop Wallpapers"
-          icon={<ImageIcon className="w-3.5 h-3.5 text-pink-400" />}
-          defaultPosition={{ x: 200, y: 70 }}
-          defaultSize={{ width: 760, height: 530 }}
-          dragConstraintsRef={desktopContainerRef}
-        >
-          <WallpaperManager />
-        </WindowFrame>
-      </div>
-
-      {/* Minimized Terminal Shell State Anchored to Bottom */}
-      <TerminalDesktop />
-
-      {/* Floating Desktop Sticky Note / Visitor Scratchpad */}
-      <DesktopStickyNote dragConstraintsRef={desktopContainerRef} />
-
-      {/* Hyprland Boot & Lock / Login Screen */}
-      <HyprlandBootScreen />
-
-      {/* Desktop Right-Click Context Menu */}
-      {contextMenu && (
-        <div
-          id="desktop-context-menu"
-          onClick={(e) => e.stopPropagation()}
-          onContextMenu={(e) => e.stopPropagation()}
-          style={{
-            top: contextMenu.y,
-            left: contextMenu.x,
-            backgroundColor: activeTheme.windowBg,
-            borderColor: activeTheme.windowBorder,
-            color: activeTheme.textPrimary,
-          }}
-          className="fixed z-[1600] w-64 rounded-xl border shadow-2xl p-1.5 font-mono text-xs backdrop-blur-xl animate-in fade-in zoom-in-95 duration-100 select-none"
-        >
-          {/* Header / Brand */}
-          <div
-            className="px-2.5 py-1.5 border-b mb-1 flex items-center justify-between text-[10px] font-bold tracking-wider uppercase opacity-75"
-            style={{ borderColor: activeTheme.headerBorder, color: activeTheme.accent }}
-          >
-            <div className="flex items-center gap-1.5">
-              <span>⟡</span>
-              <span>ADITYA-OS DESKTOP</span>
-            </div>
-            <span className="opacity-60 text-[9px]">v2.4</span>
+        {/* ================================================================= */}
+        {/* 6. FOOTER */}
+        {/* ================================================================= */}
+        <footer className="border-t border-stone-200 dark:border-stone-800 pt-10 pb-16 space-y-6 text-sm">
+          {/* Primary Text Links */}
+          <div className="flex flex-wrap items-center gap-6">
+            <a
+              href="https://www.linkedin.com/in/adityadiundi/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-stone-700 dark:text-stone-300 hover:text-stone-900 dark:hover:text-stone-100 transition-colors"
+            >
+              LinkedIn
+            </a>
+            <a
+              href="https://github.com/AdityaDiundi"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-stone-700 dark:text-stone-300 hover:text-stone-900 dark:hover:text-stone-100 transition-colors"
+            >
+              GitHub
+            </a>
+            <a
+              href="https://adityadiundi.bearblog.dev"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-stone-700 dark:text-stone-300 hover:text-stone-900 dark:hover:text-stone-100 transition-colors"
+            >
+              Bear Blog
+            </a>
+            <a
+              href="mailto:adityadiundi@gmail.com"
+              className="text-stone-700 dark:text-stone-300 hover:text-stone-900 dark:hover:text-stone-100 transition-colors"
+            >
+              Email
+            </a>
           </div>
 
-          {/* Section 1: Appearance & Desktop Customization */}
-          <div className="space-y-0.5 pb-1 mb-1 border-b" style={{ borderColor: activeTheme.headerBorder }}>
-            <button
-              type="button"
-              onClick={() => {
-                lockSession();
-                playClickChime(400);
-                setContextMenu(null);
-              }}
-              className="w-full flex items-center justify-between px-2.5 py-1.5 rounded text-left hover:bg-white/10 transition-colors cursor-pointer"
+          {/* Understated Side Projects Line */}
+          <div className="text-xs text-stone-500 dark:text-stone-400 space-x-1">
+            <span>Side projects:</span>
+            <Link
+              href="/os"
+              className="hover:text-stone-900 dark:hover:text-stone-200 underline underline-offset-2"
             >
-              <span className="flex items-center gap-2">
-                <Lock className="w-3.5 h-3.5 text-yellow-400" />
-                <span>Lock Screen</span>
-              </span>
-              <kbd className="px-1 py-0.2 rounded bg-white/10 text-[9px] text-yellow-400">Alt+L</kbd>
-            </button>
-
-            <button
-              type="button"
-              onClick={() => {
-                toggleStickyNote();
-                playClickChime(500);
-                setContextMenu(null);
-              }}
-              className="w-full flex items-center justify-between px-2.5 py-1.5 rounded text-left hover:bg-white/10 transition-colors cursor-pointer"
+              AdityaOS
+            </Link>
+            <span>·</span>
+            <Link
+              href="/pixel"
+              className="hover:text-stone-900 dark:hover:text-stone-200 underline underline-offset-2"
             >
-              <span className="flex items-center gap-2">
-                <StickyNote className="w-3.5 h-3.5 text-amber-400" />
-                <span>Sticky Note</span>
-              </span>
-              <span className={`text-[10px] font-bold ${isStickyNoteOpen ? "text-amber-400" : "opacity-40"}`}>
-                {isStickyNoteOpen ? "PINNED" : "OFF"}
-              </span>
-            </button>
-
-            <button
-              type="button"
-              onClick={() => {
-                openAndFocus("wallpaperManager");
-                setContextMenu(null);
-              }}
-              className="w-full flex items-center justify-between px-2.5 py-1.5 rounded text-left hover:bg-white/10 transition-colors cursor-pointer"
+              Pixel Studio
+            </Link>
+            <span>·</span>
+            <a
+              href="https://youtube.com/@adityadiundi"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hover:text-stone-900 dark:hover:text-stone-200 underline underline-offset-2"
             >
-              <span className="flex items-center gap-2">
-                <ImageIcon className="w-3.5 h-3.5 text-pink-400" />
-                <span>Change Wallpaper...</span>
-              </span>
-              <kbd className="px-1 py-0.2 rounded bg-white/10 text-[9px] text-pink-400">Alt+9</kbd>
-            </button>
-
-            <button
-              type="button"
-              onClick={() => {
-                toggleDesktopGrid();
-                playClickChime(500);
-                setContextMenu(null);
-              }}
-              className="w-full flex items-center justify-between px-2.5 py-1.5 rounded text-left hover:bg-white/10 transition-colors cursor-pointer"
-            >
-              <span className="flex items-center gap-2">
-                <Grid className="w-3.5 h-3.5 text-cyan-400" />
-                <span>Toggle Desktop Grid</span>
-              </span>
-              {showDesktopGrid ? (
-                <span className="text-[10px] font-bold text-emerald-400 flex items-center gap-0.5">
-                  <Check className="w-3 h-3" /> ON
-                </span>
-              ) : (
-                <span className="text-[10px] opacity-40">OFF</span>
-              )}
-            </button>
-
-            <button
-              type="button"
-              onClick={() => {
-                toggleSound();
-                setContextMenu(null);
-              }}
-              className="w-full flex items-center justify-between px-2.5 py-1.5 rounded text-left hover:bg-white/10 transition-colors cursor-pointer"
-            >
-              <span className="flex items-center gap-2">
-                {isSoundEnabled ? (
-                  <Volume2 className="w-3.5 h-3.5 text-emerald-400" />
-                ) : (
-                  <VolumeX className="w-3.5 h-3.5 opacity-40" />
-                )}
-                <span>8-Bit Music Box Audio</span>
-              </span>
-              <span className={`text-[10px] font-bold ${isSoundEnabled ? "text-emerald-400" : "opacity-40"}`}>
-                {isSoundEnabled ? "ACTIVE" : "MUTED"}
-              </span>
-            </button>
+              YouTube Gaming
+            </a>
           </div>
 
-          {/* Section 2: Quick Launch Apps / Workspaces */}
-          <div className="space-y-0.5 pb-1 mb-1 border-b" style={{ borderColor: activeTheme.headerBorder }}>
-            <button
-              type="button"
-              onClick={() => {
-                openAndFocus("coreIntro");
-                setContextMenu(null);
-              }}
-              className="w-full flex items-center justify-between px-2.5 py-1 rounded text-left hover:bg-white/10 transition-colors cursor-pointer"
-            >
-              <span className="flex items-center gap-2">
-                <Sparkles className="w-3.5 h-3.5 text-purple-400" />
-                <span>About Aditya</span>
-              </span>
-              <kbd className="px-1 py-0.2 rounded bg-white/10 text-[9px] opacity-60">Alt+1</kbd>
-            </button>
-
-            <button
-              type="button"
-              onClick={() => {
-                openAndFocus("archiveReader");
-                setContextMenu(null);
-              }}
-              className="w-full flex items-center justify-between px-2.5 py-1 rounded text-left hover:bg-white/10 transition-colors cursor-pointer"
-            >
-              <span className="flex items-center gap-2">
-                <BookOpen className="w-3.5 h-3.5 text-emerald-400" />
-                <span>Case Studies & Essays</span>
-              </span>
-              <kbd className="px-1 py-0.2 rounded bg-white/10 text-[9px] opacity-60">Alt+2</kbd>
-            </button>
-
-            <button
-              type="button"
-              onClick={() => {
-                openAndFocus("pixelEngine");
-                setContextMenu(null);
-              }}
-              className="w-full flex items-center justify-between px-2.5 py-1 rounded text-left hover:bg-white/10 transition-colors cursor-pointer"
-            >
-              <span className="flex items-center gap-2">
-                <Paintbrush className="w-3.5 h-3.5 text-amber-400" />
-                <span>Pixel Studio</span>
-              </span>
-              <kbd className="px-1 py-0.2 rounded bg-white/10 text-[9px] opacity-60">Alt+4</kbd>
-            </button>
-
-            <button
-              type="button"
-              onClick={() => {
-                openAndFocus("resumeViewer");
-                setContextMenu(null);
-              }}
-              className="w-full flex items-center justify-between px-2.5 py-1 rounded text-left hover:bg-white/10 transition-colors cursor-pointer"
-            >
-              <span className="flex items-center gap-2">
-                <FileText className="w-3.5 h-3.5 text-cyan-400" />
-                <span>Resume & Experience</span>
-              </span>
-              <kbd className="px-1 py-0.2 rounded bg-white/10 text-[9px] opacity-60">Alt+5</kbd>
-            </button>
-
-            <button
-              type="button"
-              onClick={() => {
-                openAndFocus("fieldJournal");
-                setContextMenu(null);
-              }}
-              className="w-full flex items-center justify-between px-2.5 py-1 rounded text-left hover:bg-white/10 transition-colors cursor-pointer"
-            >
-              <span className="flex items-center gap-2">
-                <Compass className="w-3.5 h-3.5 text-amber-400" />
-                <span>Rural Field Journal</span>
-              </span>
-              <kbd className="px-1 py-0.2 rounded bg-white/10 text-[9px] opacity-60">Alt+7</kbd>
-            </button>
-
-            <button
-              type="button"
-              onClick={() => {
-                openAndFocus("learnabilityLab");
-                setContextMenu(null);
-              }}
-              className="w-full flex items-center justify-between px-2.5 py-1 rounded text-left hover:bg-white/10 transition-colors cursor-pointer"
-            >
-              <span className="flex items-center gap-2">
-                <Brain className="w-3.5 h-3.5 text-cyan-400" />
-                <span>Learnability Lab</span>
-              </span>
-              <kbd className="px-1 py-0.2 rounded bg-white/10 text-[9px] opacity-60">Alt+8</kbd>
-            </button>
+          {/* Copyright */}
+          <div className="text-xs text-stone-400 dark:text-stone-600 font-mono">
+            © 2021–{new Date().getFullYear()} Aditya Diundi · Typeset with system typography
           </div>
-
-          {/* Section 3: Window Management */}
-          <div className="space-y-0.5 pb-1 mb-1 border-b" style={{ borderColor: activeTheme.headerBorder }}>
-            <button
-              type="button"
-              onClick={() => {
-                minimizeAllWindows();
-                playClickChime(420);
-                setContextMenu(null);
-              }}
-              className="w-full flex items-center justify-between px-2.5 py-1.5 rounded text-left hover:bg-white/10 transition-colors cursor-pointer"
-            >
-              <span className="flex items-center gap-2">
-                <Layers className="w-3.5 h-3.5 opacity-60" />
-                <span>Minimize All Windows</span>
-              </span>
-            </button>
-
-            <button
-              type="button"
-              onClick={() => {
-                closeAllWindows();
-                playClickChime(380);
-                setContextMenu(null);
-              }}
-              className="w-full flex items-center justify-between px-2.5 py-1.5 rounded text-left hover:bg-white/10 text-red-400 transition-colors cursor-pointer"
-            >
-              <span className="flex items-center gap-2">
-                <span>✕</span>
-                <span>Close All Windows</span>
-              </span>
-            </button>
-          </div>
-
-          {/* Section 4: Shortcuts / Help */}
-          <div className="space-y-0.5">
-            <button
-              type="button"
-              onClick={() => {
-                setShowKeysModal(true);
-                setContextMenu(null);
-              }}
-              className="w-full flex items-center justify-between px-2.5 py-1.5 rounded text-left hover:bg-white/10 transition-colors cursor-pointer"
-            >
-              <span className="flex items-center gap-2">
-                <Keyboard className="w-3.5 h-3.5 text-yellow-400" />
-                <span>Keyboard Shortcuts</span>
-              </span>
-              <kbd className="px-1 py-0.2 rounded bg-white/10 text-[9px] text-yellow-400 font-bold">?</kbd>
-            </button>
-          </div>
-        </div>
-      )}
-
-      {/* TWM Keyboard Shortcuts Modal */}
-      {showKeysModal && (
-        <div
-          onClick={() => setShowKeysModal(false)}
-          className="fixed inset-0 z-[2000] bg-black/70 backdrop-blur-sm flex items-center justify-center p-4 animate-in fade-in duration-150"
-        >
-          <div
-            onClick={(e) => e.stopPropagation()}
-            style={{
-              backgroundColor: activeTheme.windowBg,
-              borderColor: activeTheme.accent,
-              color: activeTheme.textPrimary,
-            }}
-            className="w-full max-w-md p-4 rounded-xl border shadow-2xl space-y-3 font-mono text-xs select-none"
-          >
-            <div className="flex items-center justify-between pb-2 border-b" style={{ borderColor: activeTheme.headerBorder }}>
-              <div className="font-bold flex items-center gap-2" style={{ color: activeTheme.accent }}>
-                <Keyboard className="w-4 h-4" />
-                <span>ADITYA-OS // TWM SHORTCUTS</span>
-              </div>
-              <button
-                type="button"
-                onClick={() => setShowKeysModal(false)}
-                className="opacity-60 hover:opacity-100 text-[11px]"
-              >
-                [ESC / ×]
-              </button>
-            </div>
-
-            <div className="space-y-1.5 text-[11px]">
-              <div className="flex justify-between items-center py-1 border-b border-white/5">
-                <span className="opacity-75">Switch to Core Intro</span>
-                <kbd className="px-1.5 py-0.5 rounded bg-white/10 text-cyan-400 font-bold">Alt + 1</kbd>
-              </div>
-              <div className="flex justify-between items-center py-1 border-b border-white/5">
-                <span className="opacity-75">Switch to Archive Reader (Vim)</span>
-                <kbd className="px-1.5 py-0.5 rounded bg-white/10 text-cyan-400 font-bold">Alt + 2</kbd>
-              </div>
-              <div className="flex justify-between items-center py-1 border-b border-white/5">
-                <span className="opacity-75">Switch to Stream Feed (@falsepeek)</span>
-                <kbd className="px-1.5 py-0.5 rounded bg-white/10 text-cyan-400 font-bold">Alt + 3</kbd>
-              </div>
-              <div className="flex justify-between items-center py-1 border-b border-white/5">
-                <span className="opacity-75">Switch to Pixel Engine (2D/3D Voxel)</span>
-                <kbd className="px-1.5 py-0.5 rounded bg-white/10 text-cyan-400 font-bold">Alt + 4</kbd>
-              </div>
-              <div className="flex justify-between items-center py-1 border-b border-white/5">
-                <span className="opacity-75">Switch to Resume Viewer</span>
-                <kbd className="px-1.5 py-0.5 rounded bg-white/10 text-cyan-400 font-bold">Alt + 5</kbd>
-              </div>
-              <div className="flex justify-between items-center py-1 border-b border-white/5">
-                <span className="opacity-75">Switch to Image Gallery (Feh)</span>
-                <kbd className="px-1.5 py-0.5 rounded bg-white/10 text-cyan-400 font-bold">Alt + 6</kbd>
-              </div>
-              <div className="flex justify-between items-center py-1 border-b border-white/5">
-                <span className="opacity-75">Switch to Rural Field Journal</span>
-                <kbd className="px-1.5 py-0.5 rounded bg-white/10 text-cyan-400 font-bold">Alt + 7</kbd>
-              </div>
-              <div className="flex justify-between items-center py-1 border-b border-white/5">
-                <span className="opacity-75">Switch to Learnability Diagnostics</span>
-                <kbd className="px-1.5 py-0.5 rounded bg-white/10 text-cyan-400 font-bold">Alt + 8</kbd>
-              </div>
-              <div className="flex justify-between items-center py-1 border-b border-white/5">
-                <span className="opacity-75">Switch to Wallpaper Engine</span>
-                <kbd className="px-1.5 py-0.5 rounded bg-white/10 text-rose-400 font-bold">Alt + 9</kbd>
-              </div>
-              <div className="flex justify-between items-center py-1 border-b border-white/5">
-                <span className="opacity-75">Lock Session (Hyprlock Boot Screen)</span>
-                <kbd className="px-1.5 py-0.5 rounded bg-white/10 text-yellow-400 font-bold">Alt + L</kbd>
-              </div>
-              <div className="flex justify-between items-center py-1 border-b border-white/5">
-                <span className="opacity-75">Close Active Window</span>
-                <kbd className="px-1.5 py-0.5 rounded bg-white/10 text-red-400 font-bold">Alt + Q</kbd>
-              </div>
-              <div className="flex justify-between items-center py-1">
-                <span className="opacity-75">Toggle Shortcuts Cheatsheet</span>
-                <kbd className="px-1.5 py-0.5 rounded bg-white/10 text-amber-400 font-bold">?</kbd>
-              </div>
-            </div>
-
-            <div className="pt-2 text-[10px] opacity-60 text-center">
-              Right-click anywhere on empty desktop for quick options or press [ESC] to return.
-            </div>
-          </div>
-        </div>
-      )}
-    </main>
+        </footer>
+      </main>
+    </div>
   );
 }
