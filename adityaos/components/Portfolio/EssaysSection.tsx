@@ -104,138 +104,118 @@ export function EssaysSection() {
 
         {/* Filter Bar */}
         <div
-          className={`px-8 sm:px-12 py-3.5 border-b flex items-center justify-between text-xs font-mono transition-colors ${
-            isDark
-              ? "border-zinc-800 bg-[#0c0e14]/60"
-              : "border-stone-200 bg-stone-50/80"
+          className={`p-6 sm:p-8 border-b border-dashed flex flex-wrap items-center justify-between gap-4 text-xs font-mono transition-colors ${
+            isDark ? "border-zinc-800/80" : "border-stone-200/80"
           }`}
         >
-          <div className="flex items-center gap-2.5">
+          <div className="flex items-center gap-6">
             <button
               onClick={() => setFilter("all")}
-              className={`px-3.5 py-1.5 rounded-md transition-colors cursor-pointer ${
+              className={`flex items-center gap-1.5 transition-colors cursor-pointer ${
                 filter === "all"
                   ? isDark
-                    ? "bg-white text-zinc-950 font-semibold shadow-sm"
-                    : "bg-stone-900 text-white font-semibold shadow-sm"
+                    ? "text-white font-semibold underline underline-offset-8 decoration-emerald-500 decoration-2"
+                    : "text-stone-900 font-semibold underline underline-offset-8 decoration-emerald-600 decoration-2"
                   : isDark
-                  ? "text-zinc-400 hover:text-white"
-                  : "text-stone-600 hover:text-stone-900"
+                  ? "text-zinc-500 hover:text-zinc-200"
+                  : "text-stone-500 hover:text-stone-900"
               }`}
             >
-              All Writeups ({FEATURED_ESSAYS.length})
+              <span>All Writeups</span>
+              <span className="opacity-60 text-[11px]">({FEATURED_ESSAYS.length})</span>
             </button>
             <button
               onClick={() => setFilter("essay")}
-              className={`px-3.5 py-1.5 rounded-md transition-colors cursor-pointer ${
+              className={`flex items-center gap-1.5 transition-colors cursor-pointer ${
                 filter === "essay"
                   ? isDark
-                    ? "bg-white text-zinc-950 font-semibold shadow-sm"
-                    : "bg-stone-900 text-white font-semibold shadow-sm"
+                    ? "text-white font-semibold underline underline-offset-8 decoration-emerald-500 decoration-2"
+                    : "text-stone-900 font-semibold underline underline-offset-8 decoration-emerald-600 decoration-2"
                   : isDark
-                  ? "text-zinc-400 hover:text-white"
-                  : "text-stone-600 hover:text-stone-900"
+                  ? "text-zinc-500 hover:text-zinc-200"
+                  : "text-stone-500 hover:text-stone-900"
               }`}
             >
-              Essays ({essayCount})
+              <span>Essays</span>
+              <span className="opacity-60 text-[11px]">({essayCount})</span>
             </button>
             <button
               onClick={() => setFilter("poem")}
-              className={`px-3.5 py-1.5 rounded-md transition-colors cursor-pointer ${
+              className={`flex items-center gap-1.5 transition-colors cursor-pointer ${
                 filter === "poem"
                   ? isDark
-                    ? "bg-white text-zinc-950 font-semibold shadow-sm"
-                    : "bg-stone-900 text-white font-semibold shadow-sm"
+                    ? "text-white font-semibold underline underline-offset-8 decoration-emerald-500 decoration-2"
+                    : "text-stone-900 font-semibold underline underline-offset-8 decoration-emerald-600 decoration-2"
                   : isDark
-                  ? "text-zinc-400 hover:text-white"
-                  : "text-stone-600 hover:text-stone-900"
+                  ? "text-zinc-500 hover:text-zinc-200"
+                  : "text-stone-500 hover:text-stone-900"
               }`}
             >
-              Poetics & Notes ({poemCount})
+              <span>Poetics & Notes</span>
+              <span className="opacity-60 text-[11px]">({poemCount})</span>
             </button>
           </div>
           <span
-            className={`text-xs hidden sm:inline ${
-              isDark ? "text-zinc-500" : "text-stone-500"
+            className={`text-[11px] hidden sm:inline ${
+              isDark ? "text-zinc-500" : "text-stone-400"
             }`}
           >
-            India Fellow · Medium · Bear Blog · Archive
+            India Fellow · Medium · Bear Blog
           </span>
         </div>
 
         {/* Articles Feed */}
         <div
-          className={`p-8 sm:p-12 lg:p-14 border-b ${
-            isDark ? "border-zinc-800" : "border-stone-200"
+          className={`p-6 sm:p-8 border-b border-dashed ${
+            isDark ? "border-zinc-800/80" : "border-stone-200/80"
           }`}
         >
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 lg:gap-10">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-10">
             {essays.map((essay) => {
               const hasContent = Boolean(essay.content && essay.content.length > 0);
 
               const cardContent = (
-                <>
-                  <div
-                    className={`flex items-center justify-between text-xs font-mono ${
-                      isDark ? "text-zinc-500" : "text-stone-500"
-                    }`}
-                  >
-                    <span
-                      className={`px-2.5 py-0.5 rounded border text-xs ${
-                        isDark
-                          ? "bg-zinc-900 border-zinc-800 text-zinc-300"
-                          : "bg-stone-100 border-stone-200 text-stone-700"
-                      }`}
-                    >
+                <div className="space-y-3 pb-8 border-b border-dashed border-stone-200/70 dark:border-zinc-800/70">
+                  {/* Top Metadata: Flat monospace, no boxes or fills */}
+                  <div className="flex items-center justify-between text-xs font-mono">
+                    <span className={isDark ? "text-zinc-400" : "text-stone-500"}>
                       {essay.theme}
                     </span>
-                    <span>
+                    <span className={isDark ? "text-zinc-500" : "text-stone-400"}>
                       {essay.readTime} · {essay.year}
                     </span>
                   </div>
 
+                  {/* Title with Arrow indicator */}
                   <h3
-                    className={`text-lg sm:text-xl font-bold font-sans transition-colors flex items-center justify-between gap-3 leading-snug ${
+                    className={`text-base sm:text-lg font-semibold font-sans transition-colors flex items-center justify-between gap-3 leading-snug ${
                       isDark
                         ? "text-white group-hover:text-emerald-400"
                         : "text-stone-900 group-hover:text-emerald-600"
                     }`}
                   >
                     <span>{essay.title}</span>
-                    <ArrowUpRight className="w-4 h-4 text-zinc-500 group-hover:text-emerald-500 transition-colors flex-shrink-0" />
+                    <ArrowUpRight className="w-4 h-4 text-zinc-400 group-hover:text-emerald-500 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5 flex-shrink-0 opacity-70 group-hover:opacity-100" />
                   </h3>
 
+                  {/* Excerpt with optimal measure */}
                   <p
-                    className={`text-sm font-sans leading-relaxed ${
+                    className={`text-xs sm:text-sm font-sans leading-relaxed max-w-[60ch] ${
                       isDark ? "text-zinc-400" : "text-stone-600"
                     }`}
                   >
                     {essay.excerpt}
                   </p>
 
+                  {/* Bottom: Clean Source only (no repetitive 'Read on...') */}
                   <div
-                    className={`pt-2 flex items-center justify-between text-xs font-mono ${
+                    className={`pt-1 text-xs font-mono ${
                       isDark ? "text-zinc-500" : "text-stone-400"
                     }`}
                   >
                     <span>{essay.source}</span>
-                    <span
-                      className={`group-hover:underline ${
-                        isDark ? "text-emerald-400" : "text-emerald-700 font-medium"
-                      }`}
-                    >
-                      {hasContent
-                        ? essay.category === "Poem"
-                          ? "Read Poem In-Page →"
-                          : "Read Essay In-Page →"
-                        : essay.source.includes("India Fellow")
-                        ? "Read on India Fellow →"
-                        : essay.source.includes("Medium")
-                        ? "Read on Medium →"
-                        : "Read Article →"}
-                    </span>
                   </div>
-                </>
+                </div>
               );
 
               if (hasContent) {
@@ -243,11 +223,7 @@ export function EssaysSection() {
                   <div
                     key={essay.id}
                     onClick={() => setReadingEssay(essay)}
-                    className={`group block p-7 sm:p-8 rounded-xl border transition-all space-y-4 shadow-sm cursor-pointer ${
-                      isDark
-                        ? "bg-[#0c0e14] border-zinc-800/80 hover:border-zinc-700 hover:bg-[#10131b]"
-                        : "bg-white border-stone-200 hover:border-stone-400 hover:bg-stone-50"
-                    }`}
+                    className="group block transition-opacity cursor-pointer"
                   >
                     {cardContent}
                   </div>
@@ -260,11 +236,7 @@ export function EssaysSection() {
                   href={essay.url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className={`group block p-7 sm:p-8 rounded-xl border transition-all space-y-4 shadow-sm ${
-                    isDark
-                      ? "bg-[#0c0e14] border-zinc-800/80 hover:border-zinc-700 hover:bg-[#10131b]"
-                      : "bg-white border-stone-200 hover:border-stone-400 hover:bg-stone-50"
-                  }`}
+                  className="group block transition-opacity"
                 >
                   {cardContent}
                 </a>
