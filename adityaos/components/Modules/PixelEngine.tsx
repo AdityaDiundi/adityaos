@@ -103,7 +103,7 @@ export const PixelEngine: React.FC = () => {
   // Tool & Canvas State
   const [activeTool, setActiveTool] = useState<"pencil" | "eraser" | "bucket" | "picker" | "type">("pencil");
   const [currentColor, setCurrentColor] = useState<string>(activeTheme.drawColor || "#00FFCC");
-  const [pixelSize, setPixelSize] = useState<number>(16);
+  const [pixelSize, setPixelSize] = useState<number>(8);
   const [perspective, setPerspective] = useState<"square" | "isometric">("square");
   const [is3D, setIs3D] = useState<boolean>(false);
   const [showGrid, setShowGrid] = useState<boolean>(true);
@@ -127,8 +127,8 @@ export const PixelEngine: React.FC = () => {
     totalNotesPlayed: 0,
   });
 
-  // Docked Stats Sidebar Collapsed state (from homesec.tsx lines 11360-11440)
-  const [isStatsCollapsed, setIsStatsCollapsed] = useState<boolean>(false);
+  // Docked Stats Sidebar Collapsed state (collapsed by default to maximize drawing canvas)
+  const [isStatsCollapsed, setIsStatsCollapsed] = useState<boolean>(true);
 
   // Update drawColor when theme changes
   useEffect(() => {
@@ -2104,12 +2104,12 @@ export const PixelEngine: React.FC = () => {
             <span className="text-[10px] hidden sm:inline">SIZE:</span>
             <input
               type="range"
-              min="6"
+              min="8"
               max="48"
               step="2"
               value={pixelSize}
               onChange={(e) => setPixelSize(Number(e.target.value))}
-              title={`Grid voxel size: ${pixelSize}px`}
+              title={`Grid voxel size: ${pixelSize}px (Smallest: 8px)`}
               className="w-16 sm:w-20 h-1.5 rounded-lg appearance-none cursor-pointer bg-white/20 accent-cyan-400"
             />
             <span className="font-mono font-bold text-[10px] w-5 text-right" style={{ color: activeTheme.accent }}>

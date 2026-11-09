@@ -644,6 +644,49 @@ export const INITIAL_PIXELS: [number, number, string][] = [
 
 export const createInitialPixelArt = (): Map<string, string> => {
   const map = new Map<string, string>();
-  INITIAL_PIXELS.forEach(([r, c, col]) => map.set(`${r}_${c}`, col));
+  // 1. Map base artwork to smallest 8px voxel grid (2x2 micro-voxels per block)
+  INITIAL_PIXELS.forEach(([r, c, col]) => {
+    const baseR = r * 2;
+    const baseC = c * 2;
+    map.set(`${baseR}_${baseC}`, col);
+    map.set(`${baseR}_${baseC + 1}`, col);
+    map.set(`${baseR + 1}_${baseC}`, col);
+    map.set(`${baseR + 1}_${baseC + 1}`, col);
+  });
+
+  // 2. Add high-density 8px micro-voxel details (fine stars, moon glow, neon antennas, wave glimmers)
+  const microDetails: [number, number, string][] = [
+    // Delicate micro-stars in deep sky
+    [3, 12, "#F8FAFC"],
+    [4, 28, "#F8FAFC"],
+    [3, 52, "#F8FAFC"],
+    [5, 68, "#F8FAFC"],
+    [2, 78, "#F8FAFC"],
+    [4, 84, "#F8FAFC"],
+    [6, 18, "#F8FAFC"],
+    [7, 60, "#F8FAFC"],
+    [8, 82, "#F8FAFC"],
+    // Blinking transmitter beacons on skyscraper spires
+    [8, 16, "#EF4444"],
+    [9, 16, "#EF4444"],
+    [10, 46, "#00FFCC"],
+    [11, 46, "#00FFCC"],
+    [12, 66, "#F59E0B"],
+    // Ambient micro-stars
+    [5, 34, "#CBD5E1"],
+    [6, 42, "#CBD5E1"],
+    [7, 90, "#CBD5E1"],
+    // Micro water reflections on harbor waterline
+    [53, 10, "#38BDF8"],
+    [53, 24, "#00FFCC"],
+    [53, 38, "#38BDF8"],
+    [53, 56, "#EC4899"],
+    [53, 70, "#38BDF8"],
+    [54, 18, "#0284C7"],
+    [54, 44, "#00FFCC"],
+    [54, 64, "#0284C7"],
+  ];
+  microDetails.forEach(([r, c, col]) => map.set(`${r}_${c}`, col));
+
   return map;
 };

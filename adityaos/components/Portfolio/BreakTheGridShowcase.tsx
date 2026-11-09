@@ -4,16 +4,20 @@ import React, { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import {
+  motion,
+  useMotionValue,
+  useSpring,
+  useTransform,
+  AnimatePresence,
+} from "framer-motion";
+import {
   ArrowRight,
   ArrowUpRight,
-  ExternalLink,
   Maximize2,
   Globe,
   Terminal,
   Check,
-  ShieldCheck,
-  Activity,
-  Zap,
+  Sparkles,
 } from "lucide-react";
 import { useThemeStore } from "@/store/themeStore";
 import {
@@ -110,7 +114,7 @@ function MobileDeviceFrame({
 }
 
 /* ========================================================================= */
-/* 3. Stage Canvas (The surrounding designed backdrop) */
+/* 3. Stage Canvas with Tactile 3D Tilt & Specular Sheen (Framer Design) */
 /* ========================================================================= */
 function StageCanvas({
   children,
@@ -126,39 +130,93 @@ function StageCanvas({
   const { activeTheme } = useThemeStore();
   const isDark = activeTheme.isDark;
 
+  // 3D tactile perspective physics
+  const mouseX = useMotionValue(0);
+  const mouseY = useMotionValue(0);
+  const rotateX = useSpring(useTransform(mouseY, [-0.5, 0.5], [6, -6]), {
+    stiffness: 260,
+    damping: 28,
+  });
+  const rotateY = useSpring(useTransform(mouseX, [-0.5, 0.5], [-6, 6]), {
+    stiffness: 260,
+    damping: 28,
+  });
+
+  const [mousePos, setMousePos] = useState({ x: 0, y: 0, active: false });
+
+  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    const rect = e.currentTarget.getBoundingClientRect();
+    const x = (e.clientX - rect.left) / rect.width - 0.5;
+    const y = (e.clientY - rect.top) / rect.height - 0.5;
+    mouseX.set(x);
+    mouseY.set(y);
+    setMousePos({
+      x: e.clientX - rect.left,
+      y: e.clientY - rect.top,
+      active: true,
+    });
+  };
+
+  const handleMouseLeave = () => {
+    mouseX.set(0);
+    mouseY.set(0);
+    setMousePos((prev) => ({ ...prev, active: false }));
+  };
+
   return (
-    <div
-      onClick={onClick}
-      className={`group/stage relative rounded-2xl p-4 sm:p-5 lg:p-6 flex flex-col items-center justify-center border border-dashed cursor-pointer transition-all duration-300 overflow-hidden ${
-        isDark
-          ? "bg-gradient-to-b from-[#11131a] to-[#0a0b0f] border-zinc-800 hover:border-zinc-600"
-          : "bg-gradient-to-b from-stone-100/90 to-stone-50/50 border-stone-200 hover:border-stone-300"
-      }`}
-      style={{
-        boxShadow: accentTint ? `0 0 40px -10px ${accentTint}` : undefined,
-      }}
-    >
-      {/* Delicate Micro-Dot Grid Texture */}
-      <div
-        className="absolute inset-0 opacity-[0.035] pointer-events-none"
+    <div style={{ perspective: 1200 }} className="w-full">
+      <motion.div
+        onClick={onClick}
+        onMouseMove={handleMouseMove}
+        onMouseLeave={handleMouseLeave}
         style={{
-          backgroundImage: `radial-gradient(circle, currentColor 1px, transparent 1px)`,
-          backgroundSize: "16px 16px",
+          rotateX,
+          rotateY,
+          transformStyle: "preserve-3d",
+          boxShadow: accentTint ? `0 0 50px -12px ${accentTint}` : undefined,
         }}
-      />
+        whileHover={{ y: -4 }}
+        transition={{ duration: 0.2 }}
+        className={`group/stage relative rounded-2xl p-4 sm:p-5 lg:p-6 flex flex-col items-center justify-center border border-dashed cursor-pointer transition-all duration-300 overflow-hidden ${
+          isDark
+            ? "bg-gradient-to-b from-[#11131a] to-[#0a0b0f] border-zinc-800 hover:border-zinc-600"
+            : "bg-gradient-to-b from-stone-100/90 to-stone-50/50 border-stone-200 hover:border-stone-300"
+        }`}
+      >
+        {/* Specular glare tracking mouse movement */}
+        {mousePos.active && (
+          <div
+            className="absolute inset-0 pointer-events-none transition-opacity duration-200 opacity-60"
+            style={{
+              background: `radial-gradient(circle 320px at ${mousePos.x}px ${mousePos.y}px, ${
+                isDark ? "rgba(255, 255, 255, 0.07)" : "rgba(255, 255, 255, 0.65)"
+              }, transparent 80%)`,
+            }}
+          />
+        )}
 
-      <div className="w-full relative z-10 flex items-center justify-center">
-        {children}
-      </div>
+        {/* Delicate Micro-Dot Grid Texture */}
+        <div
+          className="absolute inset-0 opacity-[0.035] pointer-events-none"
+          style={{
+            backgroundImage: `radial-gradient(circle, currentColor 1px, transparent 1px)`,
+            backgroundSize: "16px 16px",
+          }}
+        />
 
-      {label && (
-        <div className="w-full mt-3 pt-2 border-t border-dashed border-stone-200 dark:border-zinc-800/80 flex items-center justify-between text-[11px] font-mono text-stone-500 dark:text-zinc-500">
-          <span className="truncate">{label}</span>
-          <span className="flex items-center gap-1 group-hover/stage:text-stone-900 dark:group-hover/stage:text-zinc-200 transition-colors shrink-0">
-            <Maximize2 className="w-3 h-3" /> Expand
-          </span>
+        <div className="w-full relative z-10 flex items-center justify-center">
+          {children}
         </div>
-      )}
+
+        {label && (
+          <div className="w-full mt-3 pt-2 border-t border-dashed border-stone-200 dark:border-zinc-800/80 flex items-center justify-between text-[11px] font-mono text-stone-500 dark:text-zinc-500">
+            <span className="truncate">{label}</span>
+            <span className="flex items-center gap-1 group-hover/stage:text-stone-900 dark:group-hover/stage:text-zinc-200 transition-colors shrink-0">
+              <Maximize2 className="w-3 h-3" /> Interactive Sandbox ↗
+            </span>
+          </div>
+        )}
+      </motion.div>
     </div>
   );
 }
@@ -168,27 +226,27 @@ export function BreakTheGridShowcase({ onLaunchOS }: BreakTheGridShowcaseProps) 
   const isDark = activeTheme.isDark;
 
   const [modalData, setModalData] = useState<PrototypeModalData | null>(null);
-  const [mfineView, setMfineView] = useState<"admin" | "claim">("admin");
-  const [tutedudeTab, setTutedudeTab] = useState<"learn" | "resources" | "support">("learn");
+
+  // Fluid hover-driven mockup states (no rigid button clicking required)
+  const [mfineHoverState, setMfineHoverState] = useState<"admin" | "claim">("admin");
+  const [tutedudeHoverState, setTutedudeHoverState] = useState<"learn" | "resources" | "support">("learn");
 
   return (
-    <section id="work" className="relative">
+    <section id="work" className="relative w-full">
       <div
-        className={`max-w-7xl mx-auto border-x border-dashed relative transition-colors ${
-          isDark
-            ? "border-zinc-800/80 bg-[#090b10]/40"
-            : "border-stone-200/80 bg-[#FBFBF9]"
+        className={`w-full relative transition-colors ${
+          isDark ? "bg-[#090b10]/40" : "bg-[#FBFBF9]"
         }`}
       >
         {/* ========================================================================= */}
-        {/* Section Header */}
+        {/* Section Header: Minimal One Single Persuasive Thesis */}
         {/* ========================================================================= */}
         <div
-          className={`border-b border-dashed p-6 sm:p-8 transition-colors ${
+          className={`border-b border-dashed p-6 sm:p-8 lg:p-12 transition-colors ${
             isDark ? "border-zinc-800/80 bg-[#0c0e14]/70" : "border-stone-200/80 bg-white"
           }`}
         >
-          <div className="space-y-1.5">
+          <div className="space-y-2 max-w-3xl">
             <div
               className={`text-[11px] font-mono uppercase tracking-wider ${
                 isDark ? "text-zinc-500" : "text-stone-500"
@@ -197,28 +255,31 @@ export function BreakTheGridShowcase({ onLaunchOS }: BreakTheGridShowcaseProps) 
               01 // Selected Works
             </div>
             <h2
-              className={`text-xl sm:text-2xl font-sans font-semibold tracking-tight ${
+              className={`text-2xl sm:text-3xl font-sans font-semibold tracking-tight ${
                 isDark ? "text-zinc-100" : "text-stone-900"
               }`}
             >
               Case studies & shipped software.
             </h2>
             <p
-              className={`text-xs sm:text-sm font-sans max-w-2xl leading-relaxed ${
+              className={`text-sm sm:text-base font-sans leading-relaxed ${
                 isDark ? "text-zinc-400" : "text-stone-600"
               }`}
             >
-              Frontier AI evaluation benchmarks, interactive browser graphics engines, enterprise
-              health claims, fintech payment clarity, and grassroots field systems.
+              Seven production systems spanning frontier AI benchmarks, low-level browser graphics engines, and high-stakes healthcare infrastructure.
             </p>
           </div>
         </div>
 
         {/* ========================================================================= */}
-        {/* 01: JANEVAL BENCHMARK — DESIGNED DESKTOP BROWSER FRAME */}
+        {/* 01: JANEVAL BENCHMARK — VIEWPORT STAGE */}
         {/* ========================================================================= */}
-        <article
-          className={`border-b border-dashed p-6 sm:p-8 space-y-5 transition-colors ${
+        <motion.article
+          initial={{ opacity: 0, y: 32 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: "-12% 0px" }}
+          transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+          className={`border-b border-dashed p-6 sm:p-8 lg:p-12 min-h-[68vh] lg:min-h-[76vh] flex flex-col justify-center space-y-6 transition-colors ${
             isDark
               ? "border-zinc-800/80 bg-[#0c0e14]/30 hover:bg-[#0c0e14]/50"
               : "border-stone-200/80 bg-white hover:bg-stone-50/50"
@@ -231,13 +292,13 @@ export function BreakTheGridShowcase({ onLaunchOS }: BreakTheGridShowcaseProps) 
               <span className={isDark ? "text-zinc-600" : "text-stone-300"}>/</span>
               <span className={isDark ? "text-zinc-300" : "text-stone-700"}>Josh Talks</span>
               <span className={isDark ? "text-zinc-600" : "text-stone-300"}>·</span>
-              <span className={isDark ? "text-zinc-400" : "text-stone-500"}>
-                2024 · AI Healthcare Benchmark
-              </span>
+              <span className={isDark ? "text-zinc-400" : "text-stone-500"}>2024 · AI Healthcare Benchmark</span>
             </div>
             <span
-              className={`text-[11px] font-mono font-medium ${
-                isDark ? "text-emerald-400" : "text-emerald-700"
+              className={`text-[11px] font-mono font-medium px-2 py-0.5 rounded border ${
+                isDark
+                  ? "text-emerald-400 border-emerald-900/40 bg-emerald-950/20"
+                  : "text-emerald-700 border-emerald-200 bg-emerald-50"
               }`}
             >
               3.4x Accuracy Lift
@@ -245,51 +306,40 @@ export function BreakTheGridShowcase({ onLaunchOS }: BreakTheGridShowcaseProps) 
           </div>
 
           {/* Symmetrical 12-Col Split */}
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-center">
-            {/* Left Narrative with Constrained Width */}
-            <div className="lg:col-span-7 space-y-3 max-w-[62ch]">
-              <div>
-                <h3
-                  className={`text-base sm:text-lg font-sans font-semibold tracking-tight ${
-                    isDark ? "text-white" : "text-stone-900"
-                  }`}
-                >
-                  Catching AI medical mistakes before they reach rural clinics.
-                </h3>
-                <p
-                  className={`text-xs sm:text-sm font-sans pt-1 ${
-                    isDark ? "text-zinc-300" : "text-stone-700"
-                  }`}
-                >
-                  Blind pairwise evaluation arena benchmarking frontier vision models against localized clinical ground-truth.
-                </p>
-              </div>
-
-              {/* Punchy Bullet Points */}
-              <ul
-                className={`space-y-1.5 text-xs font-sans leading-relaxed pt-1 ${
-                  isDark ? "text-zinc-400" : "text-stone-600"
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
+            {/* Left Narrative: One Single Persuasive Statement */}
+            <div className="lg:col-span-6 space-y-4 max-w-[60ch]">
+              <h3
+                className={`text-xl sm:text-2xl font-sans font-semibold tracking-tight leading-snug ${
+                  isDark ? "text-white" : "text-stone-900"
                 }`}
               >
-                <li className="flex items-start gap-2">
-                  <span className="text-emerald-500 font-mono text-[11px] mt-0.5">•</span>
-                  <span><strong>120+ clinical scenarios:</strong> Benchmarked diagnostic and cultural accuracy with frontline health workers.</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <span className="text-emerald-500 font-mono text-[11px] mt-0.5">•</span>
-                  <span><strong>3.4x cultural fidelity lift:</strong> Uncovered visual hallucination failure modes across rural public health contexts.</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <span className="text-emerald-500 font-mono text-[11px] mt-0.5">•</span>
-                  <span><strong>Full scoring pipeline:</strong> Engineered evaluation scoring and interface in Next.js, TypeScript, and Tailwind.</span>
-                </li>
-              </ul>
+                Catching AI medical mistakes before they reach rural clinics.
+              </h3>
+
+              {/* Single High-Impact Persuasive Statement */}
+              <p
+                className={`text-sm sm:text-base font-sans leading-relaxed ${
+                  isDark ? "text-zinc-300" : "text-stone-700"
+                }`}
+              >
+                Benchmarked frontier vision models across 120+ localized clinical scenarios with frontline healthcare workers, eliminating diagnostic hallucinations before grassroots deployment.
+              </p>
+
+              {/* Monospace Domain Tokens */}
+              <div
+                className={`text-xs font-mono pt-1 ${
+                  isDark ? "text-zinc-500" : "text-stone-500"
+                }`}
+              >
+                Frontier AI Eval · LLM Benchmarks · Next.js · TypeScript
+              </div>
 
               {/* Action CTAs: Solid Primary + Clean Text Secondary */}
               <div className="pt-2 flex flex-wrap items-center gap-4 font-mono text-xs">
                 <Link
                   href="/work/janeval"
-                  className={`px-3.5 py-1.5 rounded-lg font-semibold flex items-center gap-1.5 transition-all cursor-pointer shadow-sm ${
+                  className={`px-4 py-2 rounded-lg font-semibold flex items-center gap-2 transition-all cursor-pointer shadow-sm ${
                     isDark
                       ? "bg-white text-zinc-950 hover:bg-zinc-200"
                       : "bg-stone-900 text-white hover:bg-black"
@@ -303,7 +353,7 @@ export function BreakTheGridShowcase({ onLaunchOS }: BreakTheGridShowcaseProps) 
                   href="https://janeval.vercel.app/"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className={`flex items-center gap-1 transition-colors cursor-pointer hover:underline ${
+                  className={`flex items-center gap-1.5 transition-colors cursor-pointer hover:underline ${
                     isDark ? "text-zinc-400 hover:text-white" : "text-stone-600 hover:text-black"
                   }`}
                 >
@@ -315,7 +365,7 @@ export function BreakTheGridShowcase({ onLaunchOS }: BreakTheGridShowcaseProps) 
             </div>
 
             {/* Right: Designed Desktop Browser Frame */}
-            <div className="lg:col-span-5">
+            <div className="lg:col-span-6">
               <StageCanvas
                 accentTint="rgba(16, 185, 129, 0.15)"
                 label="JANEVAL Pairwise Blind Elo Arena"
@@ -346,13 +396,17 @@ export function BreakTheGridShowcase({ onLaunchOS }: BreakTheGridShowcaseProps) 
               </StageCanvas>
             </div>
           </div>
-        </article>
+        </motion.article>
 
         {/* ========================================================================= */}
-        {/* 02: ADITYAOS / PIXEL STUDIO — DESIGNED DESKTOP BROWSER FRAME */}
+        {/* 02: ADITYAOS / PIXEL STUDIO — VIEWPORT STAGE */}
         {/* ========================================================================= */}
-        <article
-          className={`border-b border-dashed p-6 sm:p-8 space-y-5 transition-colors ${
+        <motion.article
+          initial={{ opacity: 0, y: 32 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: "-12% 0px" }}
+          transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+          className={`border-b border-dashed p-6 sm:p-8 lg:p-12 min-h-[68vh] lg:min-h-[76vh] flex flex-col justify-center space-y-6 transition-colors ${
             isDark
               ? "border-zinc-800/80 bg-[#0c0e14]/30 hover:bg-[#0c0e14]/50"
               : "border-stone-200/80 bg-white hover:bg-stone-50/50"
@@ -365,13 +419,13 @@ export function BreakTheGridShowcase({ onLaunchOS }: BreakTheGridShowcaseProps) 
               <span className={isDark ? "text-zinc-600" : "text-stone-300"}>/</span>
               <span className={isDark ? "text-zinc-300" : "text-stone-700"}>adityaos</span>
               <span className={isDark ? "text-zinc-600" : "text-stone-300"}>·</span>
-              <span className={isDark ? "text-zinc-400" : "text-stone-500"}>
-                In-Browser Creative Studio & Canvas
-              </span>
+              <span className={isDark ? "text-zinc-400" : "text-stone-500"}>In-Browser Creative Studio & Canvas</span>
             </div>
             <span
-              className={`text-[11px] font-mono font-medium ${
-                isDark ? "text-cyan-400" : "text-cyan-700"
+              className={`text-[11px] font-mono font-medium px-2 py-0.5 rounded border ${
+                isDark
+                  ? "text-cyan-400 border-cyan-900/40 bg-cyan-950/20"
+                  : "text-cyan-700 border-cyan-200 bg-cyan-50"
               }`}
             >
               60 FPS Canvas · 1:1 Pixel Lock
@@ -379,51 +433,38 @@ export function BreakTheGridShowcase({ onLaunchOS }: BreakTheGridShowcaseProps) 
           </div>
 
           {/* Symmetrical 12-Col Split */}
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-center">
-            {/* Left Narrative with Constrained Width */}
-            <div className="lg:col-span-7 space-y-3 max-w-[62ch]">
-              <div>
-                <h3
-                  className={`text-base sm:text-lg font-sans font-semibold tracking-tight ${
-                    isDark ? "text-white" : "text-stone-900"
-                  }`}
-                >
-                  A retro pixel art studio and sandbox built right into the browser.
-                </h3>
-                <p
-                  className={`text-xs sm:text-sm font-sans pt-1 ${
-                    isDark ? "text-zinc-300" : "text-stone-700"
-                  }`}
-                >
-                  Zero-dependency interactive graphics and cellular automata canvas running client-side.
-                </p>
-              </div>
-
-              {/* Punchy Bullet Points */}
-              <ul
-                className={`space-y-1.5 text-xs font-sans leading-relaxed pt-1 ${
-                  isDark ? "text-zinc-400" : "text-stone-600"
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
+            {/* Left Narrative: One Single Persuasive Statement */}
+            <div className="lg:col-span-6 space-y-4 max-w-[60ch]">
+              <h3
+                className={`text-xl sm:text-2xl font-sans font-semibold tracking-tight leading-snug ${
+                  isDark ? "text-white" : "text-stone-900"
                 }`}
               >
-                <li className="flex items-start gap-2">
-                  <span className="text-cyan-400 font-mono text-[11px] mt-0.5">•</span>
-                  <span><strong>60 FPS deterministic canvas:</strong> Conway&apos;s Game of Life, falling sand automata, and 1:1 pixel lock.</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <span className="text-cyan-400 font-mono text-[11px] mt-0.5">•</span>
-                  <span><strong>Algorithmic WebAudio:</strong> Procedural sound synthesizer and procedural bitmap typography.</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <span className="text-cyan-400 font-mono text-[11px] mt-0.5">•</span>
-                  <span><strong>Modular systems engine:</strong> Multi-window desktop shell with zero external runtime libraries.</span>
-                </li>
-              </ul>
+                A retro pixel art studio and sandbox built directly in the browser.
+              </h3>
 
-              {/* Action CTAs: Solid Primary + Clean Text Secondary */}
+              <p
+                className={`text-sm sm:text-base font-sans leading-relaxed ${
+                  isDark ? "text-zinc-300" : "text-stone-700"
+                }`}
+              >
+                Engineered a zero-dependency 60 FPS deterministic canvas with cellular automata, procedural WebAudio synthesis, and modular windowing.
+              </p>
+
+              <div
+                className={`text-xs font-mono pt-1 ${
+                  isDark ? "text-zinc-500" : "text-stone-500"
+                }`}
+              >
+                Interactive Graphics · Cellular Automata · WebAudio · Canvas API
+              </div>
+
+              {/* Action CTAs */}
               <div className="pt-2 flex flex-wrap items-center gap-4 font-mono text-xs">
                 <Link
                   href="/work/adityaos"
-                  className={`px-3.5 py-1.5 rounded-lg font-semibold flex items-center gap-1.5 transition-all cursor-pointer shadow-sm ${
+                  className={`px-4 py-2 rounded-lg font-semibold flex items-center gap-2 transition-all cursor-pointer shadow-sm ${
                     isDark
                       ? "bg-white text-zinc-950 hover:bg-zinc-200"
                       : "bg-stone-900 text-white hover:bg-black"
@@ -436,7 +477,7 @@ export function BreakTheGridShowcase({ onLaunchOS }: BreakTheGridShowcaseProps) 
                 {onLaunchOS && (
                   <button
                     onClick={onLaunchOS}
-                    className={`flex items-center gap-1 transition-colors cursor-pointer hover:underline ${
+                    className={`flex items-center gap-1.5 transition-colors cursor-pointer hover:underline ${
                       isDark ? "text-cyan-400 hover:text-cyan-300" : "text-cyan-700 hover:text-cyan-900"
                     }`}
                   >
@@ -448,40 +489,38 @@ export function BreakTheGridShowcase({ onLaunchOS }: BreakTheGridShowcaseProps) 
 
                 <Link
                   href="/pixel"
-                  className={`flex items-center gap-1 transition-colors cursor-pointer hover:underline ${
+                  className={`flex items-center gap-1.5 transition-colors cursor-pointer hover:underline ${
                     isDark ? "text-zinc-400 hover:text-white" : "text-stone-600 hover:text-black"
                   }`}
                 >
-                  <span>Fullscreen Canvas</span>
+                  <span>Pixel Studio</span>
                   <ArrowUpRight className="w-3 h-3 opacity-60" />
                 </Link>
               </div>
             </div>
 
-            {/* Right: Designed Desktop Browser Frame */}
-            <div className="lg:col-span-5">
+            {/* Right: Pixel Studio Browser Frame */}
+            <div className="lg:col-span-6">
               <StageCanvas
                 accentTint="rgba(6, 182, 212, 0.15)"
-                label="Pixel Studio & Conway Life Matrix"
+                label="Pixel Engine 60 FPS Deterministic Canvas"
                 onClick={() =>
                   setModalData({
-                    title: "Pixel Engine — Grid-Locked Canvas & Studio",
-                    client: "adityaos",
-                    category: "Creative Graphics & Grid Matrix",
+                    title: "AdityaOS & Pixel Engine Studio",
+                    client: "Personal System",
+                    category: "Canvas Architecture & Cellular Automata",
                     isPixelEngine: true,
-                    onLaunchOS,
+                    onLaunchOS: onLaunchOS,
                     primaryImage: "/case-studies/adityaos_pixel_engine_studio.png",
-                    secondaryImage: "/case-studies/adityaos_pixel_engine_desktop.png",
-                    primaryLabel: "Grid Studio",
-                    secondaryLabel: "Desktop Shell",
-                    defaultMode: "screens",
+                    primaryLabel: "Pixel Studio Viewport",
+                    defaultMode: "pixel",
                   })
                 }
               >
-                <BrowserFrame url="adityaos.io/studio">
+                <BrowserFrame url="aditya-os.live/pixel">
                   <Image
                     src="/case-studies/adityaos_pixel_engine_studio.png"
-                    alt="Pixel Engine Creative Studio"
+                    alt="AdityaOS Pixel Engine Canvas Interface"
                     fill
                     className="object-cover object-top"
                   />
@@ -489,13 +528,17 @@ export function BreakTheGridShowcase({ onLaunchOS }: BreakTheGridShowcaseProps) 
               </StageCanvas>
             </div>
           </div>
-        </article>
+        </motion.article>
 
         {/* ========================================================================= */}
-        {/* 03: CORPORATE CLAIMS (MFINE) — DESIGNED DESKTOP BROWSER FRAME */}
+        {/* 03: MFINE CORPORATE HEALTH & CLAIMS — VIEWPORT STAGE */}
         {/* ========================================================================= */}
-        <article
-          className={`border-b border-dashed p-6 sm:p-8 space-y-5 transition-colors ${
+        <motion.article
+          initial={{ opacity: 0, y: 32 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: "-12% 0px" }}
+          transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+          className={`border-b border-dashed p-6 sm:p-8 lg:p-12 min-h-[68vh] lg:min-h-[76vh] flex flex-col justify-center space-y-6 transition-colors ${
             isDark
               ? "border-zinc-800/80 bg-[#0c0e14]/30 hover:bg-[#0c0e14]/50"
               : "border-stone-200/80 bg-white hover:bg-stone-50/50"
@@ -508,13 +551,13 @@ export function BreakTheGridShowcase({ onLaunchOS }: BreakTheGridShowcaseProps) 
               <span className={isDark ? "text-zinc-600" : "text-stone-300"}>/</span>
               <span className={isDark ? "text-zinc-300" : "text-stone-700"}>MFine</span>
               <span className={isDark ? "text-zinc-600" : "text-stone-300"}>·</span>
-              <span className={isDark ? "text-zinc-400" : "text-stone-500"}>
-                B2B Benefits & Claims Architecture
-              </span>
+              <span className={isDark ? "text-zinc-400" : "text-stone-500"}>B2B Benefits & Claims Architecture</span>
             </div>
             <span
-              className={`text-[11px] font-mono font-medium ${
-                isDark ? "text-indigo-400" : "text-indigo-700"
+              className={`text-[11px] font-mono font-medium px-2 py-0.5 rounded border ${
+                isDark
+                  ? "text-indigo-400 border-indigo-900/40 bg-indigo-950/20"
+                  : "text-indigo-700 border-indigo-200 bg-indigo-50"
               }`}
             >
               100K+ DAU · &lt;15m Approvals
@@ -522,51 +565,38 @@ export function BreakTheGridShowcase({ onLaunchOS }: BreakTheGridShowcaseProps) 
           </div>
 
           {/* Symmetrical 12-Col Split */}
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-center">
-            {/* Left Narrative with Constrained Width */}
-            <div className="lg:col-span-7 space-y-3 max-w-[62ch]">
-              <div>
-                <h3
-                  className={`text-base sm:text-lg font-sans font-semibold tracking-tight ${
-                    isDark ? "text-white" : "text-stone-900"
-                  }`}
-                >
-                  Speeding up emergency hospital pre-authorizations to under 15 minutes.
-                </h3>
-                <p
-                  className={`text-xs sm:text-sm font-sans pt-1 ${
-                    isDark ? "text-zinc-300" : "text-stone-700"
-                  }`}
-                >
-                  Enterprise B2B insurance benefits platform and claim submission engine.
-                </p>
-              </div>
-
-              {/* Punchy Bullet Points */}
-              <ul
-                className={`space-y-1.5 text-xs font-sans leading-relaxed pt-1 ${
-                  isDark ? "text-zinc-400" : "text-stone-600"
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
+            {/* Left Narrative: One Single Persuasive Statement */}
+            <div className="lg:col-span-6 space-y-4 max-w-[60ch]">
+              <h3
+                className={`text-xl sm:text-2xl font-sans font-semibold tracking-tight leading-snug ${
+                  isDark ? "text-white" : "text-stone-900"
                 }`}
               >
-                <li className="flex items-start gap-2">
-                  <span className="text-indigo-400 font-mono text-[11px] mt-0.5">•</span>
-                  <span><strong>&lt; 15 min pre-auth triage:</strong> Instant cashless hospital clearance replacing paperwork bottlenecks.</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <span className="text-indigo-400 font-mono text-[11px] mt-0.5">•</span>
-                  <span><strong>100,000+ enterprise lives:</strong> Unified corporate wallet across inpatient, diagnostics, and OPD claims.</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <span className="text-indigo-400 font-mono text-[11px] mt-0.5">•</span>
-                  <span><strong>Enterprise design system:</strong> Multi-tenant console handling custom corporate policy matrices.</span>
-                </li>
-              </ul>
+                Speeding up emergency hospital pre-authorizations to under 15 minutes.
+              </h3>
 
-              {/* Action CTAs: Solid Primary + Clean Text Secondary */}
+              <p
+                className={`text-sm sm:text-base font-sans leading-relaxed ${
+                  isDark ? "text-zinc-300" : "text-stone-700"
+                }`}
+              >
+                Architected a unified B2B benefits console and cashless claim engine for 100,000+ enterprise lives, slashing emergency clearance delays by 85%.
+              </p>
+
+              <div
+                className={`text-xs font-mono pt-1 ${
+                  isDark ? "text-zinc-500" : "text-stone-500"
+                }`}
+              >
+                Enterprise InsurTech · Design Systems · B2B Console · Cashless OPD
+              </div>
+
+              {/* Action CTAs */}
               <div className="pt-2 flex flex-wrap items-center gap-4 font-mono text-xs">
                 <Link
                   href="/work/mfine"
-                  className={`px-3.5 py-1.5 rounded-lg font-semibold flex items-center gap-1.5 transition-all cursor-pointer shadow-sm ${
+                  className={`px-4 py-2 rounded-lg font-semibold flex items-center gap-2 transition-all cursor-pointer shadow-sm ${
                     isDark
                       ? "bg-white text-zinc-950 hover:bg-zinc-200"
                       : "bg-stone-900 text-white hover:bg-black"
@@ -580,7 +610,7 @@ export function BreakTheGridShowcase({ onLaunchOS }: BreakTheGridShowcaseProps) 
                   href="https://www.figma.com/design/pr9NQjBDkyZqALFcPkm4tJ/Corporate-S3--_-Management?node-id=704-211"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className={`flex items-center gap-1 transition-colors cursor-pointer hover:underline ${
+                  className={`flex items-center gap-1.5 transition-colors cursor-pointer hover:underline ${
                     isDark ? "text-zinc-400 hover:text-white" : "text-stone-600 hover:text-black"
                   }`}
                 >
@@ -590,53 +620,46 @@ export function BreakTheGridShowcase({ onLaunchOS }: BreakTheGridShowcaseProps) 
               </div>
             </div>
 
-            {/* Right: Designed Desktop Browser Frame with Clean Claims UI */}
-            <div className="lg:col-span-5 space-y-2">
-              {/* Interactive Viewport Switcher */}
-              <div className="flex items-center justify-between">
-                <div
-                  className={`p-0.5 rounded-lg border flex items-center gap-1 font-mono text-[10px] ${
-                    isDark ? "bg-zinc-900/80 border-zinc-800" : "bg-stone-100 border-stone-200"
-                  }`}
-                >
-                  <button
-                    onClick={() => setMfineView("admin")}
-                    className={`px-2.5 py-1 rounded transition-colors cursor-pointer ${
-                      mfineView === "admin"
+            {/* Right: Tactile Dual-Screen Stage with Fluid Hover Peek (No Click Toggles) */}
+            <div className="lg:col-span-6 space-y-2">
+              {/* Minimal Hover Scrubber Pills */}
+              <div className="flex items-center justify-between text-[11px] font-mono">
+                <div className="flex items-center gap-2">
+                  <span
+                    onMouseEnter={() => setMfineHoverState("admin")}
+                    className={`cursor-pointer transition-colors ${
+                      mfineHoverState === "admin"
                         ? isDark
-                          ? "bg-zinc-800 text-white font-semibold shadow-sm"
-                          : "bg-white text-stone-900 font-semibold shadow-sm"
-                        : isDark
-                        ? "text-zinc-400 hover:text-white"
-                        : "text-stone-500 hover:text-stone-900"
+                          ? "text-indigo-400 font-semibold"
+                          : "text-indigo-700 font-semibold"
+                        : "opacity-50 hover:opacity-100"
                     }`}
                   >
-                    B2B Admin Console
-                  </button>
-                  <button
-                    onClick={() => setMfineView("claim")}
-                    className={`px-2.5 py-1 rounded transition-colors cursor-pointer ${
-                      mfineView === "claim"
+                    ✦ B2B Admin Console
+                  </span>
+                  <span className="opacity-30">/</span>
+                  <span
+                    onMouseEnter={() => setMfineHoverState("claim")}
+                    className={`cursor-pointer transition-colors ${
+                      mfineHoverState === "claim"
                         ? isDark
-                          ? "bg-zinc-800 text-white font-semibold shadow-sm"
-                          : "bg-white text-stone-900 font-semibold shadow-sm"
-                        : isDark
-                        ? "text-zinc-400 hover:text-white"
-                        : "text-stone-500 hover:text-stone-900"
+                          ? "text-indigo-400 font-semibold"
+                          : "text-indigo-700 font-semibold"
+                        : "opacity-50 hover:opacity-100"
                     }`}
                   >
-                    Employee Claim Dispute
-                  </button>
+                    ✦ Cashless Claim Dispute
+                  </span>
                 </div>
-                <span className={`text-[10px] font-mono ${isDark ? "text-indigo-400" : "text-indigo-600"}`}>
-                  Interactive Mockup
+                <span className={`text-[10px] hidden sm:inline ${isDark ? "text-zinc-500" : "text-stone-400"}`}>
+                  Hover to preview state
                 </span>
               </div>
 
               <StageCanvas
                 accentTint="rgba(99, 102, 241, 0.15)"
                 label={
-                  mfineView === "admin"
+                  mfineHoverState === "admin"
                     ? "MFine Corporate B2B Policy Console · BHEL"
                     : "Cashless Claim Dispute & Triage · Kini's Clinic"
                 }
@@ -657,33 +680,53 @@ export function BreakTheGridShowcase({ onLaunchOS }: BreakTheGridShowcaseProps) 
                   })
                 }
               >
-                {mfineView === "admin" ? (
-                  <BrowserFrame url="mfine.co/admin/bhel/contacts">
-                    <Image
-                      src="/case-studies/mfine_bhel_admin_contacts.png"
-                      alt="MFine Corporate B2B Admin Console"
-                      fill
-                      priority
-                      unoptimized
-                      className="object-cover object-top"
-                    />
-                  </BrowserFrame>
-                ) : (
-                  <MobileDeviceFrame>
-                    <Image
-                      src="/case-studies/mfine_rejected_transaction.png"
-                      alt="MFine Cashless Claim Dispute Interface"
-                      fill
-                      priority
-                      unoptimized
-                      className="object-cover object-top"
-                    />
-                  </MobileDeviceFrame>
-                )}
+                <AnimatePresence mode="wait">
+                  {mfineHoverState === "admin" ? (
+                    <motion.div
+                      key="admin"
+                      initial={{ opacity: 0, scale: 0.98 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      exit={{ opacity: 0, scale: 0.98 }}
+                      transition={{ duration: 0.2 }}
+                      className="w-full"
+                    >
+                      <BrowserFrame url="mfine.co/admin/bhel/contacts">
+                        <Image
+                          src="/case-studies/mfine_bhel_admin_contacts.png"
+                          alt="MFine Corporate B2B Admin Console"
+                          fill
+                          priority
+                          unoptimized
+                          className="object-cover object-top"
+                        />
+                      </BrowserFrame>
+                    </motion.div>
+                  ) : (
+                    <motion.div
+                      key="claim"
+                      initial={{ opacity: 0, scale: 0.98 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      exit={{ opacity: 0, scale: 0.98 }}
+                      transition={{ duration: 0.2 }}
+                      className="w-full"
+                    >
+                      <MobileDeviceFrame>
+                        <Image
+                          src="/case-studies/mfine_rejected_transaction.png"
+                          alt="MFine Cashless Claim Dispute Interface"
+                          fill
+                          priority
+                          unoptimized
+                          className="object-cover object-top"
+                        />
+                      </MobileDeviceFrame>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
               </StageCanvas>
             </div>
           </div>
-        </article>
+        </motion.article>
 
         {/* ========================================================================= */}
         {/* ROW: 2-COLUMN MINIFIED MOBILE PRODUCTS (DIGIACCEL + MOSAIC) */}
@@ -696,8 +739,12 @@ export function BreakTheGridShowcase({ onLaunchOS }: BreakTheGridShowcaseProps) 
           }`}
         >
           {/* 04: Digiaccel UPI Clarity */}
-          <article
-            className={`p-6 sm:p-8 flex flex-col justify-between space-y-5 transition-colors ${
+          <motion.article
+            initial={{ opacity: 0, y: 32 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: "-12% 0px" }}
+            transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+            className={`p-6 sm:p-8 lg:p-10 flex flex-col justify-between space-y-6 transition-colors ${
               isDark
                 ? "bg-[#0c0e14]/30 hover:bg-[#0c0e14]/50"
                 : "bg-white hover:bg-stone-50/50"
@@ -706,7 +753,13 @@ export function BreakTheGridShowcase({ onLaunchOS }: BreakTheGridShowcaseProps) 
             <div className="space-y-4">
               <div className="flex items-center justify-between text-xs font-mono">
                 <span className="text-cyan-500 font-bold">04 / DIGIACCEL · FINTECH</span>
-                <span className={`text-[11px] font-mono ${isDark ? "text-cyan-400" : "text-cyan-700"}`}>
+                <span
+                  className={`text-[11px] font-mono px-2 py-0.5 rounded border ${
+                    isDark
+                      ? "text-cyan-400 border-cyan-900/40 bg-cyan-950/20"
+                      : "text-cyan-700 border-cyan-200 bg-cyan-50"
+                  }`}
+                >
                   -38% DROPOFFS
                 </span>
               </div>
@@ -740,28 +793,28 @@ export function BreakTheGridShowcase({ onLaunchOS }: BreakTheGridShowcaseProps) 
                 </MobileDeviceFrame>
               </StageCanvas>
 
-              <div className="space-y-2 pt-1 max-w-[56ch]">
+              <div className="space-y-2 max-w-[54ch]">
                 <h4
-                  className={`text-base font-semibold font-sans tracking-tight ${
+                  className={`text-lg font-semibold font-sans tracking-tight leading-snug ${
                     isDark ? "text-white" : "text-stone-900"
                   }`}
                 >
                   Preventing failed UPI payments before users tap &apos;Pay&apos;.
                 </h4>
-                <ul
-                  className={`space-y-1 text-xs font-sans leading-relaxed pt-0.5 ${
+                <p
+                  className={`text-xs sm:text-sm font-sans leading-relaxed ${
                     isDark ? "text-zinc-400" : "text-stone-600"
                   }`}
                 >
-                  <li className="flex items-start gap-1.5">
-                    <span className="text-cyan-400 font-mono text-[11px] mt-0.5">•</span>
-                    <span><strong>-38% payment dropoffs:</strong> Proactive bank server health meters and real-time spend runway.</span>
-                  </li>
-                  <li className="flex items-start gap-1.5">
-                    <span className="text-cyan-400 font-mono text-[11px] mt-0.5">•</span>
-                    <span><strong>Pre-transaction triage:</strong> Dynamic limit warnings with instant 1-tap bank switch failover.</span>
-                  </li>
-                </ul>
+                  Designed dynamic bank server health meters and real-time spend runways, rescuing high-intent fintech checkouts from silent gateway failures.
+                </p>
+                <div
+                  className={`text-[11px] font-mono pt-1 ${
+                    isDark ? "text-zinc-500" : "text-stone-500"
+                  }`}
+                >
+                  Fintech UX · Payments · UPI · Error Prevention
+                </div>
               </div>
             </div>
 
@@ -790,11 +843,15 @@ export function BreakTheGridShowcase({ onLaunchOS }: BreakTheGridShowcaseProps) 
                 <ArrowUpRight className="w-3 h-3 opacity-60" />
               </a>
             </div>
-          </article>
+          </motion.article>
 
           {/* 05: Mosaic Wellness / ManMatters */}
-          <article
-            className={`p-6 sm:p-8 flex flex-col justify-between space-y-5 transition-colors ${
+          <motion.article
+            initial={{ opacity: 0, y: 32 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: "-12% 0px" }}
+            transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+            className={`p-6 sm:p-8 lg:p-10 flex flex-col justify-between space-y-6 transition-colors ${
               isDark
                 ? "bg-[#0c0e14]/30 hover:bg-[#0c0e14]/50"
                 : "bg-white hover:bg-stone-50/50"
@@ -803,7 +860,13 @@ export function BreakTheGridShowcase({ onLaunchOS }: BreakTheGridShowcaseProps) 
             <div className="space-y-4">
               <div className="flex items-center justify-between text-xs font-mono">
                 <span className="text-amber-500 font-bold">05 / MOSAIC WELLNESS</span>
-                <span className={`text-[11px] font-mono ${isDark ? "text-amber-400" : "text-amber-700"}`}>
+                <span
+                  className={`text-[11px] font-mono px-2 py-0.5 rounded border ${
+                    isDark
+                      ? "text-amber-400 border-amber-900/40 bg-amber-950/20"
+                      : "text-amber-700 border-amber-200 bg-amber-50"
+                  }`}
+                >
                   +12% RETENTION
                 </span>
               </div>
@@ -868,28 +931,28 @@ export function BreakTheGridShowcase({ onLaunchOS }: BreakTheGridShowcaseProps) 
                 </MobileDeviceFrame>
               </StageCanvas>
 
-              <div className="space-y-2 pt-1 max-w-[56ch]">
+              <div className="space-y-2 max-w-[54ch]">
                 <h4
-                  className={`text-base font-semibold font-sans tracking-tight ${
+                  className={`text-lg font-semibold font-sans tracking-tight leading-snug ${
                     isDark ? "text-white" : "text-stone-900"
                   }`}
                 >
                   Helping patients build daily clinical habits in their first 21 days.
                 </h4>
-                <ul
-                  className={`space-y-1 text-xs font-sans leading-relaxed pt-0.5 ${
+                <p
+                  className={`text-xs sm:text-sm font-sans leading-relaxed ${
                     isDark ? "text-zinc-400" : "text-stone-600"
                   }`}
                 >
-                  <li className="flex items-start gap-1.5">
-                    <span className="text-amber-400 font-mono text-[11px] mt-0.5">•</span>
-                    <span><strong>+12% 90-day retention:</strong> Micro-commitment logs paired with milestone streak feedback loops.</span>
-                  </li>
-                  <li className="flex items-start gap-1.5">
-                    <span className="text-amber-400 font-mono text-[11px] mt-0.5">•</span>
-                    <span><strong>Direct care touchpoints:</strong> Scheduled doctor check-in triggers embedded directly into regimen flows.</span>
-                  </li>
-                </ul>
+                  Created a friction-free regimen engine pairing micro-commitment habit logs with milestone streaks and embedded doctor touchpoints.
+                </p>
+                <div
+                  className={`text-[11px] font-mono pt-1 ${
+                    isDark ? "text-zinc-500" : "text-stone-500"
+                  }`}
+                >
+                  HealthTech D2C · Habit Loops · Behavioral UX · Patient Retention
+                </div>
               </div>
             </div>
 
@@ -918,11 +981,11 @@ export function BreakTheGridShowcase({ onLaunchOS }: BreakTheGridShowcaseProps) 
                 <ArrowUpRight className="w-3 h-3 opacity-60" />
               </a>
             </div>
-          </article>
+          </motion.article>
         </div>
 
         {/* ========================================================================= */}
-        {/* ROW: 2-COLUMN MINIFIED MOBILE & FIELD PRODUCTS (KETTO + RAJASTHAN) */}
+        {/* ROW: 2-COLUMN MINIFIED MOBILE PRODUCTS (KETTO + TUTEDUDE) */}
         {/* ========================================================================= */}
         <div
           className={`border-b border-dashed grid grid-cols-1 md:grid-cols-2 divide-y md:divide-y-0 md:divide-x divide-dashed relative ${
@@ -931,9 +994,13 @@ export function BreakTheGridShowcase({ onLaunchOS }: BreakTheGridShowcaseProps) 
               : "border-stone-200/80 divide-stone-200/80"
           }`}
         >
-          {/* 06: Ketto+ Recurring Crowdfunding */}
-          <article
-            className={`p-6 sm:p-8 flex flex-col justify-between space-y-5 transition-colors ${
+          {/* 06: Ketto Crowdfunding */}
+          <motion.article
+            initial={{ opacity: 0, y: 32 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: "-12% 0px" }}
+            transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+            className={`p-6 sm:p-8 lg:p-10 flex flex-col justify-between space-y-6 transition-colors ${
               isDark
                 ? "bg-[#0c0e14]/30 hover:bg-[#0c0e14]/50"
                 : "bg-white hover:bg-stone-50/50"
@@ -941,9 +1008,15 @@ export function BreakTheGridShowcase({ onLaunchOS }: BreakTheGridShowcaseProps) 
           >
             <div className="space-y-4">
               <div className="flex items-center justify-between text-xs font-mono">
-                <span className="text-pink-500 font-bold">06 / KETTO · CROWDFUNDING</span>
-                <span className={`text-[11px] font-mono ${isDark ? "text-pink-400" : "text-pink-700"}`}>
-                  2.3X REPEAT DONORS
+                <span className="text-pink-500 font-bold">06 / KETTO · PHILANTHROPY</span>
+                <span
+                  className={`text-[11px] font-mono px-2 py-0.5 rounded border ${
+                    isDark
+                      ? "text-pink-400 border-pink-900/40 bg-pink-950/20"
+                      : "text-pink-700 border-pink-200 bg-pink-50"
+                  }`}
+                >
+                  2.3x REPEAT LIFT
                 </span>
               </div>
 
@@ -999,28 +1072,28 @@ export function BreakTheGridShowcase({ onLaunchOS }: BreakTheGridShowcaseProps) 
                 </MobileDeviceFrame>
               </StageCanvas>
 
-              <div className="space-y-2 pt-1 max-w-[56ch]">
+              <div className="space-y-2 max-w-[54ch]">
                 <h4
-                  className={`text-base font-semibold font-sans tracking-tight ${
+                  className={`text-lg font-semibold font-sans tracking-tight leading-snug ${
                     isDark ? "text-white" : "text-stone-900"
                   }`}
                 >
                   Turning one-time emergency donors into monthly patient sponsors.
                 </h4>
-                <ul
-                  className={`space-y-1 text-xs font-sans leading-relaxed pt-0.5 ${
+                <p
+                  className={`text-xs sm:text-sm font-sans leading-relaxed ${
                     isDark ? "text-zinc-400" : "text-stone-600"
                   }`}
                 >
-                  <li className="flex items-start gap-1.5">
-                    <span className="text-pink-400 font-mono text-[11px] mt-0.5">•</span>
-                    <span><strong>2.3x repeat donor lift:</strong> Micro-giving onboarding with ambient monthly impact updates.</span>
-                  </li>
-                  <li className="flex items-start gap-1.5">
-                    <span className="text-pink-400 font-mono text-[11px] mt-0.5">•</span>
-                    <span><strong>UPI Autopay integration:</strong> Low-friction recurring mandate flow with transparent patient tracking.</span>
-                  </li>
-                </ul>
+                  Re-engineered medical crowdfunding with UPI Autopay micro-giving mandates and transparent recovery milestone tracking.
+                </p>
+                <div
+                  className={`text-[11px] font-mono pt-1 ${
+                    isDark ? "text-zinc-500" : "text-stone-500"
+                  }`}
+                >
+                  Fintech Philanthropy · Recurring Mandates · Trust UX · UPI Autopay
+                </div>
               </div>
             </div>
 
@@ -1049,11 +1122,15 @@ export function BreakTheGridShowcase({ onLaunchOS }: BreakTheGridShowcaseProps) 
                 <ArrowUpRight className="w-3 h-3 opacity-60" />
               </a>
             </div>
-          </article>
+          </motion.article>
 
           {/* 07: TuteDude EdTech Mentorship */}
-          <article
-            className={`p-6 sm:p-8 flex flex-col justify-between space-y-5 transition-colors ${
+          <motion.article
+            initial={{ opacity: 0, y: 32 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: "-12% 0px" }}
+            transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+            className={`p-6 sm:p-8 lg:p-10 flex flex-col justify-between space-y-6 transition-colors ${
               isDark
                 ? "bg-[#0c0e14]/30 hover:bg-[#0c0e14]/50"
                 : "bg-white hover:bg-stone-50/50"
@@ -1062,75 +1139,73 @@ export function BreakTheGridShowcase({ onLaunchOS }: BreakTheGridShowcaseProps) 
             <div className="space-y-4">
               <div className="flex items-center justify-between text-xs font-mono">
                 <span className="text-sky-500 font-bold">07 / TUTEDUDE · EDTECH</span>
-                <span className={`text-[11px] font-mono ${isDark ? "text-sky-400" : "text-sky-700"}`}>
+                <span
+                  className={`text-[11px] font-mono px-2 py-0.5 rounded border ${
+                    isDark
+                      ? "text-sky-400 border-sky-900/40 bg-sky-950/20"
+                      : "text-sky-700 border-sky-200 bg-sky-50"
+                  }`}
+                >
                   +34% COMPLETION · &lt;3m MENTOR
                 </span>
               </div>
 
-              {/* Interactive Viewport Switcher */}
-              <div className="flex items-center justify-between">
-                <div
-                  className={`p-0.5 rounded-lg border flex items-center gap-1 font-mono text-[10px] ${
-                    isDark ? "bg-zinc-900/80 border-zinc-800" : "bg-stone-100 border-stone-200"
-                  }`}
-                >
-                  <button
-                    onClick={() => setTutedudeTab("learn")}
-                    className={`px-2 py-0.5 rounded transition-colors cursor-pointer ${
-                      tutedudeTab === "learn"
+              {/* Minimal Hover Scrubber Pills (Fluid preview without click toggles) */}
+              <div className="flex items-center justify-between text-[11px] font-mono">
+                <div className="flex items-center gap-1.5 sm:gap-2 text-[10px] sm:text-[11px]">
+                  <span
+                    onMouseEnter={() => setTutedudeHoverState("learn")}
+                    className={`cursor-pointer transition-colors ${
+                      tutedudeHoverState === "learn"
                         ? isDark
-                          ? "bg-zinc-800 text-white font-semibold shadow-sm"
-                          : "bg-white text-stone-900 font-semibold shadow-sm"
-                        : isDark
-                        ? "text-zinc-400 hover:text-white"
-                        : "text-stone-500 hover:text-stone-900"
+                          ? "text-sky-400 font-semibold"
+                          : "text-sky-700 font-semibold"
+                        : "opacity-50 hover:opacity-100"
                     }`}
                   >
-                    1. Learn
-                  </button>
-                  <button
-                    onClick={() => setTutedudeTab("resources")}
-                    className={`px-2 py-0.5 rounded transition-colors cursor-pointer ${
-                      tutedudeTab === "resources"
+                    ✦ IDE
+                  </span>
+                  <span className="opacity-30">/</span>
+                  <span
+                    onMouseEnter={() => setTutedudeHoverState("resources")}
+                    className={`cursor-pointer transition-colors ${
+                      tutedudeHoverState === "resources"
                         ? isDark
-                          ? "bg-zinc-800 text-white font-semibold shadow-sm"
-                          : "bg-white text-stone-900 font-semibold shadow-sm"
-                        : isDark
-                        ? "text-zinc-400 hover:text-white"
-                        : "text-stone-500 hover:text-stone-900"
+                          ? "text-sky-400 font-semibold"
+                          : "text-sky-700 font-semibold"
+                        : "opacity-50 hover:opacity-100"
                     }`}
                   >
-                    2. Resources
-                  </button>
-                  <button
-                    onClick={() => setTutedudeTab("support")}
-                    className={`px-2 py-0.5 rounded transition-colors cursor-pointer ${
-                      tutedudeTab === "support"
+                    ✦ Notes
+                  </span>
+                  <span className="opacity-30">/</span>
+                  <span
+                    onMouseEnter={() => setTutedudeHoverState("support")}
+                    className={`cursor-pointer transition-colors ${
+                      tutedudeHoverState === "support"
                         ? isDark
-                          ? "bg-zinc-800 text-white font-semibold shadow-sm"
-                          : "bg-white text-stone-900 font-semibold shadow-sm"
-                        : isDark
-                        ? "text-zinc-400 hover:text-white"
-                        : "text-stone-500 hover:text-stone-900"
+                          ? "text-sky-400 font-semibold"
+                          : "text-sky-700 font-semibold"
+                        : "opacity-50 hover:opacity-100"
                     }`}
                   >
-                    3. Live Mentor
-                  </button>
+                    ✦ Mentor (3m)
+                  </span>
                 </div>
-                <span className={`text-[10px] font-mono ${isDark ? "text-sky-400" : "text-sky-600"}`}>
-                  Interactive Mockup
+                <span className={`text-[10px] hidden sm:inline ${isDark ? "text-zinc-500" : "text-stone-400"}`}>
+                  Hover to scrub
                 </span>
               </div>
 
-              {/* Designed Smartphone Mockup with Dynamic State */}
+              {/* Designed Smartphone Mockup with Fluid AnimatePresence Hover */}
               <StageCanvas
                 accentTint="rgba(14, 165, 233, 0.12)"
                 label={
-                  tutedudeTab === "learn"
-                    ? "Lecture Player & Progress/Refund Runway"
-                    : tutedudeTab === "resources"
+                  tutedudeHoverState === "learn"
+                    ? "Lecture Player & Progress Runway"
+                    : tutedudeHoverState === "resources"
                     ? "Course Resources & Modular Cheat Sheets"
-                    : "Live 1-on-1 Mentor Queue (Avg Wait: 3m)"
+                    : "Live 1-on-1 Mentor Queue (<3m Wait)"
                 }
                 onClick={() =>
                   setModalData({
@@ -1151,46 +1226,57 @@ export function BreakTheGridShowcase({ onLaunchOS }: BreakTheGridShowcaseProps) 
               >
                 <MobileDeviceFrame>
                   <div className="relative w-full h-full bg-[#120a1f]">
-                    <Image
-                      src={
-                        tutedudeTab === "learn"
-                          ? "/case-studies/tutedude_course_player.png"
-                          : tutedudeTab === "resources"
-                          ? "/case-studies/tutedude_study_resources.png"
-                          : "/case-studies/tutedude_mentor_support.png"
-                      }
-                      alt="TuteDude Learning Experience Screen"
-                      fill
-                      priority
-                      unoptimized
-                      className="object-cover object-top transition-opacity duration-200"
-                    />
+                    <AnimatePresence mode="wait">
+                      <motion.div
+                        key={tutedudeHoverState}
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        transition={{ duration: 0.15 }}
+                        className="relative w-full h-full"
+                      >
+                        <Image
+                          src={
+                            tutedudeHoverState === "learn"
+                              ? "/case-studies/tutedude_course_player.png"
+                              : tutedudeHoverState === "resources"
+                              ? "/case-studies/tutedude_study_resources.png"
+                              : "/case-studies/tutedude_mentor_support.png"
+                          }
+                          alt="TuteDude Learning Experience Screen"
+                          fill
+                          priority
+                          unoptimized
+                          className="object-cover object-top"
+                        />
+                      </motion.div>
+                    </AnimatePresence>
                   </div>
                 </MobileDeviceFrame>
               </StageCanvas>
 
-              <div className="space-y-2 pt-1 max-w-[56ch]">
+              <div className="space-y-2 max-w-[54ch]">
                 <h4
-                  className={`text-base font-semibold font-sans tracking-tight ${
+                  className={`text-lg font-semibold font-sans tracking-tight leading-snug ${
                     isDark ? "text-white" : "text-stone-900"
                   }`}
                 >
                   Connecting stuck coding students to live mentors in under 3 minutes.
                 </h4>
-                <ul
-                  className={`space-y-1 text-xs font-sans leading-relaxed pt-0.5 ${
+                <p
+                  className={`text-xs sm:text-sm font-sans leading-relaxed ${
                     isDark ? "text-zinc-400" : "text-stone-600"
                   }`}
                 >
-                  <li className="flex items-start gap-1.5">
-                    <span className="text-sky-400 font-mono text-[11px] mt-0.5">•</span>
-                    <span><strong>+34% completion lift:</strong> In-lecture 1-on-1 mentor queues resolving syntax blockers before students abandon.</span>
-                  </li>
-                  <li className="flex items-start gap-1.5">
-                    <span className="text-sky-400 font-mono text-[11px] mt-0.5">•</span>
-                    <span><strong>Progress & refund tracker:</strong> Gamified milestone runway tying course progress to transparent refund guarantees.</span>
-                  </li>
-                </ul>
+                  Integrated instant 1-on-1 mentor queues and gamified refund runways directly into the video player, preventing drop-offs during core blockers.
+                </p>
+                <div
+                  className={`text-[11px] font-mono pt-1 ${
+                    isDark ? "text-zinc-500" : "text-stone-500"
+                  }`}
+                >
+                  EdTech · Interactive Video · Mentorship Queue · Gamified Runway
+                </div>
               </div>
             </div>
 
@@ -1245,14 +1331,18 @@ export function BreakTheGridShowcase({ onLaunchOS }: BreakTheGridShowcaseProps) 
                 <ArrowUpRight className="w-3 h-3 opacity-60" />
               </a>
             </div>
-          </article>
+          </motion.article>
         </div>
 
         {/* ========================================================================= */}
-        {/* 08: RAJASTHAN FIELDWORK & ETHNOGRAPHY — CLOSING 12-COL FEATURE */}
+        {/* 08: RAJASTHAN FIELDWORK & ETHNOGRAPHY — VIEWPORT STAGE */}
         {/* ========================================================================= */}
-        <article
-          className={`border-b border-dashed p-6 sm:p-8 space-y-5 transition-colors ${
+        <motion.article
+          initial={{ opacity: 0, y: 32 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: "-12% 0px" }}
+          transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+          className={`border-b border-dashed p-6 sm:p-8 lg:p-12 min-h-[68vh] lg:min-h-[76vh] flex flex-col justify-center space-y-6 transition-colors ${
             isDark
               ? "border-zinc-800/80 bg-[#0c0e14]/30 hover:bg-[#0c0e14]/50"
               : "border-stone-200/80 bg-white hover:bg-stone-50/50"
@@ -1265,13 +1355,13 @@ export function BreakTheGridShowcase({ onLaunchOS }: BreakTheGridShowcaseProps) 
               <span className={isDark ? "text-zinc-600" : "text-stone-300"}>/</span>
               <span className={isDark ? "text-zinc-300" : "text-stone-700"}>Project Potential x India Fellow</span>
               <span className={isDark ? "text-zinc-600" : "text-stone-300"}>·</span>
-              <span className={isDark ? "text-zinc-400" : "text-stone-500"}>
-                20 Months Grassroots Fieldwork
-              </span>
+              <span className={isDark ? "text-zinc-400" : "text-stone-500"}>20 Months Grassroots Fieldwork</span>
             </div>
             <span
-              className={`text-[11px] font-mono font-medium ${
-                isDark ? "text-emerald-400" : "text-emerald-700"
+              className={`text-[11px] font-mono font-medium px-2 py-0.5 rounded border ${
+                isDark
+                  ? "text-emerald-400 border-emerald-900/40 bg-emerald-950/20"
+                  : "text-emerald-700 border-emerald-200 bg-emerald-50"
               }`}
             >
               40+ Panchayats · Rural Rajasthan & Bihar
@@ -1279,51 +1369,38 @@ export function BreakTheGridShowcase({ onLaunchOS }: BreakTheGridShowcaseProps) 
           </div>
 
           {/* Symmetrical 12-Col Split */}
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-center">
-            {/* Left Narrative */}
-            <div className="lg:col-span-7 space-y-3 max-w-[62ch]">
-              <div>
-                <h3
-                  className={`text-base sm:text-lg font-sans font-semibold tracking-tight ${
-                    isDark ? "text-white" : "text-stone-900"
-                  }`}
-                >
-                  20 months of grassroots systems and rural youth ethnography.
-                </h3>
-                <p
-                  className={`text-xs sm:text-sm font-sans pt-1 ${
-                    isDark ? "text-zinc-300" : "text-stone-700"
-                  }`}
-                >
-                  Field immersion examining youth empowerment networks, leadership incentives, and water commons.
-                </p>
-              </div>
-
-              {/* Punchy Bullet Points */}
-              <ul
-                className={`space-y-1.5 text-xs font-sans leading-relaxed pt-1 ${
-                  isDark ? "text-zinc-400" : "text-stone-600"
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
+            {/* Left Narrative: One Single Persuasive Statement */}
+            <div className="lg:col-span-6 space-y-4 max-w-[60ch]">
+              <h3
+                className={`text-xl sm:text-2xl font-sans font-semibold tracking-tight leading-snug ${
+                  isDark ? "text-white" : "text-stone-900"
                 }`}
               >
-                <li className="flex items-start gap-2">
-                  <span className="text-emerald-400 font-mono text-[11px] mt-0.5">•</span>
-                  <span><strong>40+ rural panchayats:</strong> Deep ethnographic research across Rajasthan and Bihar investigating community leadership structures.</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <span className="text-emerald-400 font-mono text-[11px] mt-0.5">•</span>
-                  <span><strong>Youth Resource Manual:</strong> Co-designed experiential community curriculum and stewardship tools for water commons.</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <span className="text-emerald-400 font-mono text-[11px] mt-0.5">•</span>
-                  <span><strong>Pedagogical field tools:</strong> Ground-level diagnostics to measure intrinsic motivation in 39°C unventilated community spaces.</span>
-                </li>
-              </ul>
+                20 months of grassroots systems and rural youth ethnography.
+              </h3>
+
+              <p
+                className={`text-sm sm:text-base font-sans leading-relaxed ${
+                  isDark ? "text-zinc-300" : "text-stone-700"
+                }`}
+              >
+                Conducted ethnographic research across rural Rajasthan and Bihar to co-design experiential community curricula and water commons stewardship frameworks.
+              </p>
+
+              <div
+                className={`text-xs font-mono pt-1 ${
+                  isDark ? "text-zinc-500" : "text-stone-500"
+                }`}
+              >
+                Fieldwork Ethnography · Systems Design · Youth Leadership · Rajasthan & Bihar
+              </div>
 
               {/* Action CTAs */}
               <div className="pt-2 flex flex-wrap items-center gap-4 font-mono text-xs">
                 <a
                   href="#essays"
-                  className={`px-3.5 py-1.5 rounded-lg font-semibold flex items-center gap-1.5 transition-all cursor-pointer shadow-sm ${
+                  className={`px-4 py-2 rounded-lg font-semibold flex items-center gap-2 transition-all cursor-pointer shadow-sm ${
                     isDark
                       ? "bg-white text-zinc-950 hover:bg-zinc-200"
                       : "bg-stone-900 text-white hover:bg-black"
@@ -1335,7 +1412,7 @@ export function BreakTheGridShowcase({ onLaunchOS }: BreakTheGridShowcaseProps) 
 
                 <Link
                   href="/work"
-                  className={`flex items-center gap-1 transition-colors cursor-pointer hover:underline ${
+                  className={`flex items-center gap-1.5 transition-colors cursor-pointer hover:underline ${
                     isDark ? "text-zinc-400 hover:text-white" : "text-stone-600 hover:text-black"
                   }`}
                 >
@@ -1346,7 +1423,7 @@ export function BreakTheGridShowcase({ onLaunchOS }: BreakTheGridShowcaseProps) 
             </div>
 
             {/* Right: Fieldwork Photo Frame */}
-            <div className="lg:col-span-5">
+            <div className="lg:col-span-6">
               <StageCanvas
                 accentTint="rgba(16, 185, 129, 0.12)"
                 label="Grassroots Ethnography · Mewar Belt, Rural Rajasthan"
@@ -1361,7 +1438,7 @@ export function BreakTheGridShowcase({ onLaunchOS }: BreakTheGridShowcaseProps) 
                   })
                 }
               >
-                <div className="w-full max-w-[340px] rounded-xl overflow-hidden border border-stone-200/80 dark:border-zinc-700/60 shadow-xl aspect-[4/3] relative">
+                <div className="w-full max-w-[360px] rounded-xl overflow-hidden border border-stone-200/80 dark:border-zinc-700/60 shadow-xl aspect-[4/3] relative">
                   <Image
                     src="/aditya_field_full.jpg"
                     alt="Rural Fieldwork Photo in Rajasthan"
@@ -1370,7 +1447,7 @@ export function BreakTheGridShowcase({ onLaunchOS }: BreakTheGridShowcaseProps) 
                     unoptimized
                     className="object-cover object-top"
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent flex items-end p-3">
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-transparent to-transparent flex items-end p-3">
                     <span className="text-[11px] font-mono text-emerald-300 font-medium">
                       Mewar Belt · Water Commons Stewardship
                     </span>
@@ -1379,7 +1456,7 @@ export function BreakTheGridShowcase({ onLaunchOS }: BreakTheGridShowcaseProps) 
               </StageCanvas>
             </div>
           </div>
-        </article>
+        </motion.article>
       </div>
 
       {/* Interactive Prototype Modal */}

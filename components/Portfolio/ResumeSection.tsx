@@ -2,6 +2,7 @@
 
 import React from "react";
 import { Download, Mail, Phone, ExternalLink } from "lucide-react";
+import { motion } from "framer-motion";
 import { useThemeStore } from "@/store/themeStore";
 
 export function ResumeSection() {
@@ -79,21 +80,21 @@ export function ResumeSection() {
   ];
 
   return (
-    <section id="resume" className="relative">
+    <section id="resume" className="relative w-full">
       <div
-        className={`max-w-7xl mx-auto border-x border-dashed relative transition-colors ${
+        className={`w-full relative transition-colors ${
           isDark
-            ? "border-zinc-800/80 bg-[#090b10]/40"
-            : "border-stone-200/80 bg-[#FBFBF9]"
+            ? "bg-[#090b10]/40"
+            : "bg-[#FBFBF9]"
         }`}
       >
-        {/* Section Header */}
+        {/* Section Header: Minimal Single Persuasive Statement */}
         <div
-          className={`border-b border-dashed p-6 sm:p-8 relative flex flex-col sm:flex-row sm:items-end justify-between gap-4 transition-colors ${
+          className={`border-b border-dashed p-6 sm:p-8 lg:p-12 relative flex flex-col sm:flex-row sm:items-end justify-between gap-4 transition-colors ${
             isDark ? "border-zinc-800/80 bg-[#0c0e14]/70" : "border-stone-200/80 bg-white"
           }`}
         >
-          <div className="space-y-1.5">
+          <div className="space-y-2 max-w-2xl">
             <div
               className={`text-[11px] font-mono uppercase tracking-wider ${
                 isDark ? "text-zinc-500" : "text-stone-500"
@@ -102,18 +103,18 @@ export function ResumeSection() {
               04 // Experience & Credentials
             </div>
             <h2
-              className={`text-xl sm:text-2xl font-sans font-semibold tracking-tight ${
+              className={`text-2xl sm:text-3xl font-sans font-semibold tracking-tight ${
                 isDark ? "text-zinc-100" : "text-stone-900"
               }`}
             >
               Career history & credentials.
             </h2>
             <p
-              className={`text-xs sm:text-sm font-sans max-w-xl leading-relaxed ${
+              className={`text-sm sm:text-base font-sans leading-relaxed ${
                 isDark ? "text-zinc-400" : "text-stone-600"
               }`}
             >
-              Over 3 years designing product architectures across healthcare, fintech, and rural education.
+              Product design and front-end engineering leadership for high-complexity, mission-critical software systems.
             </p>
           </div>
 
@@ -133,7 +134,11 @@ export function ResumeSection() {
         </div>
 
         {/* 2-Column Split */}
-        <div
+        <motion.div
+          initial={{ opacity: 0, y: 24 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.5 }}
           className={`grid grid-cols-1 lg:grid-cols-12 divide-y divide-dashed lg:divide-y-0 lg:divide-x lg:divide-dashed border-b border-dashed transition-colors ${
             isDark
               ? "border-zinc-800/80 divide-zinc-800/80"
@@ -328,7 +333,7 @@ export function ResumeSection() {
               </div>
             </div>
           </div>
-        </div>
+        </motion.div>
       </div>
     </section>
   );

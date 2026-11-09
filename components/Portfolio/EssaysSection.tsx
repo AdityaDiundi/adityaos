@@ -3,6 +3,7 @@
 import React, { useState } from "react";
 import { FEATURED_ESSAYS } from "./caseStudiesData";
 import { ArrowUpRight, BookOpen, Feather, X, ExternalLink } from "lucide-react";
+import { motion } from "framer-motion";
 import { useThemeStore } from "@/store/themeStore";
 import { EssayItem } from "./types";
 
@@ -25,21 +26,21 @@ export function EssaysSection() {
   const poemCount = FEATURED_ESSAYS.filter((e) => e.category === "Poem").length;
 
   return (
-    <section id="essays" className="relative">
+    <section id="essays" className="relative w-full">
       <div
-        className={`max-w-7xl mx-auto border-x border-dashed relative transition-colors ${
+        className={`w-full relative transition-colors ${
           isDark
-            ? "border-zinc-800/80 bg-[#090b10]/40"
-            : "border-stone-200/80 bg-[#FBFBF9]"
+            ? "bg-[#090b10]/40"
+            : "bg-[#FBFBF9]"
         }`}
       >
-        {/* Section Header */}
+        {/* Section Header: Minimal Single Persuasive Statement */}
         <div
-          className={`border-b border-dashed p-6 sm:p-8 relative flex flex-col sm:flex-row sm:items-end justify-between gap-4 transition-colors ${
+          className={`border-b border-dashed p-6 sm:p-8 lg:p-12 relative flex flex-col sm:flex-row sm:items-end justify-between gap-4 transition-colors ${
             isDark ? "border-zinc-800/80 bg-[#0c0e14]/70" : "border-stone-200/80 bg-white"
           }`}
         >
-          <div className="space-y-1.5">
+          <div className="space-y-2 max-w-2xl">
             <div
               className={`text-[11px] font-mono uppercase tracking-wider ${
                 isDark ? "text-zinc-500" : "text-stone-500"
@@ -48,18 +49,18 @@ export function EssaysSection() {
               02 // Writing & Reflections
             </div>
             <h2
-              className={`text-xl sm:text-2xl font-sans font-semibold tracking-tight ${
+              className={`text-2xl sm:text-3xl font-sans font-semibold tracking-tight ${
                 isDark ? "text-zinc-100" : "text-stone-900"
               }`}
             >
               Essays, fieldwork & poetry.
             </h2>
             <p
-              className={`text-xs sm:text-sm font-sans max-w-xl leading-relaxed ${
+              className={`text-sm sm:text-base font-sans leading-relaxed ${
                 isDark ? "text-zinc-400" : "text-stone-600"
               }`}
             >
-              Reflections on mental models, rural ethnography, youth systems, and personal agency published on India Fellow, Medium, and Bear Blog.
+              20 months of grassroots governance and behavioral research across Rajasthan and Bihar, translated into systemic design frameworks.
             </p>
           </div>
 
@@ -229,26 +230,34 @@ export function EssaysSection() {
 
             if (hasContent) {
               return (
-                <div
+                <motion.div
                   key={essay.id}
+                  initial={{ opacity: 0, y: 16 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.4 }}
                   onClick={() => setReadingEssay(essay)}
                   className="block cursor-pointer hover:bg-stone-50/40 dark:hover:bg-zinc-900/30 transition-colors"
                 >
                   {cardContent}
-                </div>
+                </motion.div>
               );
             }
 
             return (
-              <a
+              <motion.a
                 key={essay.id}
+                initial={{ opacity: 0, y: 16 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.4 }}
                 href={essay.url}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="block hover:bg-stone-50/40 dark:hover:bg-zinc-900/30 transition-colors"
               >
                 {cardContent}
-              </a>
+              </motion.a>
             );
           })}
         </div>
