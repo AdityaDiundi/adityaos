@@ -870,9 +870,9 @@ export function AdityaOSDesktop({
         {/* Module 5: ResumeViewer Window */}
         <WindowFrame
           id="resumeViewer"
-          title="Resume // Experience & Education"
-          icon={<FileText className="w-3.5 h-3.5 text-cyan-400" />}
-          defaultPosition={{ x: 260, y: 70 }}
+          title="Resume"
+          icon={<FileText className="w-3.5 h-3.5 text-stone-400 dark:text-zinc-500" />}
+          defaultPosition={{ x: 180, y: 50 }}
           defaultSize={{ width: 720, height: 530 }}
           dragConstraintsRef={desktopContainerRef}
         >
