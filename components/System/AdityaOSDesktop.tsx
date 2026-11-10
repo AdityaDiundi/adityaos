@@ -822,9 +822,9 @@ export function AdityaOSDesktop({
         {/* Module 1: CoreIntro Window */}
         <WindowFrame
           id="coreIntro"
-          title="About // Design Technologist Bio"
-          icon={<Sparkles className="w-3.5 h-3.5 text-purple-400" />}
-          defaultPosition={{ x: 50, y: 30 }}
+          title="About"
+          icon={<Sparkles className="w-3.5 h-3.5 text-stone-400 dark:text-zinc-500" />}
+          defaultPosition={{ x: 60, y: 40 }}
           defaultSize={{ width: 620, height: 480 }}
           dragConstraintsRef={desktopContainerRef}
         >

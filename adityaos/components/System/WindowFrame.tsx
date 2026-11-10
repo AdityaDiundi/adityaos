@@ -145,52 +145,35 @@ export const WindowFrame: React.FC<WindowFrameProps> = ({
         }}
         className="h-8 px-3 flex items-center justify-between border-b select-none cursor-move transition-colors"
       >
-        {/* Left: Window identity & breadcrumb */}
+        {/* Left: Window identity */}
         <div className="flex items-center gap-2 text-xs font-mono truncate">
-          <span className="opacity-80">{icon}</span>
+          <span className="opacity-70">{icon}</span>
           <span
             style={{ color: isActive ? activeTheme.textPrimary : activeTheme.textMuted }}
-            className="font-semibold tracking-tight truncate"
+            className="font-medium tracking-tight truncate"
           >
             {title}
           </span>
-          <span className="text-[10px] opacity-60 hidden sm:inline">
-            // twm:active
-          </span>
         </div>
 
-        {/* Right: Window Controls: Minimize (-), Maximize (+), Close (x) */}
-        <div className="flex items-center gap-1.5" onPointerDown={(e) => e.stopPropagation()}>
+        {/* Right: Window Controls: Minimize (-), Close (x) */}
+        <div className="flex items-center gap-1" onPointerDown={(e) => e.stopPropagation()}>
           {/* Minimize (-) */}
           <button
             type="button"
             onClick={() => toggleMinimize(id)}
-            title="Minimize (-)"
-            className="w-5 h-5 flex items-center justify-center rounded opacity-70 hover:opacity-100 hover:text-onedark-yellow transition-all text-xs"
+            title="Minimize"
+            className="w-5 h-5 flex items-center justify-center rounded-sm opacity-60 hover:opacity-100 hover:bg-black/5 dark:hover:bg-white/5 transition-colors text-xs cursor-pointer focus:outline-none focus-visible:ring-1 focus-visible:ring-stone-400"
           >
             <Minus className="w-3 h-3" />
-          </button>
-
-          {/* Maximize (+) */}
-          <button
-            type="button"
-            onClick={() => toggleMaximize(id)}
-            title={isMaximized ? "Restore" : "Maximize (+)"}
-            className="w-5 h-5 flex items-center justify-center rounded opacity-70 hover:opacity-100 hover:text-onedark-green transition-all text-xs"
-          >
-            {isMaximized ? (
-              <Square className="w-2.5 h-2.5" />
-            ) : (
-              <Plus className="w-3 h-3" />
-            )}
           </button>
 
           {/* Close (x) */}
           <button
             type="button"
             onClick={() => closeWindow(id)}
-            title="Close (x)"
-            className="w-5 h-5 flex items-center justify-center rounded opacity-70 hover:opacity-100 hover:text-onedark-red transition-all text-xs"
+            title="Close"
+            className="w-5 h-5 flex items-center justify-center rounded-sm opacity-60 hover:opacity-100 hover:bg-black/5 dark:hover:bg-white/5 transition-colors text-xs cursor-pointer focus:outline-none focus-visible:ring-1 focus-visible:ring-stone-400"
           >
             <X className="w-3 h-3" />
           </button>
