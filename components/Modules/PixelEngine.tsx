@@ -3506,8 +3506,8 @@ export const PixelEngine: React.FC = () => {
               {/* Import Image Button */}
               <button
                 type="button"
-                onClick={() => fileInputRef.current?.click()}
-                title="Import & Auto-Gridify Image to 40x24 Matrix"
+                onClick={() => setIsImportModalOpen(true)}
+                title="Import & Convert Image to Pixel Art Pipeline"
                 className="text-stone-600 dark:text-zinc-400 hover:text-stone-950 dark:hover:text-zinc-100 hover:underline cursor-pointer focus:outline-none focus-visible:ring-1 focus-visible:ring-stone-400"
               >
                 <span>Import</span>

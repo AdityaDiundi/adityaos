@@ -19,6 +19,13 @@ import {
   oklabToRgb,
   snapToPaletteOklab,
   getDarkerShade,
+  hueAwareOklabDistance,
+  analyzeSourceImage,
+  calculateTargetGrid,
+  snapToResolutionStep,
+  extractKMeansPalette,
+  runPixelConversionPipeline,
+  RESOLUTION_STEPS,
   NAMED_PALETTES,
 } from "../components/Modules/pixelArtConverter.ts";
 
@@ -53,6 +60,137 @@ describe("Part 1: Image to Pixel Pipeline & Oklab Quantization", () => {
   test("Named palettes offer fixed color budgets (12 for chibi, 16 for scenes)", () => {
     assert.strictEqual(NAMED_PALETTES.animeChibi.length, 12, "Chibi palette must have exactly 12 curated colors");
     assert.strictEqual(NAMED_PALETTES.editorial.length, 16, "Scene editorial palette must have 16 colors");
+  });
+
+  test("Aspect ratio is strictly preserved across arbitrary image dimensions", () => {
+    // 16:9 widescreen source (1920x1080) with longestSide = 128
+    const grid169 = calculateTargetGrid(1920, 1080, 128);
+    assert.strictEqual(grid169.cols, 128);
+    assert.strictEqual(grid169.rows, 72); // 128 * (1080 / 1920) = 72
+
+    // 4:3 landscape source (800x600) with longestSide = 96
+    const grid43 = calculateTargetGrid(800, 600, 96);
+    assert.strictEqual(grid43.cols, 96);
+    assert.strictEqual(grid43.rows, 72);
+
+    // 1:2 tall portrait source (300x600) with longestSide = 96
+    const gridTall = calculateTargetGrid(300, 600, 96);
+    assert.strictEqual(gridTall.rows, 96);
+    assert.strictEqual(gridTall.cols, 48);
+
+    // Snapping to valid steps
+    assert.strictEqual(snapToResolutionStep(90), 96);
+    assert.strictEqual(snapToResolutionStep(22), 24);
+    assert.strictEqual(snapToResolutionStep(150), 160);
+  });
+
+  test("Hue-aware OKLab metric penalizes different hues even if lightness is identical", () => {
+    // Two colors with identical lightness but completely distinct hues (e.g. saturated Cyan vs saturated Pink)
+    const cyanLab = rgbToOklab(0, 220, 220);
+    const pinkLab = rgbToOklab(220, 0, 150);
+    const whiteLab = rgbToOklab(220, 220, 220);
+
+    const distHueAware = hueAwareOklabDistance(cyanLab, pinkLab, 1.5);
+    const distUnweighted = hueAwareOklabDistance(cyanLab, whiteLab, 0.0);
+
+    // Hue difference must heavily elevate the distance
+    assert.ok(distHueAware > 0.15, "Hue-aware metric must strongly separate cyan and pink");
+  });
+
+  test("Source type auto-detection recognizes pixel_art, ai_pixel, illustration, and photo", () => {
+    // 1. Pixel Art: 32x32 with only 4 unique colors and crisp transitions
+    const paData = new Uint8ClampedArray(32 * 32 * 4);
+    for (let i = 0; i < 32 * 32; i++) {
+      const c = (i % 4) * 60;
+      paData[i * 4] = c;
+      paData[i * 4 + 1] = c;
+      paData[i * 4 + 2] = c;
+      paData[i * 4 + 3] = 255;
+    }
+    const paReport = analyzeSourceImage(paData, 32, 32);
+    assert.strictEqual(paReport.detectedType, "pixel_art");
+
+    // 2. AI Pixel Style: 64x64 grid composed of 8x8 uniform blocks
+    const aiData = new Uint8ClampedArray(64 * 64 * 4);
+    for (let y = 0; y < 64; y++) {
+      for (let x = 0; x < 64; x++) {
+        const bx = Math.floor(x / 8);
+        const by = Math.floor(y / 8);
+        const c = ((bx + by) % 6) * 40;
+        const idx = (y * 64 + x) * 4;
+        aiData[idx] = c;
+        aiData[idx + 1] = (c * 2) % 255;
+        aiData[idx + 2] = 200;
+        aiData[idx + 3] = 255;
+      }
+    }
+    const aiReport = analyzeSourceImage(aiData, 64, 64);
+    assert.ok(aiReport.detectedType === "ai_pixel" || aiReport.detectedType === "pixel_art");
+
+    // 3. Photo: continuous smooth color gradients across 64x64
+    const photoData = new Uint8ClampedArray(64 * 64 * 4);
+    for (let y = 0; y < 64; y++) {
+      for (let x = 0; x < 64; x++) {
+        const idx = (y * 64 + x) * 4;
+        photoData[idx] = Math.round((x / 64) * 255);
+        photoData[idx + 1] = Math.round((y / 64) * 255);
+        photoData[idx + 2] = Math.round(((x + y) / 128) * 255);
+        photoData[idx + 3] = 255;
+      }
+    }
+    const photoReport = analyzeSourceImage(photoData, 64, 64);
+    assert.strictEqual(photoReport.detectedType, "photo");
+  });
+
+  test("End-to-end pixel conversion pipeline produces integer stages and undoable output", () => {
+    // Generate a 48x48 cartoon circle on transparent background
+    const srcW = 48, srcH = 48;
+    const testData = new Uint8ClampedArray(srcW * srcH * 4);
+    for (let y = 0; y < srcH; y++) {
+      for (let x = 0; x < srcW; x++) {
+        const idx = (y * srcW + x) * 4;
+        const dx = x - 24;
+        const dy = y - 24;
+        if (dx * dx + dy * dy <= 16 * 16) {
+          testData[idx] = 255; // Red circle
+          testData[idx + 1] = 80;
+          testData[idx + 2] = 80;
+          testData[idx + 3] = 255;
+        } else {
+          testData[idx + 3] = 0; // Transparent
+        }
+      }
+    }
+
+    const res = runPixelConversionPipeline(
+      { data: testData, width: srcW, height: srcH },
+      {
+        sourceType: "illustration",
+        longestSide: 32,
+        paletteMode: "named",
+        paletteName: "animeChibi",
+        maxPaletteColors: 12,
+        removeBg: true,
+        isolateSubject: true,
+        bgTolerance: 35,
+        ditherEnabled: false,
+        ditherStrength: 0,
+        despeckleEnabled: true,
+        despeckleMinSize: 3,
+        passDarkOutline: true,
+        passSnapTwoTone: false,
+        removeFloorLine: true,
+      }
+    );
+
+    assert.ok(res.pixels.size > 0, "Pipeline must generate pixel buffer");
+    assert.strictEqual(res.width, 32, "Target width matches calculated longestSide");
+    assert.strictEqual(res.height, 32, "Target height matches square aspect ratio");
+    assert.ok(res.stages.mask.size > 0, "Mask stage must be populated");
+    assert.ok(res.stages.downscaled.size > 0, "Downscaled stage must be populated");
+    assert.ok(res.stages.quantized.size > 0, "Quantized stage must be populated");
+    assert.ok(res.stages.outlined.size > 0, "Outlined stage must be populated");
+    assert.ok(res.paletteUsed.length > 0, "Palette used must contain colors");
   });
 });
 
