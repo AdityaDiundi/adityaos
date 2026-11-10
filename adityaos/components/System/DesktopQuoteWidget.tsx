@@ -6,7 +6,7 @@ import { useThemeStore } from "@/store/themeStore";
 import { useOSStore } from "@/store/osStore";
 import { useSoundStore } from "@/store/soundStore";
 import { Quote } from "@/scripts/extract-quotes";
-import { RotateCw, BookOpen, ExternalLink } from "lucide-react";
+// No extra icons needed for clean editorial quote widget
 
 // Safe local storage helper
 function getStoredHistory(): string[] {
@@ -51,7 +51,19 @@ export function DesktopQuoteWidget() {
 
   const [currentIndex, setCurrentIndex] = useState<number>(0);
   const [history, setHistory] = useState<string[]>([]);
-  const [isRotating, setIsRotating] = useState<boolean>(false);
+  const [isFading, setIsFading] = useState<boolean>(false);
+  const [isHovered, setIsHovered] = useState<boolean>(false);
+  const [reducedMotion, setReducedMotion] = useState<boolean>(false);
+
+  // Check prefers-reduced-motion
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
+    setReducedMotion(mq.matches);
+    const handler = (e: MediaQueryListEvent) => setReducedMotion(e.matches);
+    mq.addEventListener("change", handler);
+    return () => mq.removeEventListener("change", handler);
+  }, []);
 
   // Initialize deterministic quote of the day
   useEffect(() => {
@@ -66,65 +78,95 @@ export function DesktopQuoteWidget() {
 
   const currentQuote = quotes[currentIndex] || quotes[0];
 
-  // Rotate to next quote without repeating until full cycle
+  // Helper to pick next non-repeated quote index
+  const getNextIndex = useCallback(
+    (currIdx: number, currHistory: string[]) => {
+      const currentId = quotes[currIdx]?.id;
+      const updatedHistory = currentId ? [...currHistory, currentId].slice(-20) : currHistory;
+
+      const unseenIndices = quotes
+        .map((q, idx) => ({ q, idx }))
+        .filter(({ q, idx }) => idx !== currIdx && !updatedHistory.includes(q.id));
+
+      let nextIdx: number;
+      if (unseenIndices.length > 0) {
+        const pick = unseenIndices[Math.floor(Math.random() * unseenIndices.length)];
+        nextIdx = pick.idx;
+      } else {
+        const valid = quotes.map((_, i) => i).filter((i) => i !== currIdx);
+        nextIdx = valid[Math.floor(Math.random() * valid.length)] ?? 0;
+      }
+      return { nextIdx, updatedHistory };
+    },
+    [quotes]
+  );
+
+  // Rotate to next quote with gentle crossfade or instant for reduced motion
   const handleNextQuote = useCallback(() => {
     if (quotes.length <= 1) return;
     playClickChime(520);
-    setIsRotating(true);
-    setTimeout(() => setIsRotating(false), 250);
 
-    const currentId = currentQuote?.id;
-    const updatedHistory = currentId ? [...history, currentId].slice(-20) : history;
+    const { nextIdx, updatedHistory } = getNextIndex(currentIndex, history);
 
-    // Filter out quotes in recent history
-    const unseenIndices = quotes
-      .map((q, idx) => ({ q, idx }))
-      .filter(({ q, idx }) => idx !== currentIndex && !updatedHistory.includes(q.id));
-
-    let nextIdx: number;
-    if (unseenIndices.length > 0) {
-      const pick = unseenIndices[Math.floor(Math.random() * unseenIndices.length)];
-      nextIdx = pick.idx;
-    } else {
-      // All have been seen in history, pick any random index different from current
-      const valid = quotes.map((_, i) => i).filter((i) => i !== currentIndex);
-      nextIdx = valid[Math.floor(Math.random() * valid.length)] ?? 0;
+    if (reducedMotion) {
+      setCurrentIndex(nextIdx);
+      const newHistory = [...updatedHistory, quotes[nextIdx].id].slice(-20);
+      setHistory(newHistory);
+      saveStoredHistory(newHistory);
+      return;
     }
 
-    setCurrentIndex(nextIdx);
-    const newHistory = [...updatedHistory, quotes[nextIdx].id].slice(-20);
-    setHistory(newHistory);
-    saveStoredHistory(newHistory);
-  }, [quotes, currentIndex, currentQuote, history, playClickChime]);
+    setIsFading(true);
+    setTimeout(() => {
+      setCurrentIndex(nextIdx);
+      const newHistory = [...updatedHistory, quotes[nextIdx].id].slice(-20);
+      setHistory(newHistory);
+      saveStoredHistory(newHistory);
+      setTimeout(() => {
+        setIsFading(false);
+      }, 50);
+    }, 220);
+  }, [quotes, currentIndex, history, reducedMotion, getNextIndex, playClickChime]);
+
+  // Auto-rotate on calm timer (~20s), paused on hover or when prefers-reduced-motion
+  useEffect(() => {
+    if (reducedMotion || isHovered || quotes.length <= 1) return;
+    const timer = setInterval(() => {
+      handleNextQuote();
+    }, 20000);
+    return () => clearInterval(timer);
+  }, [reducedMotion, isHovered, quotes.length, handleNextQuote]);
 
   // Open quote source in Writing app (archiveReader) or external URL
-  const handleOpenSource = useCallback(() => {
-    if (!currentQuote) return;
-    playClickChime(450);
+  const handleOpenSource = useCallback(
+    (e: React.MouseEvent) => {
+      e.stopPropagation();
+      if (!currentQuote) return;
+      playClickChime(450);
 
-    const url = currentQuote.sourceUrl;
-    const isInternal =
-      url.startsWith("essays/") ||
-      url.startsWith("poetry/") ||
-      url.includes(".md") ||
-      url.includes(".txt");
+      const url = currentQuote.sourceUrl;
+      const isInternal =
+        url.startsWith("essays/") ||
+        url.startsWith("poetry/") ||
+        url.includes(".md") ||
+        url.includes(".txt");
 
-    if (isInternal) {
-      openWindow("archiveReader");
-      focusWindow("archiveReader");
-      // Dispatch custom event to select exact file in ArchiveReader
-      if (typeof window !== "undefined") {
-        window.dispatchEvent(
-          new CustomEvent("open-archive-file", {
-            detail: { path: url },
-          })
-        );
+      if (isInternal) {
+        openWindow("archiveReader");
+        focusWindow("archiveReader");
+        if (typeof window !== "undefined") {
+          window.dispatchEvent(
+            new CustomEvent("open-archive-file", {
+              detail: { path: url },
+            })
+          );
+        }
+      } else {
+        window.open(url, "_blank", "noopener,noreferrer");
       }
-    } else {
-      // External link (Medium, Bear Blog, etc.)
-      window.open(url, "_blank", "noopener,noreferrer");
-    }
-  }, [currentQuote, openWindow, focusWindow, playClickChime]);
+    },
+    [currentQuote, openWindow, focusWindow, playClickChime]
+  );
 
   if (!currentQuote) return null;
 
@@ -133,22 +175,28 @@ export function DesktopQuoteWidget() {
   return (
     <article
       aria-label={`Quote by Aditya Diwakar: ${currentQuote.text} from ${currentQuote.sourceTitle}`}
-      className="relative max-w-2xl w-full flex flex-col items-center text-center px-4 sm:px-6 pointer-events-none"
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+      className="relative max-w-2xl w-full flex flex-col items-center text-center px-4 sm:px-6 pointer-events-auto select-none"
     >
-      {/* Decorative Quiet Quotation Glyph */}
-      <span
-        aria-hidden="true"
-        className="font-serif text-3xl sm:text-4xl select-none leading-none opacity-20 -mb-2"
-        style={{ color: activeTheme.textPrimary }}
-      >
-        &ldquo;
-      </span>
-
       {/* Primary Quote Text in Editorial Display Serif */}
+      {/* Clicking the quote advances it immediately with subtle hover affordance */}
       <blockquote
-        className={`font-serif text-base sm:text-xl md:text-2xl font-normal leading-relaxed tracking-tight select-text transition-opacity duration-200 ${
-          isHindi ? "break-words leading-loose font-normal" : "italic"
-        }`}
+        tabIndex={0}
+        role="button"
+        onClick={handleNextQuote}
+        onKeyDown={(e) => {
+          if (e.key === "Enter" || e.key === " ") {
+            e.preventDefault();
+            handleNextQuote();
+          }
+        }}
+        title="Click to advance to another quote"
+        className={`font-serif text-base sm:text-xl md:text-2xl font-normal leading-relaxed tracking-tight cursor-pointer outline-none focus-visible:ring-1 focus-visible:ring-stone-400 rounded transition-all duration-300 ${
+          isHindi
+            ? "break-words leading-loose font-normal [text-wrap:balance]"
+            : "italic [text-wrap:balance]"
+        } ${isFading ? "opacity-0 scale-[0.99]" : "opacity-100 scale-100"} hover:opacity-80`}
         style={{
           color: activeTheme.textPrimary,
           hyphens: isHindi ? "none" : "auto",
@@ -158,56 +206,18 @@ export function DesktopQuoteWidget() {
         {currentQuote.text}
       </blockquote>
 
-      {/* Attribution & Controls Bar */}
-      <div
-        className={`mt-3 flex flex-wrap items-center justify-center gap-x-2.5 gap-y-1.5 text-xs sm:text-[13px] pointer-events-auto ${
-          isHindi ? "font-sans" : "font-mono"
-        }`}
-      >
-        {/* Source Link (opens writing app or link) */}
+      {/* Attribution Source Line: Plain muted text with underline only on hover */}
+      <div className="mt-3.5 flex items-center justify-center">
         <button
           type="button"
           onClick={handleOpenSource}
-          title={`Read full piece in Writing app: ${currentQuote.sourceTitle}`}
-          className="group flex items-center gap-1.5 text-stone-500 dark:text-zinc-400 hover:text-stone-900 dark:hover:text-zinc-100 transition-colors cursor-pointer"
+          title={`Read in Writing app: ${currentQuote.sourceTitle}`}
+          className={`text-xs sm:text-[13px] text-stone-500 dark:text-zinc-500 hover:text-stone-800 dark:hover:text-zinc-200 transition-colors cursor-pointer no-underline hover:underline underline-offset-4 decoration-stone-300 dark:decoration-zinc-700 ${
+            isHindi ? "font-serif" : "font-mono"
+          }`}
         >
-          <BookOpen className="w-3.5 h-3.5 opacity-60 group-hover:opacity-100 transition-opacity shrink-0" />
-          <span
-            className={`underline underline-offset-4 decoration-black/20 dark:decoration-white/20 group-hover:decoration-current ${
-              isHindi ? "font-serif text-xs sm:text-[13px]" : "font-mono"
-            }`}
-          >
-            {currentQuote.sourceTitle}
-          </span>
-          {currentQuote.sourceUrl.startsWith("http") && (
-            <ExternalLink className="w-3 h-3 opacity-50 shrink-0" />
-          )}
+          {currentQuote.sourceTitle}
         </button>
-
-        <span className="text-stone-300 dark:text-zinc-600 select-none">·</span>
-
-        {/* Rotate Button (↺) */}
-        <button
-          type="button"
-          onClick={handleNextQuote}
-          title="Rotate to next quote without repeats"
-          className="flex items-center gap-1.5 px-2 py-0.5 rounded-full border border-black/10 dark:border-white/10 hover:border-black/30 dark:hover:border-white/30 text-stone-500 dark:text-zinc-400 hover:text-stone-900 dark:hover:text-zinc-100 transition-all cursor-pointer hover:bg-black/5 dark:hover:bg-white/5 active:scale-95 font-mono"
-          style={{
-            backgroundColor: activeTheme.isDark ? "rgba(255, 255, 255, 0.04)" : "rgba(0, 0, 0, 0.03)",
-          }}
-        >
-          <RotateCw
-            className={`w-3 h-3 transition-transform duration-250 ${
-              isRotating ? "rotate-180" : ""
-            }`}
-          />
-          <span className="text-[11px] font-medium tracking-tight">rotate</span>
-        </button>
-
-        {/* Quiet Language Tag */}
-        <span className="text-[10px] font-mono uppercase tracking-wider text-stone-400 dark:text-zinc-500 opacity-60 select-none">
-          [{currentQuote.lang}]
-        </span>
       </div>
     </article>
   );

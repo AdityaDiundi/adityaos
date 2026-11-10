@@ -8,11 +8,10 @@ import {
   formatPoliteLiveText,
   TimeOnEarthBreakdown,
 } from "@/lib/timeOnEarth";
-import { OdometerText } from "./OdometerDigit";
 import { useThemeStore } from "@/store/themeStore";
-import { Sparkles, Calendar, Grid3X3, Clock, X } from "lucide-react";
+import { Grid3X3, X } from "lucide-react";
 
-export type DisplayFormat = "ymdhms" | "days" | "decimal" | "birthday";
+export type AgeUnit = "years" | "days" | "hours" | "seconds";
 
 interface Particle {
   x: number;
@@ -30,26 +29,30 @@ export function TimeOnEarthWidget() {
   const [breakdown, setBreakdown] = useState<TimeOnEarthBreakdown>(() =>
     calculateTimeOnEarth(Date.now(), BIO.dobTimestamp)
   );
-  const [format, setFormat] = useState<DisplayFormat>("ymdhms");
-  const [reducedMotion, setReducedMotion] = useState<boolean>(false);
+  const [unit, setUnit] = useState<AgeUnit>("days");
   const [politeText, setPoliteText] = useState<string>("");
+  const [isHoveringAge, setIsHoveringAge] = useState<boolean>(false);
   const [showLifeInWeeks, setShowLifeInWeeks] = useState<boolean>(false);
   const [hasCelebratedBirthday, setHasCelebratedBirthday] = useState<boolean>(false);
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const miniCanvasRef = useRef<HTMLCanvasElement>(null);
   const animationFrameRef = useRef<number | null>(null);
   const lastPoliteMinuteRef = useRef<number>(-1);
 
-  // Check prefers-reduced-motion
+  // Restore chosen unit from localStorage
   useEffect(() => {
-    if (typeof window === "undefined") return;
-    const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
-    setReducedMotion(mq.matches);
-    const handler = (e: MediaQueryListEvent) => setReducedMotion(e.matches);
-    mq.addEventListener("change", handler);
-    return () => mq.removeEventListener("change", handler);
+    try {
+      const saved = localStorage.getItem("aditya_os_age_unit");
+      if (saved && ["years", "days", "hours", "seconds"].includes(saved)) {
+        setUnit(saved as AgeUnit);
+      }
+    } catch {
+      // Ignore storage errors
+    }
   }, []);
 
   // Update loop: computes from Date.now() - BIO.dobTimestamp, pauses when document.hidden
+  // If unit is seconds, updates every 1s. For calm units (years, days, hours), updates every 60s
   useEffect(() => {
     let timerId: NodeJS.Timeout | null = null;
 
@@ -59,7 +62,6 @@ export function TimeOnEarthWidget() {
       const b = calculateTimeOnEarth(now, BIO.dobTimestamp);
       setBreakdown(b);
 
-      // Low-frequency polite live region: update at most once per minute
       const currentMinute = Math.floor(now / 60000);
       if (currentMinute !== lastPoliteMinuteRef.current) {
         lastPoliteMinuteRef.current = currentMinute;
@@ -68,7 +70,8 @@ export function TimeOnEarthWidget() {
     };
 
     tick();
-    timerId = setInterval(tick, 1000);
+    const intervalMs = unit === "seconds" ? 1000 : 60000;
+    timerId = setInterval(tick, intervalMs);
 
     const handleVisibilityChange = () => {
       if (!document.hidden) {
@@ -81,7 +84,7 @@ export function TimeOnEarthWidget() {
       if (timerId) clearInterval(timerId);
       document.removeEventListener("visibilitychange", handleVisibilityChange);
     };
-  }, []);
+  }, [unit]);
 
   // Birthday pixel-burst celebration: once per session on 29 Nov (IST)
   const triggerBirthdayCelebration = useCallback(() => {
@@ -118,7 +121,7 @@ export function TimeOnEarthWidget() {
       particles.forEach((p) => {
         p.x += p.vx;
         p.y += p.vy;
-        p.vy += 0.08; // subtle gravity
+        p.vy += 0.08;
         p.life += 1;
         p.alpha = Math.max(0, 1 - p.life / 70);
 
@@ -126,7 +129,6 @@ export function TimeOnEarthWidget() {
           alive = true;
           ctx.fillStyle = p.color;
           ctx.globalAlpha = p.alpha;
-          // Crisp pixel rects matching Pixel Studio style
           ctx.fillRect(Math.round(p.x), Math.round(p.y), p.size, p.size);
         }
       });
@@ -152,26 +154,77 @@ export function TimeOnEarthWidget() {
     }
   }, [breakdown.isBirthday, hasCelebratedBirthday, triggerBirthdayCelebration]);
 
-  // Cycle display formats on tap / click
-  const cycleFormat = () => {
-    setFormat((prev) => {
-      switch (prev) {
-        case "ymdhms":
-          return "days";
-        case "days":
-          return "decimal";
-        case "decimal":
-          return "birthday";
-        case "birthday":
-        default:
-          return "ymdhms";
-      }
-    });
+  // Cycle age unit on click: years -> days -> hours -> seconds
+  const cycleUnit = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    const nextOrder: Record<AgeUnit, AgeUnit> = {
+      years: "days",
+      days: "hours",
+      hours: "seconds",
+      seconds: "years",
+    };
+    const nextUnit = nextOrder[unit];
+    setUnit(nextUnit);
+    try {
+      localStorage.setItem("aditya_os_age_unit", nextUnit);
+    } catch {
+      // Ignore storage errors
+    }
   };
 
-  // Formatter for primary line
-  const pad2 = (n: number) => n.toString().padStart(2, "0");
-  const timeString = `${pad2(breakdown.hours)}:${pad2(breakdown.minutes)}:${pad2(breakdown.seconds)}`;
+  // Compute text according to active unit
+  const elapsedMs = Math.max(0, Date.now() - BIO.dobTimestamp);
+  let ageFormattedText = "";
+  if (unit === "years") {
+    const yVal = (elapsedMs / (365.2425 * 24 * 60 * 60 * 1000)).toFixed(2);
+    ageFormattedText = `${yVal} years on earth`;
+  } else if (unit === "days") {
+    const dVal = Math.floor(elapsedMs / (24 * 60 * 60 * 1000)).toLocaleString("en-US");
+    ageFormattedText = `${dVal} days on earth`;
+  } else if (unit === "hours") {
+    const hVal = Math.floor(elapsedMs / (60 * 60 * 1000)).toLocaleString("en-US");
+    ageFormattedText = `${hVal} hours on earth`;
+  } else {
+    const sVal = Math.floor(elapsedMs / 1000).toLocaleString("en-US");
+    ageFormattedText = `${sVal} seconds on earth`;
+  }
+
+  // Draw micro 52x80 dot-grid preview when hovering age
+  useEffect(() => {
+    if (!isHoveringAge || !miniCanvasRef.current) return;
+    const canvas = miniCanvasRef.current;
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
+
+    const cols = 52;
+    const rows = 80;
+    const dotWidth = 2;
+    const dotHeight = 2;
+    const pitchX = 3;
+    const pitchY = 3;
+
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    const livedColor = activeTheme.isDark ? "#e4e4e7" : "#18181b";
+    const currentColor = "#10b981";
+    const aheadColor = activeTheme.isDark ? "rgba(255,255,255,0.12)" : "rgba(0,0,0,0.1)";
+
+    for (let r = 0; r < rows; r++) {
+      for (let c = 0; c < cols; c++) {
+        const idx = r * cols + c;
+        const x = c * pitchX + 1;
+        const y = r * pitchY + 1;
+        if (idx < breakdown.totalWeeks) {
+          ctx.fillStyle = livedColor;
+        } else if (idx === breakdown.totalWeeks) {
+          ctx.fillStyle = currentColor;
+        } else {
+          ctx.fillStyle = aheadColor;
+        }
+        ctx.fillRect(x, y, dotWidth, dotHeight);
+      }
+    }
+  }, [isHoveringAge, breakdown.totalWeeks, activeTheme.isDark]);
 
   return (
     <section
@@ -189,117 +242,72 @@ export function TimeOnEarthWidget() {
         className="pointer-events-none absolute -top-8 left-1/2 -translate-x-1/2 z-20 w-[300px] h-[120px]"
       />
 
-      {/* Main Interactive Widget Pill */}
-      <div className="flex flex-col items-center gap-1.5 pointer-events-auto">
+      {/* Main Interactive Age Block (No border pills, no clock icons at rest) */}
+      <div
+        className="relative flex flex-col items-center pointer-events-auto"
+        onMouseEnter={() => setIsHoveringAge(true)}
+        onMouseLeave={() => setIsHoveringAge(false)}
+      >
+        {/* Calm Unit-Switchable Age Button */}
         <button
           type="button"
-          onClick={cycleFormat}
-          title="Click to cycle display format (Y/M/D/h/m/s · Total Days · Decimal Years · Next Birthday)"
-          className="group relative flex items-center gap-2.5 px-3.5 py-1.5 rounded-full border shadow-sm transition-all duration-200 hover:shadow-md cursor-pointer hover:scale-[1.02] active:scale-[0.98]"
-          style={{
-            backgroundColor: activeTheme.isDark ? "rgba(24, 24, 27, 0.85)" : "rgba(255, 255, 255, 0.88)",
-            borderColor: activeTheme.isDark ? "rgba(255, 255, 255, 0.12)" : "rgba(0, 0, 0, 0.1)",
-            color: activeTheme.textPrimary,
-            backdropFilter: "blur(12px)",
-          }}
+          onClick={cycleUnit}
+          title="Click to cycle units: years · days · hours · seconds"
+          className="font-mono text-xs sm:text-[13px] tracking-tight text-stone-600 dark:text-zinc-400 hover:text-stone-950 dark:hover:text-zinc-100 transition-colors cursor-pointer select-none bg-transparent border-0 p-0 focus:outline-none focus-visible:ring-1 focus-visible:ring-stone-400 rounded"
         >
-          {/* Status Indicator / Icon */}
-          {breakdown.isBirthday ? (
-            <span className="flex items-center gap-1 text-[11px] font-mono text-amber-500 font-bold uppercase tracking-wider animate-pulse">
-              <Sparkles className="w-3.5 h-3.5" />
-              <span>Day 1 of year {breakdown.years}</span>
-            </span>
-          ) : (
-            <Clock className="w-3.5 h-3.5 text-stone-400 dark:text-zinc-500 group-hover:text-emerald-500 transition-colors" />
-          )}
-
-          {/* Dynamic Value per Format */}
-          <div className="font-mono text-xs sm:text-[13px] tracking-tight tabular-nums flex items-center font-medium">
-            {format === "ymdhms" && (
-              <span className="flex items-center gap-1.5">
-                <span className="flex items-center">
-                  <OdometerText text={breakdown.years.toString()} reducedMotion={reducedMotion} />
-                  <span className="text-[10px] text-stone-400 dark:text-zinc-500 ml-0.5 mr-1 font-semibold">Y</span>
-                  <OdometerText text={pad2(breakdown.months)} reducedMotion={reducedMotion} />
-                  <span className="text-[10px] text-stone-400 dark:text-zinc-500 ml-0.5 mr-1 font-semibold">M</span>
-                  <OdometerText text={pad2(breakdown.days)} reducedMotion={reducedMotion} />
-                  <span className="text-[10px] text-stone-400 dark:text-zinc-500 ml-0.5 mr-1 font-semibold">D</span>
-                </span>
-                <span className="text-stone-300 dark:text-zinc-600">·</span>
-                <span className="flex items-center">
-                  <OdometerText text={timeString} reducedMotion={reducedMotion} />
-                </span>
-              </span>
-            )}
-
-            {format === "days" && (
-              <span className="flex items-center gap-1.5">
-                <OdometerText
-                  text={breakdown.totalDays.toLocaleString("en-US")}
-                  reducedMotion={reducedMotion}
-                />
-                <span className="text-[10px] tracking-widest text-stone-400 dark:text-zinc-500 font-semibold uppercase">
-                  DAYS ON EARTH
-                </span>
-              </span>
-            )}
-
-            {format === "decimal" && (
-              <span className="flex items-center gap-1.5">
-                <OdometerText text={breakdown.decimalYears} reducedMotion={reducedMotion} />
-                <span className="text-[10px] tracking-widest text-stone-400 dark:text-zinc-500 font-semibold uppercase">
-                  YEARS
-                </span>
-              </span>
-            )}
-
-            {format === "birthday" && (
-              <span className="flex items-center gap-1.5">
-                {breakdown.isBirthday ? (
-                  <span className="text-amber-500 font-bold uppercase tracking-wider text-xs">
-                    CELEBRATING BIRTHDAY TODAY
-                  </span>
-                ) : (
-                  <>
-                    <span className="text-[10px] tracking-wider text-stone-400 dark:text-zinc-500 font-semibold uppercase">
-                      NEXT BIRTHDAY IN
-                    </span>
-                    <OdometerText text={breakdown.daysToNextBirthday.toString()} reducedMotion={reducedMotion} />
-                    <span className="text-[10px] tracking-wider text-stone-400 dark:text-zinc-500 font-semibold uppercase">
-                      DAYS
-                    </span>
-                  </>
-                )}
-              </span>
-            )}
-          </div>
-
-          {/* Quiet format helper legend */}
-          <span className="text-[10px] font-mono text-stone-400 dark:text-zinc-500 ml-1 opacity-60 group-hover:opacity-100 transition-opacity">
-            ⇄
-          </span>
+          {ageFormattedText}
         </button>
 
-        {/* Quiet Subline: Anchor + Life-in-weeks button */}
-        <div className="flex items-center gap-2 text-[10px] font-mono text-stone-400 dark:text-zinc-500">
-          <span>SINCE 29 NOV 1997</span>
-          <span>·</span>
-          <span>JAIPUR, IST</span>
-          <span>·</span>
-          <button
-            type="button"
+        {/* Micro 52x80 Dot-Grid Popover Preview on Hover */}
+        {isHoveringAge && (
+          <div
             onClick={(e) => {
               e.stopPropagation();
-              setShowLifeInWeeks((prev) => !prev);
+              setShowLifeInWeeks(true);
             }}
-            className="hover:text-stone-700 dark:hover:text-zinc-300 underline underline-offset-2 cursor-pointer transition-colors"
+            role="button"
+            tabIndex={0}
+            title="Click to open full life-in-weeks view"
+            className="absolute bottom-full mb-3 left-1/2 -translate-x-1/2 z-30 p-3 rounded-xl border shadow-xl cursor-pointer transition-all animate-in fade-in zoom-in-95 duration-150"
+            style={{
+              backgroundColor: activeTheme.windowBg,
+              borderColor: activeTheme.windowBorder,
+              color: activeTheme.textPrimary,
+            }}
           >
-            {showLifeInWeeks ? "hide grid" : "life in weeks"}
-          </button>
+            <div className="flex items-center justify-between gap-3 text-[10px] font-mono mb-2 pb-1.5 border-b border-black/10 dark:border-white/10">
+              <span className="font-semibold uppercase tracking-wider">
+                {breakdown.totalWeeks.toLocaleString()} WEEKS
+              </span>
+              <span className="text-[9px] text-stone-400 dark:text-zinc-500">
+                CLICK TO EXPAND
+              </span>
+            </div>
+
+            {/* 52 cols x 80 rows dot canvas */}
+            <canvas
+              ref={miniCanvasRef}
+              width={158}
+              height={242}
+              className="w-[158px] h-[242px] mx-auto block"
+            />
+
+            <div className="text-[9px] font-mono text-stone-400 dark:text-zinc-500 text-center mt-2">
+              52 weeks/row · 80-year horizon
+            </div>
+          </div>
+        )}
+
+        {/* Secondary Subline: since 29 Nov 1997 with subtle Jaipur hover reveal */}
+        <div className="mt-1 flex items-center justify-center text-[11px] font-mono text-stone-400 dark:text-zinc-500 select-none group cursor-default transition-colors hover:text-stone-600 dark:hover:text-zinc-300">
+          <span>since 29 Nov 1997</span>
+          <span className="max-w-0 overflow-hidden opacity-0 group-hover:max-w-[80px] group-hover:opacity-100 transition-all duration-300 ease-out whitespace-nowrap">
+            <span className="mx-1 opacity-50">·</span>Jaipur
+          </span>
         </div>
       </div>
 
-      {/* Stretch: "Life in Weeks" Pixel Grid (52 cols x 80 rows) */}
+      {/* Full "Life in Weeks" Pixel Grid Modal (52 cols x 80 rows) */}
       {showLifeInWeeks && (
         <div
           className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm pointer-events-auto animate-in fade-in zoom-in-95 duration-150"
@@ -387,3 +395,4 @@ export function TimeOnEarthWidget() {
     </section>
   );
 }
+

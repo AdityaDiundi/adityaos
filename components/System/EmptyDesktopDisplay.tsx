@@ -22,14 +22,11 @@ export function EmptyDesktopDisplay() {
       }`}
     >
       {/* Centered Editorial Stack: Quote above Time on Earth with generous whitespace */}
-      <div className="flex flex-col items-center justify-center gap-7 sm:gap-9 max-w-3xl w-full">
+      <div className="flex flex-col items-center justify-center gap-8 sm:gap-10 max-w-3xl w-full">
         {/* Quote in Serif Editorial Style */}
         <DesktopQuoteWidget />
 
-        {/* Subtle Horizontal Divider */}
-        <div className="w-12 h-px bg-black/10 dark:bg-white/10 select-none" />
-
-        {/* Time on Earth in Mono Small Caps */}
+        {/* Time on Earth in Calm Plain Text */}
         <TimeOnEarthWidget />
       </div>
     </div>

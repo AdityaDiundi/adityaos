@@ -5,6 +5,7 @@ import { POETRY_LINES, PoetryLine } from "@/components/Portfolio/poetryData";
 import { BookOpen, Clock, Pin, Sparkles } from "lucide-react";
 import { useThemeStore } from "@/store/themeStore";
 import { useOSStore } from "@/store/osStore";
+import { CaseStudyCard } from "@/components/System/CaseStudyCard";
 
 interface DesktopObjectsProps {
   onOpenEssay: (essayPath: string) => void;
@@ -89,44 +90,17 @@ export function DesktopObjects({ onOpenEssay }: DesktopObjectsProps) {
       )}
 
       {/* ========================================================================= */}
-      {/* DESK OBJECT 2: Pinned "Latest Essay" Card (Right Side of Desktop) */}
+      {/* DESK OBJECT 2: Case Studies Selector (Right Side of Desktop) */}
       {/* ========================================================================= */}
-      <div className="hidden md:block absolute top-16 right-8 sm:right-12 z-0 pointer-events-auto select-none">
-        <div
-          onClick={() => onOpenEssay("essays/Daughters_of_Misogyny.md")}
-          className={`w-72 p-4 rounded-xl border shadow-lg transition-all duration-200 hover:-translate-y-0.5 hover:shadow-xl cursor-pointer ${
-            isDark
-              ? "bg-[#12141A]/95 border-zinc-800 text-zinc-100 hover:border-zinc-700"
-              : "bg-[#FAF7F2]/95 border-stone-200 text-[#1A1814] hover:border-stone-300"
-          }`}
-        >
-          <div className="flex items-center justify-between text-xs font-mono text-stone-500 dark:text-zinc-400 mb-2">
-            <span className="flex items-center gap-1.5 uppercase tracking-wider text-[10px] font-semibold text-emerald-600 dark:text-emerald-400">
-              <Pin className="w-3 h-3" />
-              Latest Essay
-            </span>
-            <span>26 May 2024</span>
-          </div>
-
-          <h3 className="font-serif text-lg font-normal leading-snug tracking-tight text-[#1A1814] dark:text-[#F4F4F5] mb-1.5">
-            Daughters of Misogyny
-          </h3>
-
-          <p className="font-mono text-xs text-stone-500 dark:text-zinc-400 leading-relaxed mb-3 line-clamp-2">
-            &ldquo;This world works in the strangest of the ways. Girls are born to the most misogynistic of the men...&rdquo;
-          </p>
-
-          <div className="flex items-center justify-between text-xs font-mono text-emerald-600 dark:text-emerald-400">
-            <span>Read in Writing app</span>
-            <span>→</span>
-          </div>
-        </div>
-      </div>
+      <CaseStudyCard />
 
       {/* ========================================================================= */}
       {/* DESK OBJECT 3: Small Desk Clock (Bottom-Right above shell bar) */}
       {/* ========================================================================= */}
-      <div className="hidden md:flex absolute bottom-14 right-6 sm:right-8 z-0 pointer-events-auto select-none items-center gap-2">
+      <div
+        className="hidden md:flex absolute bottom-14 right-6 sm:right-8 z-0 pointer-events-auto select-none items-center gap-2 group"
+        title="Timezone: Asia/Kolkata (IST)"
+      >
         <div
           className={`px-3 py-1.5 rounded-lg border shadow-sm backdrop-blur-md flex items-center gap-2.5 font-mono text-[12px] transition-colors ${
             isDark
@@ -138,6 +112,9 @@ export function DesktopObjects({ onOpenEssay }: DesktopObjectsProps) {
           <span className="font-semibold tracking-wider">{timeStr || "--:--:--"}</span>
           <span className="opacity-40">·</span>
           <span className="text-[11px] opacity-75">{dateStr}</span>
+          <span className="text-[10px] opacity-0 group-hover:opacity-75 transition-opacity text-emerald-600 dark:text-emerald-400 font-bold ml-0.5">
+            IST
+          </span>
         </div>
       </div>
     </>

@@ -12,6 +12,7 @@ import { GalleryViewer } from "@/components/Modules/GalleryViewer";
 import { FieldJournal } from "@/components/Modules/FieldJournal";
 import { LearnabilityLab } from "@/components/Modules/LearnabilityLab";
 import { WallpaperManager } from "@/components/Modules/WallpaperManager";
+import { CaseStudiesViewer } from "@/components/Modules/CaseStudiesViewer";
 import { DesktopStickyNote } from "@/components/Modules/DesktopStickyNote";
 import { HyprlandBootScreen } from "@/components/System/HyprlandBootScreen";
 import { PortfolioView } from "@/components/Portfolio/PortfolioView";
@@ -60,9 +61,11 @@ import {
   Folder,
   FileCode,
   SlidersHorizontal,
+  Briefcase,
 } from "lucide-react";
 
 const APP_LABELS: Record<string, string> = {
+  caseStudies: "Work",
   coreIntro: "About",
   archiveReader: "Writing",
   streamFeed: "Media",
@@ -672,7 +675,7 @@ export function AdityaOSDesktop({
               type="button"
               onClick={() => {
                 playClickChime(450);
-                openAndFocus("archiveReader");
+                openAndFocus("caseStudies");
               }}
               title="Work // Shipped Systems"
               className="group flex flex-col items-center gap-1.5 focus:outline-none cursor-pointer transition-transform active:scale-95 w-18"
@@ -964,6 +967,18 @@ export function AdityaOSDesktop({
           dragConstraintsRef={desktopContainerRef}
         >
           <WallpaperManager />
+        </WindowFrame>
+
+        {/* Module 10: CaseStudies Window */}
+        <WindowFrame
+          id="caseStudies"
+          title="Work // Case Studies & Shipped Systems"
+          icon={<Briefcase className="w-3.5 h-3.5 text-emerald-400" />}
+          defaultPosition={{ x: 120, y: 50 }}
+          defaultSize={{ width: 800, height: 530 }}
+          dragConstraintsRef={desktopContainerRef}
+        >
+          <CaseStudiesViewer />
         </WindowFrame>
       </div>
 
@@ -1335,7 +1350,7 @@ export function AdityaOSDesktop({
       <WelcomeModal
         isOpen={showWelcomeModal}
         onDismiss={handleDismissWelcome}
-        onOpenWork={() => openAndFocus("archiveReader")}
+        onOpenWork={() => openAndFocus("caseStudies")}
         onOpenWriting={() => openAndFocus("archiveReader")}
         onOpenAbout={() => openAndFocus("coreIntro")}
       />
