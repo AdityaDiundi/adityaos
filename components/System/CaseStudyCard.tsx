@@ -2,16 +2,12 @@
 
 import React, { useState, useRef, useCallback } from "react";
 import { DESKTOP_CASE_STUDIES, DesktopCaseStudy } from "@/config/caseStudies";
-import { useThemeStore } from "@/store/themeStore";
 import { useOSStore } from "@/store/osStore";
 import { useSoundStore } from "@/store/soundStore";
-import { Briefcase, ArrowUpRight } from "lucide-react";
 
 export function CaseStudyCard() {
-  const { activeTheme } = useThemeStore();
   const { openWindow, focusWindow } = useOSStore();
   const { playClickChime, playScrollNote } = useSoundStore();
-  const isDark = activeTheme.isDark;
 
   // Default active item is the most recent / featured one (index 0)
   const [selectedIndex, setSelectedIndex] = useState<number>(0);
@@ -61,95 +57,56 @@ export function CaseStudyCard() {
 
   return (
     <aside
-      aria-label="Featured Case Studies Selector"
-      className="hidden xl:block absolute top-16 right-8 sm:right-12 z-0 pointer-events-auto select-none"
+      aria-label="Featured Case Studies"
+      className="hidden xl:flex flex-col items-end text-right absolute top-16 right-8 sm:right-12 z-0 pointer-events-auto select-none"
     >
-      <div
-        className={`w-72 p-4 rounded-xl border shadow-lg transition-all duration-200 hover:shadow-xl ${
-          isDark
-            ? "bg-[#12141A]/95 border-zinc-800 text-zinc-100 hover:border-zinc-700"
-            : "bg-[#FAF7F2]/95 border-stone-200 text-[#1A1814] hover:border-stone-300"
-        }`}
-        style={{ backdropFilter: "blur(12px)" }}
+      {/* Quiet Section Label */}
+      <span className="text-[11px] font-mono tracking-tight text-stone-400 dark:text-zinc-500 mb-2">
+        Case studies
+      </span>
+
+      {/* Plain Text List of Titles (No index numbers, no arrow icons, no card chrome) */}
+      <ul
+        ref={listRef}
+        role="listbox"
+        aria-label="Case studies list"
+        className="flex flex-col items-end gap-1.5 my-0.5"
       >
-        {/* Card Header: Mono label */}
-        <div className="flex items-center justify-between text-xs font-mono text-stone-500 dark:text-zinc-400 mb-2.5">
-          <span className="flex items-center gap-1.5 uppercase tracking-wider text-[10px] font-semibold text-emerald-600 dark:text-emerald-400">
-            <Briefcase className="w-3 h-3" />
-            CASE STUDIES
-          </span>
-          <span className="text-[10px] opacity-60">
-            {activeStudy.number} / 0{DESKTOP_CASE_STUDIES.length}
-          </span>
-        </div>
+        {DESKTOP_CASE_STUDIES.map((study, idx) => {
+          const isSelected = idx === activeIndex;
+          return (
+            <li key={study.id} role="option" aria-selected={isSelected}>
+              <button
+                type="button"
+                tabIndex={0}
+                onClick={() => {
+                  setSelectedIndex(idx);
+                  handleOpenStudy(study);
+                }}
+                onMouseEnter={() => setHoveredIndex(idx)}
+                onMouseLeave={() => setHoveredIndex(null)}
+                onFocus={() => setSelectedIndex(idx)}
+                onKeyDown={(e) => handleKeyDown(e, idx)}
+                className={`text-right font-serif text-[15px] sm:text-[16px] cursor-pointer transition-all duration-150 focus:outline-none focus-visible:ring-1 focus-visible:ring-stone-400 dark:focus-visible:ring-zinc-500 rounded px-1.5 py-0.5 ${
+                  isSelected
+                    ? "text-stone-900 dark:text-zinc-100 font-medium opacity-100"
+                    : "text-stone-400 dark:text-zinc-500 hover:text-stone-700 dark:hover:text-zinc-300 font-normal opacity-70 hover:opacity-100"
+                }`}
+              >
+                {study.title}
+              </button>
+            </li>
+          );
+        })}
+      </ul>
 
-        {/* Text-Only Vertical List of Titles */}
-        <ul ref={listRef} role="listbox" aria-label="Case studies list" className="flex flex-col gap-1 my-2">
-          {DESKTOP_CASE_STUDIES.map((study, idx) => {
-            const isHighlighted = idx === activeIndex;
-            return (
-              <li key={study.id} role="option" aria-selected={isHighlighted}>
-                <button
-                  type="button"
-                  tabIndex={0}
-                  onClick={() => {
-                    setSelectedIndex(idx);
-                    handleOpenStudy(study);
-                  }}
-                  onMouseEnter={() => setHoveredIndex(idx)}
-                  onMouseLeave={() => setHoveredIndex(null)}
-                  onFocus={() => setSelectedIndex(idx)}
-                  onKeyDown={(e) => handleKeyDown(e, idx)}
-                  className={`w-full text-left px-2 py-1 rounded-md transition-colors flex items-center justify-between group cursor-pointer focus:outline-none focus-visible:ring-1 focus-visible:ring-emerald-500 ${
-                    isHighlighted
-                      ? isDark
-                        ? "bg-white/10 text-zinc-100"
-                        : "bg-black/5 text-stone-900 font-medium"
-                      : "text-stone-500 dark:text-zinc-400 hover:text-stone-800 dark:hover:text-zinc-200"
-                  }`}
-                >
-                  <span className="flex items-center gap-2 truncate text-xs">
-                    <span
-                      className={`font-mono text-[10px] ${
-                        isHighlighted ? "text-emerald-600 dark:text-emerald-400 font-bold" : "opacity-50"
-                      }`}
-                    >
-                      {study.number}
-                    </span>
-                    <span className="truncate">{study.title}</span>
-                  </span>
-
-                  <ArrowUpRight
-                    className={`w-3 h-3 shrink-0 transition-opacity ${
-                      isHighlighted ? "opacity-100 text-emerald-500" : "opacity-0 group-hover:opacity-60"
-                    }`}
-                  />
-                </button>
-              </li>
-            );
-          })}
-        </ul>
-
-        {/* Dynamic Secondary Summary Line: Swaps on hover/focus */}
-        <div
-          className="mt-3 pt-2.5 border-t border-black/5 dark:border-white/5 transition-all duration-150 min-h-[44px] flex flex-col justify-center"
-        >
-          <div className="text-[10px] font-mono text-emerald-600 dark:text-emerald-400 uppercase tracking-wider truncate font-semibold">
+      {/* One-Line Headline Outcome Beneath List (Fades in, no ellipsis truncation) */}
+      <div className="mt-2.5 min-h-[20px] flex items-center justify-end">
+        {activeStudy.outcome ? (
+          <span className="font-mono text-[11px] text-stone-500 dark:text-zinc-400 whitespace-nowrap transition-opacity duration-200 animate-in fade-in">
             {activeStudy.outcome}
-          </div>
-          <div className="font-mono text-[11px] text-stone-500 dark:text-zinc-400 truncate mt-0.5">
-            {activeStudy.role}
-          </div>
-        </div>
-
-        {/* Card Footer Call to Action */}
-        <div
-          onClick={() => handleOpenStudy(activeStudy)}
-          className="mt-2 pt-2 border-t border-black/5 dark:border-white/5 flex items-center justify-between text-[11px] font-mono text-emerald-600 dark:text-emerald-400 cursor-pointer hover:underline"
-        >
-          <span>Open in Work app</span>
-          <span>→</span>
-        </div>
+          </span>
+        ) : null}
       </div>
     </aside>
   );

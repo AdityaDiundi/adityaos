@@ -678,20 +678,14 @@ export function AdityaOSDesktop({
                 openAndFocus("caseStudies");
               }}
               title="Work // Shipped Systems"
-              className="group flex flex-col items-center gap-1.5 focus:outline-none cursor-pointer transition-transform active:scale-95 w-18"
+              className="group flex flex-col items-center gap-1.5 p-2 rounded-lg cursor-pointer transition-all duration-150 hover:-translate-y-0.5 hover:bg-black/[0.04] dark:hover:bg-white/[0.04] active:translate-y-0 active:scale-95 focus:outline-none focus-visible:ring-1 focus-visible:ring-stone-400 dark:focus-visible:ring-zinc-500 w-20"
             >
-              <div
-                style={{
-                  backgroundColor: activeTheme.isDark ? "rgba(255, 255, 255, 0.08)" : "rgba(240, 240, 243, 0.9)",
-                  borderColor: activeTheme.isDark ? "rgba(255, 255, 255, 0.12)" : "rgba(0, 0, 0, 0.08)",
-                }}
-                className="w-13 h-13 sm:w-14 sm:h-14 rounded-2xl border flex items-center justify-center shadow-sm backdrop-blur-md group-hover:scale-105 group-hover:shadow-md transition-all duration-150"
-              >
-                <PixelWorkIcon size={30} className="text-stone-800 dark:text-zinc-200" />
+              <div className="flex items-center justify-center p-0.5 [image-rendering:pixelated]">
+                <PixelWorkIcon size={32} className="text-stone-800 dark:text-zinc-200" />
               </div>
               <span
                 style={{ color: activeTheme.textPrimary }}
-                className="font-mono text-xs font-medium tracking-tight text-center select-none truncate max-w-[80px] opacity-90 group-hover:opacity-100 transition-opacity"
+                className="font-mono text-xs font-medium tracking-tight text-center select-none truncate max-w-[80px] opacity-85 group-hover:opacity-100 group-hover:underline underline-offset-4 decoration-stone-300 dark:decoration-zinc-700 transition-all"
               >
                 Work
               </span>
@@ -705,20 +699,14 @@ export function AdityaOSDesktop({
                 openAndFocus("archiveReader");
               }}
               title="Writing // Essays & Poetry"
-              className="group flex flex-col items-center gap-1.5 focus:outline-none cursor-pointer transition-transform active:scale-95 w-18"
+              className="group flex flex-col items-center gap-1.5 p-2 rounded-lg cursor-pointer transition-all duration-150 hover:-translate-y-0.5 hover:bg-black/[0.04] dark:hover:bg-white/[0.04] active:translate-y-0 active:scale-95 focus:outline-none focus-visible:ring-1 focus-visible:ring-stone-400 dark:focus-visible:ring-zinc-500 w-20"
             >
-              <div
-                style={{
-                  backgroundColor: activeTheme.isDark ? "rgba(255, 255, 255, 0.08)" : "rgba(240, 240, 243, 0.9)",
-                  borderColor: activeTheme.isDark ? "rgba(255, 255, 255, 0.12)" : "rgba(0, 0, 0, 0.08)",
-                }}
-                className="w-13 h-13 sm:w-14 sm:h-14 rounded-2xl border flex items-center justify-center shadow-sm backdrop-blur-md group-hover:scale-105 group-hover:shadow-md transition-all duration-150"
-              >
-                <PixelWritingIcon size={30} className="text-stone-800 dark:text-zinc-200" />
+              <div className="flex items-center justify-center p-0.5 [image-rendering:pixelated]">
+                <PixelWritingIcon size={32} className="text-stone-800 dark:text-zinc-200" />
               </div>
               <span
                 style={{ color: activeTheme.textPrimary }}
-                className="font-mono text-xs font-medium tracking-tight text-center select-none truncate max-w-[80px] opacity-90 group-hover:opacity-100 transition-opacity"
+                className="font-mono text-xs font-medium tracking-tight text-center select-none truncate max-w-[80px] opacity-85 group-hover:opacity-100 group-hover:underline underline-offset-4 decoration-stone-300 dark:decoration-zinc-700 transition-all"
               >
                 Writing
               </span>
@@ -732,20 +720,14 @@ export function AdityaOSDesktop({
                 openAndFocus("coreIntro");
               }}
               title="About // Bio & Identity"
-              className="group flex flex-col items-center gap-1.5 focus:outline-none cursor-pointer transition-transform active:scale-95 w-18"
+              className="group flex flex-col items-center gap-1.5 p-2 rounded-lg cursor-pointer transition-all duration-150 hover:-translate-y-0.5 hover:bg-black/[0.04] dark:hover:bg-white/[0.04] active:translate-y-0 active:scale-95 focus:outline-none focus-visible:ring-1 focus-visible:ring-stone-400 dark:focus-visible:ring-zinc-500 w-20"
             >
-              <div
-                style={{
-                  backgroundColor: activeTheme.isDark ? "rgba(255, 255, 255, 0.08)" : "rgba(240, 240, 243, 0.9)",
-                  borderColor: activeTheme.isDark ? "rgba(255, 255, 255, 0.12)" : "rgba(0, 0, 0, 0.08)",
-                }}
-                className="w-13 h-13 sm:w-14 sm:h-14 rounded-2xl border flex items-center justify-center shadow-sm backdrop-blur-md group-hover:scale-105 group-hover:shadow-md transition-all duration-150"
-              >
-                <PixelAboutIcon size={30} className="text-stone-800 dark:text-zinc-200" />
+              <div className="flex items-center justify-center p-0.5 [image-rendering:pixelated]">
+                <PixelAboutIcon size={32} className="text-stone-800 dark:text-zinc-200" />
               </div>
               <span
                 style={{ color: activeTheme.textPrimary }}
-                className="font-mono text-xs font-medium tracking-tight text-center select-none truncate max-w-[80px] opacity-90 group-hover:opacity-100 transition-opacity"
+                className="font-mono text-xs font-medium tracking-tight text-center select-none truncate max-w-[80px] opacity-85 group-hover:opacity-100 group-hover:underline underline-offset-4 decoration-stone-300 dark:decoration-zinc-700 transition-all"
               >
                 About
               </span>
@@ -759,20 +741,14 @@ export function AdityaOSDesktop({
                 openAndFocus("resumeViewer");
               }}
               title="Resume // Document & Experience"
-              className="group flex flex-col items-center gap-1.5 focus:outline-none cursor-pointer transition-transform active:scale-95 w-18"
+              className="group flex flex-col items-center gap-1.5 p-2 rounded-lg cursor-pointer transition-all duration-150 hover:-translate-y-0.5 hover:bg-black/[0.04] dark:hover:bg-white/[0.04] active:translate-y-0 active:scale-95 focus:outline-none focus-visible:ring-1 focus-visible:ring-stone-400 dark:focus-visible:ring-zinc-500 w-20"
             >
-              <div
-                style={{
-                  backgroundColor: activeTheme.isDark ? "rgba(255, 255, 255, 0.08)" : "rgba(240, 240, 243, 0.9)",
-                  borderColor: activeTheme.isDark ? "rgba(255, 255, 255, 0.12)" : "rgba(0, 0, 0, 0.08)",
-                }}
-                className="w-13 h-13 sm:w-14 sm:h-14 rounded-2xl border flex items-center justify-center shadow-sm backdrop-blur-md group-hover:scale-105 group-hover:shadow-md transition-all duration-150"
-              >
-                <PixelResumeIcon size={30} className="text-stone-800 dark:text-zinc-200" />
+              <div className="flex items-center justify-center p-0.5 [image-rendering:pixelated]">
+                <PixelResumeIcon size={32} className="text-stone-800 dark:text-zinc-200" />
               </div>
               <span
                 style={{ color: activeTheme.textPrimary }}
-                className="font-mono text-xs font-medium tracking-tight text-center select-none truncate max-w-[80px] opacity-90 group-hover:opacity-100 transition-opacity"
+                className="font-mono text-xs font-medium tracking-tight text-center select-none truncate max-w-[80px] opacity-85 group-hover:opacity-100 group-hover:underline underline-offset-4 decoration-stone-300 dark:decoration-zinc-700 transition-all"
               >
                 Resume
               </span>
@@ -786,20 +762,14 @@ export function AdityaOSDesktop({
                 openAndFocus("galleryViewer");
               }}
               title="Gallery // Visual Fieldwork"
-              className="group flex flex-col items-center gap-1.5 focus:outline-none cursor-pointer transition-transform active:scale-95 w-18"
+              className="group flex flex-col items-center gap-1.5 p-2 rounded-lg cursor-pointer transition-all duration-150 hover:-translate-y-0.5 hover:bg-black/[0.04] dark:hover:bg-white/[0.04] active:translate-y-0 active:scale-95 focus:outline-none focus-visible:ring-1 focus-visible:ring-stone-400 dark:focus-visible:ring-zinc-500 w-20"
             >
-              <div
-                style={{
-                  backgroundColor: activeTheme.isDark ? "rgba(255, 255, 255, 0.08)" : "rgba(240, 240, 243, 0.9)",
-                  borderColor: activeTheme.isDark ? "rgba(255, 255, 255, 0.12)" : "rgba(0, 0, 0, 0.08)",
-                }}
-                className="w-13 h-13 sm:w-14 sm:h-14 rounded-2xl border flex items-center justify-center shadow-sm backdrop-blur-md group-hover:scale-105 group-hover:shadow-md transition-all duration-150"
-              >
-                <PixelGalleryIcon size={30} className="text-stone-800 dark:text-zinc-200" />
+              <div className="flex items-center justify-center p-0.5 [image-rendering:pixelated]">
+                <PixelGalleryIcon size={32} className="text-stone-800 dark:text-zinc-200" />
               </div>
               <span
                 style={{ color: activeTheme.textPrimary }}
-                className="font-mono text-xs font-medium tracking-tight text-center select-none truncate max-w-[80px] opacity-90 group-hover:opacity-100 transition-opacity"
+                className="font-mono text-xs font-medium tracking-tight text-center select-none truncate max-w-[80px] opacity-85 group-hover:opacity-100 group-hover:underline underline-offset-4 decoration-stone-300 dark:decoration-zinc-700 transition-all"
               >
                 Gallery
               </span>
@@ -813,20 +783,14 @@ export function AdityaOSDesktop({
                 window.dispatchEvent(new CustomEvent("open-terminal"));
               }}
               title="Terminal // Noctalia Shell"
-              className="group flex flex-col items-center gap-1.5 focus:outline-none cursor-pointer transition-transform active:scale-95 w-18"
+              className="group flex flex-col items-center gap-1.5 p-2 rounded-lg cursor-pointer transition-all duration-150 hover:-translate-y-0.5 hover:bg-black/[0.04] dark:hover:bg-white/[0.04] active:translate-y-0 active:scale-95 focus:outline-none focus-visible:ring-1 focus-visible:ring-stone-400 dark:focus-visible:ring-zinc-500 w-20"
             >
-              <div
-                style={{
-                  backgroundColor: activeTheme.isDark ? "rgba(255, 255, 255, 0.08)" : "rgba(240, 240, 243, 0.9)",
-                  borderColor: activeTheme.isDark ? "rgba(255, 255, 255, 0.12)" : "rgba(0, 0, 0, 0.08)",
-                }}
-                className="w-13 h-13 sm:w-14 sm:h-14 rounded-2xl border flex items-center justify-center shadow-sm backdrop-blur-md group-hover:scale-105 group-hover:shadow-md transition-all duration-150"
-              >
-                <PixelTerminalIcon size={30} className="text-stone-800 dark:text-zinc-200" />
+              <div className="flex items-center justify-center p-0.5 [image-rendering:pixelated]">
+                <PixelTerminalIcon size={32} className="text-stone-800 dark:text-zinc-200" />
               </div>
               <span
                 style={{ color: activeTheme.textPrimary }}
-                className="font-mono text-xs font-medium tracking-tight text-center select-none truncate max-w-[80px] opacity-90 group-hover:opacity-100 transition-opacity"
+                className="font-mono text-xs font-medium tracking-tight text-center select-none truncate max-w-[80px] opacity-85 group-hover:opacity-100 group-hover:underline underline-offset-4 decoration-stone-300 dark:decoration-zinc-700 transition-all"
               >
                 Terminal
               </span>
@@ -840,20 +804,14 @@ export function AdityaOSDesktop({
                 openAndFocus("pixelEngine");
               }}
               title="PixelStudio // Creative Canvas"
-              className="group flex flex-col items-center gap-1.5 focus:outline-none cursor-pointer transition-transform active:scale-95 w-18"
+              className="group flex flex-col items-center gap-1.5 p-2 rounded-lg cursor-pointer transition-all duration-150 hover:-translate-y-0.5 hover:bg-black/[0.04] dark:hover:bg-white/[0.04] active:translate-y-0 active:scale-95 focus:outline-none focus-visible:ring-1 focus-visible:ring-stone-400 dark:focus-visible:ring-zinc-500 w-20"
             >
-              <div
-                style={{
-                  backgroundColor: activeTheme.isDark ? "rgba(255, 255, 255, 0.08)" : "rgba(240, 240, 243, 0.9)",
-                  borderColor: activeTheme.isDark ? "rgba(255, 255, 255, 0.12)" : "rgba(0, 0, 0, 0.08)",
-                }}
-                className="w-13 h-13 sm:w-14 sm:h-14 rounded-2xl border flex items-center justify-center shadow-sm backdrop-blur-md group-hover:scale-105 group-hover:shadow-md transition-all duration-150"
-              >
-                <PixelStudioIcon size={30} className="text-stone-800 dark:text-zinc-200" />
+              <div className="flex items-center justify-center p-0.5 [image-rendering:pixelated]">
+                <PixelStudioIcon size={32} className="text-stone-800 dark:text-zinc-200" />
               </div>
               <span
                 style={{ color: activeTheme.textPrimary }}
-                className="font-mono text-xs font-medium tracking-tight text-center select-none truncate max-w-[80px] opacity-90 group-hover:opacity-100 transition-opacity"
+                className="font-mono text-xs font-medium tracking-tight text-center select-none truncate max-w-[80px] opacity-85 group-hover:opacity-100 group-hover:underline underline-offset-4 decoration-stone-300 dark:decoration-zinc-700 transition-all"
               >
                 PixelStudio
               </span>
