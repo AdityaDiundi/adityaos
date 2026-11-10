@@ -2081,16 +2081,11 @@ export const PixelEngine: React.FC = () => {
               playPopSound(500);
             }}
             title="Pencil Tool (B / P)"
-            style={{
-              backgroundColor: activeTool === "pencil" ? activeTheme.accent : "transparent",
-              color:
-                activeTool === "pencil"
-                  ? activeTheme.isDark
-                    ? "#000"
-                    : "#fff"
-                  : activeTheme.textPrimary,
-            }}
-            className="p-1.5 rounded transition-all font-bold shadow-sm hover:opacity-80"
+            className={`p-1.5 rounded transition-colors focus:outline-none focus-visible:ring-1 focus-visible:ring-stone-400 cursor-pointer ${
+              activeTool === "pencil"
+                ? "bg-black/[0.08] dark:bg-white/[0.1] text-stone-900 dark:text-zinc-100"
+                : "text-stone-500 dark:text-zinc-400 hover:text-stone-900 dark:hover:text-zinc-100 hover:bg-black/[0.04] dark:hover:bg-white/[0.04]"
+            }`}
           >
             <Pencil className="w-3.5 h-3.5" />
           </button>
@@ -2103,11 +2098,11 @@ export const PixelEngine: React.FC = () => {
               playPopSound(450);
             }}
             title="Eraser Tool (E)"
-            style={{
-              backgroundColor: activeTool === "eraser" ? "#E06C75" : "transparent",
-              color: activeTool === "eraser" ? "#fff" : activeTheme.textPrimary,
-            }}
-            className="p-1.5 rounded transition-all font-bold shadow-sm hover:opacity-80"
+            className={`p-1.5 rounded transition-colors focus:outline-none focus-visible:ring-1 focus-visible:ring-stone-400 cursor-pointer ${
+              activeTool === "eraser"
+                ? "bg-black/[0.08] dark:bg-white/[0.1] text-stone-900 dark:text-zinc-100"
+                : "text-stone-500 dark:text-zinc-400 hover:text-stone-900 dark:hover:text-zinc-100 hover:bg-black/[0.04] dark:hover:bg-white/[0.04]"
+            }`}
           >
             <Eraser className="w-3.5 h-3.5" />
           </button>
@@ -2120,16 +2115,11 @@ export const PixelEngine: React.FC = () => {
               playPopSound(550);
             }}
             title="Paint Bucket (G)"
-            style={{
-              backgroundColor: activeTool === "bucket" ? activeTheme.accentSecondary : "transparent",
-              color:
-                activeTool === "bucket"
-                  ? activeTheme.isDark
-                    ? "#000"
-                    : "#fff"
-                  : activeTheme.textPrimary,
-            }}
-            className="p-1.5 rounded transition-all font-bold shadow-sm hover:opacity-80"
+            className={`p-1.5 rounded transition-colors focus:outline-none focus-visible:ring-1 focus-visible:ring-stone-400 cursor-pointer ${
+              activeTool === "bucket"
+                ? "bg-black/[0.08] dark:bg-white/[0.1] text-stone-900 dark:text-zinc-100"
+                : "text-stone-500 dark:text-zinc-400 hover:text-stone-900 dark:hover:text-zinc-100 hover:bg-black/[0.04] dark:hover:bg-white/[0.04]"
+            }`}
           >
             <PaintBucket className="w-3.5 h-3.5" />
           </button>
@@ -2142,16 +2132,11 @@ export const PixelEngine: React.FC = () => {
               playPopSound(600);
             }}
             title="Eyedropper (I)"
-            style={{
-              backgroundColor: activeTool === "picker" ? activeTheme.accent : "transparent",
-              color:
-                activeTool === "picker"
-                  ? activeTheme.isDark
-                    ? "#000"
-                    : "#fff"
-                  : activeTheme.textPrimary,
-            }}
-            className="p-1.5 rounded transition-all font-bold shadow-sm hover:opacity-80"
+            className={`p-1.5 rounded transition-colors focus:outline-none focus-visible:ring-1 focus-visible:ring-stone-400 cursor-pointer ${
+              activeTool === "picker"
+                ? "bg-black/[0.08] dark:bg-white/[0.1] text-stone-900 dark:text-zinc-100"
+                : "text-stone-500 dark:text-zinc-400 hover:text-stone-900 dark:hover:text-zinc-100 hover:bg-black/[0.04] dark:hover:bg-white/[0.04]"
+            }`}
           >
             <Pipette className="w-3.5 h-3.5" />
           </button>
@@ -2165,16 +2150,11 @@ export const PixelEngine: React.FC = () => {
               playPopSound(650);
             }}
             title="Type / Stamp Tool (T)"
-            style={{
-              backgroundColor: activeTool === "type" ? activeTheme.accent : "transparent",
-              color:
-                activeTool === "type"
-                  ? activeTheme.isDark
-                    ? "#000"
-                    : "#fff"
-                  : activeTheme.textPrimary,
-            }}
-            className="p-1.5 rounded transition-all font-bold shadow-sm hover:opacity-80"
+            className={`p-1.5 rounded transition-colors focus:outline-none focus-visible:ring-1 focus-visible:ring-stone-400 cursor-pointer ${
+              activeTool === "type"
+                ? "bg-black/[0.08] dark:bg-white/[0.1] text-stone-900 dark:text-zinc-100"
+                : "text-stone-500 dark:text-zinc-400 hover:text-stone-900 dark:hover:text-zinc-100 hover:bg-black/[0.04] dark:hover:bg-white/[0.04]"
+            }`}
           >
             <Type className="w-3.5 h-3.5" />
           </button>
@@ -2187,12 +2167,11 @@ export const PixelEngine: React.FC = () => {
               playPopSound(700);
             }}
             title="Symmetry Mirror Tool (M)"
-            style={{
-              backgroundColor: isSymmetry ? activeTheme.tagBg : "transparent",
-              borderColor: isSymmetry ? activeTheme.accent : "transparent",
-              color: isSymmetry ? activeTheme.accent : activeTheme.textPrimary,
-            }}
-            className="p-1.5 rounded border transition-all hover:opacity-80"
+            className={`p-1.5 rounded transition-colors focus:outline-none focus-visible:ring-1 focus-visible:ring-stone-400 cursor-pointer ${
+              isSymmetry
+                ? "bg-black/[0.08] dark:bg-white/[0.1] text-stone-900 dark:text-zinc-100"
+                : "text-stone-500 dark:text-zinc-400 hover:text-stone-900 dark:hover:text-zinc-100 hover:bg-black/[0.04] dark:hover:bg-white/[0.04]"
+            }`}
           >
             <FlipHorizontal className="w-3.5 h-3.5" />
           </button>
@@ -2204,32 +2183,25 @@ export const PixelEngine: React.FC = () => {
               setIsRainbowBrush(!isRainbowBrush);
               playPopSound(isRainbowBrush ? 400 : 700);
             }}
-            title={isRainbowBrush ? "Rainbow Chroma Brush: ON (Click to Disable)" : "Rainbow Chroma Brush: OFF (Click to Enable)"}
-            style={{
-              background: isRainbowBrush
-                ? "linear-gradient(135deg, rgba(255,0,128,0.25), rgba(0,255,200,0.25))"
-                : "transparent",
-              borderColor: isRainbowBrush ? "#00FFCC" : "transparent",
-              color: isRainbowBrush ? "#00FFCC" : activeTheme.textPrimary,
-            }}
-            className="p-1.5 rounded border transition-all hover:opacity-90 flex items-center gap-1 font-bold shadow-sm"
+            title={isRainbowBrush ? "Rainbow Chroma Brush: ON" : "Rainbow Chroma Brush: OFF"}
+            className={`p-1.5 rounded transition-colors focus:outline-none focus-visible:ring-1 focus-visible:ring-stone-400 cursor-pointer flex items-center gap-1 ${
+              isRainbowBrush
+                ? "bg-black/[0.08] dark:bg-white/[0.1] text-stone-900 dark:text-zinc-100"
+                : "text-stone-500 dark:text-zinc-400 hover:text-stone-900 dark:hover:text-zinc-100 hover:bg-black/[0.04] dark:hover:bg-white/[0.04]"
+            }`}
           >
-            <Sparkles className={`w-3.5 h-3.5 ${isRainbowBrush ? "text-pink-400 animate-spin" : ""}`} />
-            <span className="text-[9px] hidden xl:inline">RAINBOW</span>
+            <Sparkles className={`w-3.5 h-3.5 ${isRainbowBrush ? "text-amber-500 animate-spin" : ""}`} />
+            <span className="text-xs font-mono hidden xl:inline">Rainbow</span>
           </button>
 
-          <div
-            style={{ backgroundColor: activeTheme.headerBorder }}
-            className="h-4 w-px mx-1"
-          />
+          <div className="h-4 w-px mx-1 bg-black/10 dark:bg-white/10" />
 
           {/* Undo / Redo */}
           <button
             type="button"
             onClick={handleUndo}
             title="Undo (Cmd/Ctrl+Z)"
-            style={{ color: activeTheme.textPrimary }}
-            className="p-1.5 rounded hover:opacity-70 transition-colors"
+            className="p-1.5 rounded text-stone-500 dark:text-zinc-400 hover:text-stone-900 dark:hover:text-zinc-100 hover:bg-black/[0.04] dark:hover:bg-white/[0.04] transition-colors focus:outline-none focus-visible:ring-1 focus-visible:ring-stone-400 cursor-pointer"
           >
             <Undo2 className="w-3.5 h-3.5" />
           </button>
@@ -2237,24 +2209,19 @@ export const PixelEngine: React.FC = () => {
             type="button"
             onClick={handleRedo}
             title="Redo (Cmd/Ctrl+Y)"
-            style={{ color: activeTheme.textPrimary }}
-            className="p-1.5 rounded hover:opacity-70 transition-colors"
+            className="p-1.5 rounded text-stone-500 dark:text-zinc-400 hover:text-stone-900 dark:hover:text-zinc-100 hover:bg-black/[0.04] dark:hover:bg-white/[0.04] transition-colors focus:outline-none focus-visible:ring-1 focus-visible:ring-stone-400 cursor-pointer"
           >
             <Redo2 className="w-3.5 h-3.5" />
           </button>
 
-          <div
-            style={{ backgroundColor: activeTheme.headerBorder }}
-            className="h-4 w-px mx-1"
-          />
+          <div className="h-4 w-px mx-1 bg-black/10 dark:bg-white/10" />
 
           {/* Audio Mute/Unmute */}
           <button
             type="button"
             onClick={toggleAudioMute}
-            title={isAudioMuted ? "Unmute Audio Synth (Persisted)" : "Mute Audio Synth (Persisted)"}
-            style={{ color: isAudioMuted ? activeTheme.textMuted : activeTheme.accent }}
-            className="p-1.5 rounded hover:opacity-80 transition-colors"
+            title={isAudioMuted ? "Unmute Audio Synth" : "Mute Audio Synth"}
+            className="p-1.5 rounded text-stone-500 dark:text-zinc-400 hover:text-stone-900 dark:hover:text-zinc-100 hover:bg-black/[0.04] dark:hover:bg-white/[0.04] transition-colors focus:outline-none focus-visible:ring-1 focus-visible:ring-stone-400 cursor-pointer"
           >
             {isAudioMuted ? <VolumeX className="w-3.5 h-3.5" /> : <Volume2 className="w-3.5 h-3.5" />}
           </button>
@@ -2264,29 +2231,20 @@ export const PixelEngine: React.FC = () => {
             type="button"
             onClick={() => setShowShortcutsModal(true)}
             title="Keyboard Shortcuts (?)"
-            style={{
-              backgroundColor: showShortcutsModal ? activeTheme.cardBg : "transparent",
-              borderColor: activeTheme.cardBorder,
-              color: activeTheme.accent,
-            }}
-            className="px-1.5 py-1 rounded border text-[10px] font-bold hover:opacity-80 transition-all flex items-center gap-1"
+            className="px-2 py-0.5 rounded text-xs font-mono text-stone-500 dark:text-zinc-400 hover:text-stone-900 dark:hover:text-zinc-100 hover:bg-black/[0.04] dark:hover:bg-white/[0.04] transition-colors focus:outline-none focus-visible:ring-1 focus-visible:ring-stone-400 cursor-pointer flex items-center gap-1"
           >
             <HelpCircle className="w-3.5 h-3.5" />
-            <span className="hidden sm:inline">KEYS</span>
+            <span className="hidden sm:inline">Keys</span>
           </button>
 
-          <div
-            style={{ backgroundColor: activeTheme.headerBorder }}
-            className="h-4 w-px mx-1"
-          />
+          <div className="h-4 w-px mx-1 bg-black/10 dark:bg-white/10" />
 
           {/* Purge Canvas (Destructive with 5s Undo Toast) */}
           <button
             type="button"
             onClick={handleClear}
-            title="Purge Canvas (Del) — Undoable for 5s"
-            style={{ color: activeTheme.textPrimary }}
-            className="p-1.5 rounded hover:text-red-500 hover:bg-red-500/10 transition-colors"
+            title="Purge Canvas (Del)"
+            className="p-1.5 rounded text-stone-500 dark:text-zinc-400 hover:text-red-600 dark:hover:text-red-400 hover:bg-red-500/10 transition-colors focus:outline-none focus-visible:ring-1 focus-visible:ring-stone-400 cursor-pointer"
           >
             <Trash2 className="w-3.5 h-3.5" />
           </button>
@@ -2296,8 +2254,7 @@ export const PixelEngine: React.FC = () => {
             type="button"
             onClick={handleDownload}
             title="Download PNG (Cmd/Ctrl+S)"
-            style={{ color: activeTheme.accent }}
-            className="p-1.5 rounded hover:opacity-80 transition-colors"
+            className="p-1.5 rounded text-stone-500 dark:text-zinc-400 hover:text-stone-900 dark:hover:text-zinc-100 hover:bg-black/[0.04] dark:hover:bg-white/[0.04] transition-colors focus:outline-none focus-visible:ring-1 focus-visible:ring-stone-400 cursor-pointer"
           >
             <Download className="w-3.5 h-3.5" />
           </button>
@@ -2306,18 +2263,17 @@ export const PixelEngine: React.FC = () => {
           <button
             type="button"
             onClick={toggleRecording}
-            title={isRecording ? "Stop Video Recording & Download .webm" : "Record Video Clip (.webm)"}
-            style={{
-              backgroundColor: isRecording ? "rgba(239, 68, 68, 0.2)" : "transparent",
-              borderColor: isRecording ? "#EF4444" : "transparent",
-              color: isRecording ? "#EF4444" : activeTheme.accent,
-            }}
-            className="p-1.5 rounded border hover:opacity-80 transition-colors flex items-center gap-1 font-semibold"
+            title={isRecording ? "Stop Video Recording & Download" : "Record Video Clip"}
+            className={`p-1.5 rounded transition-colors focus:outline-none focus-visible:ring-1 focus-visible:ring-stone-400 cursor-pointer flex items-center gap-1 ${
+              isRecording
+                ? "text-red-500 bg-red-500/10"
+                : "text-stone-500 dark:text-zinc-400 hover:text-stone-900 dark:hover:text-zinc-100 hover:bg-black/[0.04] dark:hover:bg-white/[0.04]"
+            }`}
           >
             {isRecording ? (
               <>
                 <VideoOff className="w-3.5 h-3.5 animate-pulse text-red-500" />
-                <span className="text-[9px] text-red-400 font-bold hidden sm:inline">REC...</span>
+                <span className="text-[11px] font-mono text-red-500 hidden sm:inline">Rec...</span>
               </>
             ) : (
               <Video className="w-3.5 h-3.5" />
@@ -2326,7 +2282,7 @@ export const PixelEngine: React.FC = () => {
         </div>
 
         {/* Center: Perspective & 3D Extrusion toggles */}
-        <div className="flex items-center gap-1.5 text-[11px]">
+        <div className="flex items-center gap-1.5 text-xs font-mono">
           {/* Perspective: Square vs Isometric */}
           <button
             type="button"
@@ -2335,15 +2291,14 @@ export const PixelEngine: React.FC = () => {
               playPopSound(650);
             }}
             title="Toggle Perspective (Shift+P)"
-            style={{
-              backgroundColor: perspective === "isometric" ? activeTheme.tagBg : activeTheme.cardBg,
-              borderColor: perspective === "isometric" ? activeTheme.accent : activeTheme.cardBorder,
-              color: perspective === "isometric" ? activeTheme.accent : activeTheme.textMuted,
-            }}
-            className="px-2 py-0.5 rounded border transition-all flex items-center gap-1 font-semibold"
+            className={`px-2 py-0.5 rounded transition-colors focus:outline-none focus-visible:ring-1 focus-visible:ring-stone-400 cursor-pointer flex items-center gap-1 ${
+              perspective === "isometric"
+                ? "bg-black/[0.08] dark:bg-white/[0.1] text-stone-900 dark:text-zinc-100"
+                : "text-stone-500 dark:text-zinc-400 hover:text-stone-900 dark:hover:text-zinc-100 hover:bg-black/[0.04] dark:hover:bg-white/[0.04]"
+            }`}
           >
             <Grid className="w-3 h-3" />
-            <span>{perspective.toUpperCase()}</span>
+            <span>{perspective === "isometric" ? "Isometric" : "Square"}</span>
           </button>
 
           {/* 3D Voxel Extrusion */}
@@ -2354,15 +2309,14 @@ export const PixelEngine: React.FC = () => {
               playPopSound(700);
             }}
             title="Toggle 3D Voxel Extrusion (3)"
-            style={{
-              backgroundColor: is3D ? activeTheme.tagBg : activeTheme.cardBg,
-              borderColor: is3D ? activeTheme.accent : activeTheme.cardBorder,
-              color: is3D ? activeTheme.accent : activeTheme.textMuted,
-            }}
-            className="px-2 py-0.5 rounded border transition-all flex items-center gap-1 font-semibold"
+            className={`px-2 py-0.5 rounded transition-colors focus:outline-none focus-visible:ring-1 focus-visible:ring-stone-400 cursor-pointer flex items-center gap-1 ${
+              is3D
+                ? "bg-black/[0.08] dark:bg-white/[0.1] text-stone-900 dark:text-zinc-100"
+                : "text-stone-500 dark:text-zinc-400 hover:text-stone-900 dark:hover:text-zinc-100 hover:bg-black/[0.04] dark:hover:bg-white/[0.04]"
+            }`}
           >
             <Box className="w-3 h-3" />
-            <span>3D: {is3D ? "ON" : "OFF"}</span>
+            <span>3D: {is3D ? "on" : "off"}</span>
           </button>
 
           {/* Grid Toggle */}
@@ -2373,31 +2327,22 @@ export const PixelEngine: React.FC = () => {
               playPopSound(500);
             }}
             title="Toggle Grid Lines (Shift+G)"
-            style={{
-              backgroundColor: activeTheme.cardBg,
-              borderColor: activeTheme.cardBorder,
-              color: showGrid ? activeTheme.textPrimary : activeTheme.textMuted,
-            }}
-            className="px-2 py-0.5 rounded border transition-all"
+            className={`px-2 py-0.5 rounded transition-colors focus:outline-none focus-visible:ring-1 focus-visible:ring-stone-400 cursor-pointer ${
+              showGrid
+                ? "bg-black/[0.08] dark:bg-white/[0.1] text-stone-900 dark:text-zinc-100"
+                : "text-stone-500 dark:text-zinc-400 hover:text-stone-900 dark:hover:text-zinc-100 hover:bg-black/[0.04] dark:hover:bg-white/[0.04]"
+            }`}
           >
-            GRID: {showGrid ? "ON" : "OFF"}
+            Grid: {showGrid ? "on" : "off"}
           </button>
         </div>
 
         {/* Right: Grid Size Range Slider & Telemetry Toggle */}
-        <div className="flex items-center gap-2 text-[11px]" style={{ color: activeTheme.textMuted }}>
+        <div className="flex items-center gap-2 text-xs font-mono text-stone-500 dark:text-zinc-400">
           {/* Grid Size Slider */}
-          <div
-            style={{
-              backgroundColor: activeTheme.cardBg,
-              borderColor: activeTheme.cardBorder,
-              color: activeTheme.textPrimary,
-            }}
-            className="flex items-center gap-1.5 px-2 py-0.5 rounded border shadow-xs"
-          >
+          <div className="flex items-center gap-1.5 px-1 py-0.5">
             <Sliders className="w-3 h-3 opacity-70" />
-            <span className="text-[10px] hidden sm:inline opacity-70 font-bold">SIZE</span>
-            <span className="text-[9px] opacity-50">8</span>
+            <span className="hidden sm:inline opacity-70">Size</span>
             <input
               type="range"
               min="8"
@@ -2406,21 +2351,9 @@ export const PixelEngine: React.FC = () => {
               value={pixelSize}
               onChange={(e) => setPixelSize(Number(e.target.value))}
               title={`Brush / Voxel footprint: ${pixelSize}px (8px - 48px)`}
-              className="w-14 sm:w-20 h-1.5 rounded appearance-none cursor-pointer accent-amber-600 bg-stone-300 dark:bg-stone-700"
+              className="w-14 sm:w-20 h-1 rounded appearance-none cursor-pointer accent-stone-700 dark:accent-zinc-300 bg-stone-300 dark:bg-stone-700"
             />
-            <span className="text-[9px] opacity-50">48</span>
-            {/* Live footprint preview square */}
-            <div
-              title={`Live footprint: ${pixelSize}px`}
-              style={{
-                width: Math.min(14, Math.max(5, Math.round(pixelSize / 3))),
-                height: Math.min(14, Math.max(5, Math.round(pixelSize / 3))),
-                backgroundColor: currentColor,
-                borderColor: activeTheme.cardBorder,
-              }}
-              className="border rounded-xs shadow-xs hidden xs:block"
-            />
-            <span className="font-mono font-bold text-[10px] min-w-[24px] text-right" style={{ color: activeTheme.accent }}>
+            <span className="min-w-[28px] text-right text-stone-800 dark:text-zinc-200">
               {pixelSize}px
             </span>
           </div>
@@ -2430,15 +2363,10 @@ export const PixelEngine: React.FC = () => {
             type="button"
             onClick={() => setIsStatsCollapsed(!isStatsCollapsed)}
             title={isStatsCollapsed ? "Expand Engine Telemetry (D)" : "Collapse Engine Telemetry (D)"}
-            style={{
-              backgroundColor: activeTheme.cardBg,
-              borderColor: activeTheme.cardBorder,
-              color: activeTheme.accent,
-            }}
-            className="p-1 rounded border hover:opacity-80 transition-colors flex items-center gap-1 font-semibold text-[10px]"
+            className="px-2 py-0.5 rounded text-xs font-mono text-stone-500 dark:text-zinc-400 hover:text-stone-900 dark:hover:text-zinc-100 hover:bg-black/[0.04] dark:hover:bg-white/[0.04] transition-colors focus:outline-none focus-visible:ring-1 focus-visible:ring-stone-400 cursor-pointer flex items-center gap-1"
           >
             {isStatsCollapsed ? <ChevronLeft className="w-3.5 h-3.5" /> : <ChevronRight className="w-3.5 h-3.5" />}
-            <span className="hidden md:inline">{isStatsCollapsed ? "STATS" : "HIDE"}</span>
+            <span className="hidden md:inline">{isStatsCollapsed ? "Stats" : "Hide stats"}</span>
           </button>
         </div>
       </div>

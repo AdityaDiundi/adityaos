@@ -138,6 +138,7 @@ export const WindowFrame: React.FC<WindowFrameProps> = ({
           dragControls.start(e);
           focusWindow(id);
         }}
+        onDoubleClick={() => toggleMaximize(id)}
         style={{
           backgroundColor: isActive ? activeTheme.windowTitleBg : activeTheme.headerBg,
           borderColor: activeTheme.windowBorder,
@@ -156,7 +157,7 @@ export const WindowFrame: React.FC<WindowFrameProps> = ({
           </span>
         </div>
 
-        {/* Right: Window Controls: Minimize (-), Close (x) */}
+        {/* Right: Window Controls: Minimize (-), Maximize (□), Close (x) */}
         <div className="flex items-center gap-1" onPointerDown={(e) => e.stopPropagation()}>
           {/* Minimize (-) */}
           <button
@@ -166,6 +167,16 @@ export const WindowFrame: React.FC<WindowFrameProps> = ({
             className="w-5 h-5 flex items-center justify-center rounded-sm opacity-60 hover:opacity-100 hover:bg-black/5 dark:hover:bg-white/5 transition-colors text-xs cursor-pointer focus:outline-none focus-visible:ring-1 focus-visible:ring-stone-400"
           >
             <Minus className="w-3 h-3" />
+          </button>
+
+          {/* Maximize / Restore (□) */}
+          <button
+            type="button"
+            onClick={() => toggleMaximize(id)}
+            title={isMaximized ? "Restore" : "Maximize"}
+            className="w-5 h-5 flex items-center justify-center rounded-sm opacity-60 hover:opacity-100 hover:bg-black/5 dark:hover:bg-white/5 transition-colors text-xs cursor-pointer focus:outline-none focus-visible:ring-1 focus-visible:ring-stone-400"
+          >
+            <Square className="w-2.5 h-2.5" />
           </button>
 
           {/* Close (x) */}
