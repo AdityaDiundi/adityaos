@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { Folder, FileText, ChevronRight, ChevronDown, Code2, RefreshCw, FolderPlus } from "lucide-react";
 import { useThemeStore } from "@/store/themeStore";
 import { useSoundStore } from "@/store/soundStore";
 
@@ -626,10 +625,7 @@ export const ArchiveReader: React.FC = () => {
 
   const [archiveMap, setArchiveMap] = useState<Record<string, ArchiveItem>>(FALLBACK_ARCHIVE_DATA);
   const [selectedFile, setSelectedFile] = useState<string>("essays/Daughters_of_Misogyny.md");
-  const [openFolders, setOpenFolders] = useState<Record<string, boolean>>({
-    essays: true,
-    poetry: true,
-  });
+  const [readerMode, setReaderMode] = useState<"list" | "read">("list");
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
   const fetchContentFromApi = async () => {
@@ -676,6 +672,7 @@ export const ArchiveReader: React.FC = () => {
         } catch {
           setSelectedFile(fileParam);
         }
+        setReaderMode("read");
       }
     }
   }, []);
@@ -685,16 +682,13 @@ export const ArchiveReader: React.FC = () => {
       const customEvent = e as CustomEvent<{ path: string }>;
       if (customEvent.detail?.path) {
         setSelectedFile(customEvent.detail.path);
+        setReaderMode("read");
       }
     };
     window.addEventListener("open-archive-file", handleOpenFile);
     return () => window.removeEventListener("open-archive-file", handleOpenFile);
   }, []);
 
-  const toggleFolder = (folder: string) => {
-    playClickChime(420);
-    setOpenFolders((prev) => ({ ...prev, [folder]: !prev[folder] }));
-  };
 
   const [showSource, setShowSource] = useState<boolean>(false);
 
@@ -929,204 +923,138 @@ export const ArchiveReader: React.FC = () => {
         backgroundColor: activeTheme.windowBg,
         color: activeTheme.textPrimary,
       }}
-      className="flex flex-col h-full select-text text-xs overflow-hidden"
+      className="h-full overflow-y-auto select-text px-6 sm:px-12 md:px-16 py-8 sm:py-10"
     >
-      {/* Slim Top Bar */}
-      <div
-        style={{
-          backgroundColor: activeTheme.headerBg,
-          borderColor: activeTheme.headerBorder,
-          color: activeTheme.textPrimary,
-        }}
-        className="h-8 border-b flex items-center justify-between px-3 text-[11px] font-mono select-none flex-shrink-0"
-      >
-        <div className="flex items-center gap-2 truncate">
-          <span className="font-serif italic text-xs text-stone-900 dark:text-zinc-100 font-medium">
-            Writing
-          </span>
-          <span style={{ color: activeTheme.textMuted }}>·</span>
-          <span className="truncate opacity-80">{doc.title}</span>
-        </div>
+      {readerMode === "list" ? (
+        /* ========================================================================= */
+        /* LIST VIEW: Plain list of titles with date in muted mono + hover reveal    */
+        /* ========================================================================= */
+        <div className="max-w-2xl mx-auto space-y-8">
+          <header className="border-b border-black/10 dark:border-white/10 pb-4">
+            <h1 className="font-serif text-2xl sm:text-3xl font-normal tracking-tight text-stone-900 dark:text-zinc-100">
+              Writing
+            </h1>
+            <p className="font-mono text-xs text-stone-500 dark:text-zinc-400 mt-1">
+              Fieldwork notes, essays, and poetry
+            </p>
+          </header>
 
-        <div className="flex items-center gap-3">
-          <button
-            type="button"
-            onClick={() => setShowSource(!showSource)}
-            className="text-[10px] font-mono text-stone-500 hover:text-stone-900 dark:text-zinc-400 dark:hover:text-white transition-colors cursor-pointer"
-          >
-            {showSource ? "Reading View" : "Source"}
-          </button>
-        </div>
-      </div>
-
-      {/* Main 2-column flexbox */}
-      <div className="flex-1 flex overflow-hidden">
-        {/* Left Column: Humanized Explorer */}
-        <div
-          style={{
-            backgroundColor: activeTheme.cardBg,
-            borderColor: activeTheme.cardBorder,
-          }}
-          className="w-56 md:w-64 border-r flex flex-col flex-shrink-0 select-none"
-        >
-          <div
-            style={{
-              borderColor: activeTheme.headerBorder,
-              color: activeTheme.textMuted,
-            }}
-            className="px-3 py-2 text-[10px] uppercase font-mono font-bold border-b flex items-center justify-between"
-          >
-            <span>Library</span>
-            <Code2 className="w-3 h-3 opacity-60" />
-          </div>
-
-          <div className="p-2 space-y-2 overflow-y-auto flex-1 font-sans">
-            {categories.map((cat) => {
-              const catItems = Object.values(archiveMap).filter((i) => i.category === cat);
-              const isFolderOpen = openFolders[cat] ?? true;
-              const catLabel = cat === "essays" ? "Essays" : cat === "poetry" ? "Poetry" : cat;
+          <div className="space-y-1">
+            {Object.values(archiveMap).map((item) => {
+              const itemDoc = parseDocument(item);
+              // Extract first line of body
+              const firstLine =
+                itemDoc.bodyLines
+                  .map((l) => l.trim())
+                  .filter((l) => l.length > 0 && !l.startsWith("#") && !l.startsWith("---") && !l.startsWith("//"))[0]
+                  ?.replace(/[*_#>`]/g, "") || "";
 
               return (
-                <div key={cat} className="space-y-0.5">
-                  <button
-                    type="button"
-                    onClick={() => toggleFolder(cat)}
-                    className="w-full flex items-center gap-1.5 px-2 py-1 rounded hover:bg-black/5 dark:hover:bg-white/5 text-left transition-colors font-mono text-xs text-stone-600 dark:text-zinc-400"
-                  >
-                    {isFolderOpen ? (
-                      <ChevronDown className="w-3 h-3 opacity-60" />
-                    ) : (
-                      <ChevronRight className="w-3 h-3 opacity-60" />
-                    )}
-                    <Folder className="w-3.5 h-3.5 text-amber-500" />
-                    <span className="font-semibold text-xs tracking-tight">{catLabel}</span>
-                    <span className="text-[10px] opacity-60 ml-auto">({catItems.length})</span>
-                  </button>
-
-                  {isFolderOpen && (
-                    <div
-                      style={{ borderColor: activeTheme.headerBorder }}
-                      className="ml-3 mt-0.5 space-y-0.5 border-l pl-2"
-                    >
-                      {catItems.map((item) => {
-                        const isSelected = selectedFile === item.path;
-                        const humanTitle =
-                          item.title ||
-                          item.filename.replace(/\.(md|txt)$/, "").replace(/_/g, " ");
-
-                        return (
-                          <button
-                            key={item.id}
-                            type="button"
-                            onClick={() => {
-                              playClickChime(500);
-                              setSelectedFile(item.path);
-                            }}
-                            className={`w-full flex flex-col items-start px-2 py-1.5 rounded text-left transition-all truncate border-l-2 ${
-                              isSelected
-                                ? "bg-stone-200/60 dark:bg-zinc-800/60 border-emerald-500 text-stone-900 dark:text-zinc-100 font-medium"
-                                : "border-transparent hover:bg-black/5 dark:hover:bg-white/5 text-stone-600 dark:text-zinc-400"
-                            }`}
-                          >
-                            <span className="truncate w-full font-serif text-[13px] leading-snug">
-                              {humanTitle}
-                            </span>
-                          </button>
-                        );
-                      })}
-                    </div>
+                <div
+                  key={item.path}
+                  onClick={() => {
+                    playClickChime(480);
+                    setSelectedFile(item.path);
+                    setReaderMode("read");
+                  }}
+                  className="group p-3 -mx-3 rounded-md hover:bg-black/[0.04] dark:hover:bg-white/[0.04] transition-all cursor-pointer select-none focus:outline-none focus-visible:ring-1 focus-visible:ring-stone-400"
+                  tabIndex={0}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter" || e.key === " ") {
+                      e.preventDefault();
+                      playClickChime(480);
+                      setSelectedFile(item.path);
+                      setReaderMode("read");
+                    }
+                  }}
+                >
+                  <div className="flex items-baseline justify-between gap-4">
+                    <h2 className="font-serif text-base sm:text-[17px] text-stone-900 dark:text-zinc-100 group-hover:underline underline-offset-4 tracking-tight leading-snug">
+                      {itemDoc.title}
+                    </h2>
+                    <span className="font-mono text-xs text-stone-400 dark:text-zinc-500 shrink-0">
+                      {itemDoc.date}
+                    </span>
+                  </div>
+                  {firstLine && (
+                    <p className="font-serif text-xs sm:text-[13px] text-stone-500 dark:text-zinc-400 mt-1 line-clamp-2 leading-relaxed opacity-0 max-h-0 group-hover:opacity-100 group-hover:max-h-16 transition-all duration-200">
+                      {firstLine}
+                    </p>
                   )}
                 </div>
               );
             })}
           </div>
-
-          <div
-            style={{
-              borderColor: activeTheme.headerBorder,
-              color: activeTheme.textMuted,
-            }}
-            className="p-3 border-t text-[10px] font-mono"
-          >
-            <p className="opacity-75 leading-tight">
-              Curated essays &amp; poetry by Aditya Diundi.
-            </p>
+        </div>
+      ) : (
+        /* ========================================================================= */
+        /* READING VIEW: Single narrow serif column with generous margins             */
+        /* ========================================================================= */
+        <article className="max-w-[620px] mx-auto flex flex-col">
+          {/* Top Back Action */}
+          <div className="mb-6">
+            <button
+              type="button"
+              onClick={() => {
+                playClickChime(450);
+                setReaderMode("list");
+              }}
+              className="font-mono text-xs text-stone-500 dark:text-zinc-400 hover:text-stone-950 dark:hover:text-zinc-100 hover:underline cursor-pointer focus:outline-none focus-visible:ring-1 focus-visible:ring-stone-400"
+            >
+              ← All writing
+            </button>
           </div>
-        </div>
 
-        {/* Right Column: Editorial Reading Column Centered */}
-        <div
-          style={{
-            backgroundColor: activeTheme.windowBg,
-          }}
-          className="flex-1 overflow-y-auto px-6 sm:px-10 py-10 sm:py-12 flex justify-center"
-        >
-          <article className="w-full max-w-[640px]">
-            {showSource ? (
-              /* Raw source view fallback */
-              <div className="font-mono text-xs leading-relaxed opacity-85 select-text whitespace-pre-wrap">
-                {currentItem.lines.join("\n")}
-              </div>
-            ) : (
-              /* Editorial Typography Reader */
-              <div>
-                {/* Title in Display Serif 28-36px */}
-                <h1 className="font-serif text-[28px] sm:text-[34px] font-normal leading-[1.2] text-[#1A1814] dark:text-[#F4F4F5] tracking-tight mb-3">
-                  {doc.title}
-                </h1>
+          {/* Document Header */}
+          <header className="border-b border-black/10 dark:border-white/10 pb-6 mb-8">
+            <h1 className="font-serif text-[28px] sm:text-[34px] font-normal leading-[1.2] text-stone-900 dark:text-zinc-100 tracking-tight mb-2">
+              {doc.title}
+            </h1>
+            <div className="font-mono text-xs text-stone-400 dark:text-zinc-500 flex flex-wrap items-center gap-x-3 gap-y-1">
+              <span>{doc.date}</span>
+              <span>·</span>
+              <span>{doc.readingTime} min read</span>
+              <span>·</span>
+              <span>{doc.author}</span>
+              {doc.sourceLink && (
+                <>
+                  <span>·</span>
+                  <a
+                    href={doc.sourceLink}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-stone-600 dark:text-zinc-400 hover:underline"
+                  >
+                    Original publication
+                  </a>
+                </>
+              )}
+            </div>
+          </header>
 
-                {/* Quiet Single Meta Line in 12px mono */}
-                <div className="font-mono text-xs text-stone-500 dark:text-zinc-400 mb-8 pb-4 border-b border-stone-200/80 dark:border-zinc-800 flex flex-wrap items-center gap-2">
-                  <span>{doc.date}</span>
-                  <span className="opacity-40">·</span>
-                  <span>{doc.readingTime} min read</span>
-                  <span className="opacity-40">·</span>
-                  <span>{doc.author}</span>
-                  {doc.sourceLink && (
-                    <>
-                      <span className="opacity-40">·</span>
-                      <a
-                        href={doc.sourceLink}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-emerald-600 dark:text-emerald-400 hover:underline"
-                      >
-                        Original ↗
-                      </a>
-                    </>
-                  )}
-                </div>
+          {/* Document Body */}
+          <div className="font-serif text-[17px] sm:text-[18px] leading-[1.8] text-stone-800 dark:text-zinc-200">
+            {currentItem.category === "poetry"
+              ? renderPoetryBody(doc.bodyLines)
+              : renderEssayBody(doc.bodyLines)}
+          </div>
 
-                {/* Content body: Poetry or Essay formatting */}
-                {currentItem.category === "poetry"
-                  ? renderPoetryBody(doc.bodyLines)
-                  : renderEssayBody(doc.bodyLines)}
-              </div>
-            )}
-          </article>
-        </div>
-      </div>
-
-      {/* Single Slim Status Bar */}
-      <div
-        style={{
-          backgroundColor: activeTheme.headerBg,
-          borderColor: activeTheme.headerBorder,
-          color: activeTheme.textPrimary,
-        }}
-        className="h-6 border-t flex items-center justify-between px-3 text-[10px] font-mono select-none flex-shrink-0"
-      >
-        <div className="flex items-center gap-2 truncate">
-          <span className="font-medium truncate">
-            Writing · {doc.title}
-          </span>
-        </div>
-        <div style={{ color: activeTheme.textMuted }} className="flex items-center gap-3">
-          <span>{doc.readingTime} min read</span>
-          <span>·</span>
-          <span>{doc.wordCount} words</span>
-        </div>
-      </div>
+          {/* Bottom Back Action */}
+          <footer className="mt-12 pt-6 border-t border-black/10 dark:border-white/10 flex items-center justify-between font-mono text-xs text-stone-400 dark:text-zinc-500">
+            <button
+              type="button"
+              onClick={() => {
+                playClickChime(450);
+                setReaderMode("list");
+              }}
+              className="text-stone-700 dark:text-zinc-300 hover:underline cursor-pointer"
+            >
+              ← Back to writing
+            </button>
+            <span>Aditya Diundi · Archive</span>
+          </footer>
+        </article>
+      )}
     </div>
   );
 };

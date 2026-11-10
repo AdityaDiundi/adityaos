@@ -2451,100 +2451,45 @@ export const PixelEngine: React.FC = () => {
         }}
         className="h-8 border-b px-2 sm:px-3 flex items-center justify-between text-[11px] gap-2 overflow-x-auto flex-shrink-0 backdrop-blur-sm"
       >
-        {/* Left: Mode Selection Tabs with Line Icons & Safe Mode Switching */}
+        {/* Left: Mode Selection Tabs with Clean Soft Wash */}
         <div className="flex items-center gap-1 flex-shrink-0">
-          <span className="text-[10px] font-bold opacity-60 mr-1 hidden sm:inline">MODE:</span>
-          <button
-            type="button"
-            onClick={() => switchMode("draw")}
-            style={{
-              backgroundColor: engineMode === "draw" ? activeTheme.accent : "transparent",
-              color: engineMode === "draw" ? (activeTheme.isDark ? "#000" : "#fff") : activeTheme.textPrimary,
-              borderColor: engineMode === "draw" ? activeTheme.accent : "transparent",
-            }}
-            className="px-2 py-0.5 rounded border text-[10px] font-bold transition-all flex items-center gap-1"
-          >
-            <Palette className="w-3 h-3" />
-            <span>DRAW</span>
-          </button>
-          <button
-            type="button"
-            onClick={() => switchMode("arcade")}
-            style={{
-              backgroundColor: engineMode === "arcade" ? activeTheme.accent : "transparent",
-              color: engineMode === "arcade" ? (activeTheme.isDark ? "#000" : "#fff") : activeTheme.textPrimary,
-              borderColor: engineMode === "arcade" ? activeTheme.accent : "transparent",
-            }}
-            className="px-2 py-0.5 rounded border text-[10px] font-bold transition-all flex items-center gap-1"
-          >
-            <Gamepad2 className="w-3 h-3" />
-            <span>ARCADE</span>
-          </button>
-          <button
-            type="button"
-            onClick={() => switchMode("life")}
-            style={{
-              backgroundColor: engineMode === "life" ? activeTheme.accent : "transparent",
-              color: engineMode === "life" ? (activeTheme.isDark ? "#000" : "#fff") : activeTheme.textPrimary,
-              borderColor: engineMode === "life" ? activeTheme.accent : "transparent",
-            }}
-            className="px-2 py-0.5 rounded border text-[10px] font-bold transition-all flex items-center gap-1"
-          >
-            <Sparkles className="w-3 h-3" />
-            <span>GAME OF LIFE</span>
-          </button>
-          <button
-            type="button"
-            onClick={() => switchMode("snake")}
-            style={{
-              backgroundColor: engineMode === "snake" ? activeTheme.accent : "transparent",
-              color: engineMode === "snake" ? (activeTheme.isDark ? "#000" : "#fff") : activeTheme.textPrimary,
-              borderColor: engineMode === "snake" ? activeTheme.accent : "transparent",
-            }}
-            className="px-2 py-0.5 rounded border text-[10px] font-bold transition-all flex items-center gap-1"
-          >
-            <Activity className="w-3 h-3" />
-            <span>SNAKE</span>
-          </button>
-          <button
-            type="button"
-            onClick={() => switchMode("sand")}
-            style={{
-              backgroundColor: engineMode === "sand" ? activeTheme.accent : "transparent",
-              color: engineMode === "sand" ? (activeTheme.isDark ? "#000" : "#fff") : activeTheme.textPrimary,
-              borderColor: engineMode === "sand" ? activeTheme.accent : "transparent",
-            }}
-            className="px-2 py-0.5 rounded border text-[10px] font-bold transition-all flex items-center gap-1"
-          >
-            <Layers className="w-3 h-3" />
-            <span>SAND SIM</span>
-          </button>
+          {[
+            { id: "draw", label: "Draw" },
+            { id: "arcade", label: "Arcade" },
+            { id: "life", label: "Game of Life" },
+            { id: "snake", label: "Snake" },
+            { id: "sand", label: "Sand Sim" },
+          ].map((m) => {
+            const isSelected = engineMode === m.id;
+            return (
+              <button
+                key={m.id}
+                type="button"
+                onClick={() => switchMode(m.id as "draw" | "arcade" | "life" | "snake" | "sand")}
+                className={`px-2 py-0.5 rounded text-xs font-mono transition-colors focus:outline-none focus-visible:ring-1 focus-visible:ring-stone-400 cursor-pointer ${
+                  isSelected
+                    ? "bg-black/[0.08] dark:bg-white/[0.1] text-stone-900 dark:text-zinc-100 font-medium"
+                    : "text-stone-500 dark:text-zinc-400 hover:text-stone-900 dark:hover:text-zinc-100 hover:bg-black/[0.03] dark:hover:bg-white/[0.04]"
+                }`}
+              >
+                <span>{m.label}</span>
+              </button>
+            );
+          })}
         </div>
 
         {/* Right: Mode-Specific Interactive Controls */}
-        <div className="flex items-center gap-1.5 flex-shrink-0 text-[10px]">
+        <div className="flex items-center gap-2 flex-shrink-0 text-xs font-mono">
           {engineMode === "draw" && (
-            <div className="flex items-center gap-1.5">
+            <div className="flex items-center gap-2.5">
               {/* Automated Showcase Tour Button */}
               <button
                 type="button"
                 onClick={isShowcasePlaying ? stopShowcase : runShowcaseTour}
                 title="Automated Interactive Showcase Tour"
-                style={{
-                  backgroundColor: isShowcasePlaying
-                    ? (activeTheme.isDark ? "rgba(0,255,204,0.2)" : "#ccfbf1")
-                    : activeTheme.cardBg,
-                  borderColor: isShowcasePlaying
-                    ? (activeTheme.isDark ? "#00FFCC" : "#0f766e")
-                    : activeTheme.cardBorder,
-                  color: isShowcasePlaying
-                    ? (activeTheme.isDark ? "#00FFCC" : "#0f766e")
-                    : activeTheme.textPrimary,
-                }}
-                className="px-2 py-0.5 rounded border font-semibold flex items-center gap-1 hover:opacity-85 transition-all cursor-pointer shadow-sm"
+                className="text-stone-600 dark:text-zinc-400 hover:text-stone-950 dark:hover:text-zinc-100 hover:underline cursor-pointer focus:outline-none focus-visible:ring-1 focus-visible:ring-stone-400"
               >
-                <Sparkles className={`w-3 h-3 ${isShowcasePlaying ? (activeTheme.isDark ? "text-cyan-300" : "text-teal-700") + " animate-spin" : "text-amber-500"}`} />
-                <span>{isShowcasePlaying ? "STOP TOUR" : "SHOWCASE TOUR"}</span>
+                <span>{isShowcasePlaying ? "Stop tour" : "Showcase tour"}</span>
               </button>
 
               {/* Bot Playback Button */}
@@ -2552,15 +2497,9 @@ export const PixelEngine: React.FC = () => {
                 type="button"
                 onClick={runBotPlacement}
                 title="Automated Bot Placement Playback"
-                style={{
-                  backgroundColor: isBotDrawing ? activeTheme.accent : activeTheme.cardBg,
-                  borderColor: isBotDrawing ? activeTheme.accent : activeTheme.cardBorder,
-                  color: isBotDrawing ? (activeTheme.isDark ? "#000" : "#fff") : activeTheme.textPrimary,
-                }}
-                className="px-2 py-0.5 rounded border font-semibold flex items-center gap-1 hover:opacity-85 transition-all cursor-pointer"
+                className="text-stone-600 dark:text-zinc-400 hover:text-stone-950 dark:hover:text-zinc-100 hover:underline cursor-pointer focus:outline-none focus-visible:ring-1 focus-visible:ring-stone-400"
               >
-                <Bot className={`w-3 h-3 ${isBotDrawing ? "animate-spin" : ""}`} />
-                <span>{isBotDrawing ? "BOT..." : "AUTO-BOT"}</span>
+                <span>{isBotDrawing ? "Bot drawing..." : "Auto-bot"}</span>
               </button>
 
               {/* Hidden File Input */}
@@ -2577,15 +2516,9 @@ export const PixelEngine: React.FC = () => {
                 type="button"
                 onClick={() => fileInputRef.current?.click()}
                 title="Import & Auto-Gridify Image to 40x24 Matrix"
-                style={{
-                  backgroundColor: activeTheme.cardBg,
-                  borderColor: activeTheme.cardBorder,
-                  color: activeTheme.textPrimary,
-                }}
-                className="px-2 py-0.5 rounded border font-semibold flex items-center gap-1 hover:opacity-85 transition-all cursor-pointer"
+                className="text-stone-600 dark:text-zinc-400 hover:text-stone-950 dark:hover:text-zinc-100 hover:underline cursor-pointer focus:outline-none focus-visible:ring-1 focus-visible:ring-stone-400"
               >
-                <Upload className="w-3 h-3" />
-                <span>IMPORT</span>
+                <span>Import</span>
               </button>
 
               {/* Export JSON Matrix Button */}
@@ -2593,15 +2526,9 @@ export const PixelEngine: React.FC = () => {
                 type="button"
                 onClick={handleExportMatrixJSON}
                 title="Export Coordinates Matrix as JSON"
-                style={{
-                  backgroundColor: isExportCopied ? "#10B981" : activeTheme.cardBg,
-                  borderColor: isExportCopied ? "#10B981" : activeTheme.cardBorder,
-                  color: isExportCopied ? "#fff" : activeTheme.textPrimary,
-                }}
-                className="px-2 py-0.5 rounded border font-semibold flex items-center gap-1 hover:opacity-85 transition-all cursor-pointer"
+                className="text-stone-600 dark:text-zinc-400 hover:text-stone-950 dark:hover:text-zinc-100 hover:underline cursor-pointer focus:outline-none focus-visible:ring-1 focus-visible:ring-stone-400"
               >
-                {isExportCopied ? <Check className="w-3 h-3" /> : <FileCode className="w-3 h-3" />}
-                <span>{isExportCopied ? "COPIED JSON!" : "MATRIX JSON"}</span>
+                <span>{isExportCopied ? "Copied JSON" : "Matrix JSON"}</span>
               </button>
             </div>
           )}

@@ -834,8 +834,8 @@ export function AdityaOSDesktop({
         {/* Module 2: PixelEngine Window */}
         <WindowFrame
           id="pixelEngine"
-          title="PixelStudio // Canvas & Sand Simulation"
-          icon={<Paintbrush className="w-3.5 h-3.5" style={{ color: activeTheme.accent }} />}
+          title="PixelStudio"
+          icon={<Paintbrush className="w-3.5 h-3.5 text-stone-400 dark:text-zinc-500" />}
           defaultPosition={{ x: 140, y: 60 }}
           defaultSize={{ width: 760, height: 520 }}
           dragConstraintsRef={desktopContainerRef}
@@ -846,9 +846,9 @@ export function AdityaOSDesktop({
         {/* Module 3: ArchiveReader Window */}
         <WindowFrame
           id="archiveReader"
-          title="Writing // Fieldwork, Essays & Poetry"
-          icon={<BookOpen className="w-3.5 h-3.5 text-emerald-400" />}
-          defaultPosition={{ x: 340, y: 80 }}
+          title="Writing"
+          icon={<BookOpen className="w-3.5 h-3.5 text-stone-400 dark:text-zinc-500" />}
+          defaultPosition={{ x: 200, y: 60 }}
           defaultSize={{ width: 700, height: 480 }}
           dragConstraintsRef={desktopContainerRef}
         >
@@ -882,8 +882,8 @@ export function AdityaOSDesktop({
         {/* Module 6: GalleryViewer Window */}
         <WindowFrame
           id="galleryViewer"
-          title="Photo Gallery // Visual & Fieldwork"
-          icon={<ImageIcon className="w-3.5 h-3.5 text-pink-400" />}
+          title="Gallery"
+          icon={<ImageIcon className="w-3.5 h-3.5 text-stone-400 dark:text-zinc-500" />}
           defaultPosition={{ x: 180, y: 90 }}
           defaultSize={{ width: 740, height: 500 }}
           dragConstraintsRef={desktopContainerRef}
@@ -930,8 +930,8 @@ export function AdityaOSDesktop({
         {/* Module 10: CaseStudies Window */}
         <WindowFrame
           id="caseStudies"
-          title="Work // Case Studies & Shipped Systems"
-          icon={<Briefcase className="w-3.5 h-3.5 text-emerald-400" />}
+          title="Work"
+          icon={<Briefcase className="w-3.5 h-3.5 text-stone-400 dark:text-zinc-500" />}
           defaultPosition={{ x: 120, y: 50 }}
           defaultSize={{ width: 800, height: 530 }}
           dragConstraintsRef={desktopContainerRef}

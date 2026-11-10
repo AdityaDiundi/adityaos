@@ -361,23 +361,17 @@ export const TerminalDesktop: React.FC = () => {
     {
       label: "resume",
       action: "resume",
-      desc: "Open Resume",
-      accent: activeTheme.isDark ? "#eab308" : "#b45309",
-      icon: <FileText className="w-3 h-3 mr-1" />,
+      desc: "Open resume",
     },
     {
-      label: "theme next",
+      label: "theme",
       action: "theme next",
-      desc: "Cycle Theme",
-      accent: activeTheme.isDark ? "#c084fc" : "#7c3aed",
-      icon: <Palette className="w-3 h-3 mr-1" />,
+      desc: "Cycle theme",
     },
     {
-      label: "poetry",
+      label: "writing",
       action: "poetry",
-      desc: "Open Poetry Archive",
-      accent: activeTheme.isDark ? "#34d399" : "#059669",
-      icon: null,
+      desc: "Open writing",
     },
   ];
 
@@ -391,16 +385,16 @@ export const TerminalDesktop: React.FC = () => {
             backgroundColor: activeTheme.terminalBg,
             borderColor: activeTheme.terminalBorder,
           }}
-          className="h-64 border-t border-l border-r mx-2 md:mx-4 rounded-t-lg p-3 overflow-y-auto shadow-2xl backdrop-blur-md select-text"
+          className="h-64 border-t border-l border-r mx-2 md:mx-4 rounded-t-sm p-4 overflow-y-auto shadow-xl select-text"
         >
           {history.map((item, idx) => (
             <div key={idx} className="mb-2 text-xs">
               <div className="flex items-center gap-2">
-                <span style={{ color: activeTheme.accent }} className="font-bold">
+                <span style={{ color: activeTheme.accent }}>
                   aditya@{activeTheme.shellName}
                 </span>
                 <span style={{ color: activeTheme.textMuted }}>:</span>
-                <span style={{ color: activeTheme.accent }} className="font-bold">~</span>
+                <span style={{ color: activeTheme.accent }}>~</span>
                 <span style={{ color: activeTheme.textMuted }}>$</span>
                 <span style={{ color: activeTheme.textPrimary }}>{item.command}</span>
               </div>
@@ -416,7 +410,7 @@ export const TerminalDesktop: React.FC = () => {
           backgroundColor: activeTheme.headerBg,
           borderColor: activeTheme.headerBorder,
         }}
-        className="h-10 border-t px-3 md:px-4 flex items-center justify-between shadow-lg backdrop-blur-md"
+        className="h-9 border-t px-4 flex items-center justify-between"
       >
         {/* Left: Shell prompt & interactive input */}
         <div className="flex items-center gap-2 flex-1 max-w-xl">
@@ -424,15 +418,9 @@ export const TerminalDesktop: React.FC = () => {
             type="button"
             onClick={() => setIsExpanded(!isExpanded)}
             title={isExpanded ? "Collapse shell" : "Expand shell"}
-            style={{
-              backgroundColor: activeTheme.cardBg,
-              borderColor: activeTheme.cardBorder,
-              color: activeTheme.textPrimary,
-            }}
-            className="flex items-center gap-1.5 px-2 py-1 rounded text-[11px] border transition-colors flex-shrink-0"
+            className="flex items-center gap-1 font-mono text-xs text-stone-700 dark:text-zinc-300 hover:text-stone-950 dark:hover:text-zinc-100 hover:underline transition-colors flex-shrink-0 cursor-pointer focus:outline-none focus-visible:ring-1 focus-visible:ring-stone-400"
           >
-            <Terminal className="w-3.5 h-3.5" style={{ color: activeTheme.accent }} />
-            <span className="hidden sm:inline font-semibold">SHELL</span>
+            <span>shell</span>
             {isExpanded ? (
               <ChevronDown className="w-3 h-3 opacity-60" />
             ) : (
@@ -442,12 +430,12 @@ export const TerminalDesktop: React.FC = () => {
 
           {/* Prompt */}
           <div className="flex items-center gap-1.5 text-xs flex-1 truncate" style={{ color: activeTheme.textMuted }}>
-            <span style={{ color: activeTheme.accent }} className="font-bold hidden sm:inline">
+            <span style={{ color: activeTheme.accent }} className="hidden sm:inline">
               aditya@{activeTheme.shellName}
             </span>
             <span className="hidden sm:inline" style={{ color: activeTheme.textMuted }}>:</span>
-            <span style={{ color: activeTheme.accent }} className="font-bold hidden sm:inline">~</span>
-            <span style={{ color: activeTheme.textMuted }} className="font-bold">$</span>
+            <span style={{ color: activeTheme.accent }} className="hidden sm:inline">~</span>
+            <span style={{ color: activeTheme.textMuted }}>$</span>
             <input
               ref={inputRef}
               type="text"
@@ -461,8 +449,8 @@ export const TerminalDesktop: React.FC = () => {
           </div>
         </div>
 
-        {/* Right: Quick Chips (pixel, theme, cat poetry, stream, intro) */}
-        <div className="flex items-center gap-1.5 sm:gap-2 flex-shrink-0 ml-2 overflow-x-auto">
+        {/* Right: Quick Chips (plain text controls with hover underline) */}
+        <div className="flex items-center gap-3 sm:gap-4 flex-shrink-0 ml-2 overflow-x-auto font-mono text-xs">
           {chips.map((chip, idx) => (
             <button
               key={idx}
@@ -471,19 +459,9 @@ export const TerminalDesktop: React.FC = () => {
                 executeCommand(chip.action);
               }}
               title={chip.desc}
-              style={{
-                backgroundColor: activeTheme.isDark ? "rgba(255, 255, 255, 0.04)" : "rgba(0, 0, 0, 0.03)",
-                borderColor: activeTheme.cardBorder,
-                color: activeTheme.textPrimary,
-              }}
-              className="px-2 py-0.5 rounded text-[11px] border font-mono tracking-tight transition-all hover:scale-[1.02] active:scale-95 shadow-sm flex items-center group cursor-pointer"
+              className="text-stone-500 dark:text-zinc-400 hover:text-stone-950 dark:hover:text-zinc-100 hover:underline cursor-pointer focus:outline-none focus-visible:ring-1 focus-visible:ring-stone-400"
             >
-              {chip.icon && (
-                <span style={{ color: chip.accent }} className="transition-transform group-hover:scale-110">
-                  {chip.icon}
-                </span>
-              )}
-              <span className="group-hover:opacity-100 opacity-90">{chip.label}</span>
+              {chip.label}
             </button>
           ))}
         </div>

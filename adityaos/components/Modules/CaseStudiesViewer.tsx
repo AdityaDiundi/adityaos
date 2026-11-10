@@ -4,7 +4,6 @@ import React, { useState, useEffect, useCallback, useRef } from "react";
 import { DESKTOP_CASE_STUDIES, DesktopCaseStudy } from "@/config/caseStudies";
 import { useThemeStore } from "@/store/themeStore";
 import { useSoundStore } from "@/store/soundStore";
-import { ExternalLink, ArrowRight, ArrowLeft } from "lucide-react";
 import Link from "next/link";
 
 export function CaseStudiesViewer() {
@@ -105,20 +104,6 @@ export function CaseStudiesViewer() {
       }}
       aria-label={`Work: ${activeStudy.title}. Use Left and Right arrow keys to navigate.`}
     >
-      {/* Subtle Row of 5 Position Dots at Top Edge (Quiet, non-essential) */}
-      <div className="absolute top-3.5 right-5 z-20 flex items-center gap-1.5 pointer-events-none opacity-60">
-        {DESKTOP_CASE_STUDIES.map((_, idx) => (
-          <span
-            key={idx}
-            className={`w-1.5 h-1.5 rounded-full transition-all duration-200 ${
-              idx === currentIndex
-                ? "bg-stone-800 dark:bg-zinc-200 scale-125"
-                : "bg-black/15 dark:bg-white/20"
-            }`}
-          />
-        ))}
-      </div>
-
       {/* Main Single-Case-Study Scrollable Canvas */}
       <div
         ref={scrollContainerRef}
@@ -190,7 +175,7 @@ export function CaseStudiesViewer() {
           {activeStudy.theProblem && (
             <section className="py-7 sm:py-8 border-b border-black/10 dark:border-white/10 space-y-4">
               <h2 className="text-[11px] font-mono uppercase tracking-wider text-stone-400 dark:text-zinc-500 mb-2">
-                Problem & Root Friction
+                Problem &amp; Root Friction
               </h2>
               <div className="font-mono text-xs sm:text-[13px] leading-relaxed text-stone-600 dark:text-zinc-400 space-y-3">
                 <p>
@@ -213,17 +198,14 @@ export function CaseStudiesViewer() {
               <p className="font-serif text-base sm:text-[17px] leading-relaxed text-stone-800 dark:text-zinc-200">
                 {activeStudy.theSolution.headline}
               </p>
-              <div className="grid grid-cols-1 gap-3.5 mt-4">
+              <div className="space-y-4 mt-4">
                 {activeStudy.theSolution.pillars.map((pillar, idx) => (
-                  <div
-                    key={idx}
-                    className="p-3.5 rounded-lg border border-black/5 dark:border-white/5 bg-black/[0.02] dark:bg-white/[0.02]"
-                  >
-                    <div className="flex items-center justify-between text-[11px] font-mono font-medium mb-1">
+                  <div key={idx} className="space-y-1">
+                    <div className="flex items-baseline justify-between text-xs font-mono font-medium">
                       <span className="text-stone-900 dark:text-zinc-100">{pillar.title}</span>
-                      <span className="text-emerald-600 dark:text-emerald-400 text-[10px]">{pillar.tag}</span>
+                      <span className="text-emerald-600 dark:text-emerald-400 text-[11px]">{pillar.tag}</span>
                     </div>
-                    <p className="font-mono text-xs text-stone-500 dark:text-zinc-400 leading-relaxed">
+                    <p className="font-serif text-sm leading-relaxed text-stone-600 dark:text-zinc-400">
                       {pillar.description}
                     </p>
                   </div>
@@ -233,28 +215,22 @@ export function CaseStudiesViewer() {
           )}
 
           {/* Tags & Artifact Links */}
-          <footer className="py-6 flex flex-wrap items-center justify-between gap-3 text-xs font-mono">
-            <div className="flex flex-wrap gap-2">
+          <footer className="py-6 flex flex-wrap items-center justify-between gap-4 text-xs font-mono">
+            <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-stone-500 dark:text-zinc-400">
               {activeStudy.tags.map((tag) => (
-                <span
-                  key={tag}
-                  className="px-2 py-0.5 rounded text-[10px] border border-black/10 dark:border-white/10 text-stone-500 dark:text-zinc-400"
-                >
-                  {tag}
-                </span>
+                <span key={tag}>#{tag}</span>
               ))}
             </div>
 
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-4">
               {activeStudy.liveUrl && (
                 <a
                   href={activeStudy.liveUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center gap-1 text-emerald-600 dark:text-emerald-400 hover:underline"
+                  className="text-emerald-600 dark:text-emerald-400 hover:underline"
                 >
-                  <span>Live App</span>
-                  <ExternalLink className="w-3 h-3" />
+                  Live app
                 </a>
               )}
               {activeStudy.figmaUrl && (
@@ -262,18 +238,16 @@ export function CaseStudiesViewer() {
                   href={activeStudy.figmaUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center gap-1 text-stone-600 dark:text-zinc-400 hover:underline"
+                  className="text-stone-600 dark:text-zinc-400 hover:underline"
                 >
-                  <span>Figma File</span>
-                  <ExternalLink className="w-3 h-3" />
+                  Figma file
                 </a>
               )}
               <Link
                 href={`/work/${activeStudy.slug}`}
-                className="inline-flex items-center gap-1 text-stone-800 dark:text-zinc-200 hover:underline font-medium"
+                className="text-stone-800 dark:text-zinc-200 hover:underline font-medium"
               >
-                <span>Full Readout</span>
-                <ArrowRight className="w-3 h-3" />
+                Full readout
               </Link>
             </div>
           </footer>
@@ -287,20 +261,18 @@ export function CaseStudiesViewer() {
               type="button"
               onClick={handlePrev}
               title={`Previous: ${prevStudy.title}`}
-              className="group flex items-center gap-1.5 text-stone-400 dark:text-zinc-500 hover:text-stone-800 dark:hover:text-zinc-200 transition-colors cursor-pointer"
+              className="text-stone-400 dark:text-zinc-500 hover:text-stone-800 dark:hover:text-zinc-200 hover:underline transition-colors cursor-pointer focus:outline-none focus-visible:ring-1 focus-visible:ring-stone-400"
             >
-              <ArrowLeft className="w-3.5 h-3.5 transition-transform group-hover:-translate-x-0.5" />
-              <span>{prevStudy.title}</span>
+              previous: {prevStudy.title}
             </button>
 
             <button
               type="button"
               onClick={handleNext}
               title={`Next: ${nextStudy.title}`}
-              className="group flex items-center gap-1.5 text-stone-700 dark:text-zinc-300 hover:text-stone-950 dark:hover:text-zinc-50 font-medium transition-colors cursor-pointer"
+              className="text-stone-700 dark:text-zinc-300 hover:text-stone-950 dark:hover:text-zinc-50 hover:underline font-medium transition-colors cursor-pointer focus:outline-none focus-visible:ring-1 focus-visible:ring-stone-400"
             >
-              <span>next: {nextStudy.title}</span>
-              <ArrowRight className="w-3.5 h-3.5 transition-transform group-hover:translate-x-0.5" />
+              next: {nextStudy.title}
             </button>
           </nav>
         </article>
