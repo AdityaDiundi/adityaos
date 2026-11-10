@@ -333,61 +333,60 @@ const CASE_STUDIES: Record<string, CaseStudyDetail> = {
     team: "Aditya Diundi (Sole Design & Engineering)",
     tags: ["Creative Sandbox", "Canvas Graphics", "Web Audio", "Retro Systems"],
     summary:
-      "An in-browser retro operating system and pixel sandbox built with zero external runtime libraries, featuring Conway's Game of Life, falling sand physics, and WebAudio synth.",
+      "An in-browser retro operating system and pixel sandbox built with zero external runtime libraries, featuring five interactive engines (Draw, Arcade, Game of Life, Snake, and Sand Simulation), 3D voxel extrusion, Matrix JSON export, and WebAudio DSP synth, backed by anonymous community telemetry.",
     verifiedMetric: {
       value: "60 FPS",
-      label: "client-side rendering with zero canvas dependencies",
+      label: "client-side rasterization & Web Audio with zero runtime dependencies",
     },
-    liveUrl: "/os",
+    liveUrl: "/pixel",
     theProblem: [
-      "Most personal websites are static marketing brochures filled with buzzwords that talk about design capabilities without demonstrating deep technical craft or interactive systems design.",
-      "Modern web software is bloated: simple drawing apps often import megabytes of heavy npm dependencies, resulting in sluggish performance and high memory overhead.",
+      "Most creative web applications rely on bloated runtime frameworks that download megabytes of dependencies just to rasterize simple pixels, degrading mobile FPS and introducing bundle bloat.",
+      "Creative sandboxes often fragment drawing from dynamic play, offering isolated tools rather than an integrated retro operating system with floating windows, persistent state, and multi-mode physics.",
     ],
     myRoleAndConstraints: {
       roleScope: [
-        "Architected the modular window management system with floating, minimizing, dragging, and stacking order.",
-        "Implemented custom canvas rasterization algorithms including Bresenham line interpolation, flood-fill, and cellular automata.",
-        "Engineered real-time falling sand particle physics (sand, water, wood, acid) and WebAudio synth oscillators.",
+        "Architected the multi-window desktop shell with draggable floating windows, z-index stacking, minimizing, and keyboard palette.",
+        "Engineered 5 distinct deterministic canvas modes: Draw, Arcade collectibles, Conway's Game of Life, Snake, and Falling Sand cellular automata.",
+        "Implemented real-time 3D voxel projection and extrusion, matrix JSON serialization, and interactive Web Audio pentatonic synth.",
+        "Connected lightweight, anonymous community telemetry via Firebase Realtime Database without blocking client-side interactions.",
       ],
       constraints: [
-        "Zero External Runtime Libraries: Canvas rendering and audio synthesis had to run purely on standard HTML5 Canvas and Web Audio APIs.",
-        "Responsive Performance: 60 FPS guaranteed across both mobile touchscreens and desktop keyboards.",
+        "Zero External Runtime Libraries: Canvas rendering, particle simulation, and audio synthesis run purely on native HTML5 Canvas and Web Audio APIs.",
+        "Deterministic Multi-Mode State: Switching between Draw, Snake, Life, Arcade, and Sand simulation must preserve user artwork without layer destruction.",
+        "Privacy & Transparency: Telemetry counts aggregate pixel edits anonymously with zero user profiling or tracking cookies.",
       ],
     },
     processDecisions: [
       {
-        title: "1. Direct Canvas State Management",
+        title: "1. Multi-Engine Canvas & State Preservation",
         description:
-          "Implemented pixel matrices directly on 2D canvas context, executing Conway's Game of Life rules and cellular sand physics in real time.",
-        imageSrc: "/pixel_studio_og.png",
-        imageAlt: "AdityaOS Interactive Web Desktop and Pixel Studio",
+          "Designed a dual-buffer canvas rasterization architecture. The primary draw layer maintains user artwork in an isolated memory buffer while Arcade, Snake, Conway's Game of Life, and Falling Sand run in dedicated simulation buffers. Switching modes never destroys artwork, allowing users to move seamlessly between freehand sketching and physics simulations.",
+        imageSrc: "/case-studies/adityaos_pixel_engine_studio.png",
+        imageAlt: "Pixel Studio Multi-Mode Canvas Interface",
         tradeoffCaption:
-          "Tradeoff: Writing custom canvas logic required deep mathematical handling, but yielded a lightweight bundle with zero third-party vulnerability risk.",
+          "Tradeoff: Maintaining isolated simulation buffers requires explicit memory management on low-end mobile devices, but guarantees zero artwork loss when exploring games.",
       },
       {
-        title: "2. WebAudio Synthesizer Engine",
+        title: "2. Desktop Window Manager & Realtime Telemetry",
         description:
-          "Created an on-the-fly audio oscillator triggering retro pentatonic square waves with every brush stroke and particle collision without downloading sound files.",
-        imageSrc: "/pixel_studio_og.png",
-        imageAlt: "Pixel Studio Synthesizer and Telemetry Engine",
+          "Built a retro window manager featuring floating draggable viewports, keyboard command palette, and audio feedback. Integrated asynchronous anonymous community telemetry via Firebase RTDB to track global pixels painted and live sessions without user accounts or server-side compute overhead.",
+        imageSrc: "/case-studies/adityaos_pixel_engine_desktop.png",
+        imageAlt: "AdityaOS Desktop Window Manager and System Telemetry",
         tradeoffCaption:
-          "Tradeoff: Synthesis requires audio context user activation, but reduces page payload to 0 bytes for audio assets.",
+          "Tradeoff: Pure client-side computation keeps latency near 0ms, while asynchronous background sync enables shared community presence without requiring login barriers.",
       },
     ],
     outcomeAndImpact: {
       metrics: [
-        { value: "60 FPS", label: "client-side rendering" },
-        { value: "0", label: "external canvas or audio runtime dependencies" },
-        { value: "100%", label: "client-side execution without server compute" },
+        { value: "60 FPS", label: "deterministic client-side canvas rendering" },
+        { value: "5", label: "integrated simulation & arcade game modes" },
+        { value: "0", label: "external canvas or audio runtime libraries" },
       ],
       impactNarrative:
-        "AdityaOS demonstrates that thoughtful system design and direct web primitives can deliver rich, delightful interactive experiences without bloat.",
+        "AdityaOS and Pixel Studio prove that native web standards (Canvas 2D, Web Audio API, and CSS Grid) can deliver rich, delightful retro systems with zero runtime dependencies and anonymous community telemetry.",
     },
     whatIWouldDoDifferently:
-      "I would implement WebGL shader support to calculate larger cellular automata matrices on mobile GPUs.",
-    todoNotes: [
-      "Add touch-gesture pinch-to-zoom support for mobile canvas manipulation.",
-    ],
+      "I would implement WebGL shader acceleration for 10x larger sand cellular automata matrices on mobile GPUs while preserving native Canvas 2D fallback.",
   },
   ketto: {
     slug: "ketto",
@@ -755,19 +754,7 @@ export default function CaseStudyPage({ params }: { params: { slug: string } }) 
           </p>
         </section>
 
-        {/* Structured TODO block if information is pending decision */}
-        {study.todoNotes && study.todoNotes.length > 0 && (
-          <aside className="border border-amber-300/60 dark:border-amber-500/40 bg-amber-50 dark:bg-amber-950/20 rounded-lg p-4 text-xs text-amber-900 dark:text-amber-200 space-y-2">
-            <div className="font-semibold font-mono uppercase tracking-wider text-[11px]">
-              Content Audit Flags for this Case Study:
-            </div>
-            <ul className="list-disc list-inside space-y-1">
-              {study.todoNotes.map((note, idx) => (
-                <li key={idx}>{note}</li>
-              ))}
-            </ul>
-          </aside>
-        )}
+        {/* Private Internal TODO: study.todoNotes kept in data models, hidden from public display */}
 
         {/* Navigation Footer */}
         <div className="border-t border-stone-200 dark:border-stone-800 pt-8 flex items-center justify-between text-sm">

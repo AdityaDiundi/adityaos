@@ -38,6 +38,8 @@ import {
   Video,
   VideoOff,
   Zap,
+  HelpCircle,
+  X,
 } from "lucide-react";
 import { useThemeStore } from "@/store/themeStore";
 import { useSoundStore } from "@/store/soundStore";
@@ -103,29 +105,51 @@ export const PixelEngine: React.FC = () => {
   // Tool & Canvas State
   const [activeTool, setActiveTool] = useState<"pencil" | "eraser" | "bucket" | "picker" | "type">("pencil");
   const [currentColor, setCurrentColor] = useState<string>(activeTheme.drawColor || "#00FFCC");
+  const [customHexInput, setCustomHexInput] = useState<string>(activeTheme.drawColor || "#00FFCC");
   const [pixelSize, setPixelSize] = useState<number>(8);
   const [perspective, setPerspective] = useState<"square" | "isometric">("square");
   const [is3D, setIs3D] = useState<boolean>(false);
   const [showGrid, setShowGrid] = useState<boolean>(true);
   const [isSymmetry, setIsSymmetry] = useState<boolean>(false);
-  const [isAudioMuted, setIsAudioMuted] = useState<boolean>(!isSoundEnabled);
+  const [isAudioMuted, setIsAudioMuted] = useState<boolean>(() => {
+    if (typeof window !== "undefined") {
+      const saved = localStorage.getItem("pixel_audio_muted");
+      if (saved !== null) return saved === "true";
+    }
+    return !isSoundEnabled;
+  });
+
+  const toggleAudioMute = useCallback(() => {
+    setIsAudioMuted((prev) => {
+      const next = !prev;
+      if (typeof window !== "undefined") {
+        localStorage.setItem("pixel_audio_muted", String(next));
+      }
+      return next;
+    });
+  }, []);
+
+  const [prefersReducedMotion, setPrefersReducedMotion] = useState<boolean>(false);
+  const [showShortcutsModal, setShowShortcutsModal] = useState<boolean>(false);
   const [typeString, setTypeString] = useState<string>("ADITYA");
   const [isTypeModalOpen, setIsTypeModalOpen] = useState<boolean>(false);
   const [isImportModalOpen, setIsImportModalOpen] = useState<boolean>(false);
   const [importImageSrc, setImportImageSrc] = useState<string | null>(null);
   const [hoverCoord, setHoverCoord] = useState<{ col: number; row: number } | null>(null);
+  const [canvasPixelCount, setCanvasPixelCount] = useState<number>(639);
+  const [undoToast, setUndoToast] = useState<{ active: boolean; seconds: number; count?: number } | null>(null);
+  const purgedPixelsRef = useRef<Map<string, string> | null>(null);
+  const hasCenteredRef = useRef<boolean>(false);
   const [stats, setStats] = useState<{ drawn: number; undos: number; score: number }>({
     drawn: 639,
     undos: 0,
     score: 3195,
   });
 
-  // Global Community Stats synced via Firebase
-  const [globalStats, setGlobalStats] = useState<GlobalCommunityStats>({
-    totalPixelsDrawn: 0,
-    totalCanvasEdits: 0,
-    totalNotesPlayed: 0,
-  });
+  // Dual-buffer state to protect user's artwork across all game & simulation modes
+  const drawingBufferRef = useRef<Map<string, string>>(new Map(createInitialPixelArt()));
+  const drawingHistoryRef = useRef<Map<string, string>[]>([new Map(createInitialPixelArt())]);
+  const drawingHistoryIndexRef = useRef<number>(0);
 
   // Docked Stats Sidebar Collapsed state (collapsed by default to maximize drawing canvas)
   const [isStatsCollapsed, setIsStatsCollapsed] = useState<boolean>(true);
@@ -135,6 +159,13 @@ export const PixelEngine: React.FC = () => {
     setCurrentColor(activeTheme.drawColor);
   }, [activeTheme.drawColor]);
 
+  // Global Community Stats synced via Firebase
+  const [globalStats, setGlobalStats] = useState<GlobalCommunityStats>({
+    totalPixelsDrawn: 0,
+    totalCanvasEdits: 0,
+    totalNotesPlayed: 0,
+  });
+
   // Subscribe to live Firebase community stats
   useEffect(() => {
     const unsubscribe = subscribeToFirebaseStats((newStats) => {
@@ -142,6 +173,30 @@ export const PixelEngine: React.FC = () => {
     });
     return () => unsubscribe();
   }, []);
+
+  // Respect prefers-reduced-motion media query
+  useEffect(() => {
+    if (typeof window !== "undefined" && window.matchMedia) {
+      const media = window.matchMedia("(prefers-reduced-motion: reduce)");
+      setPrefersReducedMotion(media.matches);
+      const handler = (e: MediaQueryListEvent) => setPrefersReducedMotion(e.matches);
+      media.addEventListener("change", handler);
+      return () => media.removeEventListener("change", handler);
+    }
+  }, []);
+
+  // 5-Second Undo Toast Timer for Purge Canvas
+  useEffect(() => {
+    if (!undoToast || !undoToast.active) return;
+    if (undoToast.seconds <= 0) {
+      setUndoToast(null);
+      return;
+    }
+    const timer = setTimeout(() => {
+      setUndoToast((prev) => (prev && prev.seconds > 1 ? { ...prev, seconds: prev.seconds - 1 } : null));
+    }, 1000);
+    return () => clearTimeout(timer);
+  }, [undoToast]);
 
   // Canvas Refs
   const containerRef = useRef<HTMLDivElement>(null);
@@ -580,6 +635,24 @@ export const PixelEngine: React.FC = () => {
         }
       });
 
+      if (!hasCenteredRef.current) {
+        const cols = Math.floor(width / pixelSize);
+        const rows = Math.floor(height / pixelSize);
+        if (cols > 0 && rows > 0) {
+          hasCenteredRef.current = true;
+          const offsetCol = Math.max(0, Math.floor((cols - 92) / 2));
+          const offsetRow = Math.max(0, Math.floor((rows - 58) / 2));
+          if (offsetCol > 0 || offsetRow > 0) {
+            const centered = createInitialPixelArt(offsetRow, offsetCol);
+            pixelsRef.current = centered;
+            drawingBufferRef.current = new Map(centered);
+            historyRef.current = [new Map(centered)];
+            historyIndexRef.current = 0;
+            setCanvasPixelCount(centered.size);
+          }
+        }
+      }
+
       drawGrid();
       redrawAll();
     };
@@ -615,45 +688,52 @@ export const PixelEngine: React.FC = () => {
     const clone = new Map(pixelsRef.current);
     const newHistory = historyRef.current.slice(0, historyIndexRef.current + 1);
     newHistory.push(clone);
-    if (newHistory.length > 30) newHistory.shift();
+    if (newHistory.length > 50) newHistory.shift();
     historyRef.current = newHistory;
     historyIndexRef.current = newHistory.length - 1;
+    setCanvasPixelCount(pixelsRef.current.size);
+    if (engineMode === "draw") {
+      drawingBufferRef.current = new Map(pixelsRef.current);
+    }
     setStats((prev) => ({
       ...prev,
-      drawn: pixelsRef.current.size,
+      drawn: prev.drawn + 1,
       score: prev.score + 5,
     }));
     recordCanvasEdit(1);
-  }, []);
+  }, [engineMode]);
 
-  const handleUndo = () => {
+  const handleUndo = useCallback(() => {
     if (historyIndexRef.current > 0) {
       historyIndexRef.current--;
       pixelsRef.current = new Map(historyRef.current[historyIndexRef.current]);
+      setCanvasPixelCount(pixelsRef.current.size);
+      if (engineMode === "draw") {
+        drawingBufferRef.current = new Map(pixelsRef.current);
+      }
       redrawAll();
       setStats((prev) => ({
         ...prev,
-        drawn: pixelsRef.current.size,
         undos: prev.undos + 1,
       }));
       playPopSound(420);
       recordCanvasEdit(1);
     }
-  };
+  }, [redrawAll, playPopSound, engineMode]);
 
-  const handleRedo = () => {
+  const handleRedo = useCallback(() => {
     if (historyIndexRef.current < historyRef.current.length - 1) {
       historyIndexRef.current++;
       pixelsRef.current = new Map(historyRef.current[historyIndexRef.current]);
+      setCanvasPixelCount(pixelsRef.current.size);
+      if (engineMode === "draw") {
+        drawingBufferRef.current = new Map(pixelsRef.current);
+      }
       redrawAll();
-      setStats((prev) => ({
-        ...prev,
-        drawn: pixelsRef.current.size,
-      }));
       playPopSound(580);
       recordCanvasEdit(1);
     }
-  };
+  }, [redrawAll, playPopSound, engineMode]);
 
   // Stamp Text with PIXEL_FONT
   const stampText = useCallback(
@@ -991,6 +1071,52 @@ export const PixelEngine: React.FC = () => {
     playPopSound(800);
   }, [pixelSize, playPopSound, renderSnakeToCanvas]);
 
+  // Safe mode switching: preserves user artwork across all game & sim modes
+  const switchMode = useCallback(
+    (newMode: "draw" | "arcade" | "life" | "snake" | "sand") => {
+      if (newMode === engineMode) return;
+
+      // 1. Snapshot artwork & history buffer whenever leaving DRAW mode
+      if (engineMode === "draw") {
+        drawingBufferRef.current = new Map(pixelsRef.current);
+        drawingHistoryRef.current = historyRef.current.map((m) => new Map(m));
+        drawingHistoryIndexRef.current = historyIndexRef.current;
+      }
+
+      // 2. Stop running loops from outgoing modes
+      if (engineMode === "snake") setIsSnakeRunning(false);
+      if (engineMode === "life") setIsLifeRunning(false);
+      if (engineMode === "sand") setIsSandSimRunning(false);
+
+      setEngineMode(newMode);
+
+      // 3. Setup incoming mode
+      if (newMode === "draw") {
+        // Completely restore user's drawing buffer and history
+        pixelsRef.current = new Map(drawingBufferRef.current);
+        historyRef.current = drawingHistoryRef.current.map((m) => new Map(m));
+        historyIndexRef.current = drawingHistoryIndexRef.current;
+        setCanvasPixelCount(pixelsRef.current.size);
+        redrawAll();
+      } else if (newMode === "arcade") {
+        pixelsRef.current = new Map(drawingBufferRef.current);
+        setCanvasPixelCount(pixelsRef.current.size);
+        redrawAll();
+      } else if (newMode === "life") {
+        setIsLifeRunning(true);
+        setCanvasPixelCount(pixelsRef.current.size);
+      } else if (newMode === "snake") {
+        initSnakeGame();
+      } else if (newMode === "sand") {
+        setIsSandSimRunning(true);
+        setCanvasPixelCount(pixelsRef.current.size);
+      }
+
+      playPopSound(550);
+    },
+    [engineMode, redrawAll, initSnakeGame, playPopSound]
+  );
+
   // Keyboard navigation for Snake
   useEffect(() => {
     if (engineMode !== "snake") return;
@@ -1012,6 +1138,148 @@ export const PixelEngine: React.FC = () => {
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [engineMode]);
+
+  // Download Canvas as PNG
+  const handleDownload = useCallback(() => {
+    const canvas = artworkCanvasRef.current;
+    if (!canvas) return;
+
+    const exportCanvas = document.createElement("canvas");
+    exportCanvas.width = canvas.width;
+    exportCanvas.height = canvas.height;
+    const eCtx = exportCanvas.getContext("2d");
+    if (!eCtx) return;
+
+    eCtx.fillStyle = activeTheme.canvasBg;
+    eCtx.fillRect(0, 0, exportCanvas.width, exportCanvas.height);
+    eCtx.drawImage(canvas, 0, 0);
+
+    const link = document.createElement("a");
+    link.download = `pixel-artwork-${Date.now()}.png`;
+    link.href = exportCanvas.toDataURL("image/png");
+    link.click();
+    playPopSound(800);
+  }, [activeTheme.canvasBg, playPopSound]);
+
+  // Clear Canvas with 5-Second Undo Protection
+  const handleClear = useCallback(() => {
+    if (pixelsRef.current.size === 0) return;
+    purgedPixelsRef.current = new Map(pixelsRef.current);
+    recordPixelPopped(pixelsRef.current.size);
+    const count = pixelsRef.current.size;
+    pixelsRef.current.clear();
+    drawingBufferRef.current.clear();
+    setCanvasPixelCount(0);
+    redrawAll();
+    saveStep();
+    playPopSound(300);
+    setUndoToast({ active: true, seconds: 5, count });
+  }, [redrawAll, saveStep, playPopSound]);
+
+  const handleRestorePurged = useCallback(() => {
+    if (purgedPixelsRef.current) {
+      pixelsRef.current = new Map(purgedPixelsRef.current);
+      drawingBufferRef.current = new Map(purgedPixelsRef.current);
+      setCanvasPixelCount(pixelsRef.current.size);
+      redrawAll();
+      saveStep();
+      playPopSound(700);
+    }
+    setUndoToast(null);
+  }, [redrawAll, saveStep, playPopSound]);
+
+  // Global Keyboard Shortcuts for Pixel Engine
+  useEffect(() => {
+    const handleGlobalKey = (e: KeyboardEvent) => {
+      // Ignore keystrokes when typing in inputs or textareas
+      if (
+        e.target instanceof HTMLInputElement ||
+        e.target instanceof HTMLTextAreaElement
+      ) {
+        return;
+      }
+
+      const key = e.key.toLowerCase();
+      const isCmdOrCtrl = e.metaKey || e.ctrlKey;
+
+      if (key === "?" || (key === "/" && !isCmdOrCtrl)) {
+        e.preventDefault();
+        setShowShortcutsModal((prev) => !prev);
+        return;
+      }
+      if (key === "escape") {
+        setShowShortcutsModal(false);
+        setIsImportModalOpen(false);
+        setIsTypeModalOpen(false);
+        return;
+      }
+
+      if (isCmdOrCtrl) {
+        if (key === "z") {
+          e.preventDefault();
+          if (e.shiftKey) handleRedo();
+          else handleUndo();
+          return;
+        }
+        if (key === "y") {
+          e.preventDefault();
+          handleRedo();
+          return;
+        }
+        if (key === "s") {
+          e.preventDefault();
+          handleDownload();
+          return;
+        }
+      }
+
+      if (key === "b" || key === "p") {
+        setActiveTool("pencil");
+        playPopSound(500);
+      } else if (key === "e") {
+        setActiveTool("eraser");
+        playPopSound(450);
+      } else if (key === "g") {
+        setActiveTool("bucket");
+        playPopSound(550);
+      } else if (key === "i") {
+        setActiveTool("picker");
+        playPopSound(600);
+      } else if (key === "t") {
+        setActiveTool("type");
+        playPopSound(650);
+      } else if (key === "m") {
+        setIsSymmetry((prev) => !prev);
+        playPopSound(700);
+      } else if (key === "d") {
+        setIsStatsCollapsed((prev) => !prev);
+      } else if (e.shiftKey && key === "g") {
+        setShowGrid((prev) => !prev);
+        playPopSound(500);
+      } else if (e.shiftKey && key === "p") {
+        setPerspective((prev) => (prev === "square" ? "isometric" : "square"));
+        playPopSound(650);
+      } else if (key === "3" && !isCmdOrCtrl) {
+        setIs3D((prev) => !prev);
+        playPopSound(700);
+      } else if (key === "delete" || key === "backspace") {
+        handleClear();
+      } else if (key === "1") {
+        switchMode("draw");
+      } else if (key === "2") {
+        switchMode("arcade");
+      } else if (key === "3" && isCmdOrCtrl) {
+        switchMode("life");
+      } else if (key === "4") {
+        switchMode("snake");
+      } else if (key === "5") {
+        switchMode("sand");
+      }
+    };
+
+    window.addEventListener("keydown", handleGlobalKey);
+    return () => window.removeEventListener("keydown", handleGlobalKey);
+  }, [handleUndo, handleRedo, handleDownload, handleClear, switchMode, playPopSound]);
 
   // Snake Tick Loop
   useEffect(() => {
@@ -1396,37 +1664,6 @@ export const PixelEngine: React.FC = () => {
     }
   };
 
-  // Download Canvas as PNG
-  const handleDownload = () => {
-    const canvas = artworkCanvasRef.current;
-    if (!canvas) return;
-
-    const exportCanvas = document.createElement("canvas");
-    exportCanvas.width = canvas.width;
-    exportCanvas.height = canvas.height;
-    const eCtx = exportCanvas.getContext("2d");
-    if (!eCtx) return;
-
-    eCtx.fillStyle = activeTheme.canvasBg;
-    eCtx.fillRect(0, 0, exportCanvas.width, exportCanvas.height);
-    eCtx.drawImage(canvas, 0, 0);
-
-    const link = document.createElement("a");
-    link.download = `pixel-artwork-${Date.now()}.png`;
-    link.href = exportCanvas.toDataURL("image/png");
-    link.click();
-    playPopSound(800);
-  };
-
-  // Clear Canvas
-  const handleClear = () => {
-    recordPixelPopped(pixelsRef.current.size);
-    pixelsRef.current.clear();
-    redrawAll();
-    saveStep();
-    playPopSound(300);
-  };
-
   // Automated Bot Placement Engine (r/place bot simulation)
   const [isBotDrawing, setIsBotDrawing] = useState<boolean>(false);
   const botTimerRef = useRef<NodeJS.Timeout | null>(null);
@@ -1738,10 +1975,12 @@ export const PixelEngine: React.FC = () => {
       newPixels.forEach((hex, key) => {
         pixelsRef.current.set(key, hex);
       });
+      drawingBufferRef.current = new Map(newPixels);
+      setCanvasPixelCount(newPixels.size);
       setStats((prev) => ({
         ...prev,
-        drawn: newPixels.size,
-        score: newPixels.size * 5,
+        drawn: prev.drawn + newPixels.size,
+        score: prev.score + newPixels.size * 5,
       }));
       redrawAll();
       saveStep();
@@ -1750,31 +1989,64 @@ export const PixelEngine: React.FC = () => {
     [redrawAll, saveStep, playPopSound]
   );
 
-  // Swatch Palette (Combines active theme + cyberpunk palette)
+  // Curated, high-contrast palette without near-duplicate dark swatches
   const palette = useMemo(() => {
     return [
-      activeTheme.accent,
-      activeTheme.accentSecondary,
-      "#00FFCC",
-      "#61AFEF",
-      "#98C379",
-      "#E5C07B",
-      "#E06C75",
-      "#C678DD",
-      "#FFFFFF",
-      "#5C6370",
-      "#181B21",
-      "#D19A66",
+      "#FFFFFF", // Pure White
+      "#FAF7F2", // Paper Cream
+      "#090D16", // Deep Ink Black
+      "#EF4444", // Crimson Red
+      "#F59E0B", // Amber Gold
+      "#10B981", // Emerald Green
+      "#00FFCC", // Cyber Cyan
+      "#38BDF8", // Sky Blue
+      "#8B5CF6", // Violet Purple
+      "#EC4899", // Neon Magenta
+      "#92400E", // Warm Terracotta / Wood
     ];
-  }, [activeTheme]);
+  }, []);
 
-  // Telemetry rank title computation (from homesec.tsx)
-  const userRankTitle = useMemo(() => {
+  // Meaningful Rank & XP progression system
+  const userLevelInfo = useMemo(() => {
     const px = stats.drawn;
-    if (px > 200) return "Pixel Architect";
-    if (px > 80) return "Grid Explorer";
-    if (px > 20) return "Active Builder";
-    return "Canvas Visitor";
+    if (px >= 500) {
+      return {
+        level: 4,
+        title: "Pixel Architect",
+        nextUnlock: "Master Rank (All tools unlocked)",
+        progress: 100,
+        current: px,
+        max: 500,
+      };
+    }
+    if (px >= 200) {
+      return {
+        level: 3,
+        title: "Grid Explorer",
+        nextUnlock: "Matrix JSON Export at 500 px",
+        progress: Math.min(100, Math.floor(((px - 200) / 300) * 100)),
+        current: px,
+        max: 500,
+      };
+    }
+    if (px >= 50) {
+      return {
+        level: 2,
+        title: "Active Builder",
+        nextUnlock: "Sand Physics Lab at 200 px",
+        progress: Math.min(100, Math.floor(((px - 50) / 150) * 100)),
+        current: px,
+        max: 200,
+      };
+    }
+    return {
+      level: 1,
+      title: "Canvas Visitor",
+      nextUnlock: "Chroma Rainbow Brush at 50 px",
+      progress: Math.min(100, Math.floor((px / 50) * 100)),
+      current: px,
+      max: 50,
+    };
   }, [stats.drawn]);
 
   return (
@@ -1788,7 +2060,7 @@ export const PixelEngine: React.FC = () => {
         backgroundColor: activeTheme.windowBg,
         color: activeTheme.textPrimary,
       }}
-      className="pixel-engine flex flex-col h-full select-none font-mono text-xs overflow-hidden"
+      className="pixel-engine flex flex-col h-full select-none font-mono text-xs overflow-hidden relative"
     >
       {/* Pixel Engine Header Controls Toolbar */}
       <div
@@ -1804,8 +2076,11 @@ export const PixelEngine: React.FC = () => {
           {/* Pencil */}
           <button
             type="button"
-            onClick={() => setActiveTool("pencil")}
-            title="Pencil Tool"
+            onClick={() => {
+              setActiveTool("pencil");
+              playPopSound(500);
+            }}
+            title="Pencil Tool (B / P)"
             style={{
               backgroundColor: activeTool === "pencil" ? activeTheme.accent : "transparent",
               color:
@@ -1823,8 +2098,11 @@ export const PixelEngine: React.FC = () => {
           {/* Eraser */}
           <button
             type="button"
-            onClick={() => setActiveTool("eraser")}
-            title="Eraser Tool"
+            onClick={() => {
+              setActiveTool("eraser");
+              playPopSound(450);
+            }}
+            title="Eraser Tool (E)"
             style={{
               backgroundColor: activeTool === "eraser" ? "#E06C75" : "transparent",
               color: activeTool === "eraser" ? "#fff" : activeTheme.textPrimary,
@@ -1837,8 +2115,11 @@ export const PixelEngine: React.FC = () => {
           {/* Bucket */}
           <button
             type="button"
-            onClick={() => setActiveTool("bucket")}
-            title="Paint Bucket"
+            onClick={() => {
+              setActiveTool("bucket");
+              playPopSound(550);
+            }}
+            title="Paint Bucket (G)"
             style={{
               backgroundColor: activeTool === "bucket" ? activeTheme.accentSecondary : "transparent",
               color:
@@ -1856,8 +2137,11 @@ export const PixelEngine: React.FC = () => {
           {/* Eyedropper */}
           <button
             type="button"
-            onClick={() => setActiveTool("picker")}
-            title="Eyedropper"
+            onClick={() => {
+              setActiveTool("picker");
+              playPopSound(600);
+            }}
+            title="Eyedropper (I)"
             style={{
               backgroundColor: activeTool === "picker" ? activeTheme.accent : "transparent",
               color:
@@ -1878,8 +2162,9 @@ export const PixelEngine: React.FC = () => {
             onClick={() => {
               setActiveTool("type");
               setIsTypeModalOpen(!isTypeModalOpen);
+              playPopSound(650);
             }}
-            title="Type Tool (Stamp Text with PIXEL_FONT)"
+            title="Type / Stamp Tool (T)"
             style={{
               backgroundColor: activeTool === "type" ? activeTheme.accent : "transparent",
               color:
@@ -1897,8 +2182,11 @@ export const PixelEngine: React.FC = () => {
           {/* Symmetry Mirror */}
           <button
             type="button"
-            onClick={() => setIsSymmetry(!isSymmetry)}
-            title="Symmetry Mirror Tool"
+            onClick={() => {
+              setIsSymmetry(!isSymmetry);
+              playPopSound(700);
+            }}
+            title="Symmetry Mirror Tool (M)"
             style={{
               backgroundColor: isSymmetry ? activeTheme.tagBg : "transparent",
               borderColor: isSymmetry ? activeTheme.accent : "transparent",
@@ -1939,7 +2227,7 @@ export const PixelEngine: React.FC = () => {
           <button
             type="button"
             onClick={handleUndo}
-            title="Undo (Ctrl+Z)"
+            title="Undo (Cmd/Ctrl+Z)"
             style={{ color: activeTheme.textPrimary }}
             className="p-1.5 rounded hover:opacity-70 transition-colors"
           >
@@ -1948,7 +2236,7 @@ export const PixelEngine: React.FC = () => {
           <button
             type="button"
             onClick={handleRedo}
-            title="Redo"
+            title="Redo (Cmd/Ctrl+Y)"
             style={{ color: activeTheme.textPrimary }}
             className="p-1.5 rounded hover:opacity-70 transition-colors"
           >
@@ -1960,66 +2248,54 @@ export const PixelEngine: React.FC = () => {
             className="h-4 w-px mx-1"
           />
 
-          {/* Gravity Physics */}
-          <button
-            type="button"
-            onClick={triggerGravityPhysics}
-            title="Trigger Gravity Physics (Drop Pixels)"
-            style={{ color: activeTheme.accent }}
-            className="p-1.5 rounded hover:opacity-80 transition-colors font-bold flex items-center gap-1"
-          >
-            <Flame className="w-3.5 h-3.5 text-amber-400" />
-          </button>
-
-          {/* Arcade Mini-Game Mode Toggle */}
-          <button
-            type="button"
-            onClick={() => {
-              setIsArcadeMode(!isArcadeMode);
-              playPopSound(720);
-            }}
-            title={isArcadeMode ? "Arcade Collectibles Game: ON (Click to Disable)" : "Arcade Collectibles Game: OFF (Click to Enable)"}
-            style={{
-              backgroundColor: isArcadeMode ? `${activeTheme.accent}25` : "transparent",
-              borderColor: isArcadeMode ? activeTheme.accent : "transparent",
-              color: isArcadeMode ? activeTheme.accent : activeTheme.textMuted,
-            }}
-            className="px-2 py-1 rounded border text-[10px] font-bold hover:opacity-90 transition-all flex items-center gap-1.5"
-          >
-            <Gamepad2 className="w-3.5 h-3.5" />
-            <span className="hidden sm:inline">GAME</span>
-            {isArcadeMode && (
-              <span className="bg-amber-400 text-black px-1 rounded text-[9px] font-mono font-bold">
-                {arcadeScore}
-              </span>
-            )}
-          </button>
-
           {/* Audio Mute/Unmute */}
           <button
             type="button"
-            onClick={() => setIsAudioMuted(!isAudioMuted)}
-            title={isAudioMuted ? "Unmute Audio Synth" : "Mute Audio Synth"}
+            onClick={toggleAudioMute}
+            title={isAudioMuted ? "Unmute Audio Synth (Persisted)" : "Mute Audio Synth (Persisted)"}
             style={{ color: isAudioMuted ? activeTheme.textMuted : activeTheme.accent }}
             className="p-1.5 rounded hover:opacity-80 transition-colors"
           >
             {isAudioMuted ? <VolumeX className="w-3.5 h-3.5" /> : <Volume2 className="w-3.5 h-3.5" />}
           </button>
 
-          {/* Clear & Download */}
+          {/* Keyboard Shortcuts Help Button */}
+          <button
+            type="button"
+            onClick={() => setShowShortcutsModal(true)}
+            title="Keyboard Shortcuts (?)"
+            style={{
+              backgroundColor: showShortcutsModal ? activeTheme.cardBg : "transparent",
+              borderColor: activeTheme.cardBorder,
+              color: activeTheme.accent,
+            }}
+            className="px-1.5 py-1 rounded border text-[10px] font-bold hover:opacity-80 transition-all flex items-center gap-1"
+          >
+            <HelpCircle className="w-3.5 h-3.5" />
+            <span className="hidden sm:inline">KEYS</span>
+          </button>
+
+          <div
+            style={{ backgroundColor: activeTheme.headerBorder }}
+            className="h-4 w-px mx-1"
+          />
+
+          {/* Purge Canvas (Destructive with 5s Undo Toast) */}
           <button
             type="button"
             onClick={handleClear}
-            title="Clear Canvas"
+            title="Purge Canvas (Del) — Undoable for 5s"
             style={{ color: activeTheme.textPrimary }}
-            className="p-1.5 rounded hover:text-red-400 hover:opacity-80 transition-colors"
+            className="p-1.5 rounded hover:text-red-500 hover:bg-red-500/10 transition-colors"
           >
             <Trash2 className="w-3.5 h-3.5" />
           </button>
+
+          {/* Download PNG */}
           <button
             type="button"
             onClick={handleDownload}
-            title="Download PNG"
+            title="Download PNG (Cmd/Ctrl+S)"
             style={{ color: activeTheme.accent }}
             className="p-1.5 rounded hover:opacity-80 transition-colors"
           >
@@ -2054,7 +2330,11 @@ export const PixelEngine: React.FC = () => {
           {/* Perspective: Square vs Isometric */}
           <button
             type="button"
-            onClick={() => setPerspective(perspective === "square" ? "isometric" : "square")}
+            onClick={() => {
+              setPerspective((prev) => (prev === "square" ? "isometric" : "square"));
+              playPopSound(650);
+            }}
+            title="Toggle Perspective (Shift+P)"
             style={{
               backgroundColor: perspective === "isometric" ? activeTheme.tagBg : activeTheme.cardBg,
               borderColor: perspective === "isometric" ? activeTheme.accent : activeTheme.cardBorder,
@@ -2069,7 +2349,11 @@ export const PixelEngine: React.FC = () => {
           {/* 3D Voxel Extrusion */}
           <button
             type="button"
-            onClick={() => setIs3D(!is3D)}
+            onClick={() => {
+              setIs3D(!is3D);
+              playPopSound(700);
+            }}
+            title="Toggle 3D Voxel Extrusion (3)"
             style={{
               backgroundColor: is3D ? activeTheme.tagBg : activeTheme.cardBg,
               borderColor: is3D ? activeTheme.accent : activeTheme.cardBorder,
@@ -2084,7 +2368,11 @@ export const PixelEngine: React.FC = () => {
           {/* Grid Toggle */}
           <button
             type="button"
-            onClick={() => setShowGrid(!showGrid)}
+            onClick={() => {
+              setShowGrid(!showGrid);
+              playPopSound(500);
+            }}
+            title="Toggle Grid Lines (Shift+G)"
             style={{
               backgroundColor: activeTheme.cardBg,
               borderColor: activeTheme.cardBorder,
@@ -2098,10 +2386,18 @@ export const PixelEngine: React.FC = () => {
 
         {/* Right: Grid Size Range Slider & Telemetry Toggle */}
         <div className="flex items-center gap-2 text-[11px]" style={{ color: activeTheme.textMuted }}>
-          {/* Grid Size Slider (Issue 4) */}
-          <div className="flex items-center gap-1.5 bg-black/20 px-2 py-0.5 rounded border border-white/5">
-            <Sliders className="w-3 h-3 opacity-60" />
-            <span className="text-[10px] hidden sm:inline">SIZE:</span>
+          {/* Grid Size Slider */}
+          <div
+            style={{
+              backgroundColor: activeTheme.cardBg,
+              borderColor: activeTheme.cardBorder,
+              color: activeTheme.textPrimary,
+            }}
+            className="flex items-center gap-1.5 px-2 py-0.5 rounded border shadow-xs"
+          >
+            <Sliders className="w-3 h-3 opacity-70" />
+            <span className="text-[10px] hidden sm:inline opacity-70 font-bold">SIZE</span>
+            <span className="text-[9px] opacity-50">8</span>
             <input
               type="range"
               min="8"
@@ -2109,19 +2405,31 @@ export const PixelEngine: React.FC = () => {
               step="2"
               value={pixelSize}
               onChange={(e) => setPixelSize(Number(e.target.value))}
-              title={`Grid voxel size: ${pixelSize}px (Smallest: 8px)`}
-              className="w-16 sm:w-20 h-1.5 rounded-lg appearance-none cursor-pointer bg-white/20 accent-cyan-400"
+              title={`Brush / Voxel footprint: ${pixelSize}px (8px - 48px)`}
+              className="w-14 sm:w-20 h-1.5 rounded appearance-none cursor-pointer accent-amber-600 bg-stone-300 dark:bg-stone-700"
             />
-            <span className="font-mono font-bold text-[10px] w-5 text-right" style={{ color: activeTheme.accent }}>
-              {pixelSize}
+            <span className="text-[9px] opacity-50">48</span>
+            {/* Live footprint preview square */}
+            <div
+              title={`Live footprint: ${pixelSize}px`}
+              style={{
+                width: Math.min(14, Math.max(5, Math.round(pixelSize / 3))),
+                height: Math.min(14, Math.max(5, Math.round(pixelSize / 3))),
+                backgroundColor: currentColor,
+                borderColor: activeTheme.cardBorder,
+              }}
+              className="border rounded-xs shadow-xs hidden xs:block"
+            />
+            <span className="font-mono font-bold text-[10px] min-w-[24px] text-right" style={{ color: activeTheme.accent }}>
+              {pixelSize}px
             </span>
           </div>
 
-          {/* Toggle Sidebar (Issue 1) */}
+          {/* Toggle Telemetry Sidebar (Overlay) */}
           <button
             type="button"
             onClick={() => setIsStatsCollapsed(!isStatsCollapsed)}
-            title={isStatsCollapsed ? "Expand Engine Telemetry" : "Collapse Engine Telemetry"}
+            title={isStatsCollapsed ? "Expand Engine Telemetry (D)" : "Collapse Engine Telemetry (D)"}
             style={{
               backgroundColor: activeTheme.cardBg,
               borderColor: activeTheme.cardBorder,
@@ -2143,83 +2451,73 @@ export const PixelEngine: React.FC = () => {
         }}
         className="h-8 border-b px-2 sm:px-3 flex items-center justify-between text-[11px] gap-2 overflow-x-auto flex-shrink-0 backdrop-blur-sm"
       >
-        {/* Left: Mode Selection Tabs */}
+        {/* Left: Mode Selection Tabs with Line Icons & Safe Mode Switching */}
         <div className="flex items-center gap-1 flex-shrink-0">
           <span className="text-[10px] font-bold opacity-60 mr-1 hidden sm:inline">MODE:</span>
           <button
             type="button"
-            onClick={() => {
-              setEngineMode("draw");
-              playPopSound(500);
-            }}
+            onClick={() => switchMode("draw")}
             style={{
               backgroundColor: engineMode === "draw" ? activeTheme.accent : "transparent",
               color: engineMode === "draw" ? (activeTheme.isDark ? "#000" : "#fff") : activeTheme.textPrimary,
               borderColor: engineMode === "draw" ? activeTheme.accent : "transparent",
             }}
-            className="px-2 py-0.5 rounded border text-[10px] font-bold transition-all"
+            className="px-2 py-0.5 rounded border text-[10px] font-bold transition-all flex items-center gap-1"
           >
-            🎨 DRAW
+            <Palette className="w-3 h-3" />
+            <span>DRAW</span>
           </button>
           <button
             type="button"
-            onClick={() => {
-              setEngineMode("arcade");
-              playPopSound(600);
-            }}
+            onClick={() => switchMode("arcade")}
             style={{
               backgroundColor: engineMode === "arcade" ? activeTheme.accent : "transparent",
               color: engineMode === "arcade" ? (activeTheme.isDark ? "#000" : "#fff") : activeTheme.textPrimary,
               borderColor: engineMode === "arcade" ? activeTheme.accent : "transparent",
             }}
-            className="px-2 py-0.5 rounded border text-[10px] font-bold transition-all"
+            className="px-2 py-0.5 rounded border text-[10px] font-bold transition-all flex items-center gap-1"
           >
-            🎮 ARCADE
+            <Gamepad2 className="w-3 h-3" />
+            <span>ARCADE</span>
           </button>
           <button
             type="button"
-            onClick={() => {
-              setEngineMode("life");
-              playPopSound(700);
-            }}
+            onClick={() => switchMode("life")}
             style={{
               backgroundColor: engineMode === "life" ? activeTheme.accent : "transparent",
               color: engineMode === "life" ? (activeTheme.isDark ? "#000" : "#fff") : activeTheme.textPrimary,
               borderColor: engineMode === "life" ? activeTheme.accent : "transparent",
             }}
-            className="px-2 py-0.5 rounded border text-[10px] font-bold transition-all"
+            className="px-2 py-0.5 rounded border text-[10px] font-bold transition-all flex items-center gap-1"
           >
-            🧬 GAME OF LIFE
+            <Sparkles className="w-3 h-3" />
+            <span>GAME OF LIFE</span>
           </button>
           <button
             type="button"
-            onClick={() => {
-              setEngineMode("snake");
-              initSnakeGame();
-            }}
+            onClick={() => switchMode("snake")}
             style={{
               backgroundColor: engineMode === "snake" ? activeTheme.accent : "transparent",
               color: engineMode === "snake" ? (activeTheme.isDark ? "#000" : "#fff") : activeTheme.textPrimary,
               borderColor: engineMode === "snake" ? activeTheme.accent : "transparent",
             }}
-            className="px-2 py-0.5 rounded border text-[10px] font-bold transition-all"
+            className="px-2 py-0.5 rounded border text-[10px] font-bold transition-all flex items-center gap-1"
           >
-            🐍 SNAKE
+            <Activity className="w-3 h-3" />
+            <span>SNAKE</span>
           </button>
           <button
             type="button"
-            onClick={() => {
-              setEngineMode("sand");
-              playPopSound(550);
-            }}
+            onClick={() => switchMode("sand")}
             style={{
               backgroundColor: engineMode === "sand" ? activeTheme.accent : "transparent",
               color: engineMode === "sand" ? (activeTheme.isDark ? "#000" : "#fff") : activeTheme.textPrimary,
               borderColor: engineMode === "sand" ? activeTheme.accent : "transparent",
             }}
-            className="px-2 py-0.5 rounded border text-[10px] font-bold transition-all"
+            className="px-2 py-0.5 rounded border text-[10px] font-bold transition-all flex items-center gap-1"
           >
-            ⏳ SAND SIM
+            <Layers className="w-3 h-3" />
+            <span>SAND SIM</span>
           </button>
         </div>
 
@@ -2231,7 +2529,7 @@ export const PixelEngine: React.FC = () => {
               <button
                 type="button"
                 onClick={isShowcasePlaying ? stopShowcase : runShowcaseTour}
-                title="Automated Interactive Showcase Tour (Virtual Animated Cursor)"
+                title="Automated Interactive Showcase Tour"
                 style={{
                   backgroundColor: isShowcasePlaying
                     ? (activeTheme.isDark ? "rgba(0,255,204,0.2)" : "#ccfbf1")
@@ -2246,7 +2544,7 @@ export const PixelEngine: React.FC = () => {
                 className="px-2 py-0.5 rounded border font-semibold flex items-center gap-1 hover:opacity-85 transition-all cursor-pointer shadow-sm"
               >
                 <Sparkles className={`w-3 h-3 ${isShowcasePlaying ? (activeTheme.isDark ? "text-cyan-300" : "text-teal-700") + " animate-spin" : "text-amber-500"}`} />
-                <span>{isShowcasePlaying ? "STOP TOUR" : "🎬 SHOWCASE TOUR"}</span>
+                <span>{isShowcasePlaying ? "STOP TOUR" : "SHOWCASE TOUR"}</span>
               </button>
 
               {/* Bot Playback Button */}
@@ -2311,7 +2609,7 @@ export const PixelEngine: React.FC = () => {
           {engineMode === "arcade" && (
             <div className="flex items-center gap-2 font-mono">
               <span className="bg-amber-400 text-black px-1.5 py-0.5 rounded font-bold">
-                SCORE: {arcadeScore}
+                ARCADE SCORE: {arcadeScore}
               </span>
               {comboCount > 1 && (
                 <span className="text-pink-400 font-bold animate-pulse">
@@ -2446,7 +2744,7 @@ export const PixelEngine: React.FC = () => {
           {engineMode === "snake" && (
             <div className="flex items-center gap-2">
               <span className={`font-mono font-bold ${activeTheme.isDark ? "text-amber-400" : "text-amber-700"}`}>
-                SCORE: {snakeScore}
+                SNAKE SCORE: {snakeScore}
               </span>
               <span className={`font-mono text-[9px] ${activeTheme.isDark ? "text-zinc-400" : "text-stone-500"} hidden sm:inline`}>
                 HIGH: {snakeHighScore}
@@ -2557,7 +2855,7 @@ export const PixelEngine: React.FC = () => {
         </div>
       </div>
 
-      {/* Main Interactive Canvas Area with Swatch Bar & Docked Stats Panel */}
+      {/* Main Interactive Canvas Area with Swatch Bar & Floating Stats Overlay */}
       <div className="flex-1 flex overflow-hidden relative w-full h-full min-w-0 min-h-0">
         {/* Left Vertical Color Palette Swatches */}
         <div
@@ -2565,15 +2863,53 @@ export const PixelEngine: React.FC = () => {
             backgroundColor: activeTheme.headerBg,
             borderColor: activeTheme.headerBorder,
           }}
-          className="w-10 border-r p-1.5 flex flex-col items-center gap-1.5 z-10 select-none flex-shrink-0"
+          className="w-12 border-r p-1 flex flex-col items-center gap-1.5 z-10 select-none flex-shrink-0"
         >
+          {/* Active color chip with uppercase HEX label */}
+          <div
+            className="w-8 h-8 rounded border shadow-inner relative flex items-center justify-center cursor-pointer group"
+            style={{ backgroundColor: currentColor, borderColor: activeTheme.cardBorder }}
+            title={`Active Color: ${currentColor.toUpperCase()}`}
+          >
+            <input
+              type="color"
+              value={currentColor.startsWith("#") && currentColor.length === 7 ? currentColor : "#00FFCC"}
+              onChange={(e) => {
+                setCurrentColor(e.target.value);
+                setCustomHexInput(e.target.value.toUpperCase());
+              }}
+              title="Pick Custom Color"
+              className="absolute inset-0 opacity-0 w-full h-full cursor-pointer"
+            />
+          </div>
+
+          <span
+            className="text-[7.5px] font-mono tracking-tighter uppercase opacity-70"
+            title={currentColor}
+          >
+            {currentColor.slice(0, 7)}
+          </span>
+
+          {/* Custom HEX text input with validation */}
           <input
-            type="color"
-            value={currentColor}
-            onChange={(e) => setCurrentColor(e.target.value)}
-            title="Custom Color Picker"
-            className="w-6 h-6 rounded cursor-pointer border bg-transparent p-0 mb-1"
-            style={{ borderColor: activeTheme.cardBorder }}
+            type="text"
+            value={customHexInput}
+            onChange={(e) => {
+              const val = e.target.value.toUpperCase();
+              setCustomHexInput(val);
+              if (/^#[0-9A-F]{6}$/i.test(val)) {
+                setCurrentColor(val);
+              }
+            }}
+            placeholder="#HEX"
+            maxLength={7}
+            title="Custom HEX Color Input"
+            style={{
+              backgroundColor: activeTheme.cardBg,
+              borderColor: activeTheme.cardBorder,
+              color: activeTheme.textPrimary,
+            }}
+            className="w-10 px-0.5 py-0.5 text-[8px] font-mono text-center rounded border outline-none uppercase"
           />
 
           <div
@@ -2581,23 +2917,33 @@ export const PixelEngine: React.FC = () => {
             className="w-full h-px my-0.5"
           />
 
-          {palette.map((col, idx) => (
-            <button
-              key={idx}
-              type="button"
-              onClick={() => setCurrentColor(col)}
-              title={col}
-              style={{ backgroundColor: col }}
-              className={`w-5 h-5 rounded-sm transition-transform border ${
-                currentColor.toLowerCase() === col.toLowerCase()
-                  ? "scale-110 border-white shadow-md"
-                  : "border-black/30 hover:scale-105"
-              }`}
-            />
-          ))}
+          {/* Curated Swatches (No Near-Duplicate Darks) */}
+          <div className="flex flex-col gap-1 items-center overflow-y-auto max-h-[calc(100vh-230px)]">
+            {palette.map((col, idx) => {
+              const isActive = currentColor.toLowerCase() === col.toLowerCase();
+              return (
+                <button
+                  key={idx}
+                  type="button"
+                  onClick={() => {
+                    setCurrentColor(col);
+                    setCustomHexInput(col.toUpperCase());
+                    playPopSound(500);
+                  }}
+                  title={col}
+                  style={{ backgroundColor: col }}
+                  className={`w-6 h-6 rounded-xs transition-transform border ${
+                    isActive
+                      ? "ring-2 ring-offset-1 ring-amber-500 scale-105 border-white shadow-sm"
+                      : "border-black/30 hover:scale-105"
+                  }`}
+                />
+              );
+            })}
+          </div>
         </div>
 
-        {/* Viewport Canvas Container (100% flex-1 to fill vacant space upon sidebar minimize) */}
+        {/* Viewport Canvas Container (Remains 100% width/height regardless of stats open/close) */}
         <div
           ref={containerRef}
           onContextMenu={(e) => {
@@ -2608,7 +2954,7 @@ export const PixelEngine: React.FC = () => {
           className="flex-1 w-full h-full relative overflow-hidden cursor-crosshair min-w-0 min-h-0 pixel-engine-viewport"
         >
           {/* Grid Canvas Layer */}
-          <canvas ref={gridCanvasRef} className="absolute inset-0 pointer-events-none block w-full h-full pointer-events-none" />
+          <canvas ref={gridCanvasRef} className="absolute inset-0 pointer-events-none block w-full h-full" />
 
           {/* Main Artwork Canvas Layer */}
           <canvas
@@ -2704,16 +3050,15 @@ export const PixelEngine: React.FC = () => {
           )}
         </div>
 
-        {/* DOCKED CYBERPUNK STATS BOX (Reused from homesec.tsx lines 11360-11440) */}
+        {/* FLOATING ABSOLUTE OVERLAY STATS PANEL (0 Canvas Resize or Shift) */}
         {!isStatsCollapsed && (
           <aside
             style={{
-              width: 230,
               backgroundColor: activeTheme.headerBg,
               borderLeft: `1px solid ${activeTheme.headerBorder}`,
               color: activeTheme.textPrimary,
             }}
-            className="h-full flex flex-col z-20 overflow-hidden select-none transition-all flex-shrink-0"
+            className="absolute top-0 right-0 h-full w-[250px] shadow-2xl flex flex-col z-30 overflow-hidden select-none backdrop-blur-md"
           >
             {/* Header */}
             <div
@@ -2731,32 +3076,49 @@ export const PixelEngine: React.FC = () => {
               <button
                 type="button"
                 onClick={() => setIsStatsCollapsed(true)}
-                className="opacity-60 hover:opacity-100"
+                className="opacity-60 hover:opacity-100 p-1"
+                title="Collapse (D)"
               >
-                ◀
+                ✕
               </button>
             </div>
 
             {/* Body */}
             <div className="flex-1 p-3 overflow-y-auto space-y-3 text-[11px]">
-              {/* Metric 1: System Level */}
+              {/* Metric 1: Meaningful System Rank & Progression */}
               <div
                 style={{
                   backgroundColor: activeTheme.cardBg,
                   borderColor: activeTheme.cardBorder,
                 }}
-                className="p-2.5 rounded border space-y-1"
+                className="p-2.5 rounded border space-y-1.5"
               >
-                <div className="text-[10px] opacity-60 flex justify-between">
+                <div className="text-[10px] opacity-60 flex justify-between font-bold">
                   <span>RANK</span>
-                  <span style={{ color: activeTheme.accent }}>LVL 1</span>
+                  <span style={{ color: activeTheme.accent }}>LVL {userLevelInfo.level}</span>
                 </div>
                 <div className="font-bold text-xs" style={{ color: activeTheme.accent }}>
-                  {userRankTitle}
+                  {userLevelInfo.title}
+                </div>
+                {/* XP Progress Bar */}
+                <div className="space-y-1">
+                  <div className="w-full bg-stone-300 dark:bg-stone-700 h-1.5 rounded-full overflow-hidden">
+                    <div
+                      className="h-full bg-amber-500 rounded-full transition-all duration-300"
+                      style={{ width: `${userLevelInfo.progress}%` }}
+                    />
+                  </div>
+                  <div className="flex justify-between text-[9px] opacity-60">
+                    <span>{userLevelInfo.current} / {userLevelInfo.max} px</span>
+                    <span>{userLevelInfo.progress}%</span>
+                  </div>
+                </div>
+                <div className="text-[9px] opacity-70 pt-0.5">
+                  Next: {userLevelInfo.nextUnlock}
                 </div>
               </div>
 
-              {/* Metric 2: Live Coordinates & Pixels */}
+              {/* Metric 2: Grid State & Internal Readouts */}
               <div
                 style={{
                   backgroundColor: activeTheme.cardBg,
@@ -2772,9 +3134,27 @@ export const PixelEngine: React.FC = () => {
                   </span>
                 </div>
                 <div className="flex justify-between">
+                  <span className="opacity-70">CANVAS PX:</span>
+                  <span className="font-mono font-bold" style={{ color: activeTheme.accent }}>
+                    {canvasPixelCount}
+                  </span>
+                </div>
+                <div className="flex justify-between">
                   <span className="opacity-70">SESSION PX:</span>
                   <span className="font-mono font-bold" style={{ color: activeTheme.accent }}>
                     {stats.drawn}
+                  </span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="opacity-70">ENGINE STATUS:</span>
+                  <span className="font-mono font-bold text-emerald-600 dark:text-emerald-400">
+                    ACTIVE (TWM:ACTIVE)
+                  </span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="opacity-70">AUDIO SYNTH:</span>
+                  <span className="font-mono font-bold">
+                    {isAudioMuted ? "MUTED" : "44.1kHz DSP"}
                   </span>
                 </div>
                 <div className="flex justify-between">
@@ -2835,7 +3215,7 @@ export const PixelEngine: React.FC = () => {
                 <div className="text-[10px] opacity-70 uppercase font-semibold">BUFFER MEMORY</div>
                 <div className="flex justify-between font-mono">
                   <span className="opacity-70">VOXEL CACHE:</span>
-                  <span className="font-semibold">{(stats.drawn * 0.12).toFixed(1)} KB</span>
+                  <span className="font-semibold">{(canvasPixelCount * 0.12).toFixed(1)} KB</span>
                 </div>
                 <div className="flex justify-between font-mono">
                   <span className="opacity-70">RENDER RATE:</span>
@@ -2843,7 +3223,7 @@ export const PixelEngine: React.FC = () => {
                 </div>
               </div>
 
-              {/* Action Buttons */}
+              {/* Action Buttons: Drop Gravity lives here exclusively */}
               <div className="space-y-1.5 pt-1">
                 <button
                   type="button"
@@ -2855,7 +3235,7 @@ export const PixelEngine: React.FC = () => {
                   }}
                   className="w-full py-1.5 rounded border text-[11px] font-bold hover:opacity-80 transition-opacity flex items-center justify-center gap-1.5"
                 >
-                  <Flame className="w-3.5 h-3.5 text-amber-400" />
+                  <Flame className="w-3.5 h-3.5 text-amber-500" />
                   <span>DROP GRAVITY</span>
                 </button>
 
@@ -2866,7 +3246,7 @@ export const PixelEngine: React.FC = () => {
                     backgroundColor: activeTheme.cardBg,
                     borderColor: activeTheme.cardBorder,
                   }}
-                  className="w-full py-1.5 rounded border text-[11px] font-bold text-red-400 hover:opacity-80 transition-opacity flex items-center justify-center gap-1.5"
+                  className="w-full py-1.5 rounded border text-[11px] font-bold text-red-500 hover:bg-red-500/10 hover:opacity-90 transition-all flex items-center justify-center gap-1.5"
                 >
                   <Trash2 className="w-3.5 h-3.5" />
                   <span>PURGE CANVAS</span>
@@ -2877,7 +3257,7 @@ export const PixelEngine: React.FC = () => {
         )}
       </div>
 
-      {/* Bottom Telemetry Bar */}
+      {/* Bottom Telemetry Bar: Coordinates, Pixel Counts, Mode */}
       <div
         style={{
           backgroundColor: activeTheme.headerBg,
@@ -2887,28 +3267,221 @@ export const PixelEngine: React.FC = () => {
         className="h-6 border-t px-3 flex items-center justify-between text-[10px] select-none flex-shrink-0"
       >
         <div className="flex items-center gap-3">
-          <span className="flex items-center gap-1 font-semibold" style={{ color: activeTheme.accent }}>
-            <Activity className="w-3 h-3" />
-            ENGINE: ACTIVE
+          <span className="font-bold" style={{ color: activeTheme.accent }}>
+            MODE: {engineMode.toUpperCase()}
           </span>
           <span className="opacity-40">•</span>
           <span>
             COORD: [{hoverCoord ? `${hoverCoord.col}, ${hoverCoord.row}` : "--, --"}]
           </span>
           <span className="opacity-40">•</span>
-          <span>PIXELS: {stats.drawn}</span>
+          <span>CANVAS: {canvasPixelCount} PX</span>
           <span className="opacity-40">•</span>
-          <span>AUDIO: {isAudioMuted ? "MUTED" : "44.1kHz SYNTH"}</span>
+          <span>SESSION: {stats.drawn} PX</span>
         </div>
 
         <div className="flex items-center gap-3">
           <span>THEME: {activeTheme.name.toUpperCase()}</span>
-          <span className="opacity-40">•</span>
-          <span className="font-semibold" style={{ color: activeTheme.accentSecondary }}>
-            PERSPECTIVE: {perspective.toUpperCase()}
-          </span>
         </div>
       </div>
+
+      {/* 5-Second Undo Toast for Destructive Purge Canvas */}
+      {undoToast && undoToast.active && (
+        <div
+          role="status"
+          aria-live="polite"
+          style={{
+            backgroundColor: activeTheme.headerBg,
+            borderColor: activeTheme.accent,
+            color: activeTheme.textPrimary,
+          }}
+          className="absolute bottom-8 left-1/2 -translate-x-1/2 z-50 flex items-center gap-3 px-4 py-2 rounded-md border shadow-2xl font-mono text-xs animate-in fade-in slide-in-from-bottom-2 duration-200 backdrop-blur-md"
+        >
+          <div className="flex items-center gap-1.5 text-red-500 font-bold">
+            <Trash2 className="w-4 h-4" />
+            <span>Canvas purged ({undoToast.count ?? 0} px)</span>
+          </div>
+          <span className="text-[10px] opacity-70">Undo expires in {undoToast.seconds}s</span>
+          <button
+            type="button"
+            onClick={handleRestorePurged}
+            style={{
+              backgroundColor: activeTheme.accent,
+              color: activeTheme.isDark ? "#000" : "#fff",
+            }}
+            className="px-2.5 py-1 rounded font-bold hover:opacity-90 transition-opacity cursor-pointer"
+          >
+            RESTORE
+          </button>
+          <button
+            type="button"
+            onClick={() => setUndoToast(null)}
+            className="opacity-50 hover:opacity-100 p-0.5 ml-1"
+            title="Dismiss"
+          >
+            <X className="w-3.5 h-3.5" />
+          </button>
+        </div>
+      )}
+
+      {/* Keyboard Shortcuts Modal (?) */}
+      {showShortcutsModal && (
+        <div
+          className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4 font-mono select-none"
+          onClick={() => setShowShortcutsModal(false)}
+        >
+          <div
+            style={{
+              backgroundColor: activeTheme.windowBg,
+              borderColor: activeTheme.headerBorder,
+              color: activeTheme.textPrimary,
+            }}
+            className="w-full max-w-lg rounded-lg border shadow-2xl overflow-hidden"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Header */}
+            <div
+              style={{
+                backgroundColor: activeTheme.headerBg,
+                borderColor: activeTheme.headerBorder,
+              }}
+              className="h-10 border-b px-4 flex items-center justify-between"
+            >
+              <div className="flex items-center gap-2 font-bold text-xs" style={{ color: activeTheme.accent }}>
+                <HelpCircle className="w-4 h-4" />
+                <span>KEYBOARD SHORTCUTS</span>
+              </div>
+              <button
+                type="button"
+                onClick={() => setShowShortcutsModal(false)}
+                className="p-1 rounded hover:opacity-70 opacity-60"
+                title="Close (Esc)"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            {/* Content */}
+            <div className="p-4 space-y-4 text-xs max-h-[75vh] overflow-y-auto">
+              <div>
+                <div className="text-[10px] uppercase font-bold tracking-wider opacity-60 mb-2">
+                  Drawing Tools
+                </div>
+                <div className="grid grid-cols-2 gap-2">
+                  <div className="flex justify-between items-center bg-black/5 dark:bg-white/5 px-2.5 py-1.5 rounded">
+                    <span>Pencil</span>
+                    <kbd className="px-1.5 py-0.5 rounded bg-black/10 dark:bg-white/10 font-bold">B / P</kbd>
+                  </div>
+                  <div className="flex justify-between items-center bg-black/5 dark:bg-white/5 px-2.5 py-1.5 rounded">
+                    <span>Eraser</span>
+                    <kbd className="px-1.5 py-0.5 rounded bg-black/10 dark:bg-white/10 font-bold">E</kbd>
+                  </div>
+                  <div className="flex justify-between items-center bg-black/5 dark:bg-white/5 px-2.5 py-1.5 rounded">
+                    <span>Paint Bucket</span>
+                    <kbd className="px-1.5 py-0.5 rounded bg-black/10 dark:bg-white/10 font-bold">G</kbd>
+                  </div>
+                  <div className="flex justify-between items-center bg-black/5 dark:bg-white/5 px-2.5 py-1.5 rounded">
+                    <span>Eyedropper</span>
+                    <kbd className="px-1.5 py-0.5 rounded bg-black/10 dark:bg-white/10 font-bold">I</kbd>
+                  </div>
+                  <div className="flex justify-between items-center bg-black/5 dark:bg-white/5 px-2.5 py-1.5 rounded">
+                    <span>Type / Stamp</span>
+                    <kbd className="px-1.5 py-0.5 rounded bg-black/10 dark:bg-white/10 font-bold">T</kbd>
+                  </div>
+                  <div className="flex justify-between items-center bg-black/5 dark:bg-white/5 px-2.5 py-1.5 rounded">
+                    <span>Symmetry Mirror</span>
+                    <kbd className="px-1.5 py-0.5 rounded bg-black/10 dark:bg-white/10 font-bold">M</kbd>
+                  </div>
+                </div>
+              </div>
+
+              <div>
+                <div className="text-[10px] uppercase font-bold tracking-wider opacity-60 mb-2">
+                  Canvas & View
+                </div>
+                <div className="grid grid-cols-2 gap-2">
+                  <div className="flex justify-between items-center bg-black/5 dark:bg-white/5 px-2.5 py-1.5 rounded">
+                    <span>Toggle Grid</span>
+                    <kbd className="px-1.5 py-0.5 rounded bg-black/10 dark:bg-white/10 font-bold">Shift + G</kbd>
+                  </div>
+                  <div className="flex justify-between items-center bg-black/5 dark:bg-white/5 px-2.5 py-1.5 rounded">
+                    <span>Isometric View</span>
+                    <kbd className="px-1.5 py-0.5 rounded bg-black/10 dark:bg-white/10 font-bold">Shift + P</kbd>
+                  </div>
+                  <div className="flex justify-between items-center bg-black/5 dark:bg-white/5 px-2.5 py-1.5 rounded">
+                    <span>3D Extrusion</span>
+                    <kbd className="px-1.5 py-0.5 rounded bg-black/10 dark:bg-white/10 font-bold">3</kbd>
+                  </div>
+                  <div className="flex justify-between items-center bg-black/5 dark:bg-white/5 px-2.5 py-1.5 rounded">
+                    <span>Telemetry Stats</span>
+                    <kbd className="px-1.5 py-0.5 rounded bg-black/10 dark:bg-white/10 font-bold">D</kbd>
+                  </div>
+                  <div className="flex justify-between items-center bg-black/5 dark:bg-white/5 px-2.5 py-1.5 rounded">
+                    <span>Undo</span>
+                    <kbd className="px-1.5 py-0.5 rounded bg-black/10 dark:bg-white/10 font-bold">Cmd / Ctrl + Z</kbd>
+                  </div>
+                  <div className="flex justify-between items-center bg-black/5 dark:bg-white/5 px-2.5 py-1.5 rounded">
+                    <span>Redo</span>
+                    <kbd className="px-1.5 py-0.5 rounded bg-black/10 dark:bg-white/10 font-bold">Cmd + Y / Shift+Z</kbd>
+                  </div>
+                  <div className="flex justify-between items-center bg-black/5 dark:bg-white/5 px-2.5 py-1.5 rounded">
+                    <span>Download PNG</span>
+                    <kbd className="px-1.5 py-0.5 rounded bg-black/10 dark:bg-white/10 font-bold">Cmd / Ctrl + S</kbd>
+                  </div>
+                  <div className="flex justify-between items-center bg-black/5 dark:bg-white/5 px-2.5 py-1.5 rounded">
+                    <span>Purge Canvas</span>
+                    <kbd className="px-1.5 py-0.5 rounded bg-black/10 dark:bg-white/10 font-bold text-red-500">Del / Backspace</kbd>
+                  </div>
+                </div>
+              </div>
+
+              <div>
+                <div className="text-[10px] uppercase font-bold tracking-wider opacity-60 mb-2">
+                  Modes (Safe Artwork Preservation)
+                </div>
+                <div className="grid grid-cols-2 gap-2">
+                  <div className="flex justify-between items-center bg-black/5 dark:bg-white/5 px-2.5 py-1.5 rounded">
+                    <span>Draw Studio</span>
+                    <kbd className="px-1.5 py-0.5 rounded bg-black/10 dark:bg-white/10 font-bold">1</kbd>
+                  </div>
+                  <div className="flex justify-between items-center bg-black/5 dark:bg-white/5 px-2.5 py-1.5 rounded">
+                    <span>Arcade Mode</span>
+                    <kbd className="px-1.5 py-0.5 rounded bg-black/10 dark:bg-white/10 font-bold">2</kbd>
+                  </div>
+                  <div className="flex justify-between items-center bg-black/5 dark:bg-white/5 px-2.5 py-1.5 rounded">
+                    <span>Conway&apos;s Life</span>
+                    <kbd className="px-1.5 py-0.5 rounded bg-black/10 dark:bg-white/10 font-bold">Ctrl + 3</kbd>
+                  </div>
+                  <div className="flex justify-between items-center bg-black/5 dark:bg-white/5 px-2.5 py-1.5 rounded">
+                    <span>Voxel Snake</span>
+                    <kbd className="px-1.5 py-0.5 rounded bg-black/10 dark:bg-white/10 font-bold">4</kbd>
+                  </div>
+                  <div className="flex justify-between items-center bg-black/5 dark:bg-white/5 px-2.5 py-1.5 rounded">
+                    <span>Falling Sand Sim</span>
+                    <kbd className="px-1.5 py-0.5 rounded bg-black/10 dark:bg-white/10 font-bold">5</kbd>
+                  </div>
+                  <div className="flex justify-between items-center bg-black/5 dark:bg-white/5 px-2.5 py-1.5 rounded">
+                    <span>Shortcuts Help</span>
+                    <kbd className="px-1.5 py-0.5 rounded bg-black/10 dark:bg-white/10 font-bold">?</kbd>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Footer */}
+            <div
+              style={{
+                backgroundColor: activeTheme.headerBg,
+                borderColor: activeTheme.headerBorder,
+              }}
+              className="px-4 py-2 border-t text-[11px] opacity-70 flex justify-between items-center"
+            >
+              <span>Tip: Artwork in Draw mode is never lost when switching modes.</span>
+              <kbd className="px-1.5 py-0.5 rounded bg-black/10 dark:bg-white/10 text-[10px]">Esc to close</kbd>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Pixel Art Importer & r/place Quantizer Modal */}
       <PixelArtImportModal

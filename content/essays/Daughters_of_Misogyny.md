@@ -1,6 +1,6 @@
 # Daughters of Misogyny
 
-*Date: 26 May, 2026*  
+*Date: 26 May, 2024*  
 *Author: Aditya Diundi*  
 *Source: [diundi.bearblog.dev](https://diundi.bearblog.dev/daughters-of-misogyny/)*
 

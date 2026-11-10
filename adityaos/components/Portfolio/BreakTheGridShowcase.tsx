@@ -152,7 +152,7 @@ export function BreakTheGridShowcase({ onLaunchOS }: BreakTheGridShowcaseProps) 
             </span>
           </div>
           <span className="text-xs font-mono text-stone-400 dark:text-zinc-500">
-            7 Systems
+            8 Systems
           </span>
         </div>
 
@@ -370,7 +370,7 @@ export function BreakTheGridShowcase({ onLaunchOS }: BreakTheGridShowcaseProps) 
                   })
                 }
               >
-                <BrowserFrame url="aditya-os.live/pixel" aspectClass="aspect-[1418/782]">
+                <BrowserFrame url="diundi.space/pixel" aspectClass="aspect-[1418/782]">
                   <Image
                     src="/case-studies/adityaos_pixel_engine_studio.png"
                     alt="AdityaOS Pixel Engine Canvas Interface"

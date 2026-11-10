@@ -117,6 +117,20 @@ export function AdityaOSDesktop({
         setShowWelcomeModal(false);
         return;
       }
+      const pathname = window.location.pathname;
+      const appParam = params.get("app");
+      const hostname = window.location.hostname;
+      const isPixel =
+        hostname.includes("pixel") ||
+        pathname === "/pixel" ||
+        pathname === "/studio" ||
+        appParam === "pixel" ||
+        appParam === "pixelEngine" ||
+        defaultApp === "pixelEngine";
+      if (isPixel) {
+        setShowWelcomeModal(false);
+        return;
+      }
       const dismissed = localStorage.getItem("adityaos_welcome_dismissed");
       if (!dismissed) {
         setShowWelcomeModal(true);
@@ -124,7 +138,7 @@ export function AdityaOSDesktop({
     } catch {
       // Fallback if localStorage is disabled or throws
     }
-  }, []);
+  }, [defaultApp]);
 
   const handleDismissWelcome = () => {
     setShowWelcomeModal(false);
@@ -641,7 +655,9 @@ export function AdityaOSDesktop({
       {/* TWM Window Workspace Canvas */}
       <div className="relative flex-1 w-full h-[calc(100vh-72px)] overflow-hidden">
         {/* Three Quiet Desk Objects (Sticky Note with Poetry, Pinned Latest Essay, Desk Clock) */}
-        <DesktopObjects onOpenEssay={() => openAndFocus("archiveReader")} />
+        <div className="absolute inset-0 pointer-events-none z-0 overflow-hidden">
+          <DesktopObjects onOpenEssay={() => openAndFocus("archiveReader")} />
+        </div>
 
         {/* Desktop Background Shortcuts & Widgets (Visible on canvas) */}
         <div className="absolute inset-0 p-6 pb-16 pointer-events-none flex flex-col justify-between z-0">

@@ -77,7 +77,7 @@ export const WindowFrame: React.FC<WindowFrameProps> = ({
   const isMinimized = minimizedWindows.includes(id);
   const isMaximized = maximizedWindows.includes(id);
   const isActive = activeWindow === id;
-  const currentZIndex = zIndexMap[id] || 1;
+  const currentZIndex = (zIndexMap[id] || 1) + 20;
 
   if (!isOpen || isMinimized) return null;
 
@@ -91,10 +91,11 @@ export const WindowFrame: React.FC<WindowFrameProps> = ({
       dragElastic={0.06}
       dragMomentum={false}
       initial={{
-        opacity: 0,
-        scale: 0.95,
+        opacity: 1,
+        scale: 1,
         x: defaultPosition.x,
         y: defaultPosition.y,
+        zIndex: currentZIndex,
       }}
       animate={
         isMaximized
@@ -108,6 +109,7 @@ export const WindowFrame: React.FC<WindowFrameProps> = ({
               top: 36,
               left: 12,
               position: "fixed",
+              zIndex: currentZIndex + 50,
             }
           : {
               opacity: 1,
@@ -115,6 +117,7 @@ export const WindowFrame: React.FC<WindowFrameProps> = ({
               width: size.width,
               height: size.height,
               position: "absolute",
+              zIndex: currentZIndex,
             }
       }
       exit={{ opacity: 0, scale: 0.95 }}
@@ -127,7 +130,7 @@ export const WindowFrame: React.FC<WindowFrameProps> = ({
         boxShadow: isActive ? `0 12px 36px -8px ${activeTheme.accentGlow}` : undefined,
       }}
       data-window-id={id}
-      className={`window-frame flex flex-col border rounded-md shadow-window overflow-hidden backdrop-blur-md relative ${className}`}
+      className={`window-frame flex flex-col border rounded-md shadow-window overflow-hidden backdrop-blur-md relative z-20 ${className}`}
     >
       {/* TWM Title Bar */}
       <div

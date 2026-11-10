@@ -22,7 +22,7 @@ export function DesktopObjects({ onOpenEssay }: DesktopObjectsProps) {
   const currentPoetry: PoetryLine = POETRY_LINES[poetryIndex] || POETRY_LINES[0];
 
   // 2. Local Time Clock (Mono 12px+)
-  const [timeStr, setTimeStr] = useState<string>("12:00:00");
+  const [timeStr, setTimeStr] = useState<string>("");
   const [dateStr, setDateStr] = useState<string>("");
 
   useEffect(() => {
@@ -54,7 +54,7 @@ export function DesktopObjects({ onOpenEssay }: DesktopObjectsProps) {
       {/* ========================================================================= */}
       {/* DESK OBJECT 1: Sticky Note with Random Poetry Line (Upper-center / Left-center) */}
       {/* ========================================================================= */}
-      <div className="hidden lg:block absolute top-16 left-32 z-10 pointer-events-auto select-none">
+      <div className="hidden lg:block absolute top-16 left-32 z-0 pointer-events-auto select-none">
         <div
           onClick={() => setPoetryIndex((prev) => (prev + 1) % POETRY_LINES.length)}
           className={`w-64 p-4 rounded-sm shadow-md border rotate-[-1.5deg] hover:rotate-0 transition-transform duration-200 cursor-pointer ${
@@ -85,7 +85,7 @@ export function DesktopObjects({ onOpenEssay }: DesktopObjectsProps) {
       {/* ========================================================================= */}
       {/* DESK OBJECT 2: Pinned "Latest Essay" Card (Right Side of Desktop) */}
       {/* ========================================================================= */}
-      <div className="hidden md:block absolute top-16 right-8 sm:right-12 z-10 pointer-events-auto select-none">
+      <div className="hidden md:block absolute top-16 right-8 sm:right-12 z-0 pointer-events-auto select-none">
         <div
           onClick={() => onOpenEssay("essays/Daughters_of_Misogyny.md")}
           className={`w-72 p-4 rounded-xl border shadow-lg transition-all duration-200 hover:-translate-y-0.5 hover:shadow-xl cursor-pointer ${
@@ -99,7 +99,7 @@ export function DesktopObjects({ onOpenEssay }: DesktopObjectsProps) {
               <Pin className="w-3 h-3" />
               Latest Essay
             </span>
-            <span>26 May 2026</span>
+            <span>26 May 2024</span>
           </div>
 
           <h3 className="font-serif text-lg font-normal leading-snug tracking-tight text-[#1A1814] dark:text-[#F4F4F5] mb-1.5">
@@ -120,7 +120,7 @@ export function DesktopObjects({ onOpenEssay }: DesktopObjectsProps) {
       {/* ========================================================================= */}
       {/* DESK OBJECT 3: Small Desk Clock (Bottom-Right above shell bar) */}
       {/* ========================================================================= */}
-      <div className="hidden md:flex absolute bottom-14 right-6 sm:right-8 z-10 pointer-events-auto select-none items-center gap-2">
+      <div className="hidden md:flex absolute bottom-14 right-6 sm:right-8 z-0 pointer-events-auto select-none items-center gap-2">
         <div
           className={`px-3 py-1.5 rounded-lg border shadow-sm backdrop-blur-md flex items-center gap-2.5 font-mono text-[12px] transition-colors ${
             isDark
@@ -129,7 +129,7 @@ export function DesktopObjects({ onOpenEssay }: DesktopObjectsProps) {
           }`}
         >
           <Clock className="w-3.5 h-3.5 text-emerald-500" />
-          <span className="font-semibold tracking-wider">{timeStr}</span>
+          <span className="font-semibold tracking-wider">{timeStr || "--:--:--"}</span>
           <span className="opacity-40">·</span>
           <span className="text-[11px] opacity-75">{dateStr}</span>
         </div>

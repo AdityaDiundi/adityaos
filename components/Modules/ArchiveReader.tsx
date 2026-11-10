@@ -26,7 +26,7 @@ const FALLBACK_ARCHIVE_DATA: Record<string, ArchiveItem> = {
     lines: [
       "# Daughters of Misogyny",
       "",
-      "*Date: 26 May, 2026*",
+      "*Date: 26 May, 2024*",
       "*Author: Aditya Diundi*",
       "*Source: diundi.bearblog.dev/daughters-of-misogyny/*",
       "",
@@ -743,7 +743,7 @@ export const ArchiveReader: React.FC = () => {
 
     // Default dates if missing
     if (!date) {
-      if (item.id === "daughters") date = "26 May 2026";
+      if (item.id === "daughters") date = "26 May 2024";
       else if (item.id === "beliefs") date = "01 Apr 2026";
       else if (item.id === "tasveerein") date = "20 May 2026";
       else if (item.id === "panchayat") date = "28 Mar 2026";

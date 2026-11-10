@@ -642,12 +642,12 @@ export const INITIAL_PIXELS: [number, number, string][] = [
   [26, 43, "#0284C7"],
 ];
 
-export const createInitialPixelArt = (): Map<string, string> => {
+export const createInitialPixelArt = (rowOffset: number = 0, colOffset: number = 0): Map<string, string> => {
   const map = new Map<string, string>();
   // 1. Map base artwork to smallest 8px voxel grid (2x2 micro-voxels per block)
   INITIAL_PIXELS.forEach(([r, c, col]) => {
-    const baseR = r * 2;
-    const baseC = c * 2;
+    const baseR = r * 2 + rowOffset;
+    const baseC = c * 2 + colOffset;
     map.set(`${baseR}_${baseC}`, col);
     map.set(`${baseR}_${baseC + 1}`, col);
     map.set(`${baseR + 1}_${baseC}`, col);
@@ -686,7 +686,7 @@ export const createInitialPixelArt = (): Map<string, string> => {
     [54, 44, "#00FFCC"],
     [54, 64, "#0284C7"],
   ];
-  microDetails.forEach(([r, c, col]) => map.set(`${r}_${c}`, col));
+  microDetails.forEach(([r, c, col]) => map.set(`${r + rowOffset}_${c + colOffset}`, col));
 
   return map;
 };
