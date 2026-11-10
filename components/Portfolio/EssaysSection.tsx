@@ -29,13 +29,13 @@ export function EssaysSection() {
     <section id="essays" className="relative w-full">
       <div
         className={`w-full relative transition-colors ${
-          isDark ? "bg-[#090b10]/40" : "bg-[#FBFBF9]"
+          isDark ? "bg-[#090b10]/40" : "bg-[#FAF7F2]"
         }`}
       >
         {/* Section Header: Minimal Single-Tier Editorial Header */}
         <div
           className={`border-b border-solid border-stone-200/60 dark:border-zinc-800/60 px-6 sm:px-8 lg:px-12 py-5 flex flex-col sm:flex-row sm:items-baseline justify-between gap-3 transition-colors ${
-            isDark ? "border-zinc-800/80 bg-[#0c0e14]/70" : "border-stone-200/80 bg-white"
+            isDark ? "border-zinc-800/80 bg-[#0c0e14]/70" : "border-stone-200/80 bg-[#FAF7F2]"
           }`}
         >
           <div className="flex items-baseline gap-3">

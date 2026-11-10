@@ -19,7 +19,7 @@ export function PortfolioFooter({ onLaunchOS }: PortfolioFooterProps) {
   return (
     <footer
       className={`relative text-xs font-mono pb-16 transition-colors ${
-        isDark ? "bg-[#090b10] text-zinc-500" : "bg-[#F7F7F4] text-stone-500"
+        isDark ? "bg-[#090b10] text-zinc-500" : "bg-[#FAF7F2] text-stone-500"
       }`}
     >
       <div

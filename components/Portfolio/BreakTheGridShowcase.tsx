@@ -3,13 +3,7 @@
 import React, { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import {
-  motion,
-  useMotionValue,
-  useSpring,
-  useTransform,
-  AnimatePresence,
-} from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import {
   ArrowRight,
   ArrowUpRight,
@@ -44,10 +38,10 @@ function BrowserFrame({
 
   return (
     <div
-      className={`w-full rounded-xl overflow-hidden border shadow-sm transition-all duration-300 group-hover/stage:shadow-md ${
+      className={`w-full rounded-xl overflow-hidden border shadow-[0_20px_50px_rgba(0,0,0,0.08)] dark:shadow-[0_20px_50px_rgba(0,0,0,0.35)] transition-all duration-300 hover:shadow-xl hover:-translate-y-0.5 ${
         isDark
-          ? "bg-[#111318] border-zinc-800 shadow-black/40"
-          : "bg-white border-stone-200/90 shadow-stone-200/50"
+          ? "bg-[#111318] border-zinc-800"
+          : "bg-white border-stone-200/90"
       }`}
     >
       {/* Top Browser Bar */}
@@ -100,114 +94,15 @@ function MobileDeviceFrame({
 
   return (
     <div
-      className={`w-full max-w-[210px] sm:max-w-[230px] mx-auto rounded-2xl overflow-hidden border shadow-sm transition-all duration-300 group-hover/stage:shadow-md ${
+      className={`w-full max-w-[210px] sm:max-w-[240px] mx-auto rounded-[24px] overflow-hidden border shadow-[0_20px_45px_rgba(0,0,0,0.1)] dark:shadow-[0_20px_45px_rgba(0,0,0,0.45)] transition-all duration-300 hover:shadow-2xl hover:-translate-y-1 ${
         isDark
-          ? "bg-[#0f1117] border-zinc-800 shadow-black/50"
-          : "bg-stone-100 border-stone-200 shadow-stone-200/60"
+          ? "bg-[#0f1117] border-zinc-800"
+          : "bg-stone-100 border-stone-200/90"
       }`}
     >
       <div className="relative overflow-hidden aspect-[9/18] w-full">
         {children}
       </div>
-    </div>
-  );
-}
-
-/* ========================================================================= */
-/* 3. Stage Canvas with Tactile 3D Tilt & Specular Sheen (Framer Design) */
-/* ========================================================================= */
-function StageCanvas({
-  children,
-  accentTint,
-  label,
-  onClick,
-}: {
-  children: React.ReactNode;
-  accentTint?: string;
-  label?: string;
-  onClick?: () => void;
-}) {
-  const { activeTheme } = useThemeStore();
-  const isDark = activeTheme.isDark;
-
-  // 3D tactile perspective physics
-  const mouseX = useMotionValue(0);
-  const mouseY = useMotionValue(0);
-  const rotateX = useSpring(useTransform(mouseY, [-0.5, 0.5], [6, -6]), {
-    stiffness: 260,
-    damping: 28,
-  });
-  const rotateY = useSpring(useTransform(mouseX, [-0.5, 0.5], [-6, 6]), {
-    stiffness: 260,
-    damping: 28,
-  });
-
-  const [mousePos, setMousePos] = useState({ x: 0, y: 0, active: false });
-
-  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
-    const rect = e.currentTarget.getBoundingClientRect();
-    const x = (e.clientX - rect.left) / rect.width - 0.5;
-    const y = (e.clientY - rect.top) / rect.height - 0.5;
-    mouseX.set(x);
-    mouseY.set(y);
-    setMousePos({
-      x: e.clientX - rect.left,
-      y: e.clientY - rect.top,
-      active: true,
-    });
-  };
-
-  const handleMouseLeave = () => {
-    mouseX.set(0);
-    mouseY.set(0);
-    setMousePos((prev) => ({ ...prev, active: false }));
-  };
-
-  return (
-    <div style={{ perspective: 1200 }} className="w-full">
-      <motion.div
-        onClick={onClick}
-        onMouseMove={handleMouseMove}
-        onMouseLeave={handleMouseLeave}
-        style={{
-          rotateX,
-          rotateY,
-          transformStyle: "preserve-3d",
-          boxShadow: accentTint ? `0 0 50px -12px ${accentTint}` : undefined,
-        }}
-        whileHover={{ y: -4 }}
-        transition={{ duration: 0.2 }}
-        className={`group/stage relative rounded-2xl p-4 sm:p-5 lg:p-6 flex flex-col items-center justify-center border border-solid border-stone-200/60 dark:border-zinc-800/60 cursor-pointer transition-all duration-300 overflow-hidden ${
-          isDark
-            ? "bg-gradient-to-b from-[#11131a] to-[#0a0b0f] border-zinc-800 hover:border-zinc-600"
-            : "bg-gradient-to-b from-stone-100/90 to-stone-50/50 border-stone-200 hover:border-stone-300"
-        }`}
-      >
-        {/* Specular glare tracking mouse movement */}
-        {mousePos.active && (
-          <div
-            className="absolute inset-0 pointer-events-none transition-opacity duration-200 opacity-60"
-            style={{
-              background: `radial-gradient(circle 320px at ${mousePos.x}px ${mousePos.y}px, ${
-                isDark ? "rgba(255, 255, 255, 0.07)" : "rgba(255, 255, 255, 0.65)"
-              }, transparent 80%)`,
-            }}
-          />
-        )}
-
-        {/* Delicate Micro-Dot Grid Texture */}
-        <div
-          className="absolute inset-0 opacity-[0.035] pointer-events-none"
-          style={{
-            backgroundImage: `radial-gradient(circle, currentColor 1px, transparent 1px)`,
-            backgroundSize: "16px 16px",
-          }}
-        />
-
-        <div className="w-full relative z-10 flex items-center justify-center">
-          {children}
-        </div>
-      </motion.div>
     </div>
   );
 }
@@ -378,14 +273,13 @@ export function BreakTheGridShowcase({ onLaunchOS }: BreakTheGridShowcaseProps) 
         <motion.article
           id="project-adityaos"
           data-project-id="adityaos"
-          initial={{ opacity: 0, y: 32 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: "-12% 0px" }}
-          transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+          initial={{ opacity: 1, y: 0 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.4 }}
           className={`border-b border-stone-200/60 dark:border-zinc-800/60 px-6 sm:px-8 lg:px-12 py-8 sm:py-10 lg:py-10 min-h-[56vh] lg:min-h-[60vh] flex flex-col justify-center space-y-4 transition-colors ${
             isDark
-              ? "border-zinc-800/80 bg-[#0c0e14]/30 hover:bg-[#0c0e14]/50"
-              : "border-stone-200/80 bg-white hover:bg-stone-50/50"
+              ? "border-zinc-800/80 bg-[#0E1015]"
+              : "border-stone-200/80 bg-[#FAF7F2]"
           }`}
         >
           {/* Top Meta Line: Clean unboxed metadata */}
@@ -457,11 +351,10 @@ export function BreakTheGridShowcase({ onLaunchOS }: BreakTheGridShowcaseProps) 
               </div>
             </div>
 
-            {/* Right: Pixel Studio Browser Frame */}
-            <div className="lg:col-span-7 -mr-2 sm:-mr-4 lg:-mr-6 overflow-visible">
-              <StageCanvas
-                accentTint="rgba(6, 182, 212, 0.15)"
-                label="Pixel Engine 60 FPS Deterministic Canvas"
+            {/* Right: Pixel Studio Browser Frame (Clean without extra outer box) */}
+            <div className="lg:col-span-7 -mr-6 sm:-mr-8 lg:-mr-12 overflow-visible">
+              <div
+                className="cursor-pointer"
                 onClick={() =>
                   setModalData({
                     title: "AdityaOS & Pixel Engine Studio",
@@ -483,7 +376,7 @@ export function BreakTheGridShowcase({ onLaunchOS }: BreakTheGridShowcaseProps) 
                     className="object-cover object-top"
                   />
                 </BrowserFrame>
-              </StageCanvas>
+              </div>
             </div>
           </div>
         </motion.article>
@@ -494,14 +387,13 @@ export function BreakTheGridShowcase({ onLaunchOS }: BreakTheGridShowcaseProps) 
         <motion.article
           id="project-mfine"
           data-project-id="mfine"
-          initial={{ opacity: 0, y: 32 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: "-12% 0px" }}
-          transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+          initial={{ opacity: 1, y: 0 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.4 }}
           className={`border-b border-stone-200/60 dark:border-zinc-800/60 p-6 sm:p-8 lg:p-12 min-h-[68vh] lg:min-h-[76vh] flex flex-col justify-center space-y-6 transition-colors ${
             isDark
-              ? "border-zinc-800/80 bg-[#0c0e14]/30 hover:bg-[#0c0e14]/50"
-              : "border-stone-200/80 bg-white hover:bg-stone-50/50"
+              ? "border-zinc-800/80 bg-[#0E1015]"
+              : "border-stone-200/80 bg-[#FAF7F2]"
           }`}
         >
           {/* Top Meta Line: Clean unboxed metadata */}
@@ -570,10 +462,10 @@ export function BreakTheGridShowcase({ onLaunchOS }: BreakTheGridShowcaseProps) 
               </div>
             </div>
 
-            {/* Right: Tactile Browser Frame Stage */}
+            {/* Right: Clean Browser Frame without extra outer box */}
             <div className="lg:col-span-6">
-              <StageCanvas
-                accentTint="rgba(99, 102, 241, 0.15)"
+              <div
+                className="cursor-pointer"
                 onClick={() =>
                   setModalData({
                     title: "Corporate Health Benefits & Claim Settlement",
@@ -601,7 +493,7 @@ export function BreakTheGridShowcase({ onLaunchOS }: BreakTheGridShowcaseProps) 
                     className="object-cover object-top"
                   />
                 </BrowserFrame>
-              </StageCanvas>
+              </div>
             </div>
           </div>
         </motion.article>
@@ -620,14 +512,13 @@ export function BreakTheGridShowcase({ onLaunchOS }: BreakTheGridShowcaseProps) 
           <motion.article
             id="project-digiaccel"
             data-project-id="digiaccel"
-            initial={{ opacity: 0, y: 32 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: "-12% 0px" }}
-            transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+            initial={{ opacity: 1, y: 0 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.4 }}
             className={`p-6 sm:p-8 lg:p-10 flex flex-col justify-between space-y-6 transition-colors ${
               isDark
-                ? "bg-[#0c0e14]/30 hover:bg-[#0c0e14]/50"
-                : "bg-white hover:bg-stone-50/50"
+                ? "bg-[#0E1015]"
+                : "bg-[#FAF7F2]"
             }`}
           >
             <div className="space-y-4">
@@ -641,10 +532,9 @@ export function BreakTheGridShowcase({ onLaunchOS }: BreakTheGridShowcaseProps) 
                 </span>
               </div>
 
-              {/* Designed Smartphone Mockup */}
-              <StageCanvas
-                accentTint="rgba(6, 182, 212, 0.12)"
-                label="UPI Limit Meter & Daily Spend Runway"
+              {/* Designed Smartphone Mockup (Clean without outer box) */}
+              <div
+                className="cursor-pointer py-2 flex justify-center"
                 onClick={() =>
                   setModalData({
                     title: "UPI Limit Clarity & Spend Runway",
@@ -668,7 +558,7 @@ export function BreakTheGridShowcase({ onLaunchOS }: BreakTheGridShowcaseProps) 
                     />
                   </div>
                 </MobileDeviceFrame>
-              </StageCanvas>
+              </div>
 
               <div className="space-y-2 max-w-[54ch]">
                 <h4
@@ -726,14 +616,13 @@ export function BreakTheGridShowcase({ onLaunchOS }: BreakTheGridShowcaseProps) 
           <motion.article
             id="project-mosaic"
             data-project-id="mosaic"
-            initial={{ opacity: 0, y: 32 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: "-12% 0px" }}
-            transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+            initial={{ opacity: 1, y: 0 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.4 }}
             className={`p-6 sm:p-8 lg:p-10 flex flex-col justify-between space-y-6 transition-colors ${
               isDark
-                ? "bg-[#0c0e14]/30 hover:bg-[#0c0e14]/50"
-                : "bg-white hover:bg-stone-50/50"
+                ? "bg-[#0E1015]"
+                : "bg-[#FAF7F2]"
             }`}
           >
             <div className="space-y-4">
@@ -747,10 +636,9 @@ export function BreakTheGridShowcase({ onLaunchOS }: BreakTheGridShowcaseProps) 
                 </span>
               </div>
 
-              {/* Designed Smartphone Mockup for 21-Day Habit Engine */}
-              <StageCanvas
-                accentTint="rgba(245, 158, 11, 0.12)"
-                label="21-Day Habit Engine & Streak Tracker"
+              {/* Designed Smartphone Mockup for 21-Day Habit Engine (Clean without outer box) */}
+              <div
+                className="cursor-pointer py-2 flex justify-center"
                 onClick={() =>
                   setModalData({
                     title: "21-Day Habit & Hair Tracker",
@@ -805,7 +693,7 @@ export function BreakTheGridShowcase({ onLaunchOS }: BreakTheGridShowcaseProps) 
                     </div>
                   </div>
                 </MobileDeviceFrame>
-              </StageCanvas>
+              </div>
 
               <div className="space-y-2 max-w-[54ch]">
                 <h4
@@ -874,14 +762,13 @@ export function BreakTheGridShowcase({ onLaunchOS }: BreakTheGridShowcaseProps) 
           <motion.article
             id="project-ketto"
             data-project-id="ketto"
-            initial={{ opacity: 0, y: 32 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: "-12% 0px" }}
-            transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+            initial={{ opacity: 1, y: 0 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.4 }}
             className={`p-6 sm:p-8 lg:p-10 flex flex-col justify-between space-y-6 transition-colors ${
               isDark
-                ? "bg-[#0c0e14]/30 hover:bg-[#0c0e14]/50"
-                : "bg-white hover:bg-stone-50/50"
+                ? "bg-[#0E1015]"
+                : "bg-[#FAF7F2]"
             }`}
           >
             <div className="space-y-4">
@@ -895,10 +782,9 @@ export function BreakTheGridShowcase({ onLaunchOS }: BreakTheGridShowcaseProps) 
                 </span>
               </div>
 
-              {/* Designed Smartphone Mockup for Ketto+ Giving */}
-              <StageCanvas
-                accentTint="rgba(236, 72, 153, 0.12)"
-                label="Ketto+ Recurring Giving Onboarding"
+              {/* Designed Smartphone Mockup for Ketto+ Giving (Clean without outer box) */}
+              <div
+                className="cursor-pointer py-2 flex justify-center"
                 onClick={() =>
                   setModalData({
                     title: "Ketto+ Recurring Crowdfunding Platform",
@@ -945,7 +831,7 @@ export function BreakTheGridShowcase({ onLaunchOS }: BreakTheGridShowcaseProps) 
                     </div>
                   </div>
                 </MobileDeviceFrame>
-              </StageCanvas>
+              </div>
 
               <div className="space-y-2 max-w-[54ch]">
                 <h4
@@ -1003,14 +889,13 @@ export function BreakTheGridShowcase({ onLaunchOS }: BreakTheGridShowcaseProps) 
           <motion.article
             id="project-tutedude"
             data-project-id="tutedude"
-            initial={{ opacity: 0, y: 32 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: "-12% 0px" }}
-            transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+            initial={{ opacity: 1, y: 0 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.4 }}
             className={`p-6 sm:p-8 lg:p-10 flex flex-col justify-between space-y-6 transition-colors ${
               isDark
-                ? "bg-[#0c0e14]/30 hover:bg-[#0c0e14]/50"
-                : "bg-white hover:bg-stone-50/50"
+                ? "bg-[#0E1015]"
+                : "bg-[#FAF7F2]"
             }`}
           >
             <div className="space-y-4">
@@ -1024,9 +909,9 @@ export function BreakTheGridShowcase({ onLaunchOS }: BreakTheGridShowcaseProps) 
                 </span>
               </div>
 
-              {/* Designed Smartphone Mockup */}
-              <StageCanvas
-                accentTint="rgba(14, 165, 233, 0.12)"
+              {/* Designed Smartphone Mockup (Clean without outer box) */}
+              <div
+                className="cursor-pointer py-2 flex justify-center"
                 onClick={() =>
                   setModalData({
                     title: "TuteDude Course Architecture & 1-on-1 Mentorship",
@@ -1056,7 +941,7 @@ export function BreakTheGridShowcase({ onLaunchOS }: BreakTheGridShowcaseProps) 
                     />
                   </div>
                 </MobileDeviceFrame>
-              </StageCanvas>
+              </div>
 
               <div className="space-y-2 max-w-[54ch]">
                 <h4
@@ -1117,14 +1002,13 @@ export function BreakTheGridShowcase({ onLaunchOS }: BreakTheGridShowcaseProps) 
         <motion.article
           id="project-fieldwork"
           data-project-id="fieldwork"
-          initial={{ opacity: 0, y: 32 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: "-12% 0px" }}
-          transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+          initial={{ opacity: 1, y: 0 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.4 }}
           className={`border-b border-stone-200/60 dark:border-zinc-800/60 p-6 sm:p-8 lg:p-12 min-h-[68vh] lg:min-h-[76vh] flex flex-col justify-center space-y-6 transition-colors ${
             isDark
-              ? "border-zinc-800/80 bg-[#0c0e14]/30 hover:bg-[#0c0e14]/50"
-              : "border-stone-200/80 bg-white hover:bg-stone-50/50"
+              ? "border-zinc-800/80 bg-[#0E1015]"
+              : "border-stone-200/80 bg-[#FAF7F2]"
           }`}
         >
           {/* Top Meta Line: Clean unboxed metadata */}
@@ -1191,11 +1075,10 @@ export function BreakTheGridShowcase({ onLaunchOS }: BreakTheGridShowcaseProps) 
               </div>
             </div>
 
-            {/* Right: Fieldwork Photo Frame */}
+            {/* Right: Fieldwork Photo Frame (Clean without outer box) */}
             <div className="lg:col-span-6">
-              <StageCanvas
-                accentTint="rgba(16, 185, 129, 0.12)"
-                label="Grassroots Ethnography · Mewar Belt, Rural Rajasthan"
+              <div
+                className="w-full max-w-[420px] rounded-xl overflow-hidden border border-stone-200/80 dark:border-zinc-700/60 shadow-[0_20px_50px_rgba(0,0,0,0.08)] dark:shadow-[0_20px_50px_rgba(0,0,0,0.35)] aspect-[4/3] relative cursor-pointer hover:shadow-xl hover:-translate-y-0.5 transition-all duration-300"
                 onClick={() =>
                   setModalData({
                     title: "Grassroots Fieldwork & Ethnography",
@@ -1207,22 +1090,20 @@ export function BreakTheGridShowcase({ onLaunchOS }: BreakTheGridShowcaseProps) 
                   })
                 }
               >
-                <div className="w-full max-w-[360px] rounded-xl overflow-hidden border border-stone-200/80 dark:border-zinc-700/60 shadow-xl aspect-[4/3] relative">
-                  <Image
-                    src="/aditya_field_full.jpg"
-                    alt="Rural Fieldwork Photo in Rajasthan"
-                    fill
-                    priority
-                    unoptimized
-                    className="object-cover object-top"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-transparent to-transparent flex items-end p-3">
-                    <span className="text-[11px] font-mono text-emerald-300 font-medium">
-                      Mewar Belt · Water Commons Stewardship
-                    </span>
-                  </div>
+                <Image
+                  src="/aditya_field_full.jpg"
+                  alt="Rural Fieldwork Photo in Rajasthan"
+                  fill
+                  priority
+                  unoptimized
+                  className="object-cover object-top hover:scale-102 transition-transform duration-500"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-transparent to-transparent flex items-end p-3">
+                  <span className="text-[11px] font-mono text-emerald-300 font-medium">
+                    Mewar Belt · Water Commons Stewardship
+                  </span>
                 </div>
-              </StageCanvas>
+              </div>
             </div>
           </div>
         </motion.article>
