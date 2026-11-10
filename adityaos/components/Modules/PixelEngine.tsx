@@ -50,7 +50,7 @@ import {
   recordPixelPopped,
   GlobalCommunityStats,
 } from "@/lib/firebaseStats";
-import { createInitialPixelArt, INITIAL_PIXELS } from "./pixelArtPresets";
+import { createInitialPixelArt, INITIAL_PIXELS, SCENE_GENERATORS } from "./pixelArtPresets";
 import { PixelArtImportModal } from "./PixelArtImportModal";
 
 // 5x5 and 5x3 Pixel Bitmap Font from homesec.tsx / pixel.tsx
@@ -134,6 +134,7 @@ export const PixelEngine: React.FC = () => {
   const [typeString, setTypeString] = useState<string>("ADITYA");
   const [isTypeModalOpen, setIsTypeModalOpen] = useState<boolean>(false);
   const [isImportModalOpen, setIsImportModalOpen] = useState<boolean>(false);
+  const [isSceneMenuOpen, setIsSceneMenuOpen] = useState<boolean>(false);
   const [importImageSrc, setImportImageSrc] = useState<string | null>(null);
   const [hoverCoord, setHoverCoord] = useState<{ col: number; row: number } | null>(null);
   const [canvasPixelCount, setCanvasPixelCount] = useState<number>(639);
@@ -635,21 +636,17 @@ export const PixelEngine: React.FC = () => {
         }
       });
 
-      if (!hasCenteredRef.current) {
+      // Automatically fit the initial scene to the full canvas while pristine
+      if (historyRef.current.length <= 1) {
         const cols = Math.floor(width / pixelSize);
         const rows = Math.floor(height / pixelSize);
         if (cols > 0 && rows > 0) {
-          hasCenteredRef.current = true;
-          const offsetCol = Math.max(0, Math.floor((cols - 92) / 2));
-          const offsetRow = Math.max(0, Math.floor((rows - 58) / 2));
-          if (offsetCol > 0 || offsetRow > 0) {
-            const centered = createInitialPixelArt(offsetRow, offsetCol);
-            pixelsRef.current = centered;
-            drawingBufferRef.current = new Map(centered);
-            historyRef.current = [new Map(centered)];
-            historyIndexRef.current = 0;
-            setCanvasPixelCount(centered.size);
-          }
+          const initialScene = createInitialPixelArt(0, 0, cols, rows);
+          pixelsRef.current = initialScene;
+          drawingBufferRef.current = new Map(initialScene);
+          historyRef.current = [new Map(initialScene)];
+          historyIndexRef.current = 0;
+          setCanvasPixelCount(initialScene.size);
         }
       }
 
@@ -1969,24 +1966,69 @@ export const PixelEngine: React.FC = () => {
     [playPopSound]
   );
 
-  const handleApplyImportPixels = useCallback(
-    (newPixels: Map<string, string>, count: number) => {
+  const loadProceduralScene = useCallback(
+    (sceneKey: keyof typeof SCENE_GENERATORS) => {
+      const canvas = artworkCanvasRef.current;
+      const cols = canvas ? Math.floor(canvas.width / pixelSize) : 80;
+      const rows = canvas ? Math.floor(canvas.height / pixelSize) : 50;
+
+      const generator = SCENE_GENERATORS[sceneKey]?.generate || SCENE_GENERATORS.himalayanNight.generate;
+      const generatedPixels = generator(cols, rows);
+
       pixelsRef.current.clear();
-      newPixels.forEach((hex, key) => {
+      generatedPixels.forEach((hex: string, key: string) => {
         pixelsRef.current.set(key, hex);
       });
-      drawingBufferRef.current = new Map(newPixels);
-      setCanvasPixelCount(newPixels.size);
+      drawingBufferRef.current = new Map(generatedPixels);
+      setCanvasPixelCount(generatedPixels.size);
+      saveStep();
+      redrawAll();
+      playPopSound(750);
+      setIsSceneMenuOpen(false);
+    },
+    [pixelSize, redrawAll, saveStep, playPopSound]
+  );
+
+  const handleApplyImportPixels = useCallback(
+    (newPixels: Map<string, string>, count: number) => {
+      const canvasWidth = artworkCanvasRef.current ? Math.floor(artworkCanvasRef.current.width / pixelSize) : 48;
+      const canvasHeight = artworkCanvasRef.current ? Math.floor(artworkCanvasRef.current.height / pixelSize) : 36;
+
+      let minR = Infinity, maxR = -Infinity, minC = Infinity, maxC = -Infinity;
+      newPixels.forEach((_, key) => {
+        const [rStr, cStr] = key.split("_");
+        const r = parseInt(rStr, 10);
+        const c = parseInt(cStr, 10);
+        if (r < minR) minR = r;
+        if (r > maxR) maxR = r;
+        if (c < minC) minC = c;
+        if (c > maxC) maxC = c;
+      });
+
+      const importW = isFinite(maxC - minC) ? maxC - minC + 1 : 0;
+      const importH = isFinite(maxR - minR) ? maxR - minR + 1 : 0;
+      const offsetC = Math.max(0, Math.floor((canvasWidth - importW) / 2));
+      const offsetR = Math.max(0, Math.floor((canvasHeight - importH) / 2));
+
+      pixelsRef.current.clear();
+      newPixels.forEach((hex, key) => {
+        const [rStr, cStr] = key.split("_");
+        const r = parseInt(rStr, 10) - minR + offsetR;
+        const c = parseInt(cStr, 10) - minC + offsetC;
+        pixelsRef.current.set(`${r}_${c}`, hex);
+      });
+      drawingBufferRef.current = new Map(pixelsRef.current);
+      setCanvasPixelCount(pixelsRef.current.size);
       setStats((prev) => ({
         ...prev,
-        drawn: prev.drawn + newPixels.size,
-        score: prev.score + newPixels.size * 5,
+        drawn: prev.drawn + pixelsRef.current.size,
+        score: prev.score + pixelsRef.current.size * 5,
       }));
       redrawAll();
       saveStep();
       playPopSound(800);
     },
-    [redrawAll, saveStep, playPopSound]
+    [pixelSize, redrawAll, saveStep, playPopSound]
   );
 
   // Curated, high-contrast palette without near-duplicate dark swatches
@@ -2410,6 +2452,44 @@ export const PixelEngine: React.FC = () => {
         <div className="flex items-center gap-2 flex-shrink-0 text-xs font-mono">
           {engineMode === "draw" && (
             <div className="flex items-center gap-2.5">
+              {/* Procedural Scenes Selector */}
+              <div className="relative">
+                <button
+                  type="button"
+                  onClick={() => setIsSceneMenuOpen((prev) => !prev)}
+                  title="Generate dynamic full-canvas procedural scenes"
+                  className="text-stone-600 dark:text-zinc-400 hover:text-stone-950 dark:hover:text-zinc-100 hover:underline cursor-pointer focus:outline-none focus-visible:ring-1 focus-visible:ring-stone-400 flex items-center gap-1"
+                >
+                  <span>Scenes</span>
+                  <span className="text-[10px] opacity-70">▾</span>
+                </button>
+
+                {isSceneMenuOpen && (
+                  <div
+                    style={{
+                      backgroundColor: activeTheme.windowBg,
+                      borderColor: activeTheme.cardBorder,
+                    }}
+                    className="absolute right-0 top-full mt-1.5 w-52 rounded border shadow-lg py-1 z-50 text-left font-mono text-[11px]"
+                  >
+                    <div className="px-2.5 py-1 text-[9px] uppercase tracking-wider opacity-50 font-bold border-b border-black/5 dark:border-white/5">
+                      Procedural Scenes
+                    </div>
+                    {Object.entries(SCENE_GENERATORS).map(([key, s]) => (
+                      <button
+                        key={key}
+                        type="button"
+                        onClick={() => loadProceduralScene(key as keyof typeof SCENE_GENERATORS)}
+                        className="w-full text-left px-2.5 py-1.5 hover:bg-black/5 dark:hover:bg-white/10 transition-colors flex flex-col cursor-pointer"
+                      >
+                        <span className="font-semibold text-stone-900 dark:text-zinc-100">{s.name}</span>
+                        <span className="text-[9px] opacity-60 leading-tight">{s.description}</span>
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
+
               {/* Automated Showcase Tour Button */}
               <button
                 type="button"

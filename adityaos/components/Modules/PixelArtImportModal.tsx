@@ -42,7 +42,10 @@ export const PixelArtImportModal: React.FC<PixelArtImportModalProps> = ({
   const { playClickChime } = useSoundStore();
 
   const [activeImageSrc, setActiveImageSrc] = useState<string | null>(imageSrc);
-  const [paletteMode, setPaletteMode] = useState<"rplace" | "pico8" | "gameboy" | "original">("rplace");
+  const [paletteMode, setPaletteMode] = useState<"rplace" | "pico8" | "gameboy" | "pc98" | "tokyoDusk" | "original">("rplace");
+  const [ditherMode, setDitherMode] = useState<"bayer" | "atkinson" | "none">("bayer");
+  const [ditherStrength, setDitherStrength] = useState<number>(0.6);
+  const [smoothNoise, setSmoothNoise] = useState<boolean>(true);
   const [removeBg, setRemoveBg] = useState<boolean>(true);
   const [bgTolerance, setBgTolerance] = useState<number>(38);
   const [contrast, setContrast] = useState<number>(1.25);
@@ -87,6 +90,9 @@ export const PixelArtImportModal: React.FC<PixelArtImportModalProps> = ({
       targetCols,
       targetRows,
       paletteMode,
+      ditherMode,
+      ditherStrength,
+      smoothNoise,
       removeBg,
       bgTolerance,
       contrast,
@@ -99,6 +105,9 @@ export const PixelArtImportModal: React.FC<PixelArtImportModalProps> = ({
   }, [
     loadedImg,
     paletteMode,
+    ditherMode,
+    ditherStrength,
+    smoothNoise,
     removeBg,
     bgTolerance,
     contrast,
@@ -361,12 +370,14 @@ export const PixelArtImportModal: React.FC<PixelArtImportModalProps> = ({
             >
               <span className="font-bold text-[11px] flex items-center gap-1.5">
                 <Palette className="w-3.5 h-3.5 text-purple-400" />
-                Color Quantization
+                Color Quantization (Oklab Perceptual)
               </span>
 
               <div className="grid grid-cols-2 gap-1.5">
                 {[
                   { id: "rplace", label: "r/place 32", desc: "Crisp & Punchy" },
+                  { id: "tokyoDusk", label: "Tokyo Dusk", desc: "Cyberpunk 16" },
+                  { id: "pc98", label: "PC-98", desc: "Japanese 16" },
                   { id: "pico8", label: "PICO-8", desc: "Retro 16-Color" },
                   { id: "gameboy", label: "GameBoy", desc: "4-Tone Green" },
                   { id: "original", label: "Original", desc: "TrueColor" },
@@ -388,6 +399,70 @@ export const PixelArtImportModal: React.FC<PixelArtImportModalProps> = ({
                     <div className="text-[8px] opacity-60">{p.desc}</div>
                   </button>
                 ))}
+              </div>
+            </div>
+
+            {/* 4. Dithering & Texture */}
+            <div
+              style={{ backgroundColor: activeTheme.cardBg, borderColor: activeTheme.cardBorder }}
+              className="p-2.5 rounded-lg border space-y-2"
+            >
+              <div className="flex items-center justify-between">
+                <span className="font-bold text-[11px] flex items-center gap-1.5">
+                  <Sliders className="w-3.5 h-3.5 text-cyan-400" />
+                  Dither & Texture Engine
+                </span>
+                <span className="text-[10px] font-bold text-cyan-400 uppercase">{ditherMode}</span>
+              </div>
+
+              <div className="grid grid-cols-3 gap-1">
+                {[
+                  { id: "bayer", label: "Bayer 4×4", desc: "Retro pattern" },
+                  { id: "atkinson", label: "Atkinson", desc: "Error diffusion" },
+                  { id: "none", label: "Flat / Solid", desc: "Sharp poster" },
+                ].map((d) => (
+                  <button
+                    key={d.id}
+                    type="button"
+                    onClick={() => setDitherMode(d.id as any)}
+                    style={{
+                      borderColor: ditherMode === d.id ? activeTheme.accent : activeTheme.cardBorder,
+                      backgroundColor: ditherMode === d.id ? `${activeTheme.accent}20` : "transparent",
+                    }}
+                    className="p-1.5 rounded border text-left transition-all cursor-pointer"
+                  >
+                    <div className="font-bold text-[10px]">{d.label}</div>
+                    <div className="text-[8px] opacity-60">{d.desc}</div>
+                  </button>
+                ))}
+              </div>
+
+              {ditherMode !== "none" && (
+                <div className="space-y-1 pt-1">
+                  <div className="flex justify-between text-[10px] opacity-70">
+                    <span>Dither Diffusion Strength</span>
+                    <span>{Math.round(ditherStrength * 100)}%</span>
+                  </div>
+                  <input
+                    type="range"
+                    min="0.1"
+                    max="1.0"
+                    step="0.05"
+                    value={ditherStrength}
+                    onChange={(e) => setDitherStrength(Number(e.target.value))}
+                    className="w-full h-1 bg-white/20 rounded accent-cyan-400 cursor-pointer"
+                  />
+                </div>
+              )}
+
+              <div className="flex items-center justify-between pt-1 border-t border-white/5">
+                <span className="text-[10px] opacity-80">Photographic noise filter</span>
+                <input
+                  type="checkbox"
+                  checked={smoothNoise}
+                  onChange={(e) => setSmoothNoise(e.target.checked)}
+                  className="w-3.5 h-3.5 rounded accent-cyan-400 cursor-pointer"
+                />
               </div>
             </div>
 

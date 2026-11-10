@@ -1,692 +1,538 @@
-// Preset pixel artworks for PixelEngine (Normal Square Grid)
-// 40x24 detailed cyberpunk skyline: stars, crescent moon, layered skyscrapers, illuminated windows, cyber matrix strip, and water reflections.
-export const INITIAL_PIXELS: [number, number, string][] = [
-  [4, 16, "#F8FAFC"],
-  [4, 34, "#F8FAFC"],
-  [5, 8, "#F8FAFC"],
-  [5, 20, "#F8FAFC"],
-  [5, 23, "#00FFCC"],
-  [5, 24, "#00FFCC"],
-  [5, 37, "#FEF08A"],
-  [5, 38, "#FDE047"],
-  [5, 42, "#F8FAFC"],
-  [6, 23, "#64748B"],
-  [6, 24, "#64748B"],
-  [6, 27, "#F8FAFC"],
-  [6, 36, "#FEF08A"],
-  [6, 37, "#FDE047"],
-  [6, 39, "#EAB308"],
-  [7, 8, "#EF4444"],
-  [7, 13, "#F8FAFC"],
-  [7, 23, "#64748B"],
-  [7, 24, "#64748B"],
-  [7, 35, "#FEF08A"],
-  [7, 36, "#FDE047"],
-  [7, 39, "#CA8A04"],
-  [7, 40, "#F8FAFC"],
-  [8, 8, "#94A3B8"],
-  [8, 19, "#090D16"],
-  [8, 20, "#090D16"],
-  [8, 21, "#090D16"],
-  [8, 22, "#090D16"],
-  [8, 23, "#090D16"],
-  [8, 24, "#090D16"],
-  [8, 25, "#090D16"],
-  [8, 26, "#090D16"],
-  [8, 27, "#090D16"],
-  [8, 28, "#090D16"],
-  [8, 32, "#F8FAFC"],
-  [8, 36, "#FEF08A"],
-  [8, 37, "#FDE047"],
-  [8, 38, "#EAB308"],
-  [9, 6, "#0F172A"],
-  [9, 7, "#0F172A"],
-  [9, 8, "#0F172A"],
-  [9, 9, "#0F172A"],
-  [9, 10, "#0F172A"],
-  [9, 19, "#090D16"],
-  [9, 20, "#090D16"],
-  [9, 21, "#090D16"],
-  [9, 22, "#090D16"],
-  [9, 23, "#090D16"],
-  [9, 24, "#090D16"],
-  [9, 25, "#090D16"],
-  [9, 26, "#090D16"],
-  [9, 27, "#090D16"],
-  [9, 28, "#090D16"],
-  [9, 33, "#EF4444"],
-  [9, 37, "#FDE047"],
-  [10, 6, "#0F172A"],
-  [10, 7, "#0F172A"],
-  [10, 8, "#0F172A"],
-  [10, 9, "#0F172A"],
-  [10, 10, "#0F172A"],
-  [10, 19, "#090D16"],
-  [10, 20, "#090D16"],
-  [10, 21, "#090D16"],
-  [10, 22, "#090D16"],
-  [10, 23, "#A855F7"],
-  [10, 24, "#00FFCC"],
-  [10, 25, "#090D16"],
-  [10, 26, "#090D16"],
-  [10, 27, "#090D16"],
-  [10, 28, "#090D16"],
-  [10, 33, "#94A3B8"],
-  [11, 6, "#0F172A"],
-  [11, 7, "#38BDF8"],
-  [11, 8, "#0F172A"],
-  [11, 9, "#38BDF8"],
-  [11, 10, "#0F172A"],
-  [11, 17, "#182234"],
-  [11, 18, "#182234"],
-  [11, 19, "#090D16"],
-  [11, 20, "#00FFCC"],
-  [11, 21, "#00FFCC"],
-  [11, 22, "#090D16"],
-  [11, 23, "#EC4899"],
-  [11, 24, "#38BDF8"],
-  [11, 25, "#090D16"],
-  [11, 26, "#FBBF24"],
-  [11, 27, "#FBBF24"],
-  [11, 28, "#090D16"],
-  [11, 32, "#0F172A"],
-  [11, 33, "#0F172A"],
-  [11, 34, "#0F172A"],
-  [12, 6, "#0F172A"],
-  [12, 7, "#0F172A"],
-  [12, 8, "#0F172A"],
-  [12, 9, "#0F172A"],
-  [12, 10, "#0F172A"],
-  [12, 17, "#182234"],
-  [12, 18, "#182234"],
-  [12, 19, "#090D16"],
-  [12, 20, "#090D16"],
-  [12, 21, "#090D16"],
-  [12, 22, "#090D16"],
-  [12, 23, "#A855F7"],
-  [12, 24, "#00FFCC"],
-  [12, 25, "#090D16"],
-  [12, 26, "#090D16"],
-  [12, 27, "#090D16"],
-  [12, 28, "#090D16"],
-  [12, 31, "#182234"],
-  [12, 32, "#0F172A"],
-  [12, 33, "#0F172A"],
-  [12, 34, "#0F172A"],
-  [12, 35, "#182234"],
-  [12, 36, "#182234"],
-  [13, 5, "#1E293B"],
-  [13, 6, "#0F172A"],
-  [13, 7, "#38BDF8"],
-  [13, 8, "#0F172A"],
-  [13, 9, "#00FFCC"],
-  [13, 10, "#0F172A"],
-  [13, 16, "#1E293B"],
-  [13, 17, "#1E293B"],
-  [13, 18, "#182234"],
-  [13, 19, "#090D16"],
-  [13, 20, "#00FFCC"],
-  [13, 21, "#00FFCC"],
-  [13, 22, "#090D16"],
-  [13, 23, "#EC4899"],
-  [13, 24, "#38BDF8"],
-  [13, 25, "#090D16"],
-  [13, 26, "#FBBF24"],
-  [13, 27, "#FBBF24"],
-  [13, 28, "#090D16"],
-  [13, 30, "#0F172A"],
-  [13, 31, "#0F172A"],
-  [13, 32, "#0F172A"],
-  [13, 33, "#0F172A"],
-  [13, 34, "#0F172A"],
-  [13, 35, "#0F172A"],
-  [13, 36, "#0F172A"],
-  [14, 5, "#1E293B"],
-  [14, 6, "#0F172A"],
-  [14, 7, "#0F172A"],
-  [14, 8, "#0F172A"],
-  [14, 9, "#0F172A"],
-  [14, 10, "#0F172A"],
-  [14, 14, "#1E293B"],
-  [14, 15, "#1E293B"],
-  [14, 16, "#1E293B"],
-  [14, 17, "#1E293B"],
-  [14, 18, "#182234"],
-  [14, 19, "#090D16"],
-  [14, 20, "#090D16"],
-  [14, 21, "#090D16"],
-  [14, 22, "#090D16"],
-  [14, 23, "#A855F7"],
-  [14, 24, "#00FFCC"],
-  [14, 25, "#090D16"],
-  [14, 26, "#090D16"],
-  [14, 27, "#090D16"],
-  [14, 28, "#090D16"],
-  [14, 29, "#1E293B"],
-  [14, 30, "#0F172A"],
-  [14, 31, "#38BDF8"],
-  [14, 32, "#0F172A"],
-  [14, 33, "#C084FC"],
-  [14, 34, "#0F172A"],
-  [14, 35, "#38BDF8"],
-  [14, 36, "#0F172A"],
-  [14, 38, "#1E293B"],
-  [14, 39, "#1E293B"],
-  [14, 40, "#1E293B"],
-  [14, 41, "#1E293B"],
-  [14, 42, "#1E293B"],
-  [14, 43, "#1E293B"],
-  [15, 5, "#1E293B"],
-  [15, 6, "#0F172A"],
-  [15, 7, "#00FFCC"],
-  [15, 8, "#0F172A"],
-  [15, 9, "#38BDF8"],
-  [15, 10, "#0F172A"],
-  [15, 11, "#1E293B"],
-  [15, 12, "#1E293B"],
-  [15, 13, "#FBBF24"],
-  [15, 14, "#1E293B"],
-  [15, 15, "#FBBF24"],
-  [15, 16, "#FBBF24"],
-  [15, 17, "#1E293B"],
-  [15, 18, "#182234"],
-  [15, 19, "#090D16"],
-  [15, 20, "#00FFCC"],
-  [15, 21, "#00FFCC"],
-  [15, 22, "#090D16"],
-  [15, 23, "#EC4899"],
-  [15, 24, "#38BDF8"],
-  [15, 25, "#090D16"],
-  [15, 26, "#FBBF24"],
-  [15, 27, "#FBBF24"],
-  [15, 28, "#090D16"],
-  [15, 29, "#1E293B"],
-  [15, 30, "#0F172A"],
-  [15, 31, "#0F172A"],
-  [15, 32, "#0F172A"],
-  [15, 33, "#0F172A"],
-  [15, 34, "#0F172A"],
-  [15, 35, "#0F172A"],
-  [15, 36, "#0F172A"],
-  [15, 38, "#1E293B"],
-  [15, 39, "#1E293B"],
-  [15, 40, "#1E293B"],
-  [15, 41, "#1E293B"],
-  [15, 42, "#1E293B"],
-  [15, 43, "#1E293B"],
-  [16, 5, "#1E293B"],
-  [16, 6, "#0F172A"],
-  [16, 7, "#0F172A"],
-  [16, 8, "#0F172A"],
-  [16, 9, "#0F172A"],
-  [16, 10, "#0F172A"],
-  [16, 11, "#1E293B"],
-  [16, 12, "#1E293B"],
-  [16, 13, "#1E293B"],
-  [16, 14, "#1E293B"],
-  [16, 15, "#1E293B"],
-  [16, 16, "#1E293B"],
-  [16, 17, "#1E293B"],
-  [16, 18, "#182234"],
-  [16, 19, "#090D16"],
-  [16, 20, "#090D16"],
-  [16, 21, "#090D16"],
-  [16, 22, "#090D16"],
-  [16, 23, "#A855F7"],
-  [16, 24, "#00FFCC"],
-  [16, 25, "#090D16"],
-  [16, 26, "#090D16"],
-  [16, 27, "#090D16"],
-  [16, 28, "#090D16"],
-  [16, 29, "#1E293B"],
-  [16, 30, "#0F172A"],
-  [16, 31, "#38BDF8"],
-  [16, 32, "#0F172A"],
-  [16, 33, "#C084FC"],
-  [16, 34, "#0F172A"],
-  [16, 35, "#38BDF8"],
-  [16, 36, "#0F172A"],
-  [16, 38, "#1E293B"],
-  [16, 39, "#FBBF24"],
-  [16, 40, "#1E293B"],
-  [16, 41, "#10B981"],
-  [16, 42, "#FBBF24"],
-  [16, 43, "#1E293B"],
-  [17, 5, "#1E293B"],
-  [17, 6, "#0F172A"],
-  [17, 7, "#38BDF8"],
-  [17, 8, "#0F172A"],
-  [17, 9, "#38BDF8"],
-  [17, 10, "#0F172A"],
-  [17, 11, "#1E293B"],
-  [17, 12, "#1E293B"],
-  [17, 13, "#FBBF24"],
-  [17, 14, "#1E293B"],
-  [17, 15, "#FBBF24"],
-  [17, 16, "#FBBF24"],
-  [17, 17, "#1E293B"],
-  [17, 18, "#182234"],
-  [17, 19, "#090D16"],
-  [17, 20, "#00FFCC"],
-  [17, 21, "#00FFCC"],
-  [17, 22, "#090D16"],
-  [17, 23, "#EC4899"],
-  [17, 24, "#38BDF8"],
-  [17, 25, "#090D16"],
-  [17, 26, "#FBBF24"],
-  [17, 27, "#FBBF24"],
-  [17, 28, "#090D16"],
-  [17, 29, "#1E293B"],
-  [17, 30, "#0F172A"],
-  [17, 31, "#0F172A"],
-  [17, 32, "#0F172A"],
-  [17, 33, "#0F172A"],
-  [17, 34, "#0F172A"],
-  [17, 35, "#0F172A"],
-  [17, 36, "#0F172A"],
-  [17, 38, "#1E293B"],
-  [17, 39, "#1E293B"],
-  [17, 40, "#1E293B"],
-  [17, 41, "#1E293B"],
-  [17, 42, "#1E293B"],
-  [17, 43, "#1E293B"],
-  [18, 5, "#1E293B"],
-  [18, 6, "#0F172A"],
-  [18, 7, "#0F172A"],
-  [18, 8, "#0F172A"],
-  [18, 9, "#0F172A"],
-  [18, 10, "#0F172A"],
-  [18, 11, "#1E293B"],
-  [18, 12, "#1E293B"],
-  [18, 13, "#1E293B"],
-  [18, 14, "#1E293B"],
-  [18, 15, "#1E293B"],
-  [18, 16, "#1E293B"],
-  [18, 17, "#1E293B"],
-  [18, 18, "#182234"],
-  [18, 19, "#090D16"],
-  [18, 20, "#090D16"],
-  [18, 21, "#090D16"],
-  [18, 22, "#090D16"],
-  [18, 23, "#A855F7"],
-  [18, 24, "#00FFCC"],
-  [18, 25, "#090D16"],
-  [18, 26, "#090D16"],
-  [18, 27, "#090D16"],
-  [18, 28, "#090D16"],
-  [18, 29, "#1E293B"],
-  [18, 30, "#0F172A"],
-  [18, 31, "#38BDF8"],
-  [18, 32, "#0F172A"],
-  [18, 33, "#C084FC"],
-  [18, 34, "#0F172A"],
-  [18, 35, "#38BDF8"],
-  [18, 36, "#0F172A"],
-  [18, 38, "#1E293B"],
-  [18, 39, "#FBBF24"],
-  [18, 40, "#1E293B"],
-  [18, 41, "#10B981"],
-  [18, 42, "#FBBF24"],
-  [18, 43, "#1E293B"],
-  [19, 5, "#1E293B"],
-  [19, 6, "#0F172A"],
-  [19, 7, "#38BDF8"],
-  [19, 8, "#0F172A"],
-  [19, 9, "#00FFCC"],
-  [19, 10, "#0F172A"],
-  [19, 11, "#1E293B"],
-  [19, 12, "#1E293B"],
-  [19, 13, "#FBBF24"],
-  [19, 14, "#1E293B"],
-  [19, 15, "#FBBF24"],
-  [19, 16, "#FBBF24"],
-  [19, 17, "#1E293B"],
-  [19, 18, "#182234"],
-  [19, 19, "#090D16"],
-  [19, 20, "#00FFCC"],
-  [19, 21, "#00FFCC"],
-  [19, 22, "#090D16"],
-  [19, 23, "#EC4899"],
-  [19, 24, "#38BDF8"],
-  [19, 25, "#090D16"],
-  [19, 26, "#FBBF24"],
-  [19, 27, "#FBBF24"],
-  [19, 28, "#090D16"],
-  [19, 29, "#1E293B"],
-  [19, 30, "#0F172A"],
-  [19, 31, "#0F172A"],
-  [19, 32, "#0F172A"],
-  [19, 33, "#0F172A"],
-  [19, 34, "#0F172A"],
-  [19, 35, "#0F172A"],
-  [19, 36, "#0F172A"],
-  [19, 38, "#1E293B"],
-  [19, 39, "#1E293B"],
-  [19, 40, "#1E293B"],
-  [19, 41, "#1E293B"],
-  [19, 42, "#1E293B"],
-  [19, 43, "#1E293B"],
-  [20, 5, "#1E293B"],
-  [20, 6, "#0F172A"],
-  [20, 7, "#0F172A"],
-  [20, 8, "#0F172A"],
-  [20, 9, "#0F172A"],
-  [20, 10, "#0F172A"],
-  [20, 11, "#1E293B"],
-  [20, 12, "#1E293B"],
-  [20, 13, "#1E293B"],
-  [20, 14, "#1E293B"],
-  [20, 15, "#1E293B"],
-  [20, 16, "#1E293B"],
-  [20, 17, "#1E293B"],
-  [20, 18, "#182234"],
-  [20, 19, "#090D16"],
-  [20, 20, "#090D16"],
-  [20, 21, "#090D16"],
-  [20, 22, "#090D16"],
-  [20, 23, "#A855F7"],
-  [20, 24, "#00FFCC"],
-  [20, 25, "#090D16"],
-  [20, 26, "#090D16"],
-  [20, 27, "#090D16"],
-  [20, 28, "#090D16"],
-  [20, 29, "#1E293B"],
-  [20, 30, "#0F172A"],
-  [20, 31, "#38BDF8"],
-  [20, 32, "#0F172A"],
-  [20, 33, "#C084FC"],
-  [20, 34, "#0F172A"],
-  [20, 35, "#38BDF8"],
-  [20, 36, "#0F172A"],
-  [20, 38, "#1E293B"],
-  [20, 39, "#FBBF24"],
-  [20, 40, "#1E293B"],
-  [20, 41, "#10B981"],
-  [20, 42, "#FBBF24"],
-  [20, 43, "#1E293B"],
-  [21, 5, "#1E293B"],
-  [21, 6, "#0F172A"],
-  [21, 7, "#00FFCC"],
-  [21, 8, "#0F172A"],
-  [21, 9, "#38BDF8"],
-  [21, 10, "#0F172A"],
-  [21, 11, "#1E293B"],
-  [21, 12, "#1E293B"],
-  [21, 13, "#FBBF24"],
-  [21, 14, "#1E293B"],
-  [21, 15, "#FBBF24"],
-  [21, 16, "#FBBF24"],
-  [21, 17, "#1E293B"],
-  [21, 18, "#182234"],
-  [21, 19, "#090D16"],
-  [21, 20, "#00FFCC"],
-  [21, 21, "#00FFCC"],
-  [21, 22, "#090D16"],
-  [21, 23, "#090D16"],
-  [21, 24, "#090D16"],
-  [21, 25, "#090D16"],
-  [21, 26, "#FBBF24"],
-  [21, 27, "#FBBF24"],
-  [21, 28, "#090D16"],
-  [21, 29, "#1E293B"],
-  [21, 30, "#0F172A"],
-  [21, 31, "#0F172A"],
-  [21, 32, "#0F172A"],
-  [21, 33, "#0F172A"],
-  [21, 34, "#0F172A"],
-  [21, 35, "#0F172A"],
-  [21, 36, "#0F172A"],
-  [21, 38, "#1E293B"],
-  [21, 39, "#1E293B"],
-  [21, 40, "#1E293B"],
-  [21, 41, "#1E293B"],
-  [21, 42, "#1E293B"],
-  [21, 43, "#1E293B"],
-  [22, 5, "#1E293B"],
-  [22, 6, "#0F172A"],
-  [22, 7, "#0F172A"],
-  [22, 8, "#0F172A"],
-  [22, 9, "#0F172A"],
-  [22, 10, "#0F172A"],
-  [22, 11, "#1E293B"],
-  [22, 12, "#1E293B"],
-  [22, 13, "#1E293B"],
-  [22, 14, "#1E293B"],
-  [22, 15, "#1E293B"],
-  [22, 16, "#1E293B"],
-  [22, 17, "#1E293B"],
-  [22, 18, "#182234"],
-  [22, 19, "#090D16"],
-  [22, 20, "#090D16"],
-  [22, 21, "#090D16"],
-  [22, 22, "#090D16"],
-  [22, 23, "#090D16"],
-  [22, 24, "#090D16"],
-  [22, 25, "#090D16"],
-  [22, 26, "#090D16"],
-  [22, 27, "#090D16"],
-  [22, 28, "#090D16"],
-  [22, 29, "#1E293B"],
-  [22, 30, "#0F172A"],
-  [22, 31, "#0F172A"],
-  [22, 32, "#0F172A"],
-  [22, 33, "#0F172A"],
-  [22, 34, "#0F172A"],
-  [22, 35, "#0F172A"],
-  [22, 36, "#0F172A"],
-  [22, 38, "#1E293B"],
-  [22, 39, "#1E293B"],
-  [22, 40, "#1E293B"],
-  [22, 41, "#1E293B"],
-  [22, 42, "#1E293B"],
-  [22, 43, "#1E293B"],
-  [23, 4, "#020617"],
-  [23, 5, "#020617"],
-  [23, 6, "#00FFCC"],
-  [23, 7, "#FBBF24"],
-  [23, 8, "#020617"],
-  [23, 9, "#020617"],
-  [23, 10, "#00FFCC"],
-  [23, 11, "#FBBF24"],
-  [23, 12, "#020617"],
-  [23, 13, "#020617"],
-  [23, 14, "#00FFCC"],
-  [23, 15, "#FBBF24"],
-  [23, 16, "#020617"],
-  [23, 17, "#020617"],
-  [23, 18, "#00FFCC"],
-  [23, 19, "#FBBF24"],
-  [23, 20, "#020617"],
-  [23, 21, "#020617"],
-  [23, 22, "#00FFCC"],
-  [23, 23, "#FBBF24"],
-  [23, 24, "#020617"],
-  [23, 25, "#020617"],
-  [23, 26, "#00FFCC"],
-  [23, 27, "#FBBF24"],
-  [23, 28, "#020617"],
-  [23, 29, "#020617"],
-  [23, 30, "#00FFCC"],
-  [23, 31, "#FBBF24"],
-  [23, 32, "#020617"],
-  [23, 33, "#020617"],
-  [23, 34, "#00FFCC"],
-  [23, 35, "#FBBF24"],
-  [23, 36, "#020617"],
-  [23, 37, "#020617"],
-  [23, 38, "#00FFCC"],
-  [23, 39, "#FBBF24"],
-  [23, 40, "#020617"],
-  [23, 41, "#020617"],
-  [23, 42, "#020617"],
-  [23, 43, "#020617"],
-  [24, 4, "#082F49"],
-  [24, 5, "#082F49"],
-  [24, 6, "#082F49"],
-  [24, 7, "#082F49"],
-  [24, 8, "#00FFCC"],
-  [24, 9, "#082F49"],
-  [24, 10, "#082F49"],
-  [24, 11, "#082F49"],
-  [24, 12, "#082F49"],
-  [24, 13, "#082F49"],
-  [24, 14, "#F59E0B"],
-  [24, 15, "#082F49"],
-  [24, 16, "#082F49"],
-  [24, 17, "#082F49"],
-  [24, 18, "#082F49"],
-  [24, 19, "#082F49"],
-  [24, 20, "#082F49"],
-  [24, 21, "#082F49"],
-  [24, 22, "#082F49"],
-  [24, 23, "#EC4899"],
-  [24, 24, "#00FFCC"],
-  [24, 25, "#082F49"],
-  [24, 26, "#082F49"],
-  [24, 27, "#082F49"],
-  [24, 28, "#082F49"],
-  [24, 29, "#082F49"],
-  [24, 30, "#082F49"],
-  [24, 31, "#082F49"],
-  [24, 32, "#082F49"],
-  [24, 33, "#C084FC"],
-  [24, 34, "#082F49"],
-  [24, 35, "#082F49"],
-  [24, 36, "#082F49"],
-  [24, 37, "#082F49"],
-  [24, 38, "#082F49"],
-  [24, 39, "#082F49"],
-  [24, 40, "#082F49"],
-  [24, 41, "#082F49"],
-  [24, 42, "#082F49"],
-  [24, 43, "#082F49"],
-  [25, 4, "#0369A1"],
-  [25, 5, "#0369A1"],
-  [25, 6, "#0369A1"],
-  [25, 7, "#0369A1"],
-  [25, 8, "#00FFCC"],
-  [25, 9, "#0369A1"],
-  [25, 10, "#0369A1"],
-  [25, 11, "#0369A1"],
-  [25, 12, "#0369A1"],
-  [25, 13, "#0369A1"],
-  [25, 14, "#F59E0B"],
-  [25, 15, "#0369A1"],
-  [25, 16, "#0369A1"],
-  [25, 17, "#0369A1"],
-  [25, 18, "#0369A1"],
-  [25, 19, "#0369A1"],
-  [25, 20, "#0369A1"],
-  [25, 21, "#0369A1"],
-  [25, 22, "#0369A1"],
-  [25, 23, "#EC4899"],
-  [25, 24, "#00FFCC"],
-  [25, 25, "#0369A1"],
-  [25, 26, "#0369A1"],
-  [25, 27, "#0369A1"],
-  [25, 28, "#0369A1"],
-  [25, 29, "#0369A1"],
-  [25, 30, "#0369A1"],
-  [25, 31, "#0369A1"],
-  [25, 32, "#0369A1"],
-  [25, 33, "#C084FC"],
-  [25, 34, "#0369A1"],
-  [25, 35, "#0369A1"],
-  [25, 36, "#0369A1"],
-  [25, 37, "#0369A1"],
-  [25, 38, "#0369A1"],
-  [25, 39, "#0369A1"],
-  [25, 40, "#0369A1"],
-  [25, 41, "#0369A1"],
-  [25, 42, "#0369A1"],
-  [25, 43, "#0369A1"],
-  [26, 4, "#0284C7"],
-  [26, 5, "#0284C7"],
-  [26, 6, "#0284C7"],
-  [26, 7, "#0284C7"],
-  [26, 8, "#00FFCC"],
-  [26, 9, "#0284C7"],
-  [26, 10, "#0284C7"],
-  [26, 11, "#0284C7"],
-  [26, 12, "#0284C7"],
-  [26, 13, "#0284C7"],
-  [26, 14, "#F59E0B"],
-  [26, 15, "#0284C7"],
-  [26, 16, "#0284C7"],
-  [26, 17, "#0284C7"],
-  [26, 18, "#0284C7"],
-  [26, 19, "#0284C7"],
-  [26, 20, "#0284C7"],
-  [26, 21, "#0284C7"],
-  [26, 22, "#0284C7"],
-  [26, 23, "#EC4899"],
-  [26, 24, "#00FFCC"],
-  [26, 25, "#0284C7"],
-  [26, 26, "#0284C7"],
-  [26, 27, "#0284C7"],
-  [26, 28, "#0284C7"],
-  [26, 29, "#0284C7"],
-  [26, 30, "#0284C7"],
-  [26, 31, "#0284C7"],
-  [26, 32, "#0284C7"],
-  [26, 33, "#C084FC"],
-  [26, 34, "#0284C7"],
-  [26, 35, "#0284C7"],
-  [26, 36, "#0284C7"],
-  [26, 37, "#0284C7"],
-  [26, 38, "#0284C7"],
-  [26, 39, "#0284C7"],
-  [26, 40, "#0284C7"],
-  [26, 41, "#0284C7"],
-  [26, 42, "#0284C7"],
-  [26, 43, "#0284C7"],
+// Full-Canvas Procedural Pixel Art Masterpieces for PixelEngine
+// Generates rich, atmospheric, layered retro pixel scenes scaled to canvas dimensions.
+// Features: Bayer-dithered twilight skies, celestial bodies, parallax mountain ridges,
+// illuminated skyscraper window matrices, water reflections, and retro PC-98 scanline sunsets.
+
+export type SceneType = "himalayanNight" | "tokyoDusk" | "pc98Sunset";
+
+// Bayer 4x4 threshold matrix for retro halftone dither transitions
+const BAYER_4X4 = [
+  [0 / 16, 8 / 16, 2 / 16, 10 / 16],
+  [12 / 16, 4 / 16, 14 / 16, 6 / 16],
+  [3 / 16, 11 / 16, 1 / 16, 9 / 16],
+  [15 / 16, 7 / 16, 13 / 16, 5 / 16],
 ];
 
-export const createInitialPixelArt = (rowOffset: number = 0, colOffset: number = 0): Map<string, string> => {
-  const map = new Map<string, string>();
-  // 1. Map base artwork to smallest 8px voxel grid (2x2 micro-voxels per block)
-  INITIAL_PIXELS.forEach(([r, c, col]) => {
-    const baseR = r * 2 + rowOffset;
-    const baseC = c * 2 + colOffset;
-    map.set(`${baseR}_${baseC}`, col);
-    map.set(`${baseR}_${baseC + 1}`, col);
-    map.set(`${baseR + 1}_${baseC}`, col);
-    map.set(`${baseR + 1}_${baseC + 1}`, col);
-  });
+function shouldDither(r: number, c: number, threshold: number): boolean {
+  return BAYER_4X4[r % 4][c % 4] < threshold;
+}
 
-  // 2. Add high-density 8px micro-voxel details (fine stars, moon glow, neon antennas, wave glimmers)
-  const microDetails: [number, number, string][] = [
-    // Delicate micro-stars in deep sky
-    [3, 12, "#F8FAFC"],
-    [4, 28, "#F8FAFC"],
-    [3, 52, "#F8FAFC"],
-    [5, 68, "#F8FAFC"],
-    [2, 78, "#F8FAFC"],
-    [4, 84, "#F8FAFC"],
-    [6, 18, "#F8FAFC"],
-    [7, 60, "#F8FAFC"],
-    [8, 82, "#F8FAFC"],
-    // Blinking transmitter beacons on skyscraper spires
-    [8, 16, "#EF4444"],
-    [9, 16, "#EF4444"],
-    [10, 46, "#00FFCC"],
-    [11, 46, "#00FFCC"],
-    [12, 66, "#F59E0B"],
-    // Ambient micro-stars
-    [5, 34, "#CBD5E1"],
-    [6, 42, "#CBD5E1"],
-    [7, 90, "#CBD5E1"],
-    // Micro water reflections on harbor waterline
-    [53, 10, "#38BDF8"],
-    [53, 24, "#00FFCC"],
-    [53, 38, "#38BDF8"],
-    [53, 56, "#EC4899"],
-    [53, 70, "#38BDF8"],
-    [54, 18, "#0284C7"],
-    [54, 44, "#00FFCC"],
-    [54, 64, "#0284C7"],
-  ];
-  microDetails.forEach(([r, c, col]) => map.set(`${r + rowOffset}_${c + colOffset}`, col));
+/**
+ * 1. HIMALAYAN PINE FOREST & STARRY NIGHT
+ * Inspired by rural Himalayan fieldwork in Peora & Almora, Uttarakhand.
+ * Layered snow-capped Himalayan peaks, silhouette pine forests, starry sky with crescent moon,
+ * and a cozy mountain stone cottage with a glowing amber window and chimney smoke.
+ */
+export function generateHimalayanNight(cols: number = 72, rows: number = 44): Map<string, string> {
+  const map = new Map<string, string>();
+  const set = (r: number, c: number, col: string) => {
+    if (r >= 0 && r < rows && c >= 0 && c < cols) {
+      map.set(`${r}_${c}`, col);
+    }
+  };
+
+  const horizonRow = Math.floor(rows * 0.46);
+
+  // 1. Dithered Night Sky (Deep Navy -> Midnight Blue -> Alpine Slate)
+  for (let r = 0; r <= horizonRow + 8; r++) {
+    const t = r / (horizonRow + 8);
+    for (let c = 0; c < cols; c++) {
+      let skyCol: string;
+      if (t < 0.25) {
+        skyCol = "#050914"; // Pitch night
+      } else if (t < 0.45) {
+        const threshold = (t - 0.25) / 0.2;
+        skyCol = shouldDither(r, c, threshold) ? "#0C1428" : "#050914";
+      } else if (t < 0.7) {
+        const threshold = (t - 0.45) / 0.25;
+        skyCol = shouldDither(r, c, threshold) ? "#14233D" : "#0C1428";
+      } else {
+        const threshold = (t - 0.7) / 0.3;
+        skyCol = shouldDither(r, c, threshold) ? "#1E3554" : "#14233D";
+      }
+      set(r, c, skyCol);
+    }
+  }
+
+  // 2. Stars & Constellations
+  // Deterministic star placement across upper sky
+  for (let c = 2; c < cols - 2; c += 3) {
+    const starRow = Math.floor(Math.sin(c * 17.3 + 5) * 6 + (rows * 0.16));
+    if (starRow >= 1 && starRow < horizonRow - 4) {
+      const isBright = (c * 7) % 5 === 0;
+      set(starRow, c, isBright ? "#F8FAFC" : "#94A3B8");
+      if (isBright && (c % 11 === 0)) {
+        // Star glimmer cross
+        set(starRow - 1, c, "#64748B");
+        set(starRow + 1, c, "#64748B");
+        set(starRow, c - 1, "#64748B");
+        set(starRow, c + 1, "#64748B");
+      }
+    }
+  }
+
+  // 3. Crescent Moon (Upper Right)
+  const moonCenterR = Math.floor(rows * 0.13);
+  const moonCenterC = Math.floor(cols * 0.82);
+  const moonRadius = Math.max(3, Math.floor(rows * 0.08));
+
+  for (let dr = -moonRadius; dr <= moonRadius; dr++) {
+    for (let dc = -moonRadius; dc <= moonRadius; dc++) {
+      const dist1 = Math.sqrt(dr * dr + dc * dc);
+      const dist2 = Math.sqrt((dr + 1) * (dr + 1) + (dc - 1.5) * (dc - 1.5));
+      if (dist1 <= moonRadius && dist2 > moonRadius * 0.72) {
+        set(moonCenterR + dr, moonCenterC + dc, "#FEF08A");
+      } else if (dist1 <= moonRadius + 1 && dist1 > moonRadius && dist2 > moonRadius * 0.7) {
+        set(moonCenterR + dr, moonCenterC + dc, "#F59E0B"); // Moon halo
+      }
+    }
+  }
+
+  // 4. Distant Snow Peaks (Himalayan Range: Nanda Devi / Trishul)
+  const peakRow = (c: number): number => {
+    // Multi-octave mountain silhouette
+    const wave1 = Math.sin(c * 0.12) * (rows * 0.1);
+    const wave2 = Math.sin(c * 0.28 + 1.2) * (rows * 0.05);
+    const wave3 = Math.cos(c * 0.05 - 0.8) * (rows * 0.08);
+    return Math.floor(rows * 0.42 - Math.abs(wave1 + wave2 + wave3));
+  };
+
+  for (let c = 0; c < cols; c++) {
+    const topY = peakRow(c);
+    for (let r = topY; r < rows; r++) {
+      // Snow cap at summits
+      if (r < topY + Math.max(2, Math.floor(rows * 0.07))) {
+        set(r, c, (c % 2 === 0) ? "#F8FAFC" : "#E2E8F0");
+      } else if (r < topY + Math.max(4, Math.floor(rows * 0.14))) {
+        set(r, c, (c % 3 === 0) ? "#CBD5E1" : "#475569"); // Shaded rock crevices
+      } else {
+        set(r, c, "#1E293B"); // Mountain body
+      }
+    }
+  }
+
+  // 5. Midground Pine Ridge (Dark Forest Slopes)
+  const ridgeRow = (c: number): number => {
+    return Math.floor(rows * 0.58 + Math.sin(c * 0.08 + 2.5) * (rows * 0.09));
+  };
+
+  for (let c = 0; c < cols; c++) {
+    const topY = ridgeRow(c);
+    for (let r = topY; r < rows; r++) {
+      set(r, c, "#0B1D16"); // Deep evergreen shadow
+    }
+    // Pine tree silhouettes along the ridge crest
+    if (c % 3 === 0) {
+      const treeH = 3 + (c % 4);
+      for (let th = 0; th < treeH; th++) {
+        set(topY - th, c, "#0F2E22");
+        if (th > 0 && th < treeH - 1) {
+          set(topY - th, c - 1, "#0F2E22");
+          set(topY - th, c + 1, "#0F2E22");
+        }
+      }
+    }
+  }
+
+  // 6. Foreground Slope & Mountain Cottage (Peora Field Station)
+  const fgRow = (c: number): number => {
+    return Math.floor(rows * 0.76 - (c / cols) * (rows * 0.12));
+  };
+
+  for (let c = 0; c < cols; c++) {
+    const topY = fgRow(c);
+    for (let r = topY; r < rows; r++) {
+      set(r, c, (r === topY) ? "#163829" : "#0A1712"); // Earth ground
+    }
+  }
+
+  // Cozy Mountain Cottage (Bottom Left)
+  const houseC = Math.max(8, Math.floor(cols * 0.18));
+  const houseR = fgRow(houseC) - 1;
+  const houseW = Math.max(10, Math.floor(cols * 0.16));
+  const houseH = Math.max(6, Math.floor(rows * 0.14));
+
+  // Cottage Roof (Traditional Kumaoni Slate Roof)
+  for (let dr = 0; dr < 4; dr++) {
+    const roofSpan = houseW + (3 - dr) * 2;
+    const startC = houseC - (3 - dr);
+    for (let c = startC; c < startC + roofSpan; c++) {
+      set(houseR - houseH - dr, c, "#334155");
+    }
+  }
+
+  // Chimney & Smoke
+  const chimC = houseC + houseW - 3;
+  const chimTop = houseR - houseH - 6;
+  for (let r = chimTop; r <= houseR - houseH; r++) {
+    set(r, chimC, "#475569");
+    set(r, chimC + 1, "#475569");
+  }
+  // Smoke puffs rising into the cold night air
+  set(chimTop - 1, chimC + 1, "#94A3B8");
+  set(chimTop - 2, chimC + 2, "#CBD5E1");
+  set(chimTop - 3, chimC + 3, "#E2E8F0");
+  set(chimTop - 4, chimC + 3, "#F8FAFC");
+  set(chimTop - 5, chimC + 4, "#CBD5E1");
+
+  // Cottage Timber Walls
+  for (let r = houseR - houseH + 1; r <= houseR; r++) {
+    for (let c = houseC; c < houseC + houseW; c++) {
+      set(r, c, (r % 2 === 0) ? "#78350F" : "#92400E"); // Wood logs
+    }
+  }
+
+  // Warm Glowing Golden Window (Heart of the scene)
+  const winW = Math.max(3, Math.floor(houseW * 0.35));
+  const winH = Math.max(2, Math.floor(houseH * 0.45));
+  const winC = houseC + Math.floor((houseW - winW) / 2);
+  const winR = houseR - houseH + 2;
+
+  for (let r = winR; r < winR + winH; r++) {
+    for (let c = winC; c < winC + winW; c++) {
+      set(r, c, "#FDE047"); // Bright interior lantern
+    }
+  }
+  // Window frame cross
+  set(winR + Math.floor(winH / 2), winC + Math.floor(winW / 2), "#78350F");
+
+  // Warm amber spill on the snow/grass outside the cabin door
+  for (let dr = 1; dr <= 3; dr++) {
+    for (let dc = -dr; dc < winW + dr; dc++) {
+      set(houseR + dr, winC + dc, "#B45309");
+    }
+  }
+
+  // Tall Deodar Pine Trees framing the scene (Right side)
+  const treeC = Math.floor(cols * 0.88);
+  const treeBaseR = fgRow(treeC);
+  const treeH = Math.floor(rows * 0.35);
+
+  // Trunk
+  for (let r = treeBaseR - treeH; r <= treeBaseR; r++) {
+    set(r, treeC, "#29180E");
+  }
+  // Layered Pine Foliage
+  for (let tier = 0; tier < 5; tier++) {
+    const tierR = treeBaseR - treeH + tier * Math.floor(treeH / 5);
+    const span = tier * 2 + 1;
+    for (let dc = -span; dc <= span; dc++) {
+      set(tierR, treeC + dc, "#0B2618");
+      set(tierR + 1, treeC + dc, "#123B26");
+    }
+  }
 
   return map;
+}
+
+/**
+ * 2. CYBERPUNK NEO-TOKYO DUSK
+ * Towering high-rises with illuminated window matrices, neon billboards,
+ * warning beacon spires, and a reflective harbor waterline with dithered ripples.
+ */
+export function generateTokyoDusk(cols: number = 72, rows: number = 44): Map<string, string> {
+  const map = new Map<string, string>();
+  const set = (r: number, c: number, col: string) => {
+    if (r >= 0 && r < rows && c >= 0 && c < cols) {
+      map.set(`${r}_${c}`, col);
+    }
+  };
+
+  const waterRow = Math.floor(rows * 0.74);
+
+  // 1. Dithered Dusk Sky (Deep Violet -> Magenta -> Amber Sunset Horizon)
+  for (let r = 0; r < waterRow; r++) {
+    const t = r / waterRow;
+    for (let c = 0; c < cols; c++) {
+      let skyCol: string;
+      if (t < 0.25) {
+        skyCol = "#0B0716"; // Deep space violet
+      } else if (t < 0.5) {
+        const threshold = (t - 0.25) / 0.25;
+        skyCol = shouldDither(r, c, threshold) ? "#27123A" : "#0B0716";
+      } else if (t < 0.75) {
+        const threshold = (t - 0.5) / 0.25;
+        skyCol = shouldDither(r, c, threshold) ? "#5B1847" : "#27123A";
+      } else {
+        const threshold = (t - 0.75) / 0.25;
+        skyCol = shouldDither(r, c, threshold) ? "#9E2A4B" : "#5B1847";
+      }
+      set(r, c, skyCol);
+    }
+  }
+
+  // 2. Distant Backdrop Towers (Silhouettes in Deep Purple)
+  const bldgWidths = [6, 8, 5, 9, 7, 8, 6, 9, 7, 8, 10];
+  let curC = 0;
+  let bIdx = 0;
+
+  while (curC < cols) {
+    const bw = bldgWidths[bIdx % bldgWidths.length];
+    const bh = Math.floor(rows * 0.35 + Math.sin(bIdx * 3.7) * (rows * 0.15));
+    const topR = waterRow - bh;
+
+    for (let c = curC; c < curC + bw && c < cols; c++) {
+      for (let r = topR; r < waterRow; r++) {
+        set(r, c, "#151024");
+      }
+    }
+    curC += bw + 1;
+    bIdx++;
+  }
+
+  // 3. Main Skyscraper Layer (Detailed architecture & window matrices)
+  const foregroundBldgs = [
+    { c: 2, w: 9, h: 0.55, col: "#0C111C" },
+    { c: 13, w: 12, h: 0.68, col: "#080D18" },
+    { c: 27, w: 14, h: 0.58, col: "#0F1626" },
+    { c: 43, w: 11, h: 0.64, col: "#0A101D" },
+    { c: 56, w: 14, h: 0.52, col: "#0E1524" },
+  ];
+
+  foregroundBldgs.forEach((b, idx) => {
+    const actualW = Math.min(b.w, cols - b.c);
+    const topR = Math.floor(waterRow - rows * b.h);
+
+    // Antenna & Red Warning Beacon
+    const spireC = b.c + Math.floor(actualW / 2);
+    for (let r = topR - 6; r < topR; r++) {
+      set(r, spireC, "#64748B");
+    }
+    set(topR - 6, spireC, "#EF4444"); // Glowing beacon
+    set(topR - 5, spireC, "#EF4444");
+
+    // Building Mass
+    for (let r = topR; r < waterRow; r++) {
+      for (let c = b.c; c < b.c + actualW; c++) {
+        set(r, c, b.col);
+      }
+    }
+
+    // Illuminated Window Matrix
+    for (let r = topR + 3; r < waterRow - 2; r += 2) {
+      for (let c = b.c + 2; c < b.c + actualW - 2; c += 2) {
+        const hash = (r * 13 + c * 37 + idx * 7) % 100;
+        if (hash < 35) {
+          set(r, c, "#FDE047"); // Warm yellow window
+        } else if (hash < 50) {
+          set(r, c, "#00FFCC"); // Cyber cyan window
+        } else if (hash < 60) {
+          set(r, c, "#EC4899"); // Magenta neon window
+        }
+      }
+    }
+
+    // Cyber Neon Billboard Strip on center tower
+    if (idx === 1) {
+      const bannerTop = topR + 8;
+      const bannerC = b.c + 3;
+      for (let r = bannerTop; r < bannerTop + 10; r++) {
+        set(r, bannerC, "#00FFCC");
+        set(r, bannerC + 1, "#EC4899");
+      }
+    }
+  });
+
+  // 4. Harbor Waterline & Reflections (Bottom 26%)
+  for (let r = waterRow; r < rows; r++) {
+    const depthT = (r - waterRow) / (rows - waterRow);
+    for (let c = 0; c < cols; c++) {
+      // Base dark water
+      set(r, c, "#020D1A");
+
+      // Wave ripples with dithered reflection from buildings above
+      const waveOffset = Math.sin(c * 0.4 + r * 1.8) * 1.5;
+      const srcC = Math.round(c + waveOffset);
+      const srcR = waterRow - (r - waterRow) - 1;
+
+      const srcPix = map.get(`${srcR}_${srcC}`);
+      if (srcPix && (srcPix === "#00FFCC" || srcPix === "#EC4899" || srcPix === "#FDE047" || srcPix === "#EF4444")) {
+        // Horizontal ripple spread
+        if ((c + r) % 2 === 0 && depthT < 0.85) {
+          set(r, c, srcPix);
+        }
+      } else if (srcPix && srcPix === "#9E2A4B") {
+        if (shouldDither(r, c, 0.4)) {
+          set(r, c, "#0369A1"); // Sky reflection on water
+        }
+      }
+    }
+  }
+
+  // Waterline barrier / pier edge
+  for (let c = 0; c < cols; c++) {
+    set(waterRow, c, "#1E293B");
+    if (c % 8 === 0) {
+      set(waterRow - 1, c, "#F59E0B"); // Pier warning bollards
+    }
+  }
+
+  return map;
+}
+
+/**
+ * 3. RETRO JAPANESE PC-98 SEASIDE SUNSET
+ * Iconic vintage 16-color PC-98 anime adventure game aesthetic:
+ * Golden dithered sunset, giant low sun with scanline cuts,
+ * rhythmic ocean wave bands, and flying migratory birds.
+ */
+export function generatePC98Sunset(cols: number = 72, rows: number = 44): Map<string, string> {
+  const map = new Map<string, string>();
+  const set = (r: number, c: number, col: string) => {
+    if (r >= 0 && r < rows && c >= 0 && c < cols) {
+      map.set(`${r}_${c}`, col);
+    }
+  };
+
+  const horizonRow = Math.floor(rows * 0.52);
+
+  // 1. Sunset Gradient Sky (Royal Purple -> Crimson -> Tangerine -> Lemon Gold)
+  for (let r = 0; r < horizonRow; r++) {
+    const t = r / horizonRow;
+    for (let c = 0; c < cols; c++) {
+      let skyCol: string;
+      if (t < 0.2) {
+        skyCol = "#2E1065"; // Deep dusk violet
+      } else if (t < 0.45) {
+        const threshold = (t - 0.2) / 0.25;
+        skyCol = shouldDither(r, c, threshold) ? "#831843" : "#2E1065";
+      } else if (t < 0.75) {
+        const threshold = (t - 0.45) / 0.3;
+        skyCol = shouldDither(r, c, threshold) ? "#EA580C" : "#831843";
+      } else {
+        const threshold = (t - 0.75) / 0.25;
+        skyCol = shouldDither(r, c, threshold) ? "#FDE047" : "#EA580C";
+      }
+      set(r, c, skyCol);
+    }
+  }
+
+  // 2. Giant Low Setting Sun (with authentic PC-98 scanline slits)
+  const sunCenterR = horizonRow - 2;
+  const sunCenterC = Math.floor(cols * 0.5);
+  const sunRadius = Math.max(6, Math.floor(rows * 0.18));
+
+  for (let dr = -sunRadius; dr <= sunRadius; dr++) {
+    const curR = sunCenterR + dr;
+    if (curR >= horizonRow) continue; // Cut off at ocean horizon
+
+    for (let dc = -sunRadius; dc <= sunRadius; dc++) {
+      const dist = Math.sqrt(dr * dr + dc * dc);
+      if (dist <= sunRadius) {
+        // Retro Horizontal Scanline Slits on lower half of the sun
+        if (dr > 0 && dr % 2 === 0) {
+          continue; // Leave transparent scan slit!
+        }
+        set(curR, sunCenterC + dc, (dist < sunRadius * 0.6) ? "#FFFBEB" : "#FBBF24");
+      }
+    }
+  }
+
+  // 3. Migratory Birds flying in the warm sky
+  const birdPositions: [number, number][] = [
+    [Math.floor(rows * 0.18), Math.floor(cols * 0.25)],
+    [Math.floor(rows * 0.21), Math.floor(cols * 0.29)],
+    [Math.floor(rows * 0.24), Math.floor(cols * 0.23)],
+    [Math.floor(rows * 0.15), Math.floor(cols * 0.7)],
+    [Math.floor(rows * 0.18), Math.floor(cols * 0.74)],
+  ];
+  birdPositions.forEach(([br, bc]) => {
+    set(br, bc, "#1F1338");
+    set(br - 1, bc - 1, "#1F1338");
+    set(br - 1, bc + 1, "#1F1338");
+  });
+
+  // 4. Ocean Horizon & Layered Rhythmic Wave Planes
+  for (let r = horizonRow; r < rows; r++) {
+    const waveT = (r - horizonRow) / (rows - horizonRow);
+    const sunGlowWidth = Math.max(8, Math.floor(cols * (0.28 + waveT * 0.4)));
+    const sunLeft = sunCenterC - Math.floor(sunGlowWidth / 2);
+    const sunRight = sunCenterC + Math.floor(sunGlowWidth / 2);
+
+    for (let c = 0; c < cols; c++) {
+      // Base dark ocean depth
+      let oceanCol = (r % 2 === 0) ? "#0F172A" : "#1E293B";
+
+      // Sun reflection corridor across the water
+      if (c >= sunLeft && c <= sunRight) {
+        const glowPhase = (c - sunLeft) / sunGlowWidth;
+        const isWaveCrest = (r + Math.floor(c * 0.3)) % 3 === 0;
+
+        if (isWaveCrest) {
+          if (glowPhase > 0.35 && glowPhase < 0.65) {
+            oceanCol = "#FEF08A"; // Bright golden foam
+          } else {
+            oceanCol = "#F59E0B"; // Amber reflection
+          }
+        } else if (r % 2 === 0) {
+          oceanCol = "#B45309";
+        }
+      }
+
+      set(r, c, oceanCol);
+    }
+  }
+
+  // Distant Coastal Lighthouse on Left Edge
+  const lhC = Math.max(4, Math.floor(cols * 0.12));
+  const lhBase = horizonRow;
+  for (let r = lhBase - 8; r <= lhBase; r++) {
+    set(r, lhC, "#1F2937");
+    set(r, lhC + 1, "#1F2937");
+  }
+  set(lhBase - 9, lhC, "#FDE047"); // Lantern glow
+  set(lhBase - 9, lhC + 1, "#FDE047");
+
+  // Soft light beam sweeping to the right
+  for (let step = 1; step <= 8; step++) {
+    if (step % 2 === 0) {
+      set(lhBase - 9, lhC + 1 + step, "#FEF08A");
+    }
+  }
+
+  return map;
+}
+
+export interface ScenePreset {
+  id: SceneType;
+  name: string;
+  description: string;
+  generate: (cols?: number, rows?: number) => Map<string, string>;
+}
+
+export const SCENE_PRESETS: Record<SceneType, ScenePreset> = {
+  himalayanNight: {
+    id: "himalayanNight",
+    name: "Himalayan Night",
+    description: "Starry peaks, pine forest & glowing cottage",
+    generate: generateHimalayanNight,
+  },
+  tokyoDusk: {
+    id: "tokyoDusk",
+    name: "Tokyo Dusk",
+    description: "Cyberpunk skyline, neon signs & harbor reflections",
+    generate: generateTokyoDusk,
+  },
+  pc98Sunset: {
+    id: "pc98Sunset",
+    name: "PC-98 Sunset",
+    description: "Retro Japanese scanline sun & ocean horizon",
+    generate: generatePC98Sunset,
+  },
 };
+
+export const SCENE_GENERATORS = SCENE_PRESETS;
+
+// Backward-compatible default export: generates a full-canvas masterpiece
+export const createInitialPixelArt = (
+  rowOffset: number = 0,
+  colOffset: number = 0,
+  cols: number = 100,
+  rows: number = 70
+): Map<string, string> => {
+  // Returns the Himalayan Night landscape
+  return generateHimalayanNight(cols, rows);
+};
+
+// Retain legacy coordinate matrix export for backward compatibility
+export const INITIAL_PIXELS: [number, number, string][] = [];

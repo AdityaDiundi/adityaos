@@ -1,14 +1,45 @@
-// True Grid Pixel Art Converter & Palette Quantizer
-// Formats images into crisp, locked-grid voxel maps (r/place, PICO-8, GameBoy)
-// Implements Multi-Scale Feature Preservation, Sobel Outline Injection, Cel-Shading, and Curated Iconic Presets
+// True Grid Pixel Art Converter & Aesthetic Quantizer
+// Formats images into crisp, locked-grid voxel maps (r/place, PICO-8, PC-98, Tokyo Dusk, GameBoy)
+// Implements Oklab Perceptual Color Matching, Bayer 4x4 & Atkinson Dithering, Photographic Noise Pre-Smoothing, and Sobel Edge Gating
 
 export interface PaletteColor {
   name: string;
   hex: string;
   rgb: [number, number, number];
+  oklab?: [number, number, number];
 }
 
-export const RPLACE_PALETTE: PaletteColor[] = [
+// sRGB to Linear float
+function srgbToLinear(c: number): number {
+  const v = c / 255;
+  return v <= 0.04045 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4);
+}
+
+// Linear RGB to Oklab
+export function rgbToOklab(r: number, g: number, b: number): [number, number, number] {
+  const lr = srgbToLinear(r);
+  const lg = srgbToLinear(g);
+  const lb = srgbToLinear(b);
+
+  const l = Math.cbrt(0.4122214708 * lr + 0.5363325363 * lg + 0.0514459929 * lb);
+  const m = Math.cbrt(0.2119034982 * lr + 0.6806995451 * lg + 0.1073969566 * lb);
+  const s = Math.cbrt(0.0883024619 * lr + 0.2817188376 * lg + 0.6299787005 * lb);
+
+  return [
+    0.2104542553 * l + 0.7936177850 * m - 0.0040720468 * s,
+    1.9779984951 * l - 2.4285922050 * m + 0.4505937099 * s,
+    0.0259040371 * l + 0.7827717662 * m - 0.8086757660 * s,
+  ];
+}
+
+function initializePaletteOklab(palette: PaletteColor[]): PaletteColor[] {
+  return palette.map((col) => ({
+    ...col,
+    oklab: rgbToOklab(col.rgb[0], col.rgb[1], col.rgb[2]),
+  }));
+}
+
+export const RPLACE_PALETTE: PaletteColor[] = initializePaletteOklab([
   // Monochromes
   { name: "Black", hex: "#000000", rgb: [0, 0, 0] },
   { name: "Dark Charcoal", hex: "#222222", rgb: [34, 34, 34] },
@@ -17,7 +48,7 @@ export const RPLACE_PALETTE: PaletteColor[] = [
   { name: "Light Gray", hex: "#D4D7D9", rgb: [212, 215, 217] },
   { name: "White", hex: "#FFFFFF", rgb: [255, 255, 255] },
 
-  // Golds, Yellows & Oranges (Critical for Doge, Zenitsu & Anime)
+  // Golds, Yellows & Oranges
   { name: "Deep Amber", hex: "#7E3A00", rgb: [126, 58, 0] },
   { name: "Rust Brown", hex: "#A05A2C", rgb: [160, 90, 44] },
   { name: "Vivid Orange", hex: "#FF4500", rgb: [255, 69, 0] },
@@ -56,9 +87,9 @@ export const RPLACE_PALETTE: PaletteColor[] = [
   { name: "Deep Purple", hex: "#362078", rgb: [54, 32, 120] },
   { name: "Violet", hex: "#6A5CFF", rgb: [106, 92, 255] },
   { name: "Lavender", hex: "#94B3FF", rgb: [148, 179, 255] },
-];
+]);
 
-export const PICO8_PALETTE: PaletteColor[] = [
+export const PICO8_PALETTE: PaletteColor[] = initializePaletteOklab([
   { name: "Black", hex: "#000000", rgb: [0, 0, 0] },
   { name: "Dark Blue", hex: "#1D2B53", rgb: [29, 43, 83] },
   { name: "Dark Purple", hex: "#7E2553", rgb: [126, 37, 83] },
@@ -75,27 +106,65 @@ export const PICO8_PALETTE: PaletteColor[] = [
   { name: "Indigo", hex: "#83769C", rgb: [131, 118, 156] },
   { name: "Pink", hex: "#FF77A8", rgb: [255, 119, 168] },
   { name: "Peach", hex: "#FFCCAA", rgb: [255, 204, 170] },
-];
+]);
 
-export const GAMEBOY_PALETTE: PaletteColor[] = [
+export const GAMEBOY_PALETTE: PaletteColor[] = initializePaletteOklab([
   { name: "Darkest Green", hex: "#0F380F", rgb: [15, 56, 15] },
   { name: "Dark Green", hex: "#306230", rgb: [48, 98, 48] },
   { name: "Light Green", hex: "#8BAC0F", rgb: [139, 172, 15] },
   { name: "Lightest Green", hex: "#9BBC0F", rgb: [155, 188, 15] },
-];
+]);
 
-// Perceptual Euclidean Color Snapping
+export const PC98_PALETTE: PaletteColor[] = initializePaletteOklab([
+  { name: "Black", hex: "#000000", rgb: [0, 0, 0] },
+  { name: "Dark Blue", hex: "#0000AA", rgb: [0, 0, 170] },
+  { name: "Dark Red", hex: "#AA0000", rgb: [170, 0, 0] },
+  { name: "Dark Magenta", hex: "#AA00AA", rgb: [170, 0, 170] },
+  { name: "Dark Green", hex: "#00AA00", rgb: [0, 170, 0] },
+  { name: "Dark Cyan", hex: "#00AAAA", rgb: [0, 170, 170] },
+  { name: "Brown / Olive", hex: "#AA5500", rgb: [170, 85, 0] },
+  { name: "Light Gray", hex: "#AAAAAA", rgb: [170, 170, 170] },
+  { name: "Dark Gray", hex: "#555555", rgb: [85, 85, 85] },
+  { name: "Light Blue", hex: "#5555FF", rgb: [85, 85, 255] },
+  { name: "Light Red", hex: "#FF5555", rgb: [255, 85, 85] },
+  { name: "Light Magenta", hex: "#FF55FF", rgb: [255, 85, 255] },
+  { name: "Light Green", hex: "#55FF55", rgb: [85, 255, 85] },
+  { name: "Light Cyan", hex: "#55FFFF", rgb: [85, 255, 255] },
+  { name: "Yellow", hex: "#FFFF55", rgb: [255, 255, 85] },
+  { name: "White", hex: "#FFFFFF", rgb: [255, 255, 255] },
+]);
+
+export const TOKYO_DUSK_PALETTE: PaletteColor[] = initializePaletteOklab([
+  { name: "Night Black", hex: "#080811", rgb: [8, 8, 17] },
+  { name: "Deep Navy", hex: "#121829", rgb: [18, 24, 41] },
+  { name: "Slate Plum", hex: "#29243d", rgb: [41, 36, 61] },
+  { name: "Dusk Violet", hex: "#4b3d60", rgb: [75, 61, 96] },
+  { name: "Neon Magenta", hex: "#eb4f7c", rgb: [235, 79, 124] },
+  { name: "Pastel Rose", hex: "#f39bb4", rgb: [243, 155, 180] },
+  { name: "Warm Amber", hex: "#f59e0b", rgb: [245, 158, 11] },
+  { name: "Cyber Yellow", hex: "#fde047", rgb: [253, 224, 71] },
+  { name: "Cyber Cyan", hex: "#00ffcc", rgb: [0, 255, 204] },
+  { name: "Sky Azure", hex: "#38bdf8", rgb: [56, 189, 248] },
+  { name: "Deep Ocean", hex: "#0369a1", rgb: [3, 105, 161] },
+  { name: "Emerald Mint", hex: "#10b981", rgb: [16, 185, 129] },
+  { name: "Lavender Glow", hex: "#c084fc", rgb: [192, 132, 252] },
+  { name: "Warm Paper", hex: "#faf7f2", rgb: [250, 247, 242] },
+  { name: "Pure White", hex: "#ffffff", rgb: [255, 255, 255] },
+  { name: "Beacon Red", hex: "#ef4444", rgb: [239, 68, 68] },
+]);
+
+// Perceptual Oklab Color Matching
 export function snapToPalette(r: number, g: number, b: number, palette: PaletteColor[]): string {
+  const targetLab = rgbToOklab(r, g, b);
   let closestHex = palette[0].hex;
   let minDistance = Infinity;
 
   for (let i = 0; i < palette.length; i++) {
-    const [pr, pg, pb] = palette[i].rgb;
-    // Human eye perceptual weighting (Red: 0.3, Green: 0.59, Blue: 0.11)
-    const dr = r - pr;
-    const dg = g - pg;
-    const db = b - pb;
-    const distance = 0.3 * dr * dr + 0.59 * dg * dg + 0.11 * db * db;
+    const pLab = palette[i].oklab || rgbToOklab(palette[i].rgb[0], palette[i].rgb[1], palette[i].rgb[2]);
+    const dL = targetLab[0] - pLab[0];
+    const da = targetLab[1] - pLab[1];
+    const db = targetLab[2] - pLab[2];
+    const distance = 1.35 * dL * dL + da * da + db * db;
     if (distance < minDistance) {
       minDistance = distance;
       closestHex = palette[i].hex;
@@ -105,10 +174,21 @@ export function snapToPalette(r: number, g: number, b: number, palette: PaletteC
   return closestHex;
 }
 
+// Bayer 4x4 Dither Matrix normalized to [-0.5, 0.5]
+const BAYER_4X4 = [
+  [0 / 16 - 0.5, 8 / 16 - 0.5, 2 / 16 - 0.5, 10 / 16 - 0.5],
+  [12 / 16 - 0.5, 4 / 16 - 0.5, 14 / 16 - 0.5, 6 / 16 - 0.5],
+  [3 / 16 - 0.5, 11 / 16 - 0.5, 1 / 16 - 0.5, 9 / 16 - 0.5],
+  [15 / 16 - 0.5, 7 / 16 - 0.5, 13 / 16 - 0.5, 5 / 16 - 0.5],
+];
+
 export interface PixelConversionOptions {
   targetCols: number;
   targetRows: number;
-  paletteMode: "rplace" | "pico8" | "gameboy" | "original";
+  paletteMode: "rplace" | "pico8" | "gameboy" | "pc98" | "tokyoDusk" | "original";
+  ditherMode?: "none" | "bayer" | "atkinson";
+  ditherStrength?: number; // 0.0 to 1.0 (default 0.6)
+  smoothNoise?: boolean; // Pre-smooth camera noise before edge detection
   removeBg: boolean;
   bgTolerance: number; // 10 to 80
   contrast: number; // 1.0 to 2.2
@@ -131,10 +211,13 @@ export function processImageToPixels(
     targetCols,
     targetRows,
     paletteMode,
+    ditherMode = "bayer",
+    ditherStrength = 0.6,
+    smoothNoise = true,
     removeBg,
     bgTolerance,
     contrast,
-    outlineStrength = 0.6,
+    outlineStrength = 0.5,
     cropToSubject,
   } = options;
 
@@ -214,7 +297,7 @@ export function processImageToPixels(
     }
   }
 
-  // Determine source cropping rect (zooms tightly onto subject)
+  // Determine source cropping rect
   let cropX = 0, cropY = 0, cropW = img.width, cropH = img.height;
   if (cropToSubject && hasSubject && maxX > minX && maxY > minY) {
     const padRatio = 0.04;
@@ -241,7 +324,7 @@ export function processImageToPixels(
   finalCols = Math.max(8, finalCols);
   finalRows = Math.max(8, finalRows);
 
-  // 2. High-Resolution Multi-Scale Sampling Canvas (4x sub-sampling for fine lines & features)
+  // 2. High-Resolution Multi-Scale Sampling Canvas
   const subScale = 4;
   const interW = finalCols * subScale;
   const interH = finalRows * subScale;
@@ -256,21 +339,51 @@ export function processImageToPixels(
   interCtx.imageSmoothingEnabled = true;
   interCtx.imageSmoothingQuality = "high";
   interCtx.drawImage(img, cropX, cropY, cropW, cropH, 0, 0, interW, interH);
-  const interData = interCtx.getImageData(0, 0, interW, interH).data;
+  let interData = interCtx.getImageData(0, 0, interW, interH).data;
+
+  // Pre-smoothing box filter to remove photographic camera noise before quantization
+  if (smoothNoise) {
+    const smoothed = new Uint8ClampedArray(interData.length);
+    for (let y = 0; y < interH; y++) {
+      for (let x = 0; x < interW; x++) {
+        let sr = 0, sg = 0, sb = 0, sa = 0, sc = 0;
+        for (let dy = -1; dy <= 1; dy++) {
+          const ny = Math.max(0, Math.min(interH - 1, y + dy));
+          for (let dx = -1; dx <= 1; dx++) {
+            const nx = Math.max(0, Math.min(interW - 1, x + dx));
+            const nIdx = (ny * interW + nx) * 4;
+            sr += interData[nIdx];
+            sg += interData[nIdx + 1];
+            sb += interData[nIdx + 2];
+            sa += interData[nIdx + 3];
+            sc++;
+          }
+        }
+        const oIdx = (y * interW + x) * 4;
+        smoothed[oIdx] = sr / sc;
+        smoothed[oIdx + 1] = sg / sc;
+        smoothed[oIdx + 2] = sb / sc;
+        smoothed[oIdx + 3] = sa / sc;
+      }
+    }
+    interData = smoothed;
+  }
 
   // Selected Palette
   let activePalette: PaletteColor[] | null = null;
   if (paletteMode === "rplace") activePalette = RPLACE_PALETTE;
   else if (paletteMode === "pico8") activePalette = PICO8_PALETTE;
+  else if (paletteMode === "pc98") activePalette = PC98_PALETTE;
+  else if (paletteMode === "tokyoDusk") activePalette = TOKYO_DUSK_PALETTE;
   else if (paletteMode === "gameboy") activePalette = GAMEBOY_PALETTE;
 
   // Build cell luminance and feature maps across the target grid
   const cellAvgLum = new Float32Array(finalCols * finalRows);
   const cellMinLum = new Float32Array(finalCols * finalRows);
   const cellMaxLum = new Float32Array(finalCols * finalRows);
-  const cellAvgR = new Uint8Array(finalCols * finalRows);
-  const cellAvgG = new Uint8Array(finalCols * finalRows);
-  const cellAvgB = new Uint8Array(finalCols * finalRows);
+  const cellAvgR = new Float32Array(finalCols * finalRows);
+  const cellAvgG = new Float32Array(finalCols * finalRows);
+  const cellAvgB = new Float32Array(finalCols * finalRows);
   const cellAvgA = new Uint8Array(finalCols * finalRows);
   const cellFeatureR = new Uint8Array(finalCols * finalRows);
   const cellFeatureG = new Uint8Array(finalCols * finalRows);
@@ -314,9 +427,9 @@ export function processImageToPixels(
       }
 
       const cellIdx = gy * finalCols + gx;
-      const avgR = Math.round(sumR / count);
-      const avgG = Math.round(sumG / count);
-      const avgB = Math.round(sumB / count);
+      const avgR = sumR / count;
+      const avgG = sumG / count;
+      const avgB = sumB / count;
       const avgA = Math.round(sumA / count);
 
       cellAvgR[cellIdx] = avgR;
@@ -333,7 +446,7 @@ export function processImageToPixels(
     }
   }
 
-  // Compute 2D Sobel edge gradients across the grid
+  // 2D Sobel edge gradients across the grid
   const cellSobel = new Float32Array(finalCols * finalRows);
   for (let gy = 0; gy < finalRows; gy++) {
     for (let gx = 0; gx < finalCols; gx++) {
@@ -359,6 +472,11 @@ export function processImageToPixels(
   const startCol = Math.max(0, Math.floor((targetCols - finalCols) / 2));
   const startRow = Math.max(0, Math.floor((targetRows - finalRows) / 2));
 
+  // Error buffers for Atkinson dithering
+  const errR = new Float32Array(finalCols * finalRows);
+  const errG = new Float32Array(finalCols * finalRows);
+  const errB = new Float32Array(finalCols * finalRows);
+
   for (let gy = 0; gy < finalRows; gy++) {
     for (let gx = 0; gx < finalCols; gx++) {
       const cellIdx = gy * finalCols + gx;
@@ -375,11 +493,11 @@ export function processImageToPixels(
           0.3 * (r - bgR) ** 2 + 0.59 * (g - bgG) ** 2 + 0.11 * (b - bgB) ** 2
         );
         if (dist <= bgTolerance) {
-          continue; // Strip background!
+          continue;
         }
       }
 
-      // Feature Preservation & Sobel Outline Injection
+      // Feature Preservation & Sobel Outline
       let isOutline = false;
       if (outlineStrength > 0) {
         const minL = cellMinLum[cellIdx];
@@ -388,40 +506,80 @@ export function processImageToPixels(
         const grad = cellSobel[cellIdx];
         const curLum = cellAvgLum[cellIdx];
 
-        // 1. Dark micro-features (eyes, pupils, nostrils, eyelashes, eyebrows)
-        // If a sub-pixel in this cell is very dark while contrast is high, preserve it!
-        if (minL < 50 && contrastRange > 45 * (1.1 - outlineStrength * 0.4)) {
-          if (curLum < 165 || outlineStrength >= 0.6) {
+        // Dark micro-features (eyes, pupils, contours)
+        if (minL < 45 && contrastRange > 55 * (1.1 - outlineStrength * 0.4)) {
+          if (curLum < 155 || outlineStrength >= 0.7) {
             isOutline = true;
           } else {
-            // Blend cell toward the dark feature
             r = cellFeatureR[cellIdx];
             g = cellFeatureG[cellIdx];
             b = cellFeatureB[cellIdx];
           }
         }
 
-        // 2. High Sobel Edge gradient on contour boundaries
-        if (!isOutline && grad > 75 * (1.2 - outlineStrength * 0.5) && curLum < 155) {
+        // High Sobel Edge gradient on contour boundaries
+        if (!isOutline && grad > 90 * (1.3 - outlineStrength * 0.5) && curLum < 140) {
           isOutline = true;
         }
       }
 
       // S-curve contrast boost
       if (contrast !== 1.0) {
-        r = Math.min(255, Math.max(0, Math.round(((r / 255 - 0.5) * contrast + 0.5) * 255)));
-        g = Math.min(255, Math.max(0, Math.round(((g / 255 - 0.5) * contrast + 0.5) * 255)));
-        b = Math.min(255, Math.max(0, Math.round(((b / 255 - 0.5) * contrast + 0.5) * 255)));
+        r = Math.min(255, Math.max(0, ((r / 255 - 0.5) * contrast + 0.5) * 255));
+        g = Math.min(255, Math.max(0, ((g / 255 - 0.5) * contrast + 0.5) * 255));
+        b = Math.min(255, Math.max(0, ((b / 255 - 0.5) * contrast + 0.5) * 255));
       }
 
       let hexColor: string;
       if (isOutline) {
-        // Crisp 1-pixel dark outline anchor
         hexColor = "#000000";
       } else if (activePalette) {
-        hexColor = snapToPalette(r, g, b, activePalette);
+        if (ditherMode === "bayer") {
+          // Bayer 4x4 Ordered Dither: retro comic cross-hatching
+          const ditherVal = BAYER_4X4[gy % 4][gx % 4] * 48 * ditherStrength;
+          const dr = Math.min(255, Math.max(0, r + ditherVal));
+          const dg = Math.min(255, Math.max(0, g + ditherVal));
+          const db = Math.min(255, Math.max(0, b + ditherVal));
+          hexColor = snapToPalette(dr, dg, db, activePalette);
+        } else if (ditherMode === "atkinson") {
+          // Atkinson Error Diffusion
+          const ar = Math.min(255, Math.max(0, r + errR[cellIdx]));
+          const ag = Math.min(255, Math.max(0, g + errG[cellIdx]));
+          const ab = Math.min(255, Math.max(0, b + errB[cellIdx]));
+          hexColor = snapToPalette(ar, ag, ab, activePalette);
+
+          // Find RGB of chosen hex
+          const chosen = activePalette.find((p) => p.hex.toLowerCase() === hexColor.toLowerCase());
+          if (chosen) {
+            const diffR = (ar - chosen.rgb[0]) * ditherStrength;
+            const diffG = (ag - chosen.rgb[1]) * ditherStrength;
+            const diffB = (ab - chosen.rgb[2]) * ditherStrength;
+            const diffuse = (dx: number, dy: number) => {
+              const nx = gx + dx;
+              const ny = gy + dy;
+              if (nx >= 0 && nx < finalCols && ny >= 0 && ny < finalRows) {
+                const nIdx = ny * finalCols + nx;
+                errR[nIdx] += diffR / 8;
+                errG[nIdx] += diffG / 8;
+                errB[nIdx] += diffB / 8;
+              }
+            };
+            diffuse(1, 0);
+            diffuse(2, 0);
+            diffuse(-1, 1);
+            diffuse(0, 1);
+            diffuse(1, 1);
+            diffuse(0, 2);
+          }
+        } else {
+          // Clean flat cel-shading
+          hexColor = snapToPalette(r, g, b, activePalette);
+        }
       } else {
-        hexColor = "#" + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1);
+        const ir = Math.round(Math.min(255, Math.max(0, r)));
+        const ig = Math.round(Math.min(255, Math.max(0, g)));
+        const ib = Math.round(Math.min(255, Math.max(0, b)));
+        hexColor = "#" + ((1 << 24) + (ir << 16) + (ig << 8) + ib).toString(16).slice(1);
       }
 
       const gridR = gy + startRow;
@@ -448,7 +606,6 @@ export interface MasterpiecePreset {
   dataUrl: string;
 }
 
-// Clean SVG Data URLs
 const DOGE_SVG = `data:image/svg+xml;utf8,${encodeURIComponent(
   `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" width="120" height="120">
   <rect width="120" height="120" fill="#caa568"/>
