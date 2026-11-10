@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import Image from "next/image";
 import { useThemeStore, OSThemeId } from "@/store/themeStore";
 import { WRITING_LINES } from "./poetryData";
@@ -22,8 +22,49 @@ export function PortfolioSidebar({
   const { currentThemeId, setTheme, activeTheme } = useThemeStore();
   const isDark = activeTheme.isDark;
 
-  // Single writing line at the bottom - picked at random on page load
-  const [writingLine, setWritingLine] = useState<string>(WRITING_LINES[0]);
+  // Rotating quote in sidebar (same calm crossfade / click rotation as desktop quote)
+  const [quoteIndex, setQuoteIndex] = useState<number>(() =>
+    Math.floor(Math.random() * WRITING_LINES.length)
+  );
+  const [isQuoteFading, setIsQuoteFading] = useState<boolean>(false);
+  const [isQuoteHovered, setIsQuoteHovered] = useState<boolean>(false);
+  const [reducedMotion, setReducedMotion] = useState<boolean>(false);
+  const navListRef = useRef<HTMLElement>(null);
+
+  // Check prefers-reduced-motion
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
+    setReducedMotion(mq.matches);
+    const handler = (e: MediaQueryListEvent) => setReducedMotion(e.matches);
+    mq.addEventListener("change", handler);
+    return () => mq.removeEventListener("change", handler);
+  }, []);
+
+  // Rotate quote with calm crossfade or instant swap
+  const rotateQuote = useCallback(() => {
+    if (WRITING_LINES.length <= 1) return;
+    if (reducedMotion) {
+      setQuoteIndex((prev) => (prev + 1) % WRITING_LINES.length);
+      return;
+    }
+    setIsQuoteFading(true);
+    setTimeout(() => {
+      setQuoteIndex((prev) => (prev + 1) % WRITING_LINES.length);
+      setTimeout(() => {
+        setIsQuoteFading(false);
+      }, 40);
+    }, 200);
+  }, [reducedMotion]);
+
+  // Auto-rotate quote every 20s, pause on hover
+  useEffect(() => {
+    if (reducedMotion || isQuoteHovered || WRITING_LINES.length <= 1) return;
+    const timer = setInterval(rotateQuote, 20000);
+    return () => clearInterval(timer);
+  }, [reducedMotion, isQuoteHovered, rotateQuote]);
+
+  const activeQuoteText = WRITING_LINES[quoteIndex] || WRITING_LINES[0];
 
   // Command Palette State (Cmd+K or '/')
   const [isPaletteOpen, setIsPaletteOpen] = useState(false);
@@ -34,11 +75,6 @@ export function PortfolioSidebar({
   ]);
   const paletteInputRef = useRef<HTMLInputElement>(null);
 
-  useEffect(() => {
-    const idx = Math.floor(Math.random() * WRITING_LINES.length);
-    setWritingLine(WRITING_LINES[idx]);
-  }, []);
-
   const handleCopyEmail = (e: React.MouseEvent) => {
     e.preventDefault();
     navigator.clipboard.writeText("aditya15124@iiitd.ac.in");
@@ -46,14 +82,31 @@ export function PortfolioSidebar({
     setTimeout(() => setCopiedEmail(false), 2200);
   };
 
-  // 5 Modules: simple list without counts or project expansions
+  // 4 Modules: No "All Modules", no 00-04 prefix numbers, labels only
   const modules = [
-    { id: "all", prefix: "00", label: "All Modules" },
-    { id: "work", prefix: "01", label: "Shipped Systems" },
-    { id: "essays", prefix: "02", label: "Fieldwork & Essays" },
-    { id: "youtube", prefix: "03", label: "Watch Games" },
-    { id: "resume", prefix: "04", label: "Experience & Specs" },
+    { id: "work", label: "Shipped Systems" },
+    { id: "essays", label: "Fieldwork & Essays" },
+    { id: "youtube", label: "Watch Games" },
+    { id: "resume", label: "Experience & Specs" },
   ];
+
+  // Keyboard navigation for navigation rows (ArrowUp, ArrowDown, Enter)
+  const handleNavKeyDown = (e: React.KeyboardEvent, index: number) => {
+    if (e.key === "ArrowDown") {
+      e.preventDefault();
+      const nextIdx = (index + 1) % modules.length;
+      const btns = navListRef.current?.querySelectorAll("button");
+      btns?.[nextIdx]?.focus();
+    } else if (e.key === "ArrowUp") {
+      e.preventDefault();
+      const prevIdx = (index - 1 + modules.length) % modules.length;
+      const btns = navListRef.current?.querySelectorAll("button");
+      btns?.[prevIdx]?.focus();
+    } else if (e.key === "Enter" || e.key === " ") {
+      e.preventDefault();
+      onSelectFilter(modules[index].id);
+    }
+  };
 
   // Scroll-Spy: determine active module
   useEffect(() => {
@@ -192,7 +245,7 @@ export function PortfolioSidebar({
         }
 
         const foundModule = modules.find(
-          (m) => m.id === arg || m.prefix === arg || m.label.toLowerCase().includes(arg)
+          (m) => m.id === arg || m.label.toLowerCase().includes(arg)
         );
 
         if (foundModule) {
@@ -309,153 +362,162 @@ export function PortfolioSidebar({
       </header>
 
       {/* ========================================================================= */}
-      {/* 2. Desktop Left Pane (Exactly 4 Things with generous spacing) */}
+      {/* 2. Desktop Left Pane (Zen-inspired minimal 3 zones, single left edge)      */}
       {/* ========================================================================= */}
       <aside
-        className={`hidden lg:flex w-[260px] flex-shrink-0 sticky top-0 self-start h-screen max-h-screen border-r px-7 py-8 flex-col justify-between z-30 transition-colors ${
+        className={`hidden lg:flex w-[260px] flex-shrink-0 sticky top-0 self-start h-screen max-h-screen border-r px-6 py-7 flex-col justify-between z-30 transition-colors select-none ${
           isDark
             ? "bg-[#0E1015] border-zinc-800/60 text-zinc-100"
             : "bg-[#FAF7F2] border-stone-200/60 text-[#1A1814]"
         }`}
       >
-        {/* Top Group: 1. Portrait + Name + Role */}
-        <div className="space-y-8">
-          {/* ===================================================================== */}
-          {/* ITEM 1: Portrait (96px, rounded), Name (display serif 28px), Role (13px mono) */}
-          {/* ===================================================================== */}
-          <div>
-            <div className="relative w-24 h-24 rounded-full overflow-hidden border border-stone-200/80 dark:border-zinc-700/80 mb-5">
-              <Image
-                src="/aditya_avatar_sq.jpg"
-                alt="Aditya Diundi"
-                fill
-                className="object-cover"
-                priority
-              />
-            </div>
-
-            <h1 className="font-serif text-[28px] font-normal leading-[1.1] tracking-tight text-[#1A1814] dark:text-[#F4F4F5]">
-              Aditya Diundi
-            </h1>
-
-            <p className="text-[13px] font-mono text-stone-600 dark:text-zinc-400 mt-1.5 leading-snug">
-              Product Designer &amp; Design Technologist
-            </p>
+        {/* ===================================================================== */}
+        {/* ZONE 1: TOP (Identity)                                                */}
+        {/* ===================================================================== */}
+        <div className="flex flex-col">
+          {/* Small 44px Avatar */}
+          <div className="relative w-11 h-11 rounded-full overflow-hidden border border-stone-300/80 dark:border-zinc-700/80 shrink-0">
+            <Image
+              src="/aditya_avatar_sq.jpg"
+              alt="Aditya Diundi"
+              fill
+              className="object-cover"
+              priority
+            />
           </div>
 
-          {/* ===================================================================== */}
-          {/* ITEM 2: Availability line (green dot, no pill) + Outlined Resume + Plain text links */}
-          {/* ===================================================================== */}
-          <div className="space-y-3.5">
-            {/* Availability with small green dot (no pill container) */}
-            <div className="flex items-center text-[13px] font-mono text-stone-700 dark:text-zinc-300">
-              <span className="w-2 h-2 rounded-full bg-emerald-500 mr-2 shrink-0 animate-pulse" />
-              <span>Available for full-time roles</span>
-            </div>
+          {/* Name in Serif */}
+          <h1 className="font-serif text-[22px] font-normal leading-tight tracking-tight text-[#1A1814] dark:text-[#F4F4F5] mt-3">
+            Aditya Diundi
+          </h1>
 
-            {/* Outlined Resume button (not filled black) */}
-            <a
-              href="/Aditya_Diundi_Resume.pdf"
-              target="_blank"
-              rel="noopener noreferrer"
-              className={`w-full py-2 px-3.5 rounded border text-[13px] font-mono flex items-center justify-between transition-colors ${
-                isDark
-                  ? "border-zinc-700 text-zinc-200 hover:border-zinc-500 hover:bg-zinc-800/40"
-                  : "border-stone-300 text-[#1A1814] hover:border-stone-500 hover:bg-stone-100/60"
-              }`}
-            >
-              <span>Resume (PDF)</span>
-              <span className="opacity-60 text-xs">↗</span>
-            </a>
+          {/* Role in Mono */}
+          <p className="text-xs font-mono text-stone-500 dark:text-zinc-400 mt-1 leading-snug">
+            Product Designer &amp; Design Technologist
+          </p>
 
-            {/* Email / LinkedIn / GitHub as plain text links */}
-            <div className="flex items-center gap-2 text-[13px] font-mono text-stone-600 dark:text-zinc-400 pt-0.5 whitespace-nowrap">
-              <button
-                type="button"
-                onClick={handleCopyEmail}
-                className={`transition-colors hover:underline cursor-pointer ${
-                  isDark ? "hover:text-white" : "hover:text-[#1A1814]"
-                }`}
-              >
-                {copiedEmail ? (
-                  <span className="text-emerald-600 dark:text-emerald-400 font-medium">Copied!</span>
-                ) : (
-                  "Email"
-                )}
-              </button>
-              <span className="opacity-30">/</span>
-              <a
-                href="https://www.linkedin.com/in/adityadiundi/"
-                target="_blank"
-                rel="noopener noreferrer"
-                className={`transition-colors hover:underline ${
-                  isDark ? "hover:text-white" : "hover:text-[#1A1814]"
-                }`}
-              >
-                LinkedIn ↗
-              </a>
-              <span className="opacity-30">/</span>
-              <a
-                href="https://github.com/AdityaDiundi"
-                target="_blank"
-                rel="noopener noreferrer"
-                className={`transition-colors hover:underline ${
-                  isDark ? "hover:text-white" : "hover:text-[#1A1814]"
-                }`}
-              >
-                GitHub ↗
-              </a>
-            </div>
+          {/* Availability Line: Green dot + Open to full-time roles */}
+          <div className="flex items-center text-xs font-mono text-stone-600 dark:text-zinc-400 mt-3">
+            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 mr-2 shrink-0 animate-pulse" />
+            <span>Open to full-time roles</span>
           </div>
-
-          {/* ===================================================================== */}
-          {/* ITEM 3: Index of the 5 modules as a simple list, 14px (No counts, no expansion) */}
-          {/* ===================================================================== */}
-          <nav aria-label="Portfolio index" className="space-y-2 pt-2">
-            {modules.map((item) => {
-              const isModuleActive = effectiveModule === item.id;
-              return (
-                <button
-                  key={item.id}
-                  onClick={() => onSelectFilter(item.id)}
-                  aria-current={isModuleActive ? "page" : undefined}
-                  className={`w-full flex items-center text-[14px] transition-colors text-left cursor-pointer py-0.5 ${
-                    isModuleActive
-                      ? isDark
-                        ? "text-white font-medium"
-                        : "text-[#1A1814] font-semibold"
-                      : isDark
-                      ? "text-zinc-500 hover:text-zinc-300"
-                      : "text-stone-500 hover:text-[#1A1814]"
-                  }`}
-                >
-                  {/* Small active marker */}
-                  <span
-                    className={`w-1.5 h-1.5 rounded-full mr-2.5 transition-all ${
-                      isModuleActive
-                        ? isDark
-                          ? "bg-white opacity-100"
-                          : "bg-[#1A1814] opacity-100"
-                        : "opacity-0"
-                    }`}
-                  />
-                  <span className="font-mono text-xs opacity-50 mr-2 shrink-0">
-                    {item.prefix}
-                  </span>
-                  <span>{item.label}</span>
-                </button>
-              );
-            })}
-          </nav>
         </div>
 
         {/* ===================================================================== */}
-        {/* ITEM 4: At the bottom: One line of writing in a serif (14px, authentic Hindi) */}
+        {/* ZONE 2: MIDDLE (Navigation)                                           */}
         {/* ===================================================================== */}
-        <div className="pt-8">
-          <p className="font-serif italic text-[14px] leading-relaxed text-stone-600 dark:text-stone-400 select-text">
-            &ldquo;{writingLine}&rdquo;
-          </p>
+        <nav
+          ref={navListRef}
+          aria-label="Portfolio sections"
+          className="mt-8 flex flex-col space-y-1"
+        >
+          {modules.map((item, idx) => {
+            const isSelected = effectiveModule === item.id;
+            return (
+              <button
+                key={item.id}
+                type="button"
+                tabIndex={0}
+                onClick={() => onSelectFilter(item.id)}
+                onKeyDown={(e) => handleNavKeyDown(e, idx)}
+                aria-current={isSelected ? "page" : undefined}
+                className={`w-full h-9 -mx-2.5 px-2.5 rounded-md flex items-center text-left font-mono text-[13px] tracking-tight transition-all duration-150 cursor-pointer focus:outline-none focus-visible:ring-1 focus-visible:ring-stone-400 dark:focus-visible:ring-zinc-500 ${
+                  isSelected
+                    ? isDark
+                      ? "bg-white/[0.08] text-zinc-100"
+                      : "bg-black/[0.07] text-[#1A1814]"
+                    : isDark
+                    ? "text-zinc-400 hover:text-zinc-200 hover:bg-white/[0.04]"
+                    : "text-stone-600 hover:text-[#1A1814] hover:bg-black/[0.035]"
+                }`}
+              >
+                <span>{item.label}</span>
+              </button>
+            );
+          })}
+        </nav>
+
+        {/* ===================================================================== */}
+        {/* ZONE 3: BOTTOM (Utility, pinned to bottom)                             */}
+        {/* ===================================================================== */}
+        <div className="mt-auto pt-8 flex flex-col">
+          {/* Resume: Plain text row matching nav height, slightly muted with end arrow */}
+          <a
+            href="/Aditya_Diundi_Resume.pdf"
+            target="_blank"
+            rel="noopener noreferrer"
+            title="Open Resume PDF in new tab"
+            className={`w-full h-9 -mx-2.5 px-2.5 rounded-md flex items-center justify-between font-mono text-[13px] tracking-tight transition-all duration-150 cursor-pointer focus:outline-none focus-visible:ring-1 focus-visible:ring-stone-400 dark:focus-visible:ring-zinc-500 ${
+              isDark
+                ? "text-zinc-400 hover:text-zinc-100 hover:bg-white/[0.04]"
+                : "text-stone-600 hover:text-[#1A1814] hover:bg-black/[0.035]"
+            }`}
+          >
+            <span>Resume</span>
+            <span className="opacity-50 text-xs">↗</span>
+          </a>
+
+          {/* Contact Links: Plain muted text, separated by spacing instead of slashes, no per-link arrows */}
+          <div className="flex items-center gap-4 text-xs font-mono text-stone-500 dark:text-zinc-400 mt-2.5 whitespace-nowrap">
+            <button
+              type="button"
+              onClick={handleCopyEmail}
+              className={`transition-colors hover:underline underline-offset-4 cursor-pointer ${
+                isDark ? "hover:text-zinc-200" : "hover:text-[#1A1814]"
+              }`}
+            >
+              {copiedEmail ? (
+                <span className="text-emerald-600 dark:text-emerald-400 font-medium">Copied!</span>
+              ) : (
+                "Email"
+              )}
+            </button>
+            <a
+              href="https://www.linkedin.com/in/adityadiundi/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className={`transition-colors hover:underline underline-offset-4 ${
+                isDark ? "hover:text-zinc-200" : "hover:text-[#1A1814]"
+              }`}
+            >
+              LinkedIn
+            </a>
+            <a
+              href="https://github.com/AdityaDiundi"
+              target="_blank"
+              rel="noopener noreferrer"
+              className={`transition-colors hover:underline underline-offset-4 ${
+                isDark ? "hover:text-zinc-200" : "hover:text-[#1A1814]"
+              }`}
+            >
+              GitHub
+            </a>
+          </div>
+
+          {/* Rotating Quote: Muted italic, small, rotating the same way as desktop quote */}
+          <div
+            onClick={rotateQuote}
+            onMouseEnter={() => setIsQuoteHovered(true)}
+            onMouseLeave={() => setIsQuoteHovered(false)}
+            role="button"
+            tabIndex={0}
+            onKeyDown={(e) => {
+              if (e.key === "Enter" || e.key === " ") {
+                e.preventDefault();
+                rotateQuote();
+              }
+            }}
+            title="Click to advance quote"
+            className="mt-4 pt-3 border-t border-black/[0.06] dark:border-white/[0.06] cursor-pointer outline-none focus-visible:ring-1 focus-visible:ring-stone-400 rounded"
+          >
+            <p
+              className={`font-serif italic text-xs leading-relaxed text-stone-500 dark:text-zinc-400 hover:text-stone-700 dark:hover:text-zinc-200 transition-opacity duration-300 ${
+                isQuoteFading ? "opacity-0" : "opacity-100"
+              }`}
+            >
+              &ldquo;{activeQuoteText}&rdquo;
+            </p>
+          </div>
         </div>
       </aside>
 
