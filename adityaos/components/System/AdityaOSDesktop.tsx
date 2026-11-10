@@ -21,6 +21,7 @@ import { useSoundStore } from "@/store/soundStore";
 import { WelcomeModal } from "@/components/System/WelcomeModal";
 import { PaperPixelWallpaper } from "@/components/System/PaperPixelWallpaper";
 import { DesktopObjects } from "@/components/System/DesktopObjects";
+import { EmptyDesktopDisplay } from "@/components/System/EmptyDesktopDisplay";
 import {
   PixelWorkIcon,
   PixelWritingIcon,
@@ -654,6 +655,9 @@ export function AdityaOSDesktop({
 
       {/* TWM Window Workspace Canvas */}
       <div className="relative flex-1 w-full h-[calc(100vh-72px)] overflow-hidden">
+        {/* Empty Desktop State: Quote Library & Time on Earth Widget */}
+        <EmptyDesktopDisplay />
+
         {/* Three Quiet Desk Objects (Sticky Note with Poetry, Pinned Latest Essay, Desk Clock) */}
         <div className="absolute inset-0 pointer-events-none z-0 overflow-hidden">
           <DesktopObjects onOpenEssay={() => openAndFocus("archiveReader")} />
@@ -661,8 +665,8 @@ export function AdityaOSDesktop({
 
         {/* Desktop Background Shortcuts & Widgets (Visible on canvas) */}
         <div className="absolute inset-0 p-6 pb-16 pointer-events-none flex flex-col justify-between z-0">
-          {/* Left Desktop App Icons Column - High-craft Pixel Art Icons */}
-          <div className="flex flex-col flex-wrap max-h-[calc(100vh-140px)] gap-y-5 gap-x-6 pointer-events-auto w-fit z-10 pt-2 pl-2">
+          {/* Desktop App Icons: Grid on Mobile, Left Column on Desktop */}
+          <div className="flex flex-row sm:flex-col flex-wrap max-w-full sm:max-h-[calc(100vh-140px)] gap-y-3 sm:gap-y-5 gap-x-3 sm:gap-x-6 pointer-events-auto w-fit z-10 pt-1 sm:pt-2 pl-1 sm:pl-2">
             {/* 1: Work */}
             <button
               type="button"

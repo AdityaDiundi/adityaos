@@ -4,6 +4,7 @@ import React, { useState, useEffect } from "react";
 import { POETRY_LINES, PoetryLine } from "@/components/Portfolio/poetryData";
 import { BookOpen, Clock, Pin, Sparkles } from "lucide-react";
 import { useThemeStore } from "@/store/themeStore";
+import { useOSStore } from "@/store/osStore";
 
 interface DesktopObjectsProps {
   onOpenEssay: (essayPath: string) => void;
@@ -11,6 +12,9 @@ interface DesktopObjectsProps {
 
 export function DesktopObjects({ onOpenEssay }: DesktopObjectsProps) {
   const { activeTheme } = useThemeStore();
+  const { openWindows, minimizedWindows } = useOSStore();
+  const isDesktopEmpty =
+    openWindows.filter((id) => !minimizedWindows.includes(id)).length === 0;
   const isDark = activeTheme.isDark;
 
   // 1. Sticky Note Poetry Line
@@ -54,7 +58,8 @@ export function DesktopObjects({ onOpenEssay }: DesktopObjectsProps) {
       {/* ========================================================================= */}
       {/* DESK OBJECT 1: Sticky Note with Random Poetry Line (Upper-center / Left-center) */}
       {/* ========================================================================= */}
-      <div className="hidden lg:block absolute top-16 left-32 z-0 pointer-events-auto select-none">
+      {!isDesktopEmpty && (
+        <div className="hidden lg:block absolute top-16 left-32 z-0 pointer-events-auto select-none">
         <div
           onClick={() => setPoetryIndex((prev) => (prev + 1) % POETRY_LINES.length)}
           className={`w-64 p-4 rounded-sm shadow-md border rotate-[-1.5deg] hover:rotate-0 transition-transform duration-200 cursor-pointer ${
@@ -81,6 +86,7 @@ export function DesktopObjects({ onOpenEssay }: DesktopObjectsProps) {
           </div>
         </div>
       </div>
+      )}
 
       {/* ========================================================================= */}
       {/* DESK OBJECT 2: Pinned "Latest Essay" Card (Right Side of Desktop) */}

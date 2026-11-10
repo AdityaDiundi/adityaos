@@ -6,7 +6,11 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "test": "node --experimental-strip-types --test tests/**/*.test.ts",
+    "quotes:extract": "node --experimental-strip-types scripts/extract-quotes.ts",
+    "quotes:refresh": "node --experimental-strip-types scripts/extract-quotes.ts --refresh",
+    "quotes:review": "node --experimental-strip-types scripts/review-quotes.ts"
   },
   "dependencies": {
     "@vercel/analytics": "^2.0.1",

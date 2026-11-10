@@ -680,6 +680,17 @@ export const ArchiveReader: React.FC = () => {
     }
   }, []);
 
+  useEffect(() => {
+    const handleOpenFile = (e: Event) => {
+      const customEvent = e as CustomEvent<{ path: string }>;
+      if (customEvent.detail?.path) {
+        setSelectedFile(customEvent.detail.path);
+      }
+    };
+    window.addEventListener("open-archive-file", handleOpenFile);
+    return () => window.removeEventListener("open-archive-file", handleOpenFile);
+  }, []);
+
   const toggleFolder = (folder: string) => {
     playClickChime(420);
     setOpenFolders((prev) => ({ ...prev, [folder]: !prev[folder] }));
