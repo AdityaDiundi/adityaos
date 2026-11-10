@@ -644,8 +644,16 @@ export const ArchiveReader: React.FC = () => {
             newMap[item.path] = item;
           });
           setArchiveMap(newMap);
-          // Auto-select first item if current selection not present
-          if (!newMap[selectedFile] && data.items[0]) {
+          let target = selectedFile;
+          if (typeof window !== "undefined") {
+            const p = new URLSearchParams(window.location.search).get("file");
+            if (p) {
+              try { target = decodeURIComponent(p); } catch { target = p; }
+            }
+          }
+          if (newMap[target]) {
+            setSelectedFile(target);
+          } else if (!newMap[selectedFile] && data.items[0]) {
             setSelectedFile(data.items[0].path);
           }
         }
@@ -659,6 +667,17 @@ export const ArchiveReader: React.FC = () => {
 
   useEffect(() => {
     fetchContentFromApi();
+    if (typeof window !== "undefined") {
+      const params = new URLSearchParams(window.location.search);
+      const fileParam = params.get("file");
+      if (fileParam) {
+        try {
+          setSelectedFile(decodeURIComponent(fileParam));
+        } catch {
+          setSelectedFile(fileParam);
+        }
+      }
+    }
   }, []);
 
   const toggleFolder = (folder: string) => {
@@ -666,12 +685,231 @@ export const ArchiveReader: React.FC = () => {
     setOpenFolders((prev) => ({ ...prev, [folder]: !prev[folder] }));
   };
 
+  const [showSource, setShowSource] = useState<boolean>(false);
+
+  const categories = Array.from(new Set(Object.values(archiveMap).map((i) => i.category)));
+
+  // Extract metadata and content from lines
+  const parseDocument = (item: ArchiveItem) => {
+    let title = item.title || item.filename.replace(/\.(md|txt)$/, "").replace(/_/g, " ");
+    let date = "";
+    let author = "Aditya Diundi";
+    let sourceLink = "";
+    const bodyLines: string[] = [];
+    let isHeaderSection = true;
+
+    for (let i = 0; i < item.lines.length; i++) {
+      const line = item.lines[i];
+      const trimmed = line.trim();
+
+      if (isHeaderSection) {
+        if (trimmed.startsWith("# ")) {
+          title = trimmed.slice(2).trim();
+          continue;
+        }
+        if (trimmed.startsWith("// कविता:") || trimmed.startsWith("// व्यंग्य-कविता:")) {
+          title = trimmed.split(":")[1]?.trim() || title;
+          continue;
+        }
+        if (trimmed.startsWith("// रचनाकार:") || trimmed.includes("Author:")) {
+          author = trimmed.replace(/\*/g, "").replace(/\/\//g, "").replace("Author:", "").replace("रचनाकार:", "").trim();
+          continue;
+        }
+        if (trimmed.includes("Date:") || trimmed.startsWith("// Date:")) {
+          date = trimmed.replace(/\*/g, "").replace(/\/\//g, "").replace("Date:", "").trim();
+          continue;
+        }
+        if (trimmed.startsWith("// स्रोत:") || trimmed.includes("Source:") || trimmed.includes("Source Link:")) {
+          const match = trimmed.match(/https?:\/\/[^\s\)]+/);
+          if (match) sourceLink = match[0];
+          // Check for date in parenthesis like (20 May, 2026)
+          const dateMatch = trimmed.match(/\((\d{1,2}\s+[A-Za-z]+,?\s+\d{4})\)/);
+          if (dateMatch && !date) date = dateMatch[1];
+          continue;
+        }
+        if (trimmed === "---") {
+          isHeaderSection = false;
+          continue;
+        }
+        if (trimmed === "") {
+          continue;
+        }
+        // If we hit regular content, header section ends
+        isHeaderSection = false;
+      }
+
+      bodyLines.push(line);
+    }
+
+    // Default dates if missing
+    if (!date) {
+      if (item.id === "daughters") date = "26 May 2026";
+      else if (item.id === "beliefs") date = "01 Apr 2026";
+      else if (item.id === "tasveerein") date = "20 May 2026";
+      else if (item.id === "panchayat") date = "28 Mar 2026";
+      else if (item.id === "nahin_bulana") date = "14 Feb 2026";
+      else if (item.id === "fire_watered") date = "10 Jan 2026";
+      else date = "Archive";
+    }
+
+    const wordCount = bodyLines.join(" ").split(/\s+/).filter(Boolean).length;
+    const readingTime = Math.max(1, Math.ceil(wordCount / 180));
+
+    return { title, date, author, sourceLink, bodyLines, wordCount, readingTime };
+  };
+
   const currentItem =
     archiveMap[selectedFile] ||
     Object.values(archiveMap)[0] ||
     FALLBACK_ARCHIVE_DATA["essays/Daughters_of_Misogyny.md"];
 
-  const categories = Array.from(new Set(Object.values(archiveMap).map((i) => i.category)));
+  const doc = parseDocument(currentItem);
+
+  // Inline markdown parser helper
+  const renderInline = (text: string): React.ReactNode => {
+    const clean = text
+      .replace(/&#8216;/g, "'")
+      .replace(/&#8217;/g, "'")
+      .replace(/&#8220;/g, '"')
+      .replace(/&#8221;/g, '"');
+
+    const parts: React.ReactNode[] = [];
+    const regex = /\[([^\]]+)\]\(([^)]+)\)|\*\*([^*]+)\*\*|\*([^*]+)\*|`([^`]+)`/g;
+    let lastIdx = 0;
+    let match: RegExpExecArray | null;
+
+    while ((match = regex.exec(clean)) !== null) {
+      if (match.index > lastIdx) {
+        parts.push(clean.substring(lastIdx, match.index));
+      }
+      if (match[1] && match[2]) {
+        parts.push(
+          <a
+            key={match.index}
+            href={match[2]}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-emerald-600 dark:text-emerald-400 underline underline-offset-4 hover:opacity-80 transition-opacity"
+          >
+            {match[1]}
+          </a>
+        );
+      } else if (match[3]) {
+        parts.push(<strong key={match.index} className="font-semibold text-stone-900 dark:text-zinc-100">{match[3]}</strong>);
+      } else if (match[4]) {
+        parts.push(<em key={match.index} className="italic">{match[4]}</em>);
+      } else if (match[5]) {
+        parts.push(
+          <code key={match.index} className="font-mono text-[13px] px-1.5 py-0.5 rounded bg-stone-200/60 dark:bg-zinc-800 text-stone-800 dark:text-zinc-200">
+            {match[5]}
+          </code>
+        );
+      }
+      lastIdx = regex.lastIndex;
+    }
+
+    if (lastIdx < clean.length) {
+      parts.push(clean.substring(lastIdx));
+    }
+
+    return parts.length > 0 ? parts : clean;
+  };
+
+  // Group poetry lines into stanzas separated by empty lines
+  const renderPoetryBody = (lines: string[]) => {
+    const stanzas: string[][] = [];
+    let currentStanza: string[] = [];
+
+    lines.forEach((l) => {
+      if (l.trim() === "") {
+        if (currentStanza.length > 0) {
+          stanzas.push(currentStanza);
+          currentStanza = [];
+        }
+      } else {
+        currentStanza.push(l);
+      }
+    });
+    if (currentStanza.length > 0) stanzas.push(currentStanza);
+
+    return (
+      <div className="space-y-6">
+        {stanzas.map((stanza, sIdx) => (
+          <div
+            key={sIdx}
+            className="space-y-2 font-serif text-[18px] sm:text-[19px] leading-[1.8] italic text-stone-900 dark:text-zinc-100"
+          >
+            {stanza.map((line, lIdx) => {
+              if (line.startsWith("— ") || line.startsWith("- ")) {
+                return (
+                  <p key={lIdx} className="font-serif not-italic text-base text-stone-600 dark:text-zinc-400 mt-6 font-normal">
+                    {renderInline(line)}
+                  </p>
+                );
+              }
+              return (
+                <p key={lIdx} className="tracking-wide">
+                  {renderInline(line)}
+                </p>
+              );
+            })}
+          </div>
+        ))}
+      </div>
+    );
+  };
+
+  // Render essay body paragraphs, headings, and quotes
+  const renderEssayBody = (lines: string[]) => {
+    return (
+      <div className="space-y-5">
+        {lines.map((line, idx) => {
+          const trimmed = line.trim();
+          if (trimmed === "") return null;
+
+          if (trimmed.startsWith("### ")) {
+            return (
+              <h3 key={idx} className="font-serif text-xl sm:text-[22px] font-medium tracking-tight text-stone-900 dark:text-zinc-100 mt-8 mb-3">
+                {renderInline(trimmed.slice(4))}
+              </h3>
+            );
+          }
+          if (trimmed.startsWith("## ")) {
+            return (
+              <h2 key={idx} className="font-serif text-2xl sm:text-[26px] font-medium tracking-tight text-stone-900 dark:text-zinc-100 mt-10 mb-4">
+                {renderInline(trimmed.slice(3))}
+              </h2>
+            );
+          }
+          if (trimmed.startsWith("> ")) {
+            return (
+              <blockquote
+                key={idx}
+                className="border-l-2 border-emerald-500/80 dark:border-emerald-400/80 pl-4 py-1.5 italic my-6 text-stone-700 dark:text-zinc-300 bg-stone-100/50 dark:bg-zinc-800/30 rounded-r-md text-[17px] leading-relaxed font-serif"
+              >
+                {renderInline(trimmed.slice(2))}
+              </blockquote>
+            );
+          }
+          if (trimmed.startsWith("---")) {
+            return <hr key={idx} className="border-t border-stone-200 dark:border-zinc-800 my-8" />;
+          }
+          if (trimmed.startsWith("— ") || trimmed.startsWith("- ")) {
+            return (
+              <p key={idx} className="font-serif text-base text-stone-600 dark:text-zinc-400 mt-6 font-normal">
+                {renderInline(trimmed)}
+              </p>
+            );
+          }
+          return (
+            <p key={idx} className="font-serif text-[18px] leading-[1.75] text-stone-800 dark:text-zinc-200 mb-5">
+              {renderInline(trimmed)}
+            </p>
+          );
+        })}
+      </div>
+    );
+  };
 
   return (
     <div
@@ -680,56 +918,39 @@ export const ArchiveReader: React.FC = () => {
         backgroundColor: activeTheme.windowBg,
         color: activeTheme.textPrimary,
       }}
-      className="flex flex-col h-full select-text font-mono text-xs overflow-hidden"
+      className="flex flex-col h-full select-text text-xs overflow-hidden"
     >
-      {/* Nano/Vim top buffer tabs */}
+      {/* Slim Top Bar */}
       <div
         style={{
           backgroundColor: activeTheme.headerBg,
           borderColor: activeTheme.headerBorder,
           color: activeTheme.textPrimary,
         }}
-        className="h-7 border-b flex items-center justify-between px-3 text-[11px] select-none flex-shrink-0"
+        className="h-8 border-b flex items-center justify-between px-3 text-[11px] font-mono select-none flex-shrink-0"
       >
         <div className="flex items-center gap-2 truncate">
-          <span
-            style={{
-              backgroundColor: `${activeTheme.accent}20`,
-              color: activeTheme.accent,
-            }}
-            className="px-1.5 py-0.5 rounded text-[10px] font-bold"
-          >
-            VIM
+          <span className="font-serif italic text-xs text-stone-900 dark:text-zinc-100 font-medium">
+            Writing
           </span>
-          <span className="font-semibold truncate">
-            {currentItem.path}
-          </span>
-          <span style={{ color: activeTheme.textMuted }}>[RO]</span>
+          <span style={{ color: activeTheme.textMuted }}>·</span>
+          <span className="truncate opacity-80">{doc.title}</span>
         </div>
 
         <div className="flex items-center gap-3">
           <button
             type="button"
-            onClick={fetchContentFromApi}
-            title="Reload content from content/ folder"
-            style={{ color: activeTheme.accent }}
-            className="flex items-center gap-1 hover:opacity-80 transition-opacity text-[10px]"
+            onClick={() => setShowSource(!showSource)}
+            className="text-[10px] font-mono text-stone-500 hover:text-stone-900 dark:text-zinc-400 dark:hover:text-white transition-colors cursor-pointer"
           >
-            <RefreshCw className={`w-3 h-3 ${isLoading ? "animate-spin" : ""}`} />
-            <span className="hidden sm:inline">SYNC FOLDER</span>
+            {showSource ? "Reading View" : "Source"}
           </button>
-
-          <div style={{ color: activeTheme.textMuted }} className="hidden sm:flex items-center gap-3 text-[10px]">
-            <span>utf-8</span>
-            <span>markdown/txt</span>
-            <span>lines: {currentItem.lines.length}</span>
-          </div>
         </div>
       </div>
 
       {/* Main 2-column flexbox */}
       <div className="flex-1 flex overflow-hidden">
-        {/* Left Column: Directory Tree (Nvim Tree style) */}
+        {/* Left Column: Humanized Explorer */}
         <div
           style={{
             backgroundColor: activeTheme.cardBg,
@@ -742,39 +963,46 @@ export const ArchiveReader: React.FC = () => {
               borderColor: activeTheme.headerBorder,
               color: activeTheme.textMuted,
             }}
-            className="px-3 py-2 text-[10px] uppercase font-bold border-b flex items-center justify-between"
+            className="px-3 py-2 text-[10px] uppercase font-mono font-bold border-b flex items-center justify-between"
           >
-            <span>EXPLORER // CONTENT</span>
-            <Code2 className="w-3 h-3" />
+            <span>Library</span>
+            <Code2 className="w-3 h-3 opacity-60" />
           </div>
 
-          <div className="p-2 space-y-1 overflow-y-auto flex-1">
+          <div className="p-2 space-y-2 overflow-y-auto flex-1 font-sans">
             {categories.map((cat) => {
               const catItems = Object.values(archiveMap).filter((i) => i.category === cat);
               const isFolderOpen = openFolders[cat] ?? true;
+              const catLabel = cat === "essays" ? "Essays" : cat === "poetry" ? "Poetry" : cat;
+
               return (
-                <div key={cat}>
+                <div key={cat} className="space-y-0.5">
                   <button
                     type="button"
                     onClick={() => toggleFolder(cat)}
-                    className="w-full flex items-center gap-1.5 px-2 py-1 rounded hover:bg-white/5 text-left transition-colors"
+                    className="w-full flex items-center gap-1.5 px-2 py-1 rounded hover:bg-black/5 dark:hover:bg-white/5 text-left transition-colors font-mono text-xs text-stone-600 dark:text-zinc-400"
                   >
                     {isFolderOpen ? (
                       <ChevronDown className="w-3 h-3 opacity-60" />
                     ) : (
                       <ChevronRight className="w-3 h-3 opacity-60" />
                     )}
-                    <Folder className="w-3.5 h-3.5 text-amber-400" />
-                    <span className="font-semibold text-xs">{cat}/</span>
+                    <Folder className="w-3.5 h-3.5 text-amber-500" />
+                    <span className="font-semibold text-xs tracking-tight">{catLabel}</span>
+                    <span className="text-[10px] opacity-60 ml-auto">({catItems.length})</span>
                   </button>
 
                   {isFolderOpen && (
                     <div
                       style={{ borderColor: activeTheme.headerBorder }}
-                      className="ml-4 mt-0.5 space-y-0.5 border-l pl-1.5"
+                      className="ml-3 mt-0.5 space-y-0.5 border-l pl-2"
                     >
                       {catItems.map((item) => {
                         const isSelected = selectedFile === item.path;
+                        const humanTitle =
+                          item.title ||
+                          item.filename.replace(/\.(md|txt)$/, "").replace(/_/g, " ");
+
                         return (
                           <button
                             key={item.id}
@@ -783,20 +1011,15 @@ export const ArchiveReader: React.FC = () => {
                               playClickChime(500);
                               setSelectedFile(item.path);
                             }}
-                            style={{
-                              backgroundColor: isSelected ? `${activeTheme.accent}25` : "transparent",
-                              borderColor: isSelected ? activeTheme.accent : "transparent",
-                              color: isSelected ? activeTheme.accent : activeTheme.textPrimary,
-                            }}
-                            className={`w-full flex items-center gap-1.5 px-2 py-1 rounded text-left text-xs transition-colors truncate border ${
-                              isSelected ? "font-semibold" : "hover:bg-white/5 opacity-80 hover:opacity-100"
+                            className={`w-full flex flex-col items-start px-2 py-1.5 rounded text-left transition-all truncate border-l-2 ${
+                              isSelected
+                                ? "bg-stone-200/60 dark:bg-zinc-800/60 border-emerald-500 text-stone-900 dark:text-zinc-100 font-medium"
+                                : "border-transparent hover:bg-black/5 dark:hover:bg-white/5 text-stone-600 dark:text-zinc-400"
                             }`}
                           >
-                            <FileText
-                              className="w-3 h-3 flex-shrink-0"
-                              style={{ color: isSelected ? activeTheme.accent : activeTheme.textMuted }}
-                            />
-                            <span className="truncate">{item.filename}</span>
+                            <span className="truncate w-full font-serif text-[13px] leading-snug">
+                              {humanTitle}
+                            </span>
                           </button>
                         );
                       })}
@@ -807,125 +1030,93 @@ export const ArchiveReader: React.FC = () => {
             })}
           </div>
 
-          {/* GitHub Instruction footer */}
           <div
             style={{
               borderColor: activeTheme.headerBorder,
               color: activeTheme.textMuted,
             }}
-            className="p-2.5 border-t text-[10px] space-y-1"
+            className="p-3 border-t text-[10px] font-mono"
           >
-            <div className="flex items-center justify-between font-bold">
-              <span>{Object.keys(archiveMap).length} items indexed</span>
-              <FolderPlus className="w-3 h-3 text-emerald-400" />
-            </div>
-            <p className="opacity-70 text-[9px] leading-tight">
-              Curated essays, reflections, and poetry archives by Aditya Diundi.
+            <p className="opacity-75 leading-tight">
+              Curated essays &amp; poetry by Aditya Diundi.
             </p>
           </div>
         </div>
 
-        {/* Right Column: Syntax-highlighted text reader with line numbers gutter */}
+        {/* Right Column: Editorial Reading Column Centered */}
         <div
           style={{
             backgroundColor: activeTheme.windowBg,
           }}
-          className="flex-1 overflow-auto p-4 flex font-mono leading-relaxed"
+          className="flex-1 overflow-y-auto px-6 sm:px-10 py-10 sm:py-12 flex justify-center"
         >
-          {/* Gutter with line numbers */}
-          <div
-            style={{
-              borderColor: activeTheme.headerBorder,
-              color: activeTheme.textMuted,
-            }}
-            className="flex flex-col text-right pr-4 select-none opacity-50 border-r flex-shrink-0"
-          >
-            {currentItem.lines.map((_, i) => (
-              <span key={i} className="leading-6 text-[11px]">
-                {String(i + 1).padStart(2, "0")}
-              </span>
-            ))}
-          </div>
+          <article className="w-full max-w-[640px]">
+            {showSource ? (
+              /* Raw source view fallback */
+              <div className="font-mono text-xs leading-relaxed opacity-85 select-text whitespace-pre-wrap">
+                {currentItem.lines.join("\n")}
+              </div>
+            ) : (
+              /* Editorial Typography Reader */
+              <div>
+                {/* Title in Display Serif 28-36px */}
+                <h1 className="font-serif text-[28px] sm:text-[34px] font-normal leading-[1.2] text-[#1A1814] dark:text-[#F4F4F5] tracking-tight mb-3">
+                  {doc.title}
+                </h1>
 
-          {/* Reader text body */}
-          <div className="pl-4 flex-1 text-[13px] leading-6 overflow-x-auto" style={{ color: activeTheme.textPrimary }}>
-            {currentItem.lines.map((line, idx) => {
-              if (line.startsWith("# ")) {
-                return (
-                  <div key={idx} style={{ color: activeTheme.accent }} className="font-bold text-base my-1">
-                    {line}
-                  </div>
-                );
-              }
-              if (line.startsWith("> ")) {
-                return (
-                  <div
-                    key={idx}
-                    style={{ borderColor: activeTheme.accent }}
-                    className="italic text-amber-300 pl-2 border-l-2 my-1 opacity-90"
-                  >
-                    {line}
-                  </div>
-                );
-              }
-              if (line.startsWith("// ")) {
-                return (
-                  <div key={idx} style={{ color: activeTheme.textMuted }} className="italic">
-                    {line}
-                  </div>
-                );
-              }
-              if (line.startsWith("---")) {
-                return (
-                  <div key={idx} style={{ borderColor: activeTheme.headerBorder }} className="border-b my-2"></div>
-                );
-              }
-              if (line.startsWith("— ")) {
-                return (
-                  <div key={idx} style={{ color: activeTheme.accent }} className="font-semibold mt-3">
-                    {line}
-                  </div>
-                );
-              }
-              return (
-                <div key={idx} className={line.trim() === "" ? "h-4" : ""}>
-                  {line}
+                {/* Quiet Single Meta Line in 12px mono */}
+                <div className="font-mono text-xs text-stone-500 dark:text-zinc-400 mb-8 pb-4 border-b border-stone-200/80 dark:border-zinc-800 flex flex-wrap items-center gap-2">
+                  <span>{doc.date}</span>
+                  <span className="opacity-40">·</span>
+                  <span>{doc.readingTime} min read</span>
+                  <span className="opacity-40">·</span>
+                  <span>{doc.author}</span>
+                  {doc.sourceLink && (
+                    <>
+                      <span className="opacity-40">·</span>
+                      <a
+                        href={doc.sourceLink}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-emerald-600 dark:text-emerald-400 hover:underline"
+                      >
+                        Original ↗
+                      </a>
+                    </>
+                  )}
                 </div>
-              );
-            })}
-          </div>
+
+                {/* Content body: Poetry or Essay formatting */}
+                {currentItem.category === "poetry"
+                  ? renderPoetryBody(doc.bodyLines)
+                  : renderEssayBody(doc.bodyLines)}
+              </div>
+            )}
+          </article>
         </div>
       </div>
 
-      {/* Vim bottom statusline */}
+      {/* Single Slim Status Bar */}
       <div
         style={{
           backgroundColor: activeTheme.headerBg,
           borderColor: activeTheme.headerBorder,
           color: activeTheme.textPrimary,
         }}
-        className="h-6 border-t flex items-center justify-between px-3 text-[10px] select-none flex-shrink-0"
+        className="h-6 border-t flex items-center justify-between px-3 text-[10px] font-mono select-none flex-shrink-0"
       >
-        <div className="flex items-center gap-2">
-          <span
-            style={{
-              backgroundColor: activeTheme.accent,
-              color: activeTheme.isDark ? "#000" : "#fff",
-            }}
-            className="px-1.5 py-0.2 rounded font-bold uppercase"
-          >
-            NORMAL
-          </span>
-          <span className="font-semibold truncate">
-            {currentItem.title}
+        <div className="flex items-center gap-2 truncate">
+          <span className="font-medium truncate">
+            Writing · {doc.title}
           </span>
         </div>
-        <div style={{ color: activeTheme.textMuted }} className="flex items-center gap-4">
-          <span>unix</span>
-          <span>utf-8</span>
-          <span>100% ☰ {currentItem.lines.length}/L</span>
+        <div style={{ color: activeTheme.textMuted }} className="flex items-center gap-3">
+          <span>{doc.readingTime} min read</span>
+          <span>·</span>
+          <span>{doc.wordCount} words</span>
         </div>
       </div>
     </div>
   );
 };
+

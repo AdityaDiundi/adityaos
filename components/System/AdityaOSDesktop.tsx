@@ -18,6 +18,18 @@ import { PortfolioView } from "@/components/Portfolio/PortfolioView";
 import { useOSStore } from "@/store/osStore";
 import { useThemeStore, OS_THEMES, OSThemeId } from "@/store/themeStore";
 import { useSoundStore } from "@/store/soundStore";
+import { WelcomeModal } from "@/components/System/WelcomeModal";
+import { PaperPixelWallpaper } from "@/components/System/PaperPixelWallpaper";
+import { DesktopObjects } from "@/components/System/DesktopObjects";
+import {
+  PixelWorkIcon,
+  PixelWritingIcon,
+  PixelAboutIcon,
+  PixelResumeIcon,
+  PixelGalleryIcon,
+  PixelTerminalIcon,
+  PixelStudioIcon,
+} from "@/components/System/PixelIcons";
 import {
   Sparkles,
   BookOpen,
@@ -46,15 +58,16 @@ import {
   Lock,
   Folder,
   FileCode,
+  SlidersHorizontal,
 } from "lucide-react";
 
 const APP_LABELS: Record<string, string> = {
-  coreIntro: "About Aditya",
-  archiveReader: "Case Studies & Essays",
-  streamFeed: "Media Feed",
-  pixelEngine: "Pixel Studio",
-  resumeViewer: "Resume (PDF)",
-  galleryViewer: "Photo Gallery",
+  coreIntro: "About",
+  archiveReader: "Writing",
+  streamFeed: "Media",
+  pixelEngine: "PixelStudio",
+  resumeViewer: "Resume",
+  galleryViewer: "Gallery",
   fieldJournal: "Field Journal",
   learnabilityLab: "Diagnostic Lab",
   wallpaperManager: "Wallpaper Gallery",
@@ -94,6 +107,31 @@ export function AdityaOSDesktop({
   const [cpuUsage, setCpuUsage] = useState<number>(14);
   const [memUsage, setMemUsage] = useState<number>(38);
   const [isThemeMenuOpen, setIsThemeMenuOpen] = useState<boolean>(false);
+  const [isSettingsMenuOpen, setIsSettingsMenuOpen] = useState<boolean>(false);
+  const [showWelcomeModal, setShowWelcomeModal] = useState<boolean>(false);
+
+  useEffect(() => {
+    try {
+      const params = new URLSearchParams(window.location.search);
+      if (params.get("welcome") === "0" || params.get("welcome") === "false") {
+        setShowWelcomeModal(false);
+        return;
+      }
+      const dismissed = localStorage.getItem("adityaos_welcome_dismissed");
+      if (!dismissed) {
+        setShowWelcomeModal(true);
+      }
+    } catch {
+      // Fallback if localStorage is disabled or throws
+    }
+  }, []);
+
+  const handleDismissWelcome = () => {
+    setShowWelcomeModal(false);
+    try {
+      localStorage.setItem("adityaos_welcome_dismissed", "true");
+    } catch {}
+  };
 
   const [viewMode, setViewMode] = useState<"portfolio" | "os">(() => {
     if (initialViewMode) return initialViewMode;
@@ -307,23 +345,25 @@ export function AdityaOSDesktop({
       className="relative w-screen h-screen overflow-hidden select-none flex flex-col font-mono"
     >
       {/* Dynamic Wallpaper Layer */}
-      <div
-        className="absolute inset-0 bg-cover bg-center transition-all duration-700 ease-in-out pointer-events-none"
-        style={{
-          backgroundImage: wallpaperUrl ? `url(${wallpaperUrl})` : undefined,
-          backgroundColor: activeTheme.desktopBg,
-        }}
-      />
-
-      {/* Adaptive Wallpaper Overlay: Only applied if an external wallpaper image is loaded */}
-      {wallpaperUrl && (
-        <div
-          className={`absolute inset-0 pointer-events-none transition-colors duration-500 ${
-            activeTheme.isDark
-              ? "bg-black/40 backdrop-blur-[0.5px]"
-              : "bg-white/20 backdrop-blur-[0.5px]"
-          }`}
-        />
+      {wallpaperUrl ? (
+        <>
+          <div
+            className="absolute inset-0 bg-cover bg-center transition-all duration-700 ease-in-out pointer-events-none"
+            style={{
+              backgroundImage: `url(${wallpaperUrl})`,
+              backgroundColor: activeTheme.desktopBg,
+            }}
+          />
+          <div
+            className={`absolute inset-0 pointer-events-none transition-colors duration-500 ${
+              activeTheme.isDark
+                ? "bg-black/40 backdrop-blur-[0.5px]"
+                : "bg-white/20 backdrop-blur-[0.5px]"
+            }`}
+          />
+        </>
+      ) : (
+        <PaperPixelWallpaper />
       )}
 
       {/* Desktop Grid Lines (Toggled via showDesktopGrid) */}
@@ -336,28 +376,26 @@ export function AdityaOSDesktop({
           }}
         />
       )}
-      {/* Top Riced Status Bar - Elevated z-[1000] so it ALWAYS stays above windows */}
+
+      {/* Top Bar - Elevated z-[1000] without horizontal clipping */}
       <header
         style={{
           backgroundColor: activeTheme.headerBg,
           borderColor: activeTheme.headerBorder,
           color: activeTheme.textPrimary,
         }}
-        className="h-8 border-b px-3 flex items-center justify-between text-xs z-[1000] backdrop-blur-md relative whitespace-nowrap select-none overflow-visible"
+        className="h-8 border-b px-3 sm:px-4 flex items-center justify-between text-xs z-[1000] backdrop-blur-md relative whitespace-nowrap select-none overflow-visible"
       >
-        {/* Left: OS Branding & Clickable Workspace Tags */}
+        {/* Left: OS Branding & Clickable Workspace Tabs (if >= 2 windows) */}
         <div className="flex items-center gap-2 sm:gap-3 shrink-0 whitespace-nowrap">
           <button
             type="button"
-            onClick={() => openAndFocus("coreIntro")}
-            title="Focus AdityaOS Core"
+            onClick={() => setShowWelcomeModal(true)}
+            title="Desk of Aditya Diundi (Click to open Welcome door)"
             className="flex items-center gap-1.5 font-bold hover:opacity-80 transition-opacity cursor-pointer whitespace-nowrap shrink-0"
           >
             <span style={{ color: activeTheme.accent }}>⟡</span>
             <span className="whitespace-nowrap" style={{ color: activeTheme.textPrimary }}>aditya-os</span>
-            <span style={{ color: activeTheme.textMuted }} className="text-[10px] font-normal hidden sm:inline">
-              v2.4
-            </span>
           </button>
 
           <button
@@ -378,248 +416,61 @@ export function AdityaOSDesktop({
               borderColor: activeTheme.isDark ? "#00FFCC" : "rgba(0, 0, 0, 0.18)",
               color: activeTheme.isDark ? "#00FFCC" : "#121316",
             }}
-            title="Exit back to Product Designer Portfolio"
+            title="Exit back to Portfolio"
           >
             <span>← Portfolio</span>
           </button>
 
-          <div
-            style={{ backgroundColor: activeTheme.headerBorder }}
-            className="h-3 w-px shrink-0"
-          />
+          {/* Workspace Tabs: Shown only when 2 or more windows are open */}
+          {openWindows.length >= 2 && (
+            <>
+              <div
+                style={{ backgroundColor: activeTheme.headerBorder }}
+                className="h-3 w-px shrink-0 hidden sm:block"
+              />
 
-          {/* Interactive Workspace Tags */}
-          <div className="flex items-center gap-1 text-[11px] shrink-0 whitespace-nowrap">
-            {/* [1:SYS] -> coreIntro */}
-            <button
-              type="button"
-              onClick={() => openAndFocus("coreIntro")}
-              style={{
-                backgroundColor:
-                  activeWindow === "coreIntro" ? activeTheme.cardBg : "transparent",
-                borderColor:
-                  activeWindow === "coreIntro" ? activeTheme.accent : "transparent",
-                color:
-                  activeWindow === "coreIntro" ? activeTheme.accent : activeTheme.textMuted,
-              }}
-              className="px-1.5 py-0.2 rounded border font-semibold hover:opacity-100 transition-all cursor-pointer shrink-0"
-              title="Workspace 1: Identity & Core Intro"
-            >
-              [1:CORE]
-            </button>
-
-            {/* [2:ARCHIVE] -> archiveReader */}
-            <button
-              type="button"
-              onClick={() => openAndFocus("archiveReader")}
-              style={{
-                backgroundColor:
-                  activeWindow === "archiveReader" ? activeTheme.cardBg : "transparent",
-                borderColor:
-                  activeWindow === "archiveReader" ? activeTheme.accent : "transparent",
-                color:
-                  activeWindow === "archiveReader" ? activeTheme.accent : activeTheme.textMuted,
-              }}
-              className="px-1.5 py-0.2 rounded border font-semibold hover:opacity-100 transition-all cursor-pointer shrink-0"
-              title="Workspace 2: Essays & Poetry Archive"
-            >
-              [2:ARCHIVE]
-            </button>
-
-            {/* [3:MEDIA] -> streamFeed */}
-            <button
-              type="button"
-              onClick={() => openAndFocus("streamFeed")}
-              style={{
-                backgroundColor:
-                  activeWindow === "streamFeed" ? activeTheme.cardBg : "transparent",
-                borderColor:
-                  activeWindow === "streamFeed" ? activeTheme.accent : "transparent",
-                color:
-                  activeWindow === "streamFeed" ? activeTheme.accent : activeTheme.textMuted,
-              }}
-              className="px-1.5 py-0.2 rounded border font-semibold hover:opacity-100 transition-all cursor-pointer shrink-0"
-              title="Workspace 3: @falsepeek Media & Shorts Feed"
-            >
-              [3:MEDIA]
-            </button>
-
-            {/* [4:CANVAS] -> pixelEngine */}
-            <button
-              type="button"
-              onClick={() => openAndFocus("pixelEngine")}
-              style={{
-                backgroundColor:
-                  activeWindow === "pixelEngine" ? activeTheme.cardBg : "transparent",
-                borderColor:
-                  activeWindow === "pixelEngine" ? activeTheme.accent : "transparent",
-                color:
-                  activeWindow === "pixelEngine" ? activeTheme.accent : activeTheme.textMuted,
-              }}
-              className="px-1.5 py-0.2 rounded border font-semibold hover:opacity-100 transition-all cursor-pointer shrink-0"
-              title="Workspace 4: Pixel Engine 2D/3D Voxel Canvas"
-            >
-              [4:CANVAS]
-            </button>
-
-            {/* [5:RESUME] -> resumeViewer */}
-            <button
-              type="button"
-              onClick={() => openAndFocus("resumeViewer")}
-              style={{
-                backgroundColor:
-                  activeWindow === "resumeViewer" ? activeTheme.cardBg : "transparent",
-                borderColor:
-                  activeWindow === "resumeViewer" ? activeTheme.accent : "transparent",
-                color:
-                  activeWindow === "resumeViewer" ? activeTheme.accent : activeTheme.textMuted,
-              }}
-              className="px-1.5 py-0.2 rounded border font-semibold hover:opacity-100 transition-all cursor-pointer hidden sm:inline-block shrink-0"
-              title="Workspace 5: Resume & Experience Viewer"
-            >
-              [5:RESUME]
-            </button>
-
-            {/* [6:GALLERY] -> galleryViewer */}
-            <button
-              type="button"
-              onClick={() => openAndFocus("galleryViewer")}
-              style={{
-                backgroundColor:
-                  activeWindow === "galleryViewer" ? activeTheme.cardBg : "transparent",
-                borderColor:
-                  activeWindow === "galleryViewer" ? activeTheme.accent : "transparent",
-                color:
-                  activeWindow === "galleryViewer" ? activeTheme.accent : activeTheme.textMuted,
-              }}
-              className="px-1.5 py-0.2 rounded border font-semibold hover:opacity-100 transition-all cursor-pointer hidden lg:inline-block shrink-0"
-              title="Workspace 6: Feh Image Gallery"
-            >
-              [6:GALLERY]
-            </button>
-
-            {/* [7:FIELD] -> fieldJournal */}
-            <button
-              type="button"
-              onClick={() => openAndFocus("fieldJournal")}
-              style={{
-                backgroundColor:
-                  activeWindow === "fieldJournal" ? activeTheme.cardBg : "transparent",
-                borderColor:
-                  activeWindow === "fieldJournal" ? activeTheme.accent : "transparent",
-                color:
-                  activeWindow === "fieldJournal" ? activeTheme.accent : activeTheme.textMuted,
-              }}
-              className="px-1.5 py-0.2 rounded border font-semibold hover:opacity-100 transition-all cursor-pointer hidden xl:inline-block shrink-0"
-              title="Workspace 7: Rajasthan Field Journal & Grassroots Leadership"
-            >
-              [7:FIELD]
-            </button>
-
-            {/* [8:DIAGNOSTICS] -> learnabilityLab */}
-            <button
-              type="button"
-              onClick={() => openAndFocus("learnabilityLab")}
-              style={{
-                backgroundColor:
-                  activeWindow === "learnabilityLab" ? activeTheme.cardBg : "transparent",
-                borderColor:
-                  activeWindow === "learnabilityLab" ? activeTheme.accent : "transparent",
-                color:
-                  activeWindow === "learnabilityLab" ? activeTheme.accent : activeTheme.textMuted,
-              }}
-              className="px-1.5 py-0.2 rounded border font-semibold hover:opacity-100 transition-all cursor-pointer hidden 2xl:inline-block shrink-0"
-              title="Workspace 8: Aarohi Bal Sansar Learnability Lab"
-            >
-              [8:DIAGNOSTICS]
-            </button>
-
-            {/* [9:WALLPAPER] -> wallpaperManager */}
-            <button
-              type="button"
-              onClick={() => openAndFocus("wallpaperManager")}
-              style={{
-                backgroundColor:
-                  activeWindow === "wallpaperManager" ? activeTheme.cardBg : "transparent",
-                borderColor:
-                  activeWindow === "wallpaperManager" ? activeTheme.accent : "transparent",
-                color:
-                  activeWindow === "wallpaperManager" ? activeTheme.accent : activeTheme.textMuted,
-              }}
-              className="px-1.5 py-0.2 rounded border font-semibold hover:opacity-100 transition-all cursor-pointer hidden 2xl:inline-block shrink-0"
-              title="Workspace 9: Dynamic Wallpaper Engine"
-            >
-              [9:WALLPAPER]
-            </button>
-          </div>
+              <div className="flex items-center gap-1 text-[11px] shrink-0 whitespace-nowrap">
+                {openWindows.map((winId) => {
+                  const label = (APP_LABELS[winId] || winId).toUpperCase();
+                  const isActive = activeWindow === winId;
+                  return (
+                    <button
+                      key={winId}
+                      type="button"
+                      onClick={() => openAndFocus(winId)}
+                      style={{
+                        backgroundColor: isActive ? activeTheme.cardBg : "transparent",
+                        borderColor: isActive ? activeTheme.accent : "transparent",
+                        color: isActive ? activeTheme.accent : activeTheme.textMuted,
+                      }}
+                      className="px-1.5 py-0.2 rounded border font-semibold hover:opacity-100 transition-all cursor-pointer shrink-0"
+                    >
+                      [{label}]
+                    </button>
+                  );
+                })}
+              </div>
+            </>
+          )}
         </div>
 
-        {/* Center: Active Window Title Tag */}
-        <div className="hidden xl:flex items-center gap-2 text-[11px] shrink-0 whitespace-nowrap" style={{ color: activeTheme.textMuted }}>
-          <span>ACTIVE:</span>
-          <span
-            style={{
-              backgroundColor: activeTheme.cardBg,
-              borderColor: activeTheme.cardBorder,
-              color: activeTheme.accent,
-            }}
-            className="px-2 py-0.5 rounded border font-semibold"
-          >
-            {activeWindow ? (APP_LABELS[activeWindow] || activeWindow) : "Desktop Workspace"}
+        {/* Center: Current Window Title */}
+        <div className="hidden md:flex items-center gap-2 text-[11px] truncate px-3" style={{ color: activeTheme.textMuted }}>
+          <span className="font-serif italic text-[12px] opacity-80">
+            {activeWindow ? (APP_LABELS[activeWindow] || activeWindow) : "Aditya Diundi // Desk"}
           </span>
         </div>
 
-        {/* Right: Launchers + Theme Switcher + Audio + Telemetry + Clock */}
-        <div className="flex items-center gap-1.5 sm:gap-2.5 text-[11px] shrink-0 whitespace-nowrap">
-          {/* Quick Utility Launchers: Visitor Note + Wallpaper Switcher */}
-          <div className="flex items-center gap-1.5">
-            {/* Sticky Note Toggle */}
-            <button
-              type="button"
-              onClick={() => {
-                playClickChime(520);
-                toggleStickyNote();
-              }}
-              title="Toggle Sticky Note"
-              style={{
-                backgroundColor: isStickyNoteOpen ? "rgba(245, 158, 11, 0.2)" : activeTheme.cardBg,
-                borderColor: isStickyNoteOpen ? "#fbbf24" : activeTheme.cardBorder,
-                color: isStickyNoteOpen ? "#fbbf24" : activeTheme.textMuted,
-              }}
-              className="flex items-center gap-1.5 px-2 py-0.5 rounded border text-[11px] font-semibold transition-all hover:opacity-100 cursor-pointer"
-            >
-              <StickyNote className="w-3 h-3 text-amber-500" />
-              <span className="hidden sm:inline">Note</span>
-            </button>
-
-            {/* Wallpaper Engine Quick Launcher */}
-            <button
-              type="button"
-              onClick={() => openAndFocus("wallpaperManager")}
-              title="Change Wallpaper (Alt+9)"
-              style={{
-                backgroundColor: activeWindow === "wallpaperManager" ? activeTheme.cardBg : "transparent",
-                borderColor: activeWindow === "wallpaperManager" ? activeTheme.accent : activeTheme.cardBorder,
-                color: activeWindow === "wallpaperManager" ? activeTheme.accent : activeTheme.textMuted,
-              }}
-              className="p-1 rounded border hover:bg-white/10 transition-colors cursor-pointer"
-            >
-              <ImageIcon className="w-3.5 h-3.5 text-pink-400" />
-            </button>
-          </div>
-
-          <div
-            style={{ backgroundColor: activeTheme.headerBorder }}
-            className="h-3 w-px"
-          />
-
-          {/* Theme Selector Dropdown Menu with z-[1200] */}
+        {/* Right: Theme Selector + Keys Button + Settings Menu */}
+        <div className="flex items-center gap-1.5 sm:gap-2 text-[11px] shrink-0 whitespace-nowrap">
+          {/* Theme Selector Dropdown Menu */}
           <div className="relative" id="theme-selector-container">
             <button
               type="button"
               onClick={(e) => {
                 e.stopPropagation();
                 setIsThemeMenuOpen((prev) => !prev);
+                setIsSettingsMenuOpen(false);
               }}
               title="Change OS Theme"
               style={{
@@ -634,7 +485,6 @@ export function AdityaOSDesktop({
               <ChevronDown className="w-3 h-3 opacity-60" />
             </button>
 
-            {/* Dropdown Popover - Elevated z-[1200] to always overlay active windows and canvas */}
             {isThemeMenuOpen && (
               <div
                 onClick={(e) => e.stopPropagation()}
@@ -687,175 +537,125 @@ export function AdityaOSDesktop({
             )}
           </div>
 
-          {/* Quick Dark / Light Toggle */}
-          <button
-            type="button"
-            onClick={() => {
-              toggleDarkLight();
-              playClickChime(500);
-            }}
-            title={activeTheme.isDark ? "Switch to Light Mode" : "Switch to Dark Mode"}
-            style={{
-              backgroundColor: activeTheme.cardBg,
-              borderColor: activeTheme.cardBorder,
-              color: activeTheme.textPrimary,
-            }}
-            className="p-1 rounded border hover:opacity-80 transition-colors"
-          >
-            {activeTheme.isDark ? (
-              <Sun className="w-3.5 h-3.5 text-amber-400" />
-            ) : (
-              <Moon className="w-3.5 h-3.5 text-blue-500" />
-            )}
-          </button>
-
-          {/* Audio Synthesizer / Beethoven Für Elise Toggle */}
-          <button
-            type="button"
-            onClick={() => {
-              toggleSound();
-              playClickChime(700);
-            }}
-            title={isSoundEnabled ? "Mute Beethoven Für Elise Music Box" : "Enable Beethoven Für Elise Music Box"}
-            style={{
-              backgroundColor: activeTheme.cardBg,
-              borderColor: isSoundEnabled ? activeTheme.accent : activeTheme.cardBorder,
-              color: isSoundEnabled ? activeTheme.accent : activeTheme.textMuted,
-            }}
-            className="p-1 rounded border hover:opacity-80 transition-colors flex items-center gap-1"
-          >
-            {isSoundEnabled ? (
-              <Volume2 className="w-3.5 h-3.5 text-emerald-400" />
-            ) : (
-              <VolumeX className="w-3.5 h-3.5 opacity-50" />
-            )}
-          </button>
-
-          {/* Keyboard Shortcuts Trigger */}
+          {/* Keyboard Shortcuts Trigger (Keys) */}
           <button
             type="button"
             onClick={() => {
               playClickChime(540);
               setShowKeysModal(!showKeysModal);
             }}
-            title="TWM Keyboard Shortcuts (Press ?)"
+            title="Keyboard Shortcuts (Press ?)"
             style={{
               backgroundColor: showKeysModal ? activeTheme.accent : activeTheme.cardBg,
               borderColor: showKeysModal ? activeTheme.accent : activeTheme.cardBorder,
               color: showKeysModal ? (activeTheme.isDark ? "#000" : "#fff") : activeTheme.textMuted,
             }}
-            className="p-1 rounded border hover:opacity-80 transition-colors hidden sm:flex items-center gap-1 text-[10px] font-bold"
+            className="p-1 px-1.5 rounded border hover:opacity-80 transition-colors flex items-center gap-1 text-[10px] font-bold cursor-pointer"
           >
             <Keyboard className="w-3.5 h-3.5" />
-            <span className="hidden md:inline">KEYS</span>
+            <span className="hidden sm:inline">KEYS</span>
           </button>
 
-          <div
-            style={{ backgroundColor: activeTheme.headerBorder }}
-            className="h-3 w-px hidden lg:block"
-          />
+          {/* Settings / Overflow Menu (Contains Audio, Dark/Light mode, Lock) */}
+          <div className="relative" id="settings-menu-container">
+            <button
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation();
+                setIsSettingsMenuOpen((prev) => !prev);
+                setIsThemeMenuOpen(false);
+              }}
+              title="Desktop Controls & Overflow"
+              style={{
+                backgroundColor: activeTheme.cardBg,
+                borderColor: activeTheme.cardBorder,
+                color: activeTheme.textPrimary,
+              }}
+              className="p-1 px-1.5 rounded border hover:opacity-80 transition-opacity cursor-pointer flex items-center"
+            >
+              <SlidersHorizontal className="w-3.5 h-3.5" />
+            </button>
 
-          {/* Telemetry Chips */}
-          <div
-            className="hidden lg:flex items-center gap-2 text-[10px]"
-            style={{ color: activeTheme.textMuted }}
-          >
-            <div className="flex items-center gap-1">
-              <Cpu className="w-3 h-3 text-purple-400" />
-              <span>{cpuUsage}%</span>
-            </div>
-            <div className="flex items-center gap-1">
-              <Activity className="w-3 h-3 text-emerald-400" />
-              <span>{memUsage}%</span>
-            </div>
-          </div>
+            {isSettingsMenuOpen && (
+              <div
+                onClick={(e) => e.stopPropagation()}
+                style={{
+                  backgroundColor: activeTheme.windowBg,
+                  borderColor: activeTheme.windowBorder,
+                  color: activeTheme.textPrimary,
+                }}
+                className="absolute right-0 top-full mt-1.5 w-52 rounded-md border shadow-2xl p-1.5 z-[1200] flex flex-col gap-1 backdrop-blur-xl animate-in fade-in zoom-in-95 duration-100 font-mono text-xs"
+              >
+                {/* Dark/Light toggle */}
+                <button
+                  type="button"
+                  onClick={() => {
+                    toggleDarkLight();
+                    playClickChime(500);
+                  }}
+                  className="flex items-center justify-between px-2.5 py-1.5 rounded hover:bg-white/5 transition-colors cursor-pointer"
+                >
+                  <span className="flex items-center gap-2">
+                    {activeTheme.isDark ? <Sun className="w-3.5 h-3.5 text-amber-400" /> : <Moon className="w-3.5 h-3.5 text-blue-500" />}
+                    <span>{activeTheme.isDark ? "Light Mode" : "Dark Mode"}</span>
+                  </span>
+                </button>
 
-          {/* Clock */}
-          <div
-            style={{
-              backgroundColor: activeTheme.cardBg,
-              borderColor: activeTheme.cardBorder,
-              color: activeTheme.textPrimary,
-            }}
-            className="flex items-center gap-1.5 px-2 py-0.5 rounded border font-semibold text-[11px]"
-          >
-            <Clock className="w-3 h-3" style={{ color: activeTheme.accent }} />
-            <span>{timeStr}</span>
+                {/* Sound / Für Elise toggle */}
+                <button
+                  type="button"
+                  onClick={() => {
+                    toggleSound();
+                    playClickChime(700);
+                  }}
+                  className="flex items-center justify-between px-2.5 py-1.5 rounded hover:bg-white/5 transition-colors cursor-pointer"
+                >
+                  <span className="flex items-center gap-2">
+                    {isSoundEnabled ? <Volume2 className="w-3.5 h-3.5 text-emerald-400" /> : <VolumeX className="w-3.5 h-3.5 opacity-50" />}
+                    <span>Für Elise Music Box</span>
+                  </span>
+                  <span className="text-[10px] opacity-60">{isSoundEnabled ? "ON" : "OFF"}</span>
+                </button>
+
+                {/* Lock session */}
+                <button
+                  type="button"
+                  onClick={() => {
+                    lockSession();
+                    setIsSettingsMenuOpen(false);
+                  }}
+                  className="flex items-center justify-between px-2.5 py-1.5 rounded hover:bg-white/5 transition-colors cursor-pointer border-t border-white/5 mt-0.5 pt-1.5"
+                >
+                  <span className="flex items-center gap-2">
+                    <Lock className="w-3.5 h-3.5 text-yellow-400" />
+                    <span>Lock Screen</span>
+                  </span>
+                  <kbd className="text-[9px] opacity-60">Alt+L</kbd>
+                </button>
+              </div>
+            )}
           </div>
         </div>
       </header>
 
       {/* TWM Window Workspace Canvas */}
       <div className="relative flex-1 w-full h-[calc(100vh-72px)] overflow-hidden">
-        {/* Desktop Background Shortcuts & Widgets (Visible on empty canvas) */}
+        {/* Three Quiet Desk Objects (Sticky Note with Poetry, Pinned Latest Essay, Desk Clock) */}
+        <DesktopObjects onOpenEssay={() => openAndFocus("archiveReader")} />
+
+        {/* Desktop Background Shortcuts & Widgets (Visible on canvas) */}
         <div className="absolute inset-0 p-6 pb-16 pointer-events-none flex flex-col justify-between z-0">
-          {/* Left Desktop App Icons Column - Ultra-clean minimalistic squircle form */}
-          <div className="flex flex-col flex-wrap max-h-[calc(100vh-140px)] gap-y-5 gap-x-6 pointer-events-auto w-fit z-10">
-            {/* 1: PixelStudio */}
-            <button
-              type="button"
-              onClick={() => {
-                playClickChime(500);
-                openAndFocus("pixelEngine");
-              }}
-              title="Launch PixelStudio"
-              className="group flex flex-col items-center gap-1.5 focus:outline-none cursor-pointer transition-transform active:scale-95 w-16"
-            >
-              <div
-                style={{
-                  backgroundColor: activeTheme.isDark ? "rgba(255, 255, 255, 0.08)" : "rgba(240, 240, 243, 0.9)",
-                  borderColor: activeTheme.isDark ? "rgba(255, 255, 255, 0.12)" : "rgba(0, 0, 0, 0.08)",
-                }}
-                className="w-13 h-13 sm:w-14 sm:h-14 rounded-2xl border flex items-center justify-center shadow-sm backdrop-blur-md group-hover:scale-105 group-hover:shadow-md transition-all duration-150"
-              >
-                <Paintbrush className="w-6 h-6 text-sky-400 group-hover:scale-110 transition-transform -rotate-12 stroke-[1.8]" />
-              </div>
-              <span
-                style={{ color: activeTheme.textPrimary }}
-                className="font-mono text-[11px] font-medium tracking-tight text-center select-none truncate max-w-[76px] opacity-85 group-hover:opacity-100 transition-opacity"
-              >
-                PixelStudio
-              </span>
-            </button>
-
-            {/* 2: Terminal */}
-            <button
-              type="button"
-              onClick={() => {
-                playClickChime(420);
-                window.dispatchEvent(new CustomEvent("open-terminal"));
-              }}
-              title="Toggle Noctalia Shell Terminal"
-              className="group flex flex-col items-center gap-1.5 focus:outline-none cursor-pointer transition-transform active:scale-95 w-16"
-            >
-              <div
-                style={{
-                  backgroundColor: activeTheme.isDark ? "rgba(255, 255, 255, 0.08)" : "rgba(240, 240, 243, 0.9)",
-                  borderColor: activeTheme.isDark ? "rgba(255, 255, 255, 0.12)" : "rgba(0, 0, 0, 0.08)",
-                }}
-                className="w-13 h-13 sm:w-14 sm:h-14 rounded-2xl border flex items-center justify-center shadow-sm backdrop-blur-md group-hover:scale-105 group-hover:shadow-md transition-all duration-150"
-              >
-                <span className="font-mono text-base font-bold text-neutral-800 dark:text-neutral-200 tracking-tighter select-none group-hover:scale-110 transition-transform">
-                  &gt;_
-                </span>
-              </div>
-              <span
-                style={{ color: activeTheme.textPrimary }}
-                className="font-mono text-[11px] font-medium tracking-tight text-center select-none truncate max-w-[76px] opacity-85 group-hover:opacity-100 transition-opacity"
-              >
-                Terminal
-              </span>
-            </button>
-
-            {/* 3: Projects */}
+          {/* Left Desktop App Icons Column - High-craft Pixel Art Icons */}
+          <div className="flex flex-col flex-wrap max-h-[calc(100vh-140px)] gap-y-5 gap-x-6 pointer-events-auto w-fit z-10 pt-2 pl-2">
+            {/* 1: Work */}
             <button
               type="button"
               onClick={() => {
                 playClickChime(450);
                 openAndFocus("archiveReader");
               }}
-              title="Open Case Studies & Engineering Projects"
-              className="group flex flex-col items-center gap-1.5 focus:outline-none cursor-pointer transition-transform active:scale-95 w-16"
+              title="Work // Shipped Systems"
+              className="group flex flex-col items-center gap-1.5 focus:outline-none cursor-pointer transition-transform active:scale-95 w-18"
             >
               <div
                 style={{
@@ -864,25 +664,25 @@ export function AdityaOSDesktop({
                 }}
                 className="w-13 h-13 sm:w-14 sm:h-14 rounded-2xl border flex items-center justify-center shadow-sm backdrop-blur-md group-hover:scale-105 group-hover:shadow-md transition-all duration-150"
               >
-                <Folder className="w-6 h-6 text-neutral-700 dark:text-neutral-200 stroke-[1.6] group-hover:scale-110 transition-transform" />
+                <PixelWorkIcon size={30} className="text-stone-800 dark:text-zinc-200" />
               </div>
               <span
                 style={{ color: activeTheme.textPrimary }}
-                className="font-mono text-[11px] font-medium tracking-tight text-center select-none truncate max-w-[76px] opacity-85 group-hover:opacity-100 transition-opacity"
+                className="font-mono text-xs font-medium tracking-tight text-center select-none truncate max-w-[80px] opacity-90 group-hover:opacity-100 transition-opacity"
               >
-                Projects
+                Work
               </span>
             </button>
 
-            {/* 4: Writings */}
+            {/* 2: Writing */}
             <button
               type="button"
               onClick={() => {
                 playClickChime(450);
                 openAndFocus("archiveReader");
               }}
-              title="Open Essays & Poetry Archive"
-              className="group flex flex-col items-center gap-1.5 focus:outline-none cursor-pointer transition-transform active:scale-95 w-16"
+              title="Writing // Essays & Poetry"
+              className="group flex flex-col items-center gap-1.5 focus:outline-none cursor-pointer transition-transform active:scale-95 w-18"
             >
               <div
                 style={{
@@ -891,79 +691,25 @@ export function AdityaOSDesktop({
                 }}
                 className="w-13 h-13 sm:w-14 sm:h-14 rounded-2xl border flex items-center justify-center shadow-sm backdrop-blur-md group-hover:scale-105 group-hover:shadow-md transition-all duration-150"
               >
-                <FileText className="w-6 h-6 text-neutral-700 dark:text-neutral-200 stroke-[1.6] group-hover:scale-110 transition-transform" />
+                <PixelWritingIcon size={30} className="text-stone-800 dark:text-zinc-200" />
               </div>
               <span
                 style={{ color: activeTheme.textPrimary }}
-                className="font-mono text-[11px] font-medium tracking-tight text-center select-none truncate max-w-[76px] opacity-85 group-hover:opacity-100 transition-opacity"
+                className="font-mono text-xs font-medium tracking-tight text-center select-none truncate max-w-[80px] opacity-90 group-hover:opacity-100 transition-opacity"
               >
-                Writings
+                Writing
               </span>
             </button>
 
-            {/* 5: Resume */}
-            <button
-              type="button"
-              onClick={() => {
-                playClickChime(400);
-                openAndFocus("resumeViewer");
-              }}
-              title="Open Resume & Experience"
-              className="group flex flex-col items-center gap-1.5 focus:outline-none cursor-pointer transition-transform active:scale-95 w-16"
-            >
-              <div
-                style={{
-                  backgroundColor: activeTheme.isDark ? "rgba(255, 255, 255, 0.08)" : "rgba(240, 240, 243, 0.9)",
-                  borderColor: activeTheme.isDark ? "rgba(255, 255, 255, 0.12)" : "rgba(0, 0, 0, 0.08)",
-                }}
-                className="w-13 h-13 sm:w-14 sm:h-14 rounded-2xl border flex items-center justify-center shadow-sm backdrop-blur-md group-hover:scale-105 group-hover:shadow-md transition-all duration-150"
-              >
-                <FileCode className="w-6 h-6 text-neutral-700 dark:text-neutral-200 stroke-[1.6] group-hover:scale-110 transition-transform" />
-              </div>
-              <span
-                style={{ color: activeTheme.textPrimary }}
-                className="font-mono text-[11px] font-medium tracking-tight text-center select-none truncate max-w-[76px] opacity-85 group-hover:opacity-100 transition-opacity"
-              >
-                Resume
-              </span>
-            </button>
-
-            {/* 6: Gallery */}
-            <button
-              type="button"
-              onClick={() => {
-                playClickChime(480);
-                openAndFocus("galleryViewer");
-              }}
-              title="Open Visual Photo Gallery"
-              className="group flex flex-col items-center gap-1.5 focus:outline-none cursor-pointer transition-transform active:scale-95 w-16"
-            >
-              <div
-                style={{
-                  backgroundColor: activeTheme.isDark ? "rgba(255, 255, 255, 0.08)" : "rgba(240, 240, 243, 0.9)",
-                  borderColor: activeTheme.isDark ? "rgba(255, 255, 255, 0.12)" : "rgba(0, 0, 0, 0.08)",
-                }}
-                className="w-13 h-13 sm:w-14 sm:h-14 rounded-2xl border flex items-center justify-center shadow-sm backdrop-blur-md group-hover:scale-105 group-hover:shadow-md transition-all duration-150"
-              >
-                <ImageIcon className="w-6 h-6 text-neutral-700 dark:text-neutral-200 stroke-[1.6] group-hover:scale-110 transition-transform" />
-              </div>
-              <span
-                style={{ color: activeTheme.textPrimary }}
-                className="font-mono text-[11px] font-medium tracking-tight text-center select-none truncate max-w-[76px] opacity-85 group-hover:opacity-100 transition-opacity"
-              >
-                Gallery
-              </span>
-            </button>
-
-            {/* 7: AboutMe */}
+            {/* 3: About */}
             <button
               type="button"
               onClick={() => {
                 playClickChime(460);
                 openAndFocus("coreIntro");
               }}
-              title="About Aditya Diundi"
-              className="group flex flex-col items-center gap-1.5 focus:outline-none cursor-pointer transition-transform active:scale-95 w-16"
+              title="About // Bio & Identity"
+              className="group flex flex-col items-center gap-1.5 focus:outline-none cursor-pointer transition-transform active:scale-95 w-18"
             >
               <div
                 style={{
@@ -972,42 +718,130 @@ export function AdityaOSDesktop({
                 }}
                 className="w-13 h-13 sm:w-14 sm:h-14 rounded-2xl border flex items-center justify-center shadow-sm backdrop-blur-md group-hover:scale-105 group-hover:shadow-md transition-all duration-150"
               >
-                <Sparkles className="w-6 h-6 text-neutral-700 dark:text-neutral-200 stroke-[1.6] group-hover:scale-110 transition-transform" />
+                <PixelAboutIcon size={30} className="text-stone-800 dark:text-zinc-200" />
               </div>
               <span
                 style={{ color: activeTheme.textPrimary }}
-                className="font-mono text-[11px] font-medium tracking-tight text-center select-none truncate max-w-[76px] opacity-85 group-hover:opacity-100 transition-opacity"
+                className="font-mono text-xs font-medium tracking-tight text-center select-none truncate max-w-[80px] opacity-90 group-hover:opacity-100 transition-opacity"
               >
-                AboutMe
+                About
               </span>
             </button>
-          </div>
 
-          {/* Bottom Desktop System Info Widget (Right Aligned) */}
-          <div className="hidden md:flex items-end justify-end pointer-events-auto">
-            <div
-              style={{
-                backgroundColor: activeTheme.cardBg,
-                borderColor: activeTheme.cardBorder,
-                color: activeTheme.textPrimary,
+            {/* 4: Resume */}
+            <button
+              type="button"
+              onClick={() => {
+                playClickChime(400);
+                openAndFocus("resumeViewer");
               }}
-              className="p-3 rounded-md border text-[11px] backdrop-blur-md max-w-sm space-y-1 shadow-md opacity-75 hover:opacity-100 transition-opacity"
+              title="Resume // Document & Experience"
+              className="group flex flex-col items-center gap-1.5 focus:outline-none cursor-pointer transition-transform active:scale-95 w-18"
             >
-              <div className="flex items-center gap-2 font-bold" style={{ color: activeTheme.accent }}>
-                <Sparkles className="w-3.5 h-3.5" />
-                <span>ADITYA-OS // Interactive Web Desktop</span>
+              <div
+                style={{
+                  backgroundColor: activeTheme.isDark ? "rgba(255, 255, 255, 0.08)" : "rgba(240, 240, 243, 0.9)",
+                  borderColor: activeTheme.isDark ? "rgba(255, 255, 255, 0.12)" : "rgba(0, 0, 0, 0.08)",
+                }}
+                className="w-13 h-13 sm:w-14 sm:h-14 rounded-2xl border flex items-center justify-center shadow-sm backdrop-blur-md group-hover:scale-105 group-hover:shadow-md transition-all duration-150"
+              >
+                <PixelResumeIcon size={30} className="text-stone-800 dark:text-zinc-200" />
               </div>
-              <p className="text-[10px] opacity-75 leading-relaxed">
-                Click any desktop icon or shell chip to launch windows. Press &apos;?&apos; for keyboard shortcuts.
-              </p>
-            </div>
+              <span
+                style={{ color: activeTheme.textPrimary }}
+                className="font-mono text-xs font-medium tracking-tight text-center select-none truncate max-w-[80px] opacity-90 group-hover:opacity-100 transition-opacity"
+              >
+                Resume
+              </span>
+            </button>
+
+            {/* 5: Gallery */}
+            <button
+              type="button"
+              onClick={() => {
+                playClickChime(480);
+                openAndFocus("galleryViewer");
+              }}
+              title="Gallery // Visual Fieldwork"
+              className="group flex flex-col items-center gap-1.5 focus:outline-none cursor-pointer transition-transform active:scale-95 w-18"
+            >
+              <div
+                style={{
+                  backgroundColor: activeTheme.isDark ? "rgba(255, 255, 255, 0.08)" : "rgba(240, 240, 243, 0.9)",
+                  borderColor: activeTheme.isDark ? "rgba(255, 255, 255, 0.12)" : "rgba(0, 0, 0, 0.08)",
+                }}
+                className="w-13 h-13 sm:w-14 sm:h-14 rounded-2xl border flex items-center justify-center shadow-sm backdrop-blur-md group-hover:scale-105 group-hover:shadow-md transition-all duration-150"
+              >
+                <PixelGalleryIcon size={30} className="text-stone-800 dark:text-zinc-200" />
+              </div>
+              <span
+                style={{ color: activeTheme.textPrimary }}
+                className="font-mono text-xs font-medium tracking-tight text-center select-none truncate max-w-[80px] opacity-90 group-hover:opacity-100 transition-opacity"
+              >
+                Gallery
+              </span>
+            </button>
+
+            {/* 6: Terminal */}
+            <button
+              type="button"
+              onClick={() => {
+                playClickChime(420);
+                window.dispatchEvent(new CustomEvent("open-terminal"));
+              }}
+              title="Terminal // Noctalia Shell"
+              className="group flex flex-col items-center gap-1.5 focus:outline-none cursor-pointer transition-transform active:scale-95 w-18"
+            >
+              <div
+                style={{
+                  backgroundColor: activeTheme.isDark ? "rgba(255, 255, 255, 0.08)" : "rgba(240, 240, 243, 0.9)",
+                  borderColor: activeTheme.isDark ? "rgba(255, 255, 255, 0.12)" : "rgba(0, 0, 0, 0.08)",
+                }}
+                className="w-13 h-13 sm:w-14 sm:h-14 rounded-2xl border flex items-center justify-center shadow-sm backdrop-blur-md group-hover:scale-105 group-hover:shadow-md transition-all duration-150"
+              >
+                <PixelTerminalIcon size={30} className="text-stone-800 dark:text-zinc-200" />
+              </div>
+              <span
+                style={{ color: activeTheme.textPrimary }}
+                className="font-mono text-xs font-medium tracking-tight text-center select-none truncate max-w-[80px] opacity-90 group-hover:opacity-100 transition-opacity"
+              >
+                Terminal
+              </span>
+            </button>
+
+            {/* 7: PixelStudio */}
+            <button
+              type="button"
+              onClick={() => {
+                playClickChime(500);
+                openAndFocus("pixelEngine");
+              }}
+              title="PixelStudio // Creative Canvas"
+              className="group flex flex-col items-center gap-1.5 focus:outline-none cursor-pointer transition-transform active:scale-95 w-18"
+            >
+              <div
+                style={{
+                  backgroundColor: activeTheme.isDark ? "rgba(255, 255, 255, 0.08)" : "rgba(240, 240, 243, 0.9)",
+                  borderColor: activeTheme.isDark ? "rgba(255, 255, 255, 0.12)" : "rgba(0, 0, 0, 0.08)",
+                }}
+                className="w-13 h-13 sm:w-14 sm:h-14 rounded-2xl border flex items-center justify-center shadow-sm backdrop-blur-md group-hover:scale-105 group-hover:shadow-md transition-all duration-150"
+              >
+                <PixelStudioIcon size={30} className="text-stone-800 dark:text-zinc-200" />
+              </div>
+              <span
+                style={{ color: activeTheme.textPrimary }}
+                className="font-mono text-xs font-medium tracking-tight text-center select-none truncate max-w-[80px] opacity-90 group-hover:opacity-100 transition-opacity"
+              >
+                PixelStudio
+              </span>
+            </button>
           </div>
         </div>
 
         {/* Module 1: CoreIntro Window */}
         <WindowFrame
           id="coreIntro"
-          title="About Aditya // Design Philosophy & Bio"
+          title="About // Design Technologist Bio"
           icon={<Sparkles className="w-3.5 h-3.5 text-purple-400" />}
           defaultPosition={{ x: 50, y: 30 }}
           defaultSize={{ width: 620, height: 480 }}
@@ -1019,7 +853,7 @@ export function AdityaOSDesktop({
         {/* Module 2: PixelEngine Window */}
         <WindowFrame
           id="pixelEngine"
-          title="Pixel Studio // Creative Grid Canvas"
+          title="PixelStudio // Canvas & Sand Simulation"
           icon={<Paintbrush className="w-3.5 h-3.5" style={{ color: activeTheme.accent }} />}
           defaultPosition={{ x: 140, y: 60 }}
           defaultSize={{ width: 760, height: 520 }}
@@ -1031,7 +865,7 @@ export function AdityaOSDesktop({
         {/* Module 3: ArchiveReader Window */}
         <WindowFrame
           id="archiveReader"
-          title="Archive // Case Studies & Essays"
+          title="Writing // Fieldwork, Essays & Poetry"
           icon={<BookOpen className="w-3.5 h-3.5 text-emerald-400" />}
           defaultPosition={{ x: 340, y: 80 }}
           defaultSize={{ width: 700, height: 480 }}
@@ -1476,6 +1310,15 @@ export function AdityaOSDesktop({
           </div>
         </div>
       )}
+
+      {/* Welcome Modal on first load */}
+      <WelcomeModal
+        isOpen={showWelcomeModal}
+        onDismiss={handleDismissWelcome}
+        onOpenWork={() => openAndFocus("archiveReader")}
+        onOpenWriting={() => openAndFocus("archiveReader")}
+        onOpenAbout={() => openAndFocus("coreIntro")}
+      />
     </main>
   );
 }

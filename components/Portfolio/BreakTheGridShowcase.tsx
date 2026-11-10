@@ -29,9 +29,11 @@ interface BreakTheGridShowcaseProps {
 function BrowserFrame({
   url,
   children,
+  aspectClass = "aspect-[16/10]",
 }: {
   url: string;
   children: React.ReactNode;
+  aspectClass?: string;
 }) {
   const { activeTheme } = useThemeStore();
   const isDark = activeTheme.isDark;
@@ -74,7 +76,7 @@ function BrowserFrame({
       </div>
 
       {/* Frame Body */}
-      <div className="relative overflow-hidden bg-stone-900/5 dark:bg-black/30 aspect-[16/10]">
+      <div className={`relative overflow-hidden bg-stone-900/5 dark:bg-black/30 ${aspectClass}`}>
         {children}
       </div>
     </div>
@@ -368,7 +370,7 @@ export function BreakTheGridShowcase({ onLaunchOS }: BreakTheGridShowcaseProps) 
                   })
                 }
               >
-                <BrowserFrame url="aditya-os.live/pixel">
+                <BrowserFrame url="aditya-os.live/pixel" aspectClass="aspect-[1418/782]">
                   <Image
                     src="/case-studies/adityaos_pixel_engine_studio.png"
                     alt="AdityaOS Pixel Engine Canvas Interface"
@@ -483,7 +485,7 @@ export function BreakTheGridShowcase({ onLaunchOS }: BreakTheGridShowcaseProps) 
                   })
                 }
               >
-                <BrowserFrame url="mfine.co/admin/bhel/contacts">
+                <BrowserFrame url="mfine.co/admin/bhel/contacts" aspectClass="aspect-[1366/768]">
                   <Image
                     src="/case-studies/mfine_bhel_admin_contacts.png"
                     alt="MFine Corporate B2B Admin Console"

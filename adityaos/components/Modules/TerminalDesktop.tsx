@@ -54,12 +54,12 @@ export const TerminalDesktop: React.FC = () => {
     let output: React.ReactNode = null;
     const lowerCmd = trimmed.toLowerCase();
 
-    if (trimmed === "cat poetry.txt" || trimmed === "open archive" || trimmed === "archive") {
+    if (trimmed === "cat poetry.txt" || trimmed === "poetry" || trimmed === "open archive" || trimmed === "archive") {
       restoreWindow("archiveReader");
       focusWindow("archiveReader");
       output = (
         <span className="text-onedark-green">
-          [OK] Spawning ArchiveReader window (Vim/Nano buffer attached).
+          [OK] Spawning ArchiveReader window (Writing buffer attached).
         </span>
       );
     } else if (trimmed === "./play_latest_match" || trimmed === "play" || trimmed === "stream") {
@@ -359,32 +359,11 @@ export const TerminalDesktop: React.FC = () => {
 
   const chips = [
     {
-      label: "./pixel_engine",
-      action: "./pixel_engine",
-      desc: "Pixel Engine Canvas",
-      accent: activeTheme.accent,
-      icon: <Paintbrush className="w-3 h-3 mr-1" />,
-    },
-    {
-      label: "./change_wallpaper",
-      action: "./change_wallpaper",
-      desc: "Wallpaper Manager",
-      accent: "#ec4899",
-      icon: <ImageIcon className="w-3 h-3 mr-1" />,
-    },
-    {
-      label: "cat resume.pdf",
-      action: "cat resume.pdf",
+      label: "resume",
+      action: "resume",
       desc: "Open Resume",
       accent: activeTheme.isDark ? "#eab308" : "#b45309",
       icon: <FileText className="w-3 h-3 mr-1" />,
-    },
-    {
-      label: "feh gallery",
-      action: "feh",
-      desc: "Image Gallery",
-      accent: activeTheme.isDark ? "#06b6d4" : "#0891b2",
-      icon: <ImageIcon className="w-3 h-3 mr-1" />,
     },
     {
       label: "theme next",
@@ -394,24 +373,10 @@ export const TerminalDesktop: React.FC = () => {
       icon: <Palette className="w-3 h-3 mr-1" />,
     },
     {
-      label: "cat poetry.txt",
-      action: "cat poetry.txt",
-      desc: "Open Archive",
+      label: "poetry",
+      action: "poetry",
+      desc: "Open Poetry Archive",
       accent: activeTheme.isDark ? "#34d399" : "#059669",
-      icon: null,
-    },
-    {
-      label: "./play_latest_match",
-      action: "./play_latest_match",
-      desc: "Stream Feed",
-      accent: activeTheme.isDark ? "#60a5fa" : "#2563eb",
-      icon: null,
-    },
-    {
-      label: "fetch core_intro",
-      action: "fetch core_intro",
-      desc: "Restore Intro",
-      accent: activeTheme.textMuted,
       icon: null,
     },
   ];
