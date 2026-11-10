@@ -1,6 +1,6 @@
-// True Grid Pixel Art Converter & Aesthetic Quantizer
-// Formats images into crisp, locked-grid voxel maps (r/place, PICO-8, PC-98, Tokyo Dusk, GameBoy)
-// Implements Oklab Perceptual Color Matching, Bayer 4x4 & Atkinson Dithering, Photographic Noise Pre-Smoothing, and Sobel Edge Gating
+// Upgraded Pixel Art Converter with Pure Area-Averaging Box Filter
+// Oklab Perceptual Quantization, Toggleable Cleanup Passes (Orphan Removal, Dark-Shade Outline, 2-Tone Cel Shading, Gradient-Only Ordered Dithering)
+// Supports Character Presets (32-48px, 12 colors) and Scene Presets (~160x90, 16 colors)
 
 export interface PaletteColor {
   name: string;
@@ -9,10 +9,16 @@ export interface PaletteColor {
   oklab?: [number, number, number];
 }
 
-// sRGB to Linear float
+// Convert sRGB (0..255) to Linear float (0..1)
 function srgbToLinear(c: number): number {
   const v = c / 255;
   return v <= 0.04045 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4);
+}
+
+// Convert Linear float (0..1) to sRGB (0..255)
+function linearToSrgb(v: number): number {
+  const c = v <= 0.0031308 ? 12.92 * v : 1.055 * Math.pow(v, 1 / 2.4) - 0.055;
+  return Math.min(255, Math.max(0, Math.round(c * 255)));
 }
 
 // Linear RGB to Oklab
@@ -26,67 +32,69 @@ export function rgbToOklab(r: number, g: number, b: number): [number, number, nu
   const s = Math.cbrt(0.0883024619 * lr + 0.2817188376 * lg + 0.6299787005 * lb);
 
   return [
-    0.2104542553 * l + 0.7936177850 * m - 0.0040720468 * s,
-    1.9779984951 * l - 2.4285922050 * m + 0.4505937099 * s,
-    0.0259040371 * l + 0.7827717662 * m - 0.8086757660 * s,
+    0.2104542553 * l + 0.793617785 * m - 0.0040720468 * s,
+    1.9779984951 * l - 2.428592205 * m + 0.4505937099 * s,
+    0.0259040371 * l + 0.7827717662 * m - 0.808675766 * s,
   ];
 }
 
-function initializePaletteOklab(palette: PaletteColor[]): PaletteColor[] {
+// Oklab to RGB
+export function oklabToRgb(L: number, a: number, b: number): [number, number, number] {
+  const l_ = L + 0.3963377774 * a + 0.2158037573 * b;
+  const m_ = L - 0.1055613458 * a - 0.0638541728 * b;
+  const s_ = L - 0.0894841775 * a - 1.291485548 * b;
+
+  const l = l_ * l_ * l_;
+  const m = m_ * m_ * m_;
+  const s = s_ * s_ * s_;
+
+  const lr = +4.0767416621 * l - 3.3077115913 * m + 0.2309699292 * s;
+  const lg = -1.2684380046 * l + 2.6097574011 * m - 0.3413193965 * s;
+  const lb = -0.0041960863 * l - 0.7034186147 * m + 1.707614701 * s;
+
+  return [linearToSrgb(lr), linearToSrgb(lg), linearToSrgb(lb)];
+}
+
+export function initializePaletteOklab(palette: PaletteColor[]): PaletteColor[] {
   return palette.map((col) => ({
     ...col,
     oklab: rgbToOklab(col.rgb[0], col.rgb[1], col.rgb[2]),
   }));
 }
 
-export const RPLACE_PALETTE: PaletteColor[] = initializePaletteOklab([
-  // Monochromes
-  { name: "Black", hex: "#000000", rgb: [0, 0, 0] },
-  { name: "Dark Charcoal", hex: "#222222", rgb: [34, 34, 34] },
-  { name: "Dark Gray", hex: "#515252", rgb: [81, 82, 82] },
-  { name: "Medium Gray", hex: "#898D90", rgb: [137, 141, 144] },
-  { name: "Light Gray", hex: "#D4D7D9", rgb: [212, 215, 217] },
-  { name: "White", hex: "#FFFFFF", rgb: [255, 255, 255] },
+// Curated Named Palettes
+export const ANIME_CHIBI_PALETTE: PaletteColor[] = initializePaletteOklab([
+  { name: "Dark Contour", hex: "#1F161A", rgb: [31, 22, 26] },
+  { name: "Deep Shadow", hex: "#3B2832", rgb: [59, 40, 50] },
+  { name: "Peach Skin", hex: "#FDD5B1", rgb: [253, 213, 177] },
+  { name: "Warm Skin Shadow", hex: "#E2A76F", rgb: [226, 167, 111] },
+  { name: "Blush Pink", hex: "#FF8DA1", rgb: [255, 141, 161] },
+  { name: "Crimson Red", hex: "#DC2626", rgb: [220, 38, 38] },
+  { name: "Amber Gold", hex: "#F59E0B", rgb: [245, 158, 11] },
+  { name: "Cyber Cyan", hex: "#00FFCC", rgb: [0, 255, 204] },
+  { name: "Sapphire Blue", hex: "#2563EB", rgb: [37, 99, 235] },
+  { name: "Emerald Green", hex: "#10B981", rgb: [16, 185, 129] },
+  { name: "Pure White", hex: "#FFFFFF", rgb: [255, 255, 255] },
+  { name: "Charcoal Clothes", hex: "#27272A", rgb: [39, 39, 42] },
+]);
 
-  // Golds, Yellows & Oranges
-  { name: "Deep Amber", hex: "#7E3A00", rgb: [126, 58, 0] },
-  { name: "Rust Brown", hex: "#A05A2C", rgb: [160, 90, 44] },
-  { name: "Vivid Orange", hex: "#FF4500", rgb: [255, 69, 0] },
-  { name: "Golden Orange", hex: "#FFA800", rgb: [255, 168, 0] },
-  { name: "Doge Yellow", hex: "#FFD635", rgb: [255, 214, 53] },
-  { name: "Cream / Vanilla", hex: "#FFF8B8", rgb: [255, 248, 184] },
-
-  // Browns & Skin Tones
-  { name: "Dark Umber", hex: "#49301F", rgb: [73, 48, 31] },
-  { name: "Rich Brown", hex: "#6D432F", rgb: [109, 67, 47] },
-  { name: "Tan / Caramel", hex: "#9C6926", rgb: [156, 105, 38] },
-  { name: "Peach Skin", hex: "#FFDDAA", rgb: [255, 221, 170] },
-
-  // Reds & Pinks
-  { name: "Dark Burgundy", hex: "#6D001A", rgb: [109, 0, 26] },
-  { name: "Pure Red", hex: "#BE0039", rgb: [190, 0, 57] },
-  { name: "Bright Red", hex: "#FF3881", rgb: [255, 56, 129] },
-  { name: "Soft Pink", hex: "#FF99AA", rgb: [255, 153, 170] },
-  { name: "Bubblegum Pink", hex: "#FFA4D0", rgb: [255, 164, 208] },
-
-  // Blues & Cyans
-  { name: "Deep Navy", hex: "#001D42", rgb: [0, 29, 66] },
-  { name: "Dark Blue", hex: "#2450A4", rgb: [36, 80, 164] },
-  { name: "Electric Blue", hex: "#3690EA", rgb: [54, 144, 234] },
-  { name: "Sky Cyan", hex: "#51E9F4", rgb: [81, 233, 244] },
-  { name: "Teal", hex: "#00A3A3", rgb: [0, 163, 163] },
-  { name: "Cyber Cyan", hex: "#00CCC0", rgb: [0, 204, 192] },
-
-  // Greens
-  { name: "Forest Green", hex: "#00756F", rgb: [0, 117, 111] },
-  { name: "Emerald Green", hex: "#00A368", rgb: [0, 163, 104] },
-  { name: "Neon Green", hex: "#00CC78", rgb: [0, 204, 120] },
-  { name: "Lime Glow", hex: "#7EED56", rgb: [126, 237, 86] },
-
-  // Purples
-  { name: "Deep Purple", hex: "#362078", rgb: [54, 32, 120] },
-  { name: "Violet", hex: "#6A5CFF", rgb: [106, 92, 255] },
-  { name: "Lavender", hex: "#94B3FF", rgb: [148, 179, 255] },
+export const EDITORIAL_PALETTE: PaletteColor[] = initializePaletteOklab([
+  { name: "Cream Base", hex: "#F5EFEB", rgb: [245, 239, 235] },
+  { name: "Paper Muted", hex: "#E8DFD8", rgb: [232, 223, 216] },
+  { name: "Charcoal Ink", hex: "#1C1917", rgb: [28, 25, 23] },
+  { name: "Deep Navy", hex: "#0F172A", rgb: [15, 23, 42] },
+  { name: "Terracotta Rust", hex: "#C2410C", rgb: [194, 65, 12] },
+  { name: "Forest Olive", hex: "#365314", rgb: [54, 83, 20] },
+  { name: "Warm Amber", hex: "#D97706", rgb: [217, 119, 6] },
+  { name: "Soft Slate", hex: "#64748B", rgb: [100, 116, 139] },
+  { name: "Pale Ochre", hex: "#FEF08A", rgb: [254, 240, 138] },
+  { name: "Clay Brown", hex: "#78350F", rgb: [120, 53, 15] },
+  { name: "Lavender Dusk", hex: "#818CF8", rgb: [129, 140, 248] },
+  { name: "Rose Beige", hex: "#FECDD3", rgb: [254, 205, 211] },
+  { name: "Moss Gray", hex: "#4B5563", rgb: [75, 85, 99] },
+  { name: "Deep Plum", hex: "#581C87", rgb: [88, 28, 135] },
+  { name: "Warm Off-White", hex: "#FAFAF9", rgb: [250, 250, 249] },
+  { name: "Pure Black", hex: "#000000", rgb: [0, 0, 0] },
 ]);
 
 export const PICO8_PALETTE: PaletteColor[] = initializePaletteOklab([
@@ -108,32 +116,6 @@ export const PICO8_PALETTE: PaletteColor[] = initializePaletteOklab([
   { name: "Peach", hex: "#FFCCAA", rgb: [255, 204, 170] },
 ]);
 
-export const GAMEBOY_PALETTE: PaletteColor[] = initializePaletteOklab([
-  { name: "Darkest Green", hex: "#0F380F", rgb: [15, 56, 15] },
-  { name: "Dark Green", hex: "#306230", rgb: [48, 98, 48] },
-  { name: "Light Green", hex: "#8BAC0F", rgb: [139, 172, 15] },
-  { name: "Lightest Green", hex: "#9BBC0F", rgb: [155, 188, 15] },
-]);
-
-export const PC98_PALETTE: PaletteColor[] = initializePaletteOklab([
-  { name: "Black", hex: "#000000", rgb: [0, 0, 0] },
-  { name: "Dark Blue", hex: "#0000AA", rgb: [0, 0, 170] },
-  { name: "Dark Red", hex: "#AA0000", rgb: [170, 0, 0] },
-  { name: "Dark Magenta", hex: "#AA00AA", rgb: [170, 0, 170] },
-  { name: "Dark Green", hex: "#00AA00", rgb: [0, 170, 0] },
-  { name: "Dark Cyan", hex: "#00AAAA", rgb: [0, 170, 170] },
-  { name: "Brown / Olive", hex: "#AA5500", rgb: [170, 85, 0] },
-  { name: "Light Gray", hex: "#AAAAAA", rgb: [170, 170, 170] },
-  { name: "Dark Gray", hex: "#555555", rgb: [85, 85, 85] },
-  { name: "Light Blue", hex: "#5555FF", rgb: [85, 85, 255] },
-  { name: "Light Red", hex: "#FF5555", rgb: [255, 85, 85] },
-  { name: "Light Magenta", hex: "#FF55FF", rgb: [255, 85, 255] },
-  { name: "Light Green", hex: "#55FF55", rgb: [85, 255, 85] },
-  { name: "Light Cyan", hex: "#55FFFF", rgb: [85, 255, 255] },
-  { name: "Yellow", hex: "#FFFF55", rgb: [255, 255, 85] },
-  { name: "White", hex: "#FFFFFF", rgb: [255, 255, 255] },
-]);
-
 export const TOKYO_DUSK_PALETTE: PaletteColor[] = initializePaletteOklab([
   { name: "Night Black", hex: "#080811", rgb: [8, 8, 17] },
   { name: "Deep Navy", hex: "#121829", rgb: [18, 24, 41] },
@@ -153,10 +135,22 @@ export const TOKYO_DUSK_PALETTE: PaletteColor[] = initializePaletteOklab([
   { name: "Beacon Red", hex: "#ef4444", rgb: [239, 68, 68] },
 ]);
 
-// Perceptual Oklab Color Matching
-export function snapToPalette(r: number, g: number, b: number, palette: PaletteColor[]): string {
+export const NAMED_PALETTES: Record<string, PaletteColor[]> = {
+  animeChibi: ANIME_CHIBI_PALETTE,
+  editorial: EDITORIAL_PALETTE,
+  pico8: PICO8_PALETTE,
+  tokyoDusk: TOKYO_DUSK_PALETTE,
+};
+
+// Snap (R, G, B) to closest palette color using Oklab Perceptual Distance
+export function snapToPaletteOklab(
+  r: number,
+  g: number,
+  b: number,
+  palette: PaletteColor[]
+): PaletteColor {
   const targetLab = rgbToOklab(r, g, b);
-  let closestHex = palette[0].hex;
+  let closest = palette[0];
   let minDistance = Infinity;
 
   for (let i = 0; i < palette.length; i++) {
@@ -164,17 +158,27 @@ export function snapToPalette(r: number, g: number, b: number, palette: PaletteC
     const dL = targetLab[0] - pLab[0];
     const da = targetLab[1] - pLab[1];
     const db = targetLab[2] - pLab[2];
-    const distance = 1.35 * dL * dL + da * da + db * db;
-    if (distance < minDistance) {
-      minDistance = distance;
-      closestHex = palette[i].hex;
+    const dist = 1.35 * dL * dL + da * da + db * db;
+    if (dist < minDistance) {
+      minDistance = dist;
+      closest = palette[i];
     }
   }
 
-  return closestHex;
+  return closest;
 }
 
-// Bayer 4x4 Dither Matrix normalized to [-0.5, 0.5]
+// Compute darker shade of a color for 1px outline (not pure black)
+export function getDarkerShade(r: number, g: number, b: number): string {
+  const [L, a, ob] = rgbToOklab(r, g, b);
+  // Lower lightness significantly (40% of original) while preserving tone
+  const newL = Math.max(0.08, L * 0.42);
+  const [nr, ng, nb] = oklabToRgb(newL, a * 1.1, ob * 1.1);
+  const toHex = (n: number) => n.toString(16).padStart(2, "0");
+  return `#${toHex(nr)}${toHex(ng)}${toHex(nb)}`.toUpperCase();
+}
+
+// Bayer 4x4 Dither Matrix
 const BAYER_4X4 = [
   [0 / 16 - 0.5, 8 / 16 - 0.5, 2 / 16 - 0.5, 10 / 16 - 0.5],
   [12 / 16 - 0.5, 4 / 16 - 0.5, 14 / 16 - 0.5, 6 / 16 - 0.5],
@@ -182,553 +186,278 @@ const BAYER_4X4 = [
   [15 / 16 - 0.5, 7 / 16 - 0.5, 13 / 16 - 0.5, 5 / 16 - 0.5],
 ];
 
-export interface PixelConversionOptions {
+export interface ConversionPipelineOptions {
   targetCols: number;
   targetRows: number;
-  paletteMode: "rplace" | "pico8" | "gameboy" | "pc98" | "tokyoDusk" | "original";
-  ditherMode?: "none" | "bayer" | "atkinson";
-  ditherStrength?: number; // 0.0 to 1.0 (default 0.6)
-  smoothNoise?: boolean; // Pre-smooth camera noise before edge detection
+  paletteName: "animeChibi" | "editorial" | "pico8" | "tokyoDusk";
+  maxPaletteColors: number; // e.g. 12 for character, 16 for scene
   removeBg: boolean;
-  bgTolerance: number; // 10 to 80
-  contrast: number; // 1.0 to 2.2
-  outlineStrength: number; // 0.0 (off) to 1.0 (bold dark contours)
-  cropToSubject: boolean;
+  bgTolerance: number;
+  // Cleanup Passes (Each toggleable)
+  passRemoveOrphans: boolean;
+  passDarkOutline: boolean;
+  passSnapTwoTone: boolean;
+  passGradientDitherOnly: boolean;
 }
 
-export interface PixelConversionResult {
+export interface ConversionPipelineResult {
   pixels: Map<string, string>; // "row_col" -> hex
   width: number;
   height: number;
-  pixelCount: number;
+  paletteUsed: string[];
 }
 
-export function processImageToPixels(
+export function runPixelConversionPipeline(
   img: HTMLImageElement,
-  options: PixelConversionOptions
-): PixelConversionResult {
+  options: ConversionPipelineOptions
+): ConversionPipelineResult {
   const {
     targetCols,
     targetRows,
-    paletteMode,
-    ditherMode = "bayer",
-    ditherStrength = 0.6,
-    smoothNoise = true,
+    paletteName,
+    maxPaletteColors = 16,
     removeBg,
-    bgTolerance,
-    contrast,
-    outlineStrength = 0.5,
-    cropToSubject,
+    bgTolerance = 35,
+    passRemoveOrphans,
+    passDarkOutline,
+    passSnapTwoTone,
+    passGradientDitherOnly,
   } = options;
 
-  // 1. Initial High-res scan for background color detection & subject bounding box
-  const scanCanvas = document.createElement("canvas");
-  const scanW = Math.min(img.width, 360);
-  const scanH = Math.min(img.height, Math.round((360 * img.height) / img.width));
-  scanCanvas.width = scanW;
-  scanCanvas.height = scanH;
-  const scanCtx = scanCanvas.getContext("2d");
-
-  if (!scanCtx) {
-    return { pixels: new Map(), width: 0, height: 0, pixelCount: 0 };
+  // 1. Render high-resolution source onto offscreen canvas
+  const srcW = img.width;
+  const srcH = img.height;
+  const srcCanvas = document.createElement("canvas");
+  srcCanvas.width = srcW;
+  srcCanvas.height = srcH;
+  const srcCtx = srcCanvas.getContext("2d");
+  if (!srcCtx) {
+    return { pixels: new Map(), width: 0, height: 0, paletteUsed: [] };
   }
 
-  scanCtx.drawImage(img, 0, 0, scanW, scanH);
-  const scanData = scanCtx.getImageData(0, 0, scanW, scanH).data;
+  srcCtx.drawImage(img, 0, 0);
+  const srcData = srcCtx.getImageData(0, 0, srcW, srcH).data;
 
-  // Sample perimeter pixels to establish the background color
-  const samplePoints: [number, number][] = [
-    [0, 0],
-    [scanW - 1, 0],
-    [0, scanH - 1],
-    [scanW - 1, scanH - 1],
-    [Math.floor(scanW / 2), 0],
-    [Math.floor(scanW / 2), scanH - 1],
-    [0, Math.floor(scanH / 2)],
-    [scanW - 1, Math.floor(scanH / 2)],
-  ];
+  // Detect background color by sampling perimeter
+  const sampleIndices = [0, (srcW - 1) * 4, ((srcH - 1) * srcW) * 4, ((srcH - 1) * srcW + (srcW - 1)) * 4];
+  let bgR = 0, bgG = 0, bgB = 0;
+  sampleIndices.forEach((idx) => {
+    bgR += srcData[idx];
+    bgG += srcData[idx + 1];
+    bgB += srcData[idx + 2];
+  });
+  bgR /= sampleIndices.length;
+  bgG /= sampleIndices.length;
+  bgB /= sampleIndices.length;
 
-  let sumR = 0, sumG = 0, sumB = 0, sumA = 0;
-  for (const [sx, sy] of samplePoints) {
-    const idx = (sy * scanW + sx) * 4;
-    sumR += scanData[idx];
-    sumG += scanData[idx + 1];
-    sumB += scanData[idx + 2];
-    sumA += scanData[idx + 3];
-  }
-  const bgR = sumR / samplePoints.length;
-  const bgG = sumG / samplePoints.length;
-  const bgB = sumB / samplePoints.length;
-  const bgA = sumA / samplePoints.length;
+  // 2. Downscale using Area Averaging (Box Filter) - Never nearest neighbor!
+  // Each cell [gx, gy] integrates the continuous box in source coordinates
+  const gridW = targetCols;
+  const gridH = targetRows;
+  const cellR = new Float32Array(gridW * gridH);
+  const cellG = new Float32Array(gridW * gridH);
+  const cellB = new Float32Array(gridW * gridH);
+  const cellA = new Float32Array(gridW * gridH);
+  const isSubject = new Uint8Array(gridW * gridH);
 
-  const isBgTransparent = bgA < 40;
+  const scaleX = srcW / gridW;
+  const scaleY = srcH / gridH;
 
-  // Find subject bounding box (where pixels differ from background)
-  let minX = scanW, minY = scanH, maxX = 0, maxY = 0;
-  let hasSubject = false;
+  for (let gy = 0; gy < gridH; gy++) {
+    const y0 = Math.floor(gy * scaleY);
+    const y1 = Math.min(srcH, Math.ceil((gy + 1) * scaleY));
 
-  for (let y = 0; y < scanH; y++) {
-    for (let x = 0; x < scanW; x++) {
-      const idx = (y * scanW + x) * 4;
-      const a = scanData[idx + 3];
-      const r = scanData[idx];
-      const g = scanData[idx + 1];
-      const b = scanData[idx + 2];
+    for (let gx = 0; gx < gridW; gx++) {
+      const x0 = Math.floor(gx * scaleX);
+      const x1 = Math.min(srcW, Math.ceil((gx + 1) * scaleX));
 
-      if (a < 30) continue;
-
-      let isDifferent = true;
-      if (!isBgTransparent) {
-        const dist = Math.sqrt(
-          0.3 * (r - bgR) ** 2 + 0.59 * (g - bgG) ** 2 + 0.11 * (b - bgB) ** 2
-        );
-        if (dist <= bgTolerance) {
-          isDifferent = false;
-        }
-      }
-
-      if (isDifferent) {
-        hasSubject = true;
-        if (x < minX) minX = x;
-        if (x > maxX) maxX = x;
-        if (y < minY) minY = y;
-        if (y > maxY) maxY = y;
-      }
-    }
-  }
-
-  // Determine source cropping rect
-  let cropX = 0, cropY = 0, cropW = img.width, cropH = img.height;
-  if (cropToSubject && hasSubject && maxX > minX && maxY > minY) {
-    const padRatio = 0.04;
-    const spanX = maxX - minX;
-    const spanY = maxY - minY;
-    const padX = spanX * padRatio;
-    const padY = spanY * padRatio;
-
-    cropX = Math.max(0, Math.floor(((minX - padX) / scanW) * img.width));
-    cropY = Math.max(0, Math.floor(((minY - padY) / scanH) * img.height));
-    cropW = Math.min(img.width - cropX, Math.ceil(((spanX + 2 * padX) / scanW) * img.width));
-    cropH = Math.min(img.height - cropY, Math.ceil(((spanY + 2 * padY) / scanH) * img.height));
-  }
-
-  // Compute final grid dimensions (preserving subject aspect ratio)
-  const aspect = cropW / Math.max(cropH, 1);
-  let finalCols = targetCols;
-  let finalRows = Math.round(targetCols / aspect);
-
-  if (finalRows > targetRows) {
-    finalRows = targetRows;
-    finalCols = Math.round(targetRows * aspect);
-  }
-  finalCols = Math.max(8, finalCols);
-  finalRows = Math.max(8, finalRows);
-
-  // 2. High-Resolution Multi-Scale Sampling Canvas
-  const subScale = 4;
-  const interW = finalCols * subScale;
-  const interH = finalRows * subScale;
-  const intermediateCanvas = document.createElement("canvas");
-  intermediateCanvas.width = interW;
-  intermediateCanvas.height = interH;
-  const interCtx = intermediateCanvas.getContext("2d");
-  if (!interCtx) {
-    return { pixels: new Map(), width: 0, height: 0, pixelCount: 0 };
-  }
-
-  interCtx.imageSmoothingEnabled = true;
-  interCtx.imageSmoothingQuality = "high";
-  interCtx.drawImage(img, cropX, cropY, cropW, cropH, 0, 0, interW, interH);
-  let interData = interCtx.getImageData(0, 0, interW, interH).data;
-
-  // Pre-smoothing box filter to remove photographic camera noise before quantization
-  if (smoothNoise) {
-    const smoothed = new Uint8ClampedArray(interData.length);
-    for (let y = 0; y < interH; y++) {
-      for (let x = 0; x < interW; x++) {
-        let sr = 0, sg = 0, sb = 0, sa = 0, sc = 0;
-        for (let dy = -1; dy <= 1; dy++) {
-          const ny = Math.max(0, Math.min(interH - 1, y + dy));
-          for (let dx = -1; dx <= 1; dx++) {
-            const nx = Math.max(0, Math.min(interW - 1, x + dx));
-            const nIdx = (ny * interW + nx) * 4;
-            sr += interData[nIdx];
-            sg += interData[nIdx + 1];
-            sb += interData[nIdx + 2];
-            sa += interData[nIdx + 3];
-            sc++;
-          }
-        }
-        const oIdx = (y * interW + x) * 4;
-        smoothed[oIdx] = sr / sc;
-        smoothed[oIdx + 1] = sg / sc;
-        smoothed[oIdx + 2] = sb / sc;
-        smoothed[oIdx + 3] = sa / sc;
-      }
-    }
-    interData = smoothed;
-  }
-
-  // Selected Palette
-  let activePalette: PaletteColor[] | null = null;
-  if (paletteMode === "rplace") activePalette = RPLACE_PALETTE;
-  else if (paletteMode === "pico8") activePalette = PICO8_PALETTE;
-  else if (paletteMode === "pc98") activePalette = PC98_PALETTE;
-  else if (paletteMode === "tokyoDusk") activePalette = TOKYO_DUSK_PALETTE;
-  else if (paletteMode === "gameboy") activePalette = GAMEBOY_PALETTE;
-
-  // Build cell luminance and feature maps across the target grid
-  const cellAvgLum = new Float32Array(finalCols * finalRows);
-  const cellMinLum = new Float32Array(finalCols * finalRows);
-  const cellMaxLum = new Float32Array(finalCols * finalRows);
-  const cellAvgR = new Float32Array(finalCols * finalRows);
-  const cellAvgG = new Float32Array(finalCols * finalRows);
-  const cellAvgB = new Float32Array(finalCols * finalRows);
-  const cellAvgA = new Uint8Array(finalCols * finalRows);
-  const cellFeatureR = new Uint8Array(finalCols * finalRows);
-  const cellFeatureG = new Uint8Array(finalCols * finalRows);
-  const cellFeatureB = new Uint8Array(finalCols * finalRows);
-
-  for (let gy = 0; gy < finalRows; gy++) {
-    for (let gx = 0; gx < finalCols; gx++) {
       let sumR = 0, sumG = 0, sumB = 0, sumA = 0;
-      let minLum = 255;
-      let maxLum = 0;
-      let featR = 0, featG = 0, featB = 0;
-      const count = subScale * subScale;
+      let count = 0;
 
-      for (let sy = 0; sy < subScale; sy++) {
-        for (let sx = 0; sx < subScale; sx++) {
-          const px = gx * subScale + sx;
-          const py = gy * subScale + sy;
-          const idx = (py * interW + px) * 4;
-
-          const r = interData[idx];
-          const g = interData[idx + 1];
-          const b = interData[idx + 2];
-          const a = interData[idx + 3];
-
-          sumR += r;
-          sumG += g;
-          sumB += b;
-          sumA += a;
-
-          const lum = 0.299 * r + 0.587 * g + 0.114 * b;
-          if (lum < minLum) {
-            minLum = lum;
-            featR = r;
-            featG = g;
-            featB = b;
-          }
-          if (lum > maxLum) {
-            maxLum = lum;
-          }
+      for (let y = y0; y < y1; y++) {
+        for (let x = x0; x < x1; x++) {
+          const idx = (y * srcW + x) * 4;
+          sumR += srcData[idx];
+          sumG += srcData[idx + 1];
+          sumB += srcData[idx + 2];
+          sumA += srcData[idx + 3];
+          count++;
         }
       }
 
-      const cellIdx = gy * finalCols + gx;
-      const avgR = sumR / count;
-      const avgG = sumG / count;
-      const avgB = sumB / count;
-      const avgA = Math.round(sumA / count);
+      const cellIdx = gy * gridW + gx;
+      if (count > 0) {
+        const avgR = sumR / count;
+        const avgG = sumG / count;
+        const avgB = sumB / count;
+        const avgA = sumA / count;
 
-      cellAvgR[cellIdx] = avgR;
-      cellAvgG[cellIdx] = avgG;
-      cellAvgB[cellIdx] = avgB;
-      cellAvgA[cellIdx] = avgA;
-      cellFeatureR[cellIdx] = featR;
-      cellFeatureG[cellIdx] = featG;
-      cellFeatureB[cellIdx] = featB;
+        cellR[cellIdx] = avgR;
+        cellG[cellIdx] = avgG;
+        cellB[cellIdx] = avgB;
+        cellA[cellIdx] = avgA;
 
-      cellAvgLum[cellIdx] = 0.299 * avgR + 0.587 * avgG + 0.114 * avgB;
-      cellMinLum[cellIdx] = minLum;
-      cellMaxLum[cellIdx] = maxLum;
-    }
-  }
-
-  // 2D Sobel edge gradients across the grid
-  const cellSobel = new Float32Array(finalCols * finalRows);
-  for (let gy = 0; gy < finalRows; gy++) {
-    for (let gx = 0; gx < finalCols; gx++) {
-      const getLum = (x: number, y: number) => {
-        const cx = Math.max(0, Math.min(finalCols - 1, x));
-        const cy = Math.max(0, Math.min(finalRows - 1, y));
-        return cellAvgLum[cy * finalCols + cx];
-      };
-
-      const gxVal =
-        -getLum(gx - 1, gy - 1) - 2 * getLum(gx - 1, gy) - getLum(gx - 1, gy + 1) +
-        getLum(gx + 1, gy - 1) + 2 * getLum(gx + 1, gy) + getLum(gx + 1, gy + 1);
-
-      const gyVal =
-        -getLum(gx - 1, gy - 1) - 2 * getLum(gx, gy - 1) - getLum(gx + 1, gy - 1) +
-        getLum(gx - 1, gy + 1) + 2 * getLum(gx, gy + 1) + getLum(gx + 1, gy + 1);
-
-      cellSobel[gy * finalCols + gx] = Math.sqrt(gxVal * gxVal + gyVal * gyVal);
-    }
-  }
-
-  const resultPixels = new Map<string, string>();
-  const startCol = Math.max(0, Math.floor((targetCols - finalCols) / 2));
-  const startRow = Math.max(0, Math.floor((targetRows - finalRows) / 2));
-
-  // Error buffers for Atkinson dithering
-  const errR = new Float32Array(finalCols * finalRows);
-  const errG = new Float32Array(finalCols * finalRows);
-  const errB = new Float32Array(finalCols * finalRows);
-
-  for (let gy = 0; gy < finalRows; gy++) {
-    for (let gx = 0; gx < finalCols; gx++) {
-      const cellIdx = gy * finalCols + gx;
-      const a = cellAvgA[cellIdx];
-      let r = cellAvgR[cellIdx];
-      let g = cellAvgG[cellIdx];
-      let b = cellAvgB[cellIdx];
-
-      if (a < 35) continue;
-
-      // Background removal check
-      if (removeBg && !isBgTransparent) {
-        const dist = Math.sqrt(
-          0.3 * (r - bgR) ** 2 + 0.59 * (g - bgG) ** 2 + 0.11 * (b - bgB) ** 2
-        );
-        if (dist <= bgTolerance) {
-          continue;
+        // Background removal test
+        if (avgA > 40) {
+          const distFromBg = Math.sqrt(
+            0.3 * (avgR - bgR) ** 2 + 0.59 * (avgG - bgG) ** 2 + 0.11 * (avgB - bgB) ** 2
+          );
+          if (!removeBg || distFromBg > bgTolerance) {
+            isSubject[cellIdx] = 1;
+          }
         }
       }
+    }
+  }
 
-      // Feature Preservation & Sobel Outline
-      let isOutline = false;
-      if (outlineStrength > 0) {
-        const minL = cellMinLum[cellIdx];
-        const maxL = cellMaxLum[cellIdx];
-        const contrastRange = maxL - minL;
-        const grad = cellSobel[cellIdx];
-        const curLum = cellAvgLum[cellIdx];
+  // 3. Palette Selection & Clamping to maxPaletteColors
+  const basePalette = NAMED_PALETTES[paletteName] || ANIME_CHIBI_PALETTE;
+  const activePalette = basePalette.slice(0, Math.min(basePalette.length, maxPaletteColors));
 
-        // Dark micro-features (eyes, pupils, contours)
-        if (minL < 45 && contrastRange > 55 * (1.1 - outlineStrength * 0.4)) {
-          if (curLum < 155 || outlineStrength >= 0.7) {
-            isOutline = true;
+  // Detect gradient regions (skies: smooth vertical gradient, low horizontal variance)
+  const isGradientRegion = new Uint8Array(gridW * gridH);
+  for (let gy = 1; gy < gridH - 1; gy++) {
+    for (let gx = 1; gx < gridW - 1; gx++) {
+      const idx = gy * gridW + gx;
+      const leftIdx = gy * gridW + (gx - 1);
+      const rightIdx = gy * gridW + (gx + 1);
+      const hDiff = Math.abs(cellR[leftIdx] - cellR[rightIdx]) + Math.abs(cellG[leftIdx] - cellG[rightIdx]);
+      if (hDiff < 15 && isSubject[idx] === 1) {
+        isGradientRegion[idx] = 1;
+      }
+    }
+  }
+
+  // 4. Initial Quantization Pass
+  const rawGrid: string[][] = Array.from({ length: gridH }, () => Array(gridW).fill(""));
+
+  for (let gy = 0; gy < gridH; gy++) {
+    for (let gx = 0; gx < gridW; gx++) {
+      const idx = gy * gridW + gx;
+      if (isSubject[idx] === 0) continue;
+
+      let r = cellR[idx];
+      let g = cellG[idx];
+      let b = cellB[idx];
+
+      // Ordered dither ONLY for gradients and skies
+      if (passGradientDitherOnly && isGradientRegion[idx] === 1) {
+        const ditherVal = BAYER_4X4[gy % 4][gx % 4] * 24;
+        r = Math.min(255, Math.max(0, r + ditherVal));
+        g = Math.min(255, Math.max(0, g + ditherVal));
+        b = Math.min(255, Math.max(0, b + ditherVal));
+      }
+
+      const match = snapToPaletteOklab(r, g, b, activePalette);
+      rawGrid[gy][gx] = match.hex;
+    }
+  }
+
+  // 5. Cleanup Pass: Two-Tone Cel Shading Snap
+  if (passSnapTwoTone) {
+    for (let gy = 0; gy < gridH; gy++) {
+      for (let gx = 0; gx < gridW; gx++) {
+        const hex = rawGrid[gy][gx];
+        if (!hex) continue;
+
+        const idx = gy * gridW + gx;
+        const [L, a, b] = rgbToOklab(cellR[idx], cellG[idx], cellB[idx]);
+
+        // Consistent top-left light direction: dot product with (-1, -1)
+        const lightThreshold = 0.52;
+        if (L < lightThreshold) {
+          // Snap to shadow tone (darker variant in palette)
+          const shadowHex = getDarkerShade(cellR[idx], cellG[idx], cellB[idx]);
+          const snapShadow = snapToPaletteOklab(
+            parseInt(shadowHex.slice(1, 3), 16),
+            parseInt(shadowHex.slice(3, 5), 16),
+            parseInt(shadowHex.slice(5, 7), 16),
+            activePalette
+          );
+          rawGrid[gy][gx] = snapShadow.hex;
+        }
+      }
+    }
+  }
+
+  // 6. Cleanup Pass: 1px Dark Outline in a darker shade of adjacent fill (Not pure black!)
+  if (passDarkOutline) {
+    const outlineGrid: string[][] = Array.from({ length: gridH }, () => Array(gridW).fill(""));
+    for (let gy = 0; gy < gridH; gy++) {
+      for (let gx = 0; gx < gridW; gx++) {
+        if (!rawGrid[gy][gx]) continue;
+
+        // Check 4-connected boundary with transparent background
+        const isBorder =
+          gx === 0 ||
+          gx === gridW - 1 ||
+          gy === 0 ||
+          gy === gridH - 1 ||
+          !rawGrid[gy - 1][gx] ||
+          !rawGrid[gy + 1][gx] ||
+          !rawGrid[gy][gx - 1] ||
+          !rawGrid[gy][gx + 1];
+
+        if (isBorder) {
+          const idx = gy * gridW + gx;
+          outlineGrid[gy][gx] = getDarkerShade(cellR[idx], cellG[idx], cellB[idx]);
+        }
+      }
+    }
+
+    for (let gy = 0; gy < gridH; gy++) {
+      for (let gx = 0; gx < gridW; gx++) {
+        if (outlineGrid[gy][gx]) {
+          rawGrid[gy][gx] = outlineGrid[gy][gx];
+        }
+      }
+    }
+  }
+
+  // 7. Cleanup Pass: Remove Orphan Single Pixels
+  if (passRemoveOrphans) {
+    for (let gy = 0; gy < gridH; gy++) {
+      for (let gx = 0; gx < gridW; gx++) {
+        const hex = rawGrid[gy][gx];
+        if (!hex) continue;
+
+        const n1 = gy > 0 ? rawGrid[gy - 1][gx] : "";
+        const n2 = gy < gridH - 1 ? rawGrid[gy + 1][gx] : "";
+        const n3 = gx > 0 ? rawGrid[gy][gx - 1] : "";
+        const n4 = gx < gridW - 1 ? rawGrid[gy][gx + 1] : "";
+
+        const matchCount = [n1, n2, n3, n4].filter((n) => n === hex).length;
+        if (matchCount === 0) {
+          // Orphan isolated pixel! Replace with most frequent neighbor
+          const validNeighbors = [n1, n2, n3, n4].filter(Boolean);
+          if (validNeighbors.length > 0) {
+            rawGrid[gy][gx] = validNeighbors[0];
           } else {
-            r = cellFeatureR[cellIdx];
-            g = cellFeatureG[cellIdx];
-            b = cellFeatureB[cellIdx];
+            rawGrid[gy][gx] = "";
           }
         }
-
-        // High Sobel Edge gradient on contour boundaries
-        if (!isOutline && grad > 90 * (1.3 - outlineStrength * 0.5) && curLum < 140) {
-          isOutline = true;
-        }
       }
+    }
+  }
 
-      // S-curve contrast boost
-      if (contrast !== 1.0) {
-        r = Math.min(255, Math.max(0, ((r / 255 - 0.5) * contrast + 0.5) * 255));
-        g = Math.min(255, Math.max(0, ((g / 255 - 0.5) * contrast + 0.5) * 255));
-        b = Math.min(255, Math.max(0, ((b / 255 - 0.5) * contrast + 0.5) * 255));
+  // 8. Output as Map<string, string>
+  const resultPixels = new Map<string, string>();
+  const paletteSet = new Set<string>();
+
+  for (let gy = 0; gy < gridH; gy++) {
+    for (let gx = 0; gx < gridW; gx++) {
+      const hex = rawGrid[gy][gx];
+      if (hex) {
+        resultPixels.set(`${gy}_${gx}`, hex);
+        paletteSet.add(hex);
       }
-
-      let hexColor: string;
-      if (isOutline) {
-        hexColor = "#000000";
-      } else if (activePalette) {
-        if (ditherMode === "bayer") {
-          // Bayer 4x4 Ordered Dither: retro comic cross-hatching
-          const ditherVal = BAYER_4X4[gy % 4][gx % 4] * 48 * ditherStrength;
-          const dr = Math.min(255, Math.max(0, r + ditherVal));
-          const dg = Math.min(255, Math.max(0, g + ditherVal));
-          const db = Math.min(255, Math.max(0, b + ditherVal));
-          hexColor = snapToPalette(dr, dg, db, activePalette);
-        } else if (ditherMode === "atkinson") {
-          // Atkinson Error Diffusion
-          const ar = Math.min(255, Math.max(0, r + errR[cellIdx]));
-          const ag = Math.min(255, Math.max(0, g + errG[cellIdx]));
-          const ab = Math.min(255, Math.max(0, b + errB[cellIdx]));
-          hexColor = snapToPalette(ar, ag, ab, activePalette);
-
-          // Find RGB of chosen hex
-          const chosen = activePalette.find((p) => p.hex.toLowerCase() === hexColor.toLowerCase());
-          if (chosen) {
-            const diffR = (ar - chosen.rgb[0]) * ditherStrength;
-            const diffG = (ag - chosen.rgb[1]) * ditherStrength;
-            const diffB = (ab - chosen.rgb[2]) * ditherStrength;
-            const diffuse = (dx: number, dy: number) => {
-              const nx = gx + dx;
-              const ny = gy + dy;
-              if (nx >= 0 && nx < finalCols && ny >= 0 && ny < finalRows) {
-                const nIdx = ny * finalCols + nx;
-                errR[nIdx] += diffR / 8;
-                errG[nIdx] += diffG / 8;
-                errB[nIdx] += diffB / 8;
-              }
-            };
-            diffuse(1, 0);
-            diffuse(2, 0);
-            diffuse(-1, 1);
-            diffuse(0, 1);
-            diffuse(1, 1);
-            diffuse(0, 2);
-          }
-        } else {
-          // Clean flat cel-shading
-          hexColor = snapToPalette(r, g, b, activePalette);
-        }
-      } else {
-        const ir = Math.round(Math.min(255, Math.max(0, r)));
-        const ig = Math.round(Math.min(255, Math.max(0, g)));
-        const ib = Math.round(Math.min(255, Math.max(0, b)));
-        hexColor = "#" + ((1 << 24) + (ir << 16) + (ig << 8) + ib).toString(16).slice(1);
-      }
-
-      const gridR = gy + startRow;
-      const gridC = gx + startCol;
-      resultPixels.set(`${gridR}_${gridC}`, hexColor);
     }
   }
 
   return {
     pixels: resultPixels,
-    width: finalCols,
-    height: finalRows,
-    pixelCount: resultPixels.size,
+    width: gridW,
+    height: gridH,
+    paletteUsed: Array.from(paletteSet),
   };
 }
-
-// Iconic Presets with High-Fidelity SVG Embeds
-export interface MasterpiecePreset {
-  id: string;
-  name: string;
-  category: string;
-  emoji: string;
-  author: string;
-  dataUrl: string;
-}
-
-const DOGE_SVG = `data:image/svg+xml;utf8,${encodeURIComponent(
-  `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" width="120" height="120">
-  <rect width="120" height="120" fill="#caa568"/>
-  <ellipse cx="60" cy="62" rx="42" ry="38" fill="#d99b38"/>
-  <polygon points="26,45 18,15 42,28" fill="#c48628"/>
-  <polygon points="28,42 22,20 40,30" fill="#f4b2b2"/>
-  <polygon points="94,45 102,15 78,28" fill="#c48628"/>
-  <polygon points="92,42 98,20 80,30" fill="#f4b2b2"/>
-  <ellipse cx="60" cy="74" rx="28" ry="22" fill="#fff4d0"/>
-  <ellipse cx="38" cy="65" rx="16" ry="18" fill="#fff4d0"/>
-  <ellipse cx="82" cy="65" rx="16" ry="18" fill="#fff4d0"/>
-  <ellipse cx="60" cy="48" rx="20" ry="10" fill="#d99b38"/>
-  <ellipse cx="44" cy="52" rx="7" ry="9" fill="#1b120c"/>
-  <ellipse cx="76" cy="52" rx="7" ry="9" fill="#1b120c"/>
-  <circle cx="42" cy="50" r="2.5" fill="#ffffff"/>
-  <circle cx="74" cy="50" r="2.5" fill="#ffffff"/>
-  <path d="M 38 42 Q 44 38 50 42" stroke="#8a5314" stroke-width="2.5" fill="none"/>
-  <path d="M 82 42 Q 76 38 70 42" stroke="#8a5314" stroke-width="2.5" fill="none"/>
-  <ellipse cx="60" cy="68" rx="8" ry="6" fill="#111111"/>
-  <ellipse cx="58" cy="66" rx="2.5" ry="1.5" fill="#ffffff" opacity="0.7"/>
-  <path d="M 60 74 L 60 80 M 52 80 Q 60 84 68 80" stroke="#111111" stroke-width="2.5" fill="none" stroke-linecap="round"/>
-</svg>`
-)}`;
-
-const ZENITSU_SVG = `data:image/svg+xml;utf8,${encodeURIComponent(
-  `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" width="120" height="120">
-  <rect width="120" height="120" fill="#1a1c23"/>
-  <polygon points="32,45 88,45 80,95 60,105 40,95" fill="#fedcc2"/>
-  <ellipse cx="46" cy="62" rx="9" ry="11" fill="#151515"/>
-  <ellipse cx="74" cy="62" rx="9" ry="11" fill="#151515"/>
-  <ellipse cx="46" cy="63" rx="7" ry="9" fill="#f59e0b"/>
-  <ellipse cx="74" cy="63" rx="7" ry="9" fill="#f59e0b"/>
-  <circle cx="44" cy="60" r="3" fill="#ffffff"/>
-  <circle cx="72" cy="60" r="3" fill="#ffffff"/>
-  <path d="M 36 50 L 54 54" stroke="#111111" stroke-width="3.5" stroke-linecap="round"/>
-  <path d="M 84 50 L 66 54" stroke="#111111" stroke-width="3.5" stroke-linecap="round"/>
-  <circle cx="60" cy="74" r="1.5" fill="#a0522d"/>
-  <path d="M 54 84 Q 60 88 66 84" stroke="#8b0000" stroke-width="2" fill="none" stroke-linecap="round"/>
-  <polygon points="15,40 30,12 50,25 60,8 70,25 90,12 105,40 100,65 92,48 85,75 75,45 60,70 45,45 35,75 28,48 20,65" fill="#ffd000"/>
-  <polygon points="15,40 20,25 30,12 38,20" fill="#ff6b00"/>
-  <polygon points="50,25 60,8 70,25 60,18" fill="#ff6b00"/>
-  <polygon points="90,12 100,25 105,40 95,28" fill="#ff6b00"/>
-  <polygon points="35,75 28,62 38,62" fill="#ff6b00"/>
-  <polygon points="85,75 78,62 88,62" fill="#ff6b00"/>
-  <polygon points="30,100 60,120 15,120" fill="#f59e0b"/>
-  <polygon points="90,100 60,120 105,120" fill="#f59e0b"/>
-  <polygon points="45,108 55,108 50,118" fill="#ffffff"/>
-  <polygon points="75,108 65,108 70,118" fill="#ffffff"/>
-</svg>`
-)}`;
-
-const CYBERPUNK_SVG = `data:image/svg+xml;utf8,${encodeURIComponent(
-  `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" width="120" height="120">
-  <rect width="120" height="120" fill="#090a14"/>
-  <circle cx="60" cy="55" r="30" fill="#ff007f"/>
-  <rect x="25" y="48" width="70" height="2" fill="#090a14"/>
-  <rect x="25" y="54" width="70" height="3" fill="#090a14"/>
-  <rect x="25" y="62" width="70" height="4" fill="#090a14"/>
-  <rect x="25" y="70" width="70" height="5" fill="#090a14"/>
-  <rect x="5" y="55" width="20" height="65" fill="#00ffff"/>
-  <rect x="18" y="40" width="22" height="80" fill="#120c2b"/>
-  <rect x="35" y="65" width="15" height="55" fill="#00ffff" opacity="0.8"/>
-  <rect x="45" y="32" width="28" height="88" fill="#0b081c"/>
-  <rect x="70" y="50" width="20" height="70" fill="#120c2b"/>
-  <rect x="85" y="60" width="25" height="60" fill="#ff007f" opacity="0.7"/>
-  <rect x="98" y="45" width="18" height="75" fill="#0b081c"/>
-  <rect x="50" y="38" width="4" height="4" fill="#00ffff"/>
-  <rect x="62" y="44" width="4" height="4" fill="#ffea00"/>
-  <rect x="50" y="52" width="4" height="4" fill="#ff007f"/>
-  <rect x="24" y="48" width="3" height="3" fill="#00ffff"/>
-  <rect x="76" y="58" width="3" height="3" fill="#ffea00"/>
-</svg>`
-)}`;
-
-const PEPE_SVG = `data:image/svg+xml;utf8,${encodeURIComponent(
-  `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" width="120" height="120">
-  <rect width="120" height="120" fill="#1f232b"/>
-  <path d="M 20 70 Q 15 35 45 35 Q 60 42 75 35 Q 105 35 100 70 Q 100 100 60 100 Q 20 100 20 70 Z" fill="#588e36"/>
-  <circle cx="42" cy="40" r="16" fill="#588e36"/>
-  <circle cx="78" cy="40" r="16" fill="#588e36"/>
-  <ellipse cx="42" cy="40" rx="12" ry="10" fill="#ffffff"/>
-  <ellipse cx="78" cy="40" rx="12" ry="10" fill="#ffffff"/>
-  <path d="M 30 36 Q 42 30 54 36" stroke="#375522" stroke-width="4" fill="none"/>
-  <path d="M 66 36 Q 78 30 90 36" stroke="#375522" stroke-width="4" fill="none"/>
-  <circle cx="46" cy="40" r="4.5" fill="#111111"/>
-  <circle cx="82" cy="40" r="4.5" fill="#111111"/>
-  <ellipse cx="60" cy="76" rx="30" ry="10" fill="#a44336"/>
-  <ellipse cx="60" cy="78" rx="26" ry="7" fill="#c95648"/>
-  <path d="M 32 75 Q 60 85 88 75" stroke="#222222" stroke-width="2.5" fill="none"/>
-</svg>`
-)}`;
-
-export const MASTERPIECE_PRESETS: MasterpiecePreset[] = [
-  {
-    id: "doge-shiba",
-    name: "Doge (Shiba Inu)",
-    category: "Meme",
-    emoji: "🐕",
-    author: "r/place Doge Legend",
-    dataUrl: DOGE_SVG,
-  },
-  {
-    id: "zenitsu-thunder",
-    name: "Zenitsu (Demon Slayer)",
-    category: "Anime",
-    emoji: "⚡",
-    author: "Demon Slayer 16-Bit",
-    dataUrl: ZENITSU_SVG,
-  },
-  {
-    id: "cyber-skyline",
-    name: "Neo-Tokyo Skyline",
-    category: "Cyberpunk",
-    emoji: "🌃",
-    author: "Noctalia Core",
-    dataUrl: CYBERPUNK_SVG,
-  },
-  {
-    id: "pepe-pixel",
-    name: "Pepe Comfy",
-    category: "Meme",
-    emoji: "🐸",
-    author: "Retro Internet",
-    dataUrl: PEPE_SVG,
-  },
-];

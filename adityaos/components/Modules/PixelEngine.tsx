@@ -40,6 +40,12 @@ import {
   Zap,
   HelpCircle,
   X,
+  Minus,
+  Square,
+  Circle,
+  Triangle,
+  Hexagon,
+  Wand2,
 } from "lucide-react";
 import { useThemeStore } from "@/store/themeStore";
 import { useSoundStore } from "@/store/soundStore";
@@ -52,6 +58,20 @@ import {
 } from "@/lib/firebaseStats";
 import { createInitialPixelArt, INITIAL_PIXELS, SCENE_GENERATORS, SCENE_PRESETS } from "./pixelArtPresets";
 import { PixelArtImportModal } from "./PixelArtImportModal";
+import { PixelSceneModal } from "./PixelSceneModal";
+import {
+  rasterizeLine,
+  rasterizeRectangle,
+  rasterizeEllipse,
+  rasterizeTriangle,
+  rasterizePolygon,
+  rasterizeRoundedRectangle,
+  ShapeOptions,
+} from "./pixelShapes";
+import {
+  rasterizeTextToPixels,
+  TextRasterOptions,
+} from "./pixelTextRasterizer";
 
 // 5x5 and 5x3 Pixel Bitmap Font from homesec.tsx / pixel.tsx
 const PIXEL_FONT: Record<string, string[]> = {
@@ -103,7 +123,19 @@ export const PixelEngine: React.FC = () => {
   const { playScrollNote, isSoundEnabled } = useSoundStore();
 
   // Tool & Canvas State
-  const [activeTool, setActiveTool] = useState<"pencil" | "eraser" | "bucket" | "picker" | "type">("pencil");
+  const [activeTool, setActiveTool] = useState<
+    | "pencil"
+    | "eraser"
+    | "bucket"
+    | "picker"
+    | "type"
+    | "line"
+    | "rect"
+    | "ellipse"
+    | "triangle"
+    | "polygon"
+    | "roundedRect"
+  >("pencil");
   const [currentColor, setCurrentColor] = useState<string>(activeTheme.drawColor || "#00FFCC");
   const [customHexInput, setCustomHexInput] = useState<string>(activeTheme.drawColor || "#00FFCC");
   const [pixelSize, setPixelSize] = useState<number>(8);
@@ -111,6 +143,40 @@ export const PixelEngine: React.FC = () => {
   const [is3D, setIs3D] = useState<boolean>(false);
   const [showGrid, setShowGrid] = useState<boolean>(true);
   const [isSymmetry, setIsSymmetry] = useState<boolean>(false);
+
+  // Shape Tools Options State
+  const [shapeMode, setShapeMode] = useState<"outline" | "fill" | "both">("outline");
+  const [shapeThickness, setShapeThickness] = useState<number>(1);
+  const [shapeFillColor, setShapeFillColor] = useState<string>("#FAF7F2");
+  const [shapeOutlineColor, setShapeOutlineColor] = useState<string>(activeTheme.drawColor || "#00FFCC");
+  const [polygonVertices, setPolygonVertices] = useState<[number, number][]>([]);
+  const shapeStartRef = useRef<{ col: number; row: number } | null>(null);
+  const isDrawingShapeRef = useRef<boolean>(false);
+
+  // Live On-Canvas Text Tool State
+  interface LiveTextSession {
+    active: boolean;
+    col: number;
+    row: number;
+    text: string;
+    scale: number;
+    fontId: "classic5x7" | "micro3x5" | "unicode1bit";
+    color: string;
+    align: "left" | "center" | "right";
+    outline: boolean;
+    shadow: boolean;
+    cursorIndex: number;
+  }
+  const [liveText, setLiveText] = useState<LiveTextSession | null>(null);
+  const [textScale, setTextScale] = useState<number>(1);
+  const [textFontId, setTextFontId] = useState<"classic5x7" | "micro3x5" | "unicode1bit">("classic5x7");
+  const [textAlign, setTextAlign] = useState<"left" | "center" | "right">("left");
+  const [textOutline, setTextOutline] = useState<boolean>(false);
+  const [textShadow, setTextShadow] = useState<boolean>(false);
+  const [cursorBlink, setCursorBlink] = useState<boolean>(true);
+
+  // Text-to-Pixel-Grid Scene Generator Modal State
+  const [isSceneModalOpen, setIsSceneModalOpen] = useState<boolean>(false);
   const [isAudioMuted, setIsAudioMuted] = useState<boolean>(() => {
     if (typeof window !== "undefined") {
       const saved = localStorage.getItem("pixel_audio_muted");
@@ -774,6 +840,89 @@ export const PixelEngine: React.FC = () => {
     [currentColor, isSymmetry, redrawAll, saveStep, playPopSound]
   );
 
+  // Commit Live On-Canvas Text Session
+  const commitLiveText = useCallback(() => {
+    if (!liveText || !liveText.active || !liveText.text) {
+      setLiveText(null);
+      const pCanvas = previewCanvasRef.current;
+      if (pCanvas) {
+        const pCtx = pCanvas.getContext("2d");
+        pCtx?.clearRect(0, 0, pCanvas.width, pCanvas.height);
+      }
+      return;
+    }
+
+    const textPixels = rasterizeTextToPixels(liveText);
+    textPixels.forEach((hex, key) => {
+      pixelsRef.current.set(key, hex);
+    });
+
+    setLiveText(null);
+    const pCanvas = previewCanvasRef.current;
+    if (pCanvas) {
+      const pCtx = pCanvas.getContext("2d");
+      pCtx?.clearRect(0, 0, pCanvas.width, pCanvas.height);
+    }
+
+    recordPixelDrawn(textPixels.size);
+    redrawAll();
+    saveStep();
+    playPopSound(750);
+  }, [liveText, redrawAll, saveStep, playPopSound]);
+
+  // Commit Polygon Shape
+  const commitPolygon = useCallback(() => {
+    if (polygonVertices.length < 3) {
+      setPolygonVertices([]);
+      const pCanvas = previewCanvasRef.current;
+      pCanvas?.getContext("2d")?.clearRect(0, 0, pCanvas.width, pCanvas.height);
+      return;
+    }
+
+    const shapeOpt: ShapeOptions = {
+      mode: shapeMode,
+      strokeThickness: shapeThickness,
+      outlineColor: shapeOutlineColor || currentColor,
+      fillColor: shapeFillColor,
+    };
+
+    const pts = rasterizePolygon(polygonVertices, shapeOpt);
+    pts.forEach((pt) => {
+      pixelsRef.current.set(`${pt.row}_${pt.col}`, pt.color);
+    });
+
+    setPolygonVertices([]);
+    const pCanvas = previewCanvasRef.current;
+    if (pCanvas) {
+      const pCtx = pCanvas.getContext("2d");
+      pCtx?.clearRect(0, 0, pCanvas.width, pCanvas.height);
+    }
+
+    recordPixelDrawn(pts.length);
+    redrawAll();
+    saveStep();
+    playPopSound(700);
+  }, [
+    polygonVertices,
+    shapeMode,
+    shapeThickness,
+    shapeOutlineColor,
+    currentColor,
+    shapeFillColor,
+    redrawAll,
+    saveStep,
+    playPopSound,
+  ]);
+
+  // Caret Blinking Timer for Live Text
+  useEffect(() => {
+    if (!liveText || !liveText.active) return;
+    const interval = setInterval(() => {
+      setCursorBlink((b) => !b);
+    }, 450);
+    return () => clearInterval(interval);
+  }, [liveText]);
+
   // Gravity Physics Simulation
   const triggerGravityPhysics = useCallback(() => {
     if (pixelsRef.current.size === 0 || isGravityActiveRef.current) return;
@@ -1199,6 +1348,101 @@ export const PixelEngine: React.FC = () => {
       const key = e.key.toLowerCase();
       const isCmdOrCtrl = e.metaKey || e.ctrlKey;
 
+      // Handle Active On-Canvas Live Text Typing
+      if (liveText && liveText.active) {
+        if (key === "escape") {
+          e.preventDefault();
+          setLiveText(null);
+          const pCanvas = previewCanvasRef.current;
+          pCanvas?.getContext("2d")?.clearRect(0, 0, pCanvas.width, pCanvas.height);
+          return;
+        }
+
+        if (isCmdOrCtrl && key === "enter") {
+          e.preventDefault();
+          commitLiveText();
+          return;
+        }
+
+        if (key === "enter") {
+          e.preventDefault();
+          setLiveText((prev) => {
+            if (!prev) return null;
+            const t = prev.text;
+            const idx = prev.cursorIndex;
+            return {
+              ...prev,
+              text: t.slice(0, idx) + "\n" + t.slice(idx),
+              cursorIndex: idx + 1,
+            };
+          });
+          return;
+        }
+
+        if (key === "backspace") {
+          e.preventDefault();
+          setLiveText((prev) => {
+            if (!prev || prev.cursorIndex <= 0) return prev;
+            const t = prev.text;
+            const idx = prev.cursorIndex;
+            return {
+              ...prev,
+              text: t.slice(0, idx - 1) + t.slice(idx),
+              cursorIndex: idx - 1,
+            };
+          });
+          return;
+        }
+
+        if (key === "arrowleft") {
+          e.preventDefault();
+          setLiveText((prev) =>
+            prev ? { ...prev, cursorIndex: Math.max(0, prev.cursorIndex - 1) } : null
+          );
+          return;
+        }
+
+        if (key === "arrowright") {
+          e.preventDefault();
+          setLiveText((prev) =>
+            prev ? { ...prev, cursorIndex: Math.min(prev.text.length, prev.cursorIndex + 1) } : null
+          );
+          return;
+        }
+
+        if (e.key.length === 1 && !isCmdOrCtrl && !e.altKey) {
+          e.preventDefault();
+          setLiveText((prev) => {
+            if (!prev) return null;
+            const t = prev.text;
+            const idx = prev.cursorIndex;
+            return {
+              ...prev,
+              text: t.slice(0, idx) + e.key + t.slice(idx),
+              cursorIndex: idx + 1,
+            };
+          });
+          return;
+        }
+        return;
+      }
+
+      // Handle Active Polygon Vertex Session
+      if (activeTool === "polygon" && polygonVertices.length > 0) {
+        if (key === "enter") {
+          e.preventDefault();
+          commitPolygon();
+          return;
+        }
+        if (key === "escape") {
+          e.preventDefault();
+          setPolygonVertices([]);
+          const pCanvas = previewCanvasRef.current;
+          pCanvas?.getContext("2d")?.clearRect(0, 0, pCanvas.width, pCanvas.height);
+          return;
+        }
+      }
+
       if (key === "?" || (key === "/" && !isCmdOrCtrl)) {
         e.preventDefault();
         setShowShortcutsModal((prev) => !prev);
@@ -1208,6 +1452,11 @@ export const PixelEngine: React.FC = () => {
         setShowShortcutsModal(false);
         setIsImportModalOpen(false);
         setIsTypeModalOpen(false);
+        setIsSceneModalOpen(false);
+        isDrawingShapeRef.current = false;
+        shapeStartRef.current = null;
+        const pCanvas = previewCanvasRef.current;
+        pCanvas?.getContext("2d")?.clearRect(0, 0, pCanvas.width, pCanvas.height);
         return;
       }
 
@@ -1245,6 +1494,24 @@ export const PixelEngine: React.FC = () => {
       } else if (key === "t") {
         setActiveTool("type");
         playPopSound(650);
+      } else if (key === "l") {
+        setActiveTool("line");
+        playPopSound(550);
+      } else if (key === "u") {
+        setActiveTool("rect");
+        playPopSound(550);
+      } else if (key === "c") {
+        setActiveTool("ellipse");
+        playPopSound(550);
+      } else if (key === "y") {
+        setActiveTool("triangle");
+        playPopSound(550);
+      } else if (key === "x") {
+        setActiveTool("polygon");
+        playPopSound(550);
+      } else if (key === "k") {
+        setActiveTool("roundedRect");
+        playPopSound(550);
       } else if (key === "m") {
         setIsSymmetry((prev) => !prev);
         playPopSound(700);
@@ -1276,7 +1543,19 @@ export const PixelEngine: React.FC = () => {
 
     window.addEventListener("keydown", handleGlobalKey);
     return () => window.removeEventListener("keydown", handleGlobalKey);
-  }, [handleUndo, handleRedo, handleDownload, handleClear, switchMode, playPopSound]);
+  }, [
+    liveText,
+    commitLiveText,
+    activeTool,
+    polygonVertices,
+    commitPolygon,
+    handleUndo,
+    handleRedo,
+    handleDownload,
+    handleClear,
+    switchMode,
+    playPopSound,
+  ]);
 
   // Snake Tick Loop
   useEffect(() => {
@@ -1493,6 +1772,184 @@ export const PixelEngine: React.FC = () => {
     }
   }, [playPopSound]);
 
+  // Unified Preview Renderer for Hover, Shapes, Polygon, and Live Text
+  const renderPreview = useCallback(
+    (hoverC: number, hoverR: number, e?: React.PointerEvent<HTMLCanvasElement>) => {
+      const pCanvas = previewCanvasRef.current;
+      const canvas = artworkCanvasRef.current;
+      if (!pCanvas || !canvas) return;
+      const pCtx = pCanvas.getContext("2d");
+      if (!pCtx) return;
+
+      pCtx.clearRect(0, 0, pCanvas.width, pCanvas.height);
+      const cols = Math.ceil(canvas.width / pixelSize) + 2;
+      const rows = Math.ceil(canvas.height / pixelSize) + 2;
+
+      // 1. Live Text Session Preview
+      if (liveText && liveText.active) {
+        const textPixels = rasterizeTextToPixels(liveText);
+        textPixels.forEach((hex, key) => {
+          const idx = key.indexOf("_");
+          const r = +key.slice(0, idx);
+          const c = +key.slice(idx + 1);
+          const { x, y } = projectToScreen(c, r, pixelSize, canvas.width, canvas.height, cols, rows);
+          pCtx.fillStyle = hex;
+          pCtx.fillRect(x, y, pixelSize, pixelSize);
+        });
+
+        // Blinking 1px Caret at Caret Offset
+        if (cursorBlink) {
+          const lines = liveText.text.slice(0, liveText.cursorIndex).split("\n");
+          const curLineIdx = lines.length - 1;
+          const curLineText = lines[curLineIdx];
+          const fontH = (liveText.fontId === "micro3x5" ? 6 : 8) * liveText.scale;
+          const fontW = (liveText.fontId === "micro3x5" ? 4 : 6) * liveText.scale;
+          const caretC = liveText.col + curLineText.length * fontW;
+          const caretR = liveText.row + curLineIdx * fontH;
+          const { x, y } = projectToScreen(caretC, caretR, pixelSize, canvas.width, canvas.height, cols, rows);
+
+          pCtx.fillStyle = activeTheme.accent;
+          pCtx.fillRect(x, y, Math.max(2, Math.floor(pixelSize * 0.25)), fontH * pixelSize);
+        }
+        return;
+      }
+
+      // 2. Interactive Shape Drag Preview
+      if (isDrawingShapeRef.current && shapeStartRef.current) {
+        const start = shapeStartRef.current;
+        let c0 = start.col;
+        let r0 = start.row;
+        let c1 = hoverC;
+        let r1 = hoverR;
+
+        const isShift = e?.shiftKey;
+        const isAlt = e?.altKey;
+
+        if (isAlt) {
+          const dc = c1 - c0;
+          const dr = r1 - r0;
+          c0 = start.col - dc;
+          r0 = start.row - dr;
+          c1 = start.col + dc;
+          r1 = start.row + dr;
+        }
+
+        if (isShift) {
+          if (activeTool === "line") {
+            const dc = c1 - start.col;
+            const dr = r1 - start.row;
+            const angle = Math.atan2(dr, dc);
+            const snapped = Math.round(angle / (Math.PI / 4)) * (Math.PI / 4);
+            const dist = Math.sqrt(dc * dc + dr * dr);
+            c1 = Math.round(start.col + Math.cos(snapped) * dist);
+            r1 = Math.round(start.row + Math.sin(snapped) * dist);
+          } else if (["rect", "ellipse", "triangle", "roundedRect"].includes(activeTool)) {
+            const side = Math.max(Math.abs(c1 - c0), Math.abs(r1 - r0));
+            c1 = c0 + (c1 >= c0 ? side : -side);
+            r1 = r0 + (r1 >= r0 ? side : -side);
+          }
+        }
+
+        const shapeOpt: ShapeOptions = {
+          mode: shapeMode,
+          strokeThickness: shapeThickness,
+          outlineColor: shapeOutlineColor || currentColor,
+          fillColor: shapeFillColor,
+        };
+
+        let previewPts: { col: number; row: number; color: string }[] = [];
+        if (activeTool === "line") {
+          previewPts = rasterizeLine(c0, r0, c1, r1, shapeOpt.outlineColor, shapeOpt.strokeThickness);
+        } else if (activeTool === "rect") {
+          previewPts = rasterizeRectangle(c0, r0, c1, r1, shapeOpt);
+        } else if (activeTool === "ellipse") {
+          previewPts = rasterizeEllipse(c0, r0, c1, r1, shapeOpt);
+        } else if (activeTool === "triangle") {
+          const apexC = Math.round((c0 + c1) / 2);
+          previewPts = rasterizeTriangle([apexC, r0], [c0, r1], [c1, r1], shapeOpt);
+        } else if (activeTool === "roundedRect") {
+          previewPts = rasterizeRoundedRectangle(c0, r0, c1, r1, Math.max(2, shapeThickness * 3), shapeOpt);
+        }
+
+        previewPts.forEach((pt) => {
+          const { x, y } = projectToScreen(pt.col, pt.row, pixelSize, canvas.width, canvas.height, cols, rows);
+          pCtx.fillStyle = pt.color;
+          pCtx.fillRect(x, y, pixelSize, pixelSize);
+        });
+        return;
+      }
+
+      // 3. Polygon Multi-Point Preview
+      if (activeTool === "polygon" && polygonVertices.length > 0) {
+        for (let i = 0; i < polygonVertices.length - 1; i++) {
+          const [vx0, vy0] = polygonVertices[i];
+          const [vx1, vy1] = polygonVertices[i + 1];
+          const edgePts = rasterizeLine(vx0, vy0, vx1, vy1, shapeOutlineColor || currentColor, shapeThickness);
+          edgePts.forEach((pt) => {
+            const { x, y } = projectToScreen(pt.col, pt.row, pixelSize, canvas.width, canvas.height, cols, rows);
+            pCtx.fillStyle = pt.color;
+            pCtx.fillRect(x, y, pixelSize, pixelSize);
+          });
+        }
+
+        const lastV = polygonVertices[polygonVertices.length - 1];
+        const rubberBand = rasterizeLine(lastV[0], lastV[1], hoverC, hoverR, activeTheme.accent, 1);
+        rubberBand.forEach((pt) => {
+          const { x, y } = projectToScreen(pt.col, pt.row, pixelSize, canvas.width, canvas.height, cols, rows);
+          pCtx.fillStyle = pt.color;
+          pCtx.fillRect(x, y, pixelSize, pixelSize);
+        });
+
+        const startV = polygonVertices[0];
+        const { x: sx, y: sy } = projectToScreen(startV[0], startV[1], pixelSize, canvas.width, canvas.height, cols, rows);
+        pCtx.strokeStyle = "#F59E0B";
+        pCtx.lineWidth = 1.5;
+        pCtx.strokeRect(sx - 2, sy - 2, pixelSize + 4, pixelSize + 4);
+        return;
+      }
+
+      // 4. Standard Hover Grid Cursor
+      const { x, y } = projectToScreen(hoverC, hoverR, pixelSize, canvas.width, canvas.height, cols, rows);
+      pCtx.strokeStyle = activeTheme.accent;
+      pCtx.lineWidth = 1.5;
+      if (perspective === "isometric") {
+        const { hx, hy } = getIsoMetrics(pixelSize, canvas.width, canvas.height, cols, rows);
+        pCtx.beginPath();
+        pCtx.moveTo(x, y);
+        pCtx.lineTo(x + hx, y + hy);
+        pCtx.lineTo(x, y + 2 * hy);
+        pCtx.lineTo(x - hx, y + hy);
+        pCtx.closePath();
+        pCtx.stroke();
+      } else {
+        pCtx.strokeRect(x, y, pixelSize, pixelSize);
+      }
+    },
+    [
+      liveText,
+      cursorBlink,
+      activeTool,
+      shapeMode,
+      shapeThickness,
+      shapeOutlineColor,
+      shapeFillColor,
+      currentColor,
+      polygonVertices,
+      pixelSize,
+      perspective,
+      activeTheme,
+      projectToScreen,
+      getIsoMetrics,
+    ]
+  );
+
+  // Redraw preview whenever liveText or cursorBlink changes
+  useEffect(() => {
+    if (liveText && liveText.active) {
+      renderPreview(liveText.col, liveText.row);
+    }
+  }, [liveText, cursorBlink, renderPreview]);
+
   // Pointer Event Handlers
   const handlePointerDown = (e: React.PointerEvent<HTMLCanvasElement>) => {
     if (isShowcasePlaying) {
@@ -1515,6 +1972,57 @@ export const PixelEngine: React.FC = () => {
     const key = `${row}_${col}`;
     lastCoordRef.current = { col, row };
 
+    // Shape Tools Initiation
+    if (["line", "rect", "ellipse", "triangle", "roundedRect"].includes(activeTool)) {
+      if (liveText && liveText.active) {
+        commitLiveText();
+      }
+      isDrawingShapeRef.current = true;
+      shapeStartRef.current = { col, row };
+      renderPreview(col, row, e);
+      return;
+    }
+
+    // Polygon Vertex Insertion / Closing
+    if (activeTool === "polygon") {
+      if (liveText && liveText.active) {
+        commitLiveText();
+      }
+      if (polygonVertices.length >= 2) {
+        const startV = polygonVertices[0];
+        if (Math.abs(col - startV[0]) <= 1 && Math.abs(row - startV[1]) <= 1) {
+          commitPolygon();
+          return;
+        }
+      }
+      setPolygonVertices((prev) => [...prev, [col, row]]);
+      playPopSound(550);
+      renderPreview(col, row, e);
+      return;
+    }
+
+    // On-Canvas Text Placement
+    if (activeTool === "type") {
+      if (liveText && liveText.active) {
+        commitLiveText();
+      }
+      setLiveText({
+        active: true,
+        col,
+        row,
+        text: "",
+        scale: textScale,
+        fontId: textFontId,
+        color: currentColor,
+        align: textAlign,
+        outline: textOutline,
+        shadow: textShadow,
+        cursorIndex: 0,
+      });
+      playPopSound(600);
+      return;
+    }
+
     if (activeTool === "picker") {
       const picked = pixelsRef.current.get(key);
       if (picked) {
@@ -1522,11 +2030,6 @@ export const PixelEngine: React.FC = () => {
         setActiveTool("pencil");
         playPopSound(650);
       }
-      return;
-    }
-
-    if (activeTool === "type") {
-      stampText(typeString || "ADITYA", col, row);
       return;
     }
 
@@ -1583,30 +2086,8 @@ export const PixelEngine: React.FC = () => {
     const { col, row } = projectToGrid(mx, my, pixelSize, canvas.width, canvas.height, cols, rows);
     setHoverCoord({ col, row });
 
-    // Draw hover outline on preview canvas
-    const pCanvas = previewCanvasRef.current;
-    if (pCanvas) {
-      const pCtx = pCanvas.getContext("2d");
-      if (pCtx) {
-        pCtx.clearRect(0, 0, pCanvas.width, pCanvas.height);
-        const { x, y } = projectToScreen(col, row, pixelSize, canvas.width, canvas.height, cols, rows);
-
-        pCtx.strokeStyle = activeTheme.accent;
-        pCtx.lineWidth = 1.5;
-        if (perspective === "isometric") {
-          const { hx, hy } = getIsoMetrics(pixelSize, canvas.width, canvas.height, cols, rows);
-          pCtx.beginPath();
-          pCtx.moveTo(x, y);
-          pCtx.lineTo(x + hx, y + hy);
-          pCtx.lineTo(x, y + 2 * hy);
-          pCtx.lineTo(x - hx, y + hy);
-          pCtx.closePath();
-          pCtx.stroke();
-        } else {
-          pCtx.strokeRect(x, y, pixelSize, pixelSize);
-        }
-      }
-    }
+    // Draw hover / shape / text preview
+    renderPreview(col, row, e);
 
     if (!isDrawingRef.current) return;
 
@@ -1654,6 +2135,84 @@ export const PixelEngine: React.FC = () => {
     try {
       e.currentTarget.releasePointerCapture(e.pointerId);
     } catch {}
+
+    // Shape Drawing Commit
+    if (isDrawingShapeRef.current && shapeStartRef.current) {
+      const start = shapeStartRef.current;
+      let c0 = start.col;
+      let r0 = start.row;
+      let c1 = lastCoordRef.current ? lastCoordRef.current.col : start.col;
+      let r1 = lastCoordRef.current ? lastCoordRef.current.row : start.row;
+
+      const isShift = e.shiftKey;
+      const isAlt = e.altKey;
+
+      if (isAlt) {
+        const dc = c1 - c0;
+        const dr = r1 - r0;
+        c0 = start.col - dc;
+        r0 = start.row - dr;
+        c1 = start.col + dc;
+        r1 = start.row + dr;
+      }
+
+      if (isShift) {
+        if (activeTool === "line") {
+          const dc = c1 - start.col;
+          const dr = r1 - start.row;
+          const angle = Math.atan2(dr, dc);
+          const snapped = Math.round(angle / (Math.PI / 4)) * (Math.PI / 4);
+          const dist = Math.sqrt(dc * dc + dr * dr);
+          c1 = Math.round(start.col + Math.cos(snapped) * dist);
+          r1 = Math.round(start.row + Math.sin(snapped) * dist);
+        } else if (["rect", "ellipse", "triangle", "roundedRect"].includes(activeTool)) {
+          const side = Math.max(Math.abs(c1 - c0), Math.abs(r1 - r0));
+          c1 = c0 + (c1 >= c0 ? side : -side);
+          r1 = r0 + (r1 >= r0 ? side : -side);
+        }
+      }
+
+      const shapeOpt: ShapeOptions = {
+        mode: shapeMode,
+        strokeThickness: shapeThickness,
+        outlineColor: shapeOutlineColor || currentColor,
+        fillColor: shapeFillColor,
+      };
+
+      let pts: { col: number; row: number; color: string }[] = [];
+      if (activeTool === "line") {
+        pts = rasterizeLine(c0, r0, c1, r1, shapeOpt.outlineColor, shapeOpt.strokeThickness);
+      } else if (activeTool === "rect") {
+        pts = rasterizeRectangle(c0, r0, c1, r1, shapeOpt);
+      } else if (activeTool === "ellipse") {
+        pts = rasterizeEllipse(c0, r0, c1, r1, shapeOpt);
+      } else if (activeTool === "triangle") {
+        const apexC = Math.round((c0 + c1) / 2);
+        pts = rasterizeTriangle([apexC, r0], [c0, r1], [c1, r1], shapeOpt);
+      } else if (activeTool === "roundedRect") {
+        pts = rasterizeRoundedRectangle(c0, r0, c1, r1, Math.max(2, shapeThickness * 3), shapeOpt);
+      }
+
+      pts.forEach((pt) => {
+        pixelsRef.current.set(`${pt.row}_${pt.col}`, pt.color);
+      });
+
+      isDrawingShapeRef.current = false;
+      shapeStartRef.current = null;
+
+      const pCanvas = previewCanvasRef.current;
+      if (pCanvas) {
+        const pCtx = pCanvas.getContext("2d");
+        pCtx?.clearRect(0, 0, pCanvas.width, pCanvas.height);
+      }
+
+      recordPixelDrawn(pts.length);
+      redrawAll();
+      saveStep();
+      playPopSound(700);
+      return;
+    }
+
     if (isDrawingRef.current) {
       isDrawingRef.current = false;
       lastCoordRef.current = null;
@@ -2208,15 +2767,122 @@ export const PixelEngine: React.FC = () => {
             <Pipette className="w-3.5 h-3.5" />
           </button>
 
-          {/* Type / Stamp Tool */}
+          {/* Shape Tools Separator */}
+          <div className="h-4 w-px mx-1 bg-black/10 dark:bg-white/10" />
+
+          {/* Line Tool (L) */}
+          <button
+            type="button"
+            onClick={() => {
+              setActiveTool("line");
+              playPopSound(520);
+            }}
+            title="Line Tool (L)"
+            className={`p-1.5 rounded transition-colors focus:outline-none focus-visible:ring-1 focus-visible:ring-stone-400 cursor-pointer ${
+              activeTool === "line"
+                ? "bg-black/[0.08] dark:bg-white/[0.1] text-stone-900 dark:text-zinc-100"
+                : "text-stone-500 dark:text-zinc-400 hover:text-stone-900 dark:hover:text-zinc-100 hover:bg-black/[0.04] dark:hover:bg-white/[0.04]"
+            }`}
+          >
+            <Minus className="w-3.5 h-3.5" />
+          </button>
+
+          {/* Rectangle Tool (U) */}
+          <button
+            type="button"
+            onClick={() => {
+              setActiveTool("rect");
+              playPopSound(530);
+            }}
+            title="Rectangle Tool (U)"
+            className={`p-1.5 rounded transition-colors focus:outline-none focus-visible:ring-1 focus-visible:ring-stone-400 cursor-pointer ${
+              activeTool === "rect"
+                ? "bg-black/[0.08] dark:bg-white/[0.1] text-stone-900 dark:text-zinc-100"
+                : "text-stone-500 dark:text-zinc-400 hover:text-stone-900 dark:hover:text-zinc-100 hover:bg-black/[0.04] dark:hover:bg-white/[0.04]"
+            }`}
+          >
+            <Square className="w-3.5 h-3.5" />
+          </button>
+
+          {/* Ellipse Tool (C) */}
+          <button
+            type="button"
+            onClick={() => {
+              setActiveTool("ellipse");
+              playPopSound(540);
+            }}
+            title="Ellipse / Circle Tool (C)"
+            className={`p-1.5 rounded transition-colors focus:outline-none focus-visible:ring-1 focus-visible:ring-stone-400 cursor-pointer ${
+              activeTool === "ellipse"
+                ? "bg-black/[0.08] dark:bg-white/[0.1] text-stone-900 dark:text-zinc-100"
+                : "text-stone-500 dark:text-zinc-400 hover:text-stone-900 dark:hover:text-zinc-100 hover:bg-black/[0.04] dark:hover:bg-white/[0.04]"
+            }`}
+          >
+            <Circle className="w-3.5 h-3.5" />
+          </button>
+
+          {/* Triangle Tool (Y) */}
+          <button
+            type="button"
+            onClick={() => {
+              setActiveTool("triangle");
+              playPopSound(550);
+            }}
+            title="Triangle Tool (Y)"
+            className={`p-1.5 rounded transition-colors focus:outline-none focus-visible:ring-1 focus-visible:ring-stone-400 cursor-pointer ${
+              activeTool === "triangle"
+                ? "bg-black/[0.08] dark:bg-white/[0.1] text-stone-900 dark:text-zinc-100"
+                : "text-stone-500 dark:text-zinc-400 hover:text-stone-900 dark:hover:text-zinc-100 hover:bg-black/[0.04] dark:hover:bg-white/[0.04]"
+            }`}
+          >
+            <Triangle className="w-3.5 h-3.5" />
+          </button>
+
+          {/* Polygon Tool (X) */}
+          <button
+            type="button"
+            onClick={() => {
+              setActiveTool("polygon");
+              playPopSound(560);
+            }}
+            title="Polygon Tool (X) - Click points, Enter/Double-click to close"
+            className={`p-1.5 rounded transition-colors focus:outline-none focus-visible:ring-1 focus-visible:ring-stone-400 cursor-pointer ${
+              activeTool === "polygon"
+                ? "bg-black/[0.08] dark:bg-white/[0.1] text-stone-900 dark:text-zinc-100"
+                : "text-stone-500 dark:text-zinc-400 hover:text-stone-900 dark:hover:text-zinc-100 hover:bg-black/[0.04] dark:hover:bg-white/[0.04]"
+            }`}
+          >
+            <Hexagon className="w-3.5 h-3.5" />
+          </button>
+
+          {/* Rounded Rectangle Tool (K) */}
+          <button
+            type="button"
+            onClick={() => {
+              setActiveTool("roundedRect");
+              playPopSound(570);
+            }}
+            title="Rounded Rectangle Tool (K)"
+            className={`p-1.5 rounded transition-colors focus:outline-none focus-visible:ring-1 focus-visible:ring-stone-400 cursor-pointer ${
+              activeTool === "roundedRect"
+                ? "bg-black/[0.08] dark:bg-white/[0.1] text-stone-900 dark:text-zinc-100"
+                : "text-stone-500 dark:text-zinc-400 hover:text-stone-900 dark:hover:text-zinc-100 hover:bg-black/[0.04] dark:hover:bg-white/[0.04]"
+            }`}
+          >
+            <div className="w-3.5 h-3.5 rounded border-[1.5px] border-current" />
+          </button>
+
+          {/* Text Tool Separator */}
+          <div className="h-4 w-px mx-1 bg-black/10 dark:bg-white/10" />
+
+          {/* On-Canvas Text Tool (T) */}
           <button
             type="button"
             onClick={() => {
               setActiveTool("type");
-              setIsTypeModalOpen(!isTypeModalOpen);
               playPopSound(650);
             }}
-            title="Type / Stamp Tool (T)"
+            title="On-Canvas Text Tool (T) - Click canvas to type directly"
             className={`p-1.5 rounded transition-colors focus:outline-none focus-visible:ring-1 focus-visible:ring-stone-400 cursor-pointer ${
               activeTool === "type"
                 ? "bg-black/[0.08] dark:bg-white/[0.1] text-stone-900 dark:text-zinc-100"
@@ -2438,6 +3104,231 @@ export const PixelEngine: React.FC = () => {
         </div>
       </div>
 
+      {/* Contextual Tool Options Strip: Shape Tools */}
+      {["line", "rect", "ellipse", "triangle", "polygon", "roundedRect"].includes(activeTool) && (
+        <div
+          style={{
+            backgroundColor: activeTheme.headerBg,
+            borderColor: activeTheme.headerBorder,
+            color: activeTheme.textPrimary,
+          }}
+          className="h-8 border-b px-2 sm:px-3 flex items-center justify-between text-[11px] gap-2 overflow-x-auto flex-shrink-0 select-none z-20"
+        >
+          <div className="flex items-center gap-2 flex-shrink-0">
+            <span className="text-[10px] uppercase font-bold tracking-wider opacity-60">
+              {activeTool === "line" ? "Line" : activeTool === "rect" ? "Rectangle" : activeTool === "ellipse" ? "Ellipse" : activeTool === "triangle" ? "Triangle" : activeTool === "polygon" ? "Polygon" : "Rounded Rect"}
+            </span>
+
+            {activeTool !== "line" && (
+              <div className="flex items-center rounded bg-black/5 dark:bg-white/5 p-0.5 gap-0.5">
+                {(["outline", "fill", "both"] as const).map((mode) => (
+                  <button
+                    key={mode}
+                    type="button"
+                    onClick={() => setShapeMode(mode)}
+                    className={`px-1.5 py-0.5 rounded text-[10px] capitalize transition-colors ${
+                      shapeMode === mode
+                        ? "bg-black/10 dark:bg-white/15 font-semibold text-stone-900 dark:text-zinc-100"
+                        : "text-stone-500 dark:text-zinc-400 hover:text-stone-900 dark:hover:text-zinc-200"
+                    }`}
+                  >
+                    {mode}
+                  </button>
+                ))}
+              </div>
+            )}
+
+            {/* Thickness */}
+            {(shapeMode !== "fill" || activeTool === "line") && (
+              <div className="flex items-center gap-1">
+                <span className="text-[10px] opacity-60">Stroke:</span>
+                <div className="flex items-center rounded bg-black/5 dark:bg-white/5 p-0.5 gap-0.5">
+                  {[1, 2, 3, 4].map((th) => (
+                    <button
+                      key={th}
+                      type="button"
+                      onClick={() => setShapeThickness(th)}
+                      className={`px-1.5 py-0.5 rounded text-[10px] font-mono ${
+                        shapeThickness === th
+                          ? "bg-black/10 dark:bg-white/15 font-bold text-stone-900 dark:text-zinc-100"
+                          : "text-stone-500 dark:text-zinc-400 hover:text-stone-900 dark:hover:text-zinc-200"
+                      }`}
+                    >
+                      {th}px
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Fill Color swatch (when fill or both) */}
+            {(shapeMode === "fill" || shapeMode === "both") && activeTool !== "line" && (
+              <div className="flex items-center gap-1">
+                <span className="text-[10px] opacity-60">Fill:</span>
+                <div className="relative w-4 h-4 rounded border border-black/20 dark:border-white/20 overflow-hidden cursor-pointer">
+                  <input
+                    type="color"
+                    value={shapeFillColor.startsWith("#") ? shapeFillColor : "#38bdf8"}
+                    onChange={(e) => setShapeFillColor(e.target.value)}
+                    className="absolute -inset-1 w-8 h-8 opacity-0 cursor-pointer"
+                    title="Pick Fill Color"
+                  />
+                  <div className="w-full h-full" style={{ backgroundColor: shapeFillColor }} />
+                </div>
+              </div>
+            )}
+
+            {/* Polygon Controls */}
+            {activeTool === "polygon" && polygonVertices.length > 0 && (
+              <div className="flex items-center gap-1.5 ml-2">
+                <span className="text-[10px] text-amber-500 font-bold">{polygonVertices.length} vertices</span>
+                <button
+                  type="button"
+                  onClick={commitPolygon}
+                  className="px-2 py-0.5 rounded bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-[10px] cursor-pointer"
+                >
+                  Close (Enter)
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setPolygonVertices([]);
+                    redrawAll();
+                  }}
+                  className="px-2 py-0.5 rounded bg-black/10 dark:bg-white/10 hover:bg-black/20 text-[10px] cursor-pointer"
+                >
+                  Cancel (Esc)
+                </button>
+              </div>
+            )}
+          </div>
+
+          <div className="text-[10px] opacity-50 hidden md:inline">
+            Shift: 1:1 / 45° · Alt: From center · Esc: Cancel
+          </div>
+        </div>
+      )}
+
+      {/* Contextual Tool Options Strip: On-Canvas Text Tool */}
+      {activeTool === "type" && (
+        <div
+          style={{
+            backgroundColor: activeTheme.headerBg,
+            borderColor: activeTheme.headerBorder,
+            color: activeTheme.textPrimary,
+          }}
+          className="h-8 border-b px-2 sm:px-3 flex items-center justify-between text-[11px] gap-2 overflow-x-auto flex-shrink-0 select-none z-20"
+        >
+          <div className="flex items-center gap-2 flex-shrink-0">
+            <span className="text-[10px] uppercase font-bold tracking-wider opacity-60">Text</span>
+
+            {/* Font selector */}
+            <select
+              value={textFontId}
+              onChange={(e) => setTextFontId(e.target.value as any)}
+              className="px-1.5 py-0.5 rounded bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10 text-[10px] font-mono cursor-pointer"
+            >
+              <option value="classic5x7">5x7 Classic (ASCII)</option>
+              <option value="micro3x5">3x5 Micro</option>
+              <option value="unicode1bit">1-Bit Unicode (Devanagari/Intl)</option>
+            </select>
+
+            {/* Scale */}
+            <div className="flex items-center gap-1">
+              <span className="text-[10px] opacity-60">Scale:</span>
+              <div className="flex items-center rounded bg-black/5 dark:bg-white/5 p-0.5 gap-0.5">
+                {[1, 2, 3, 4].map((sc) => (
+                  <button
+                    key={sc}
+                    type="button"
+                    onClick={() => setTextScale(sc)}
+                    className={`px-1.5 py-0.5 rounded text-[10px] font-mono cursor-pointer ${
+                      textScale === sc
+                        ? "bg-black/10 dark:bg-white/15 font-bold text-stone-900 dark:text-zinc-100"
+                        : "text-stone-500 dark:text-zinc-400 hover:text-stone-900 dark:hover:text-zinc-200"
+                    }`}
+                  >
+                    {sc}x
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Align */}
+            <div className="flex items-center rounded bg-black/5 dark:bg-white/5 p-0.5 gap-0.5">
+              {(["left", "center", "right"] as const).map((al) => (
+                <button
+                  key={al}
+                  type="button"
+                  onClick={() => setTextAlign(al)}
+                  className={`px-1.5 py-0.5 rounded text-[10px] capitalize cursor-pointer ${
+                    textAlign === al
+                      ? "bg-black/10 dark:bg-white/15 font-semibold text-stone-900 dark:text-zinc-100"
+                      : "text-stone-500 dark:text-zinc-400 hover:text-stone-900 dark:hover:text-zinc-200"
+                  }`}
+                >
+                  {al}
+                </button>
+              ))}
+            </div>
+
+            {/* 1px Outline */}
+            <button
+              type="button"
+              onClick={() => setTextOutline((prev) => !prev)}
+              className={`px-1.5 py-0.5 rounded text-[10px] border transition-colors cursor-pointer ${
+                textOutline
+                  ? "bg-black/10 dark:bg-white/15 border-stone-400 font-semibold text-stone-900 dark:text-zinc-100"
+                  : "border-transparent text-stone-500 dark:text-zinc-400 hover:bg-black/5"
+              }`}
+            >
+              Outline
+            </button>
+
+            {/* 1px Shadow */}
+            <button
+              type="button"
+              onClick={() => setTextShadow((prev) => !prev)}
+              className={`px-1.5 py-0.5 rounded text-[10px] border transition-colors cursor-pointer ${
+                textShadow
+                  ? "bg-black/10 dark:bg-white/15 border-stone-400 font-semibold text-stone-900 dark:text-zinc-100"
+                  : "border-transparent text-stone-500 dark:text-zinc-400 hover:bg-black/5"
+              }`}
+            >
+              Shadow
+            </button>
+
+            {/* Live typing session commit/cancel */}
+            {liveText?.active && (
+              <div className="flex items-center gap-1.5 ml-2">
+                <button
+                  type="button"
+                  onClick={commitLiveText}
+                  className="px-2 py-0.5 rounded bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-[10px] cursor-pointer"
+                >
+                  Commit (Ctrl+Enter)
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setLiveText(null);
+                    const pCanvas = previewCanvasRef.current;
+                    if (pCanvas) pCanvas.getContext("2d")?.clearRect(0, 0, pCanvas.width, pCanvas.height);
+                  }}
+                  className="px-2 py-0.5 rounded bg-black/10 dark:bg-white/10 hover:bg-black/20 text-[10px] cursor-pointer"
+                >
+                  Cancel (Esc)
+                </button>
+              </div>
+            )}
+          </div>
+
+          <div className="text-[10px] opacity-50 hidden md:inline">
+            {liveText?.active ? "Type on canvas · Enter: newline · Arrows: move caret" : "Click anywhere on canvas to type directly"}
+          </div>
+        </div>
+      )}
+
       {/* Mini-Games & Modes Selector Deck */}
       <div
         style={{
@@ -2597,6 +3488,20 @@ export const PixelEngine: React.FC = () => {
                 accept="image/*"
                 className="hidden"
               />
+
+              {/* AI Text Scene Generator */}
+              <button
+                type="button"
+                onClick={() => {
+                  setIsSceneModalOpen(true);
+                  playPopSound(700);
+                }}
+                title="AI Text-to-Pixel-Grid Scene Generator with 3-round critique"
+                className="text-stone-600 dark:text-zinc-400 hover:text-stone-950 dark:hover:text-zinc-100 hover:underline cursor-pointer focus:outline-none focus-visible:ring-1 focus-visible:ring-stone-400 flex items-center gap-1"
+              >
+                <Wand2 className="w-3 h-3 text-amber-500" />
+                <span>Text Scene</span>
+              </button>
 
               {/* Import Image Button */}
               <button
@@ -3399,8 +4304,32 @@ export const PixelEngine: React.FC = () => {
                     <kbd className="px-1.5 py-0.5 rounded bg-black/10 dark:bg-white/10 font-bold">I</kbd>
                   </div>
                   <div className="flex justify-between items-center bg-black/5 dark:bg-white/5 px-2.5 py-1.5 rounded">
-                    <span>Type / Stamp</span>
+                    <span>On-Canvas Text</span>
                     <kbd className="px-1.5 py-0.5 rounded bg-black/10 dark:bg-white/10 font-bold">T</kbd>
+                  </div>
+                  <div className="flex justify-between items-center bg-black/5 dark:bg-white/5 px-2.5 py-1.5 rounded">
+                    <span>Line</span>
+                    <kbd className="px-1.5 py-0.5 rounded bg-black/10 dark:bg-white/10 font-bold">L</kbd>
+                  </div>
+                  <div className="flex justify-between items-center bg-black/5 dark:bg-white/5 px-2.5 py-1.5 rounded">
+                    <span>Rectangle</span>
+                    <kbd className="px-1.5 py-0.5 rounded bg-black/10 dark:bg-white/10 font-bold">U</kbd>
+                  </div>
+                  <div className="flex justify-between items-center bg-black/5 dark:bg-white/5 px-2.5 py-1.5 rounded">
+                    <span>Ellipse / Circle</span>
+                    <kbd className="px-1.5 py-0.5 rounded bg-black/10 dark:bg-white/10 font-bold">C</kbd>
+                  </div>
+                  <div className="flex justify-between items-center bg-black/5 dark:bg-white/5 px-2.5 py-1.5 rounded">
+                    <span>Triangle</span>
+                    <kbd className="px-1.5 py-0.5 rounded bg-black/10 dark:bg-white/10 font-bold">Y</kbd>
+                  </div>
+                  <div className="flex justify-between items-center bg-black/5 dark:bg-white/5 px-2.5 py-1.5 rounded">
+                    <span>Polygon</span>
+                    <kbd className="px-1.5 py-0.5 rounded bg-black/10 dark:bg-white/10 font-bold">X</kbd>
+                  </div>
+                  <div className="flex justify-between items-center bg-black/5 dark:bg-white/5 px-2.5 py-1.5 rounded">
+                    <span>Rounded Rect</span>
+                    <kbd className="px-1.5 py-0.5 rounded bg-black/10 dark:bg-white/10 font-bold">K</kbd>
                   </div>
                   <div className="flex justify-between items-center bg-black/5 dark:bg-white/5 px-2.5 py-1.5 rounded">
                     <span>Symmetry Mirror</span>
@@ -3504,6 +4433,15 @@ export const PixelEngine: React.FC = () => {
         imageSrc={importImageSrc}
         canvasCols={artworkCanvasRef.current ? Math.floor(artworkCanvasRef.current.width / pixelSize) : 48}
         canvasRows={artworkCanvasRef.current ? Math.floor(artworkCanvasRef.current.height / pixelSize) : 36}
+        onApplyPixels={handleApplyImportPixels}
+      />
+
+      {/* AI Text-to-Pixel-Grid Scene Generator Modal */}
+      <PixelSceneModal
+        isOpen={isSceneModalOpen}
+        onClose={() => setIsSceneModalOpen(false)}
+        canvasCols={artworkCanvasRef.current ? Math.floor(artworkCanvasRef.current.width / pixelSize) : 80}
+        canvasRows={artworkCanvasRef.current ? Math.floor(artworkCanvasRef.current.height / pixelSize) : 50}
         onApplyPixels={handleApplyImportPixels}
       />
     </div>

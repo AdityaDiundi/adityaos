@@ -7,18 +7,17 @@ import {
   X,
   Sparkles,
   Sliders,
-  Scissors,
-  Palette,
-  Maximize2,
   Check,
   Upload,
-  Feather,
+  Layers,
+  Palette,
+  Eye,
 } from "lucide-react";
 import {
-  processImageToPixels,
-  PixelConversionOptions,
-  PixelConversionResult,
-  MASTERPIECE_PRESETS,
+  runPixelConversionPipeline,
+  ConversionPipelineOptions,
+  ConversionPipelineResult,
+  NAMED_PALETTES,
 } from "./pixelArtConverter";
 
 interface PixelArtImportModalProps {
@@ -42,30 +41,30 @@ export const PixelArtImportModal: React.FC<PixelArtImportModalProps> = ({
   const { playClickChime } = useSoundStore();
 
   const [activeImageSrc, setActiveImageSrc] = useState<string | null>(imageSrc);
-  const [paletteMode, setPaletteMode] = useState<"rplace" | "pico8" | "gameboy" | "pc98" | "tokyoDusk" | "original">("rplace");
-  const [ditherMode, setDitherMode] = useState<"bayer" | "atkinson" | "none">("bayer");
-  const [ditherStrength, setDitherStrength] = useState<number>(0.6);
-  const [smoothNoise, setSmoothNoise] = useState<boolean>(true);
+  const [targetPreset, setTargetPreset] = useState<"char32" | "char48" | "scene160" | "canvas">("char48");
+  const [paletteName, setPaletteName] = useState<"animeChibi" | "editorial" | "pico8" | "tokyoDusk">("animeChibi");
+  const [maxPaletteColors, setMaxPaletteColors] = useState<number>(12);
   const [removeBg, setRemoveBg] = useState<boolean>(true);
-  const [bgTolerance, setBgTolerance] = useState<number>(38);
-  const [contrast, setContrast] = useState<number>(1.25);
-  const [outlineStrength, setOutlineStrength] = useState<number>(0.65);
-  const [cropToSubject, setCropToSubject] = useState<boolean>(true);
-  const [resolutionPreset, setResolutionPreset] = useState<number>(48);
+  const [bgTolerance, setBgTolerance] = useState<number>(35);
 
-  const [previewResult, setPreviewResult] = useState<PixelConversionResult | null>(null);
+  // Toggleable Cleanup Passes
+  const [passRemoveOrphans, setPassRemoveOrphans] = useState<boolean>(true);
+  const [passDarkOutline, setPassDarkOutline] = useState<boolean>(true);
+  const [passSnapTwoTone, setPassSnapTwoTone] = useState<boolean>(true);
+  const [passGradientDitherOnly, setPassGradientDitherOnly] = useState<boolean>(true);
+
+  // View state: split comparison vs converted only
+  const [previewMode, setPreviewMode] = useState<"split" | "pixel" | "original">("split");
+
+  const [previewResult, setPreviewResult] = useState<ConversionPipelineResult | null>(null);
   const [loadedImg, setLoadedImg] = useState<HTMLImageElement | null>(null);
   const previewCanvasRef = useRef<HTMLCanvasElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  // Sync prop imageSrc
   useEffect(() => {
-    if (imageSrc) {
-      setActiveImageSrc(imageSrc);
-    }
+    if (imageSrc) setActiveImageSrc(imageSrc);
   }, [imageSrc]);
 
-  // Load Image into HTMLImageElement
   useEffect(() => {
     if (!activeImageSrc) {
       setLoadedImg(null);
@@ -73,483 +72,393 @@ export const PixelArtImportModal: React.FC<PixelArtImportModalProps> = ({
     }
     const img = new Image();
     img.crossOrigin = "anonymous";
-    img.onload = () => {
-      setLoadedImg(img);
-    };
+    img.onload = () => setLoadedImg(img);
     img.src = activeImageSrc;
   }, [activeImageSrc]);
 
-  // Process image whenever settings or image changes
+  // Adjust default max palette colors based on target preset
+  useEffect(() => {
+    if (targetPreset === "char32" || targetPreset === "char48") {
+      setMaxPaletteColors(12);
+      setPaletteName("animeChibi");
+    } else {
+      setMaxPaletteColors(16);
+      setPaletteName("editorial");
+    }
+  }, [targetPreset]);
+
+  // Run conversion pipeline whenever options change
   useEffect(() => {
     if (!loadedImg) return;
 
-    const targetCols = Math.min(resolutionPreset, canvasCols || 48);
-    const targetRows = Math.min(resolutionPreset, canvasRows || 36);
+    let cols = 48;
+    let rows = 48;
+    if (targetPreset === "char32") {
+      cols = 32;
+      rows = 32;
+    } else if (targetPreset === "char48") {
+      cols = 48;
+      rows = 48;
+    } else if (targetPreset === "scene160") {
+      cols = 160;
+      rows = 90;
+    } else if (targetPreset === "canvas") {
+      cols = canvasCols || 80;
+      rows = canvasRows || 50;
+    }
 
-    const options: PixelConversionOptions = {
-      targetCols,
-      targetRows,
-      paletteMode,
-      ditherMode,
-      ditherStrength,
-      smoothNoise,
+    const options: ConversionPipelineOptions = {
+      targetCols: cols,
+      targetRows: rows,
+      paletteName,
+      maxPaletteColors,
       removeBg,
       bgTolerance,
-      contrast,
-      outlineStrength,
-      cropToSubject,
+      passRemoveOrphans,
+      passDarkOutline,
+      passSnapTwoTone,
+      passGradientDitherOnly,
     };
 
-    const res = processImageToPixels(loadedImg, options);
+    const res = runPixelConversionPipeline(loadedImg, options);
     setPreviewResult(res);
   }, [
     loadedImg,
-    paletteMode,
-    ditherMode,
-    ditherStrength,
-    smoothNoise,
+    targetPreset,
+    paletteName,
+    maxPaletteColors,
     removeBg,
     bgTolerance,
-    contrast,
-    outlineStrength,
-    cropToSubject,
-    resolutionPreset,
+    passRemoveOrphans,
+    passDarkOutline,
+    passSnapTwoTone,
+    passGradientDitherOnly,
     canvasCols,
     canvasRows,
   ]);
 
-  // Render Preview onto Canvas
+  // Render before/after onto preview canvas
   useEffect(() => {
     const canvas = previewCanvasRef.current;
-    if (!canvas || !previewResult) return;
+    if (!canvas || !previewResult || !loadedImg) return;
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
 
-    const cellSize = Math.max(4, Math.floor(280 / Math.max(previewResult.width, previewResult.height, 1)));
-    canvas.width = previewResult.width * cellSize;
-    canvas.height = previewResult.height * cellSize;
+    ctx.imageSmoothingEnabled = false;
 
-    // Dark grid background
-    ctx.fillStyle = "#0D0F14";
+    const pw = previewResult.width;
+    const ph = previewResult.height;
+    const scale = Math.max(3, Math.min(8, Math.floor(320 / Math.max(pw, ph))));
+
+    canvas.width = pw * scale;
+    canvas.height = ph * scale;
+
+    ctx.fillStyle = activeTheme.isDark ? "#0A0D14" : "#F5EFEB";
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-    // Subtle grid lines
-    ctx.strokeStyle = "rgba(255, 255, 255, 0.05)";
-    ctx.lineWidth = 1;
-    for (let x = 0; x <= canvas.width; x += cellSize) {
-      ctx.beginPath();
-      ctx.moveTo(x, 0);
-      ctx.lineTo(x, canvas.height);
-      ctx.stroke();
-    }
-    for (let y = 0; y <= canvas.height; y += cellSize) {
-      ctx.beginPath();
-      ctx.moveTo(0, y);
-      ctx.lineTo(canvas.width, y);
-      ctx.stroke();
+    if (previewMode === "original") {
+      ctx.imageSmoothingEnabled = true;
+      ctx.drawImage(loadedImg, 0, 0, canvas.width, canvas.height);
+      return;
     }
 
-    // Draw pixels
+    // Render pixel result
     previewResult.pixels.forEach((hex, key) => {
-      const [rStr, cStr] = key.split("_");
-      const r = parseInt(rStr, 10);
-      const c = parseInt(cStr, 10);
+      const idx = key.indexOf("_");
+      const r = +key.slice(0, idx);
+      const c = +key.slice(idx + 1);
 
-      const px = c * cellSize;
-      const py = r * cellSize;
+      if (previewMode === "split" && c < Math.floor(pw / 2)) {
+        // Left half: original image
+        return;
+      }
 
       ctx.fillStyle = hex;
-      ctx.fillRect(px, py, cellSize, cellSize);
+      ctx.fillRect(c * scale, r * scale, scale, scale);
     });
-  }, [previewResult]);
 
-  const handleApply = () => {
-    if (!previewResult || previewResult.pixels.size === 0) return;
-    playClickChime(800);
-    onApplyPixels(previewResult.pixels, previewResult.pixelCount);
-    onClose();
-  };
+    if (previewMode === "split") {
+      // Draw left half with original image
+      ctx.save();
+      ctx.beginPath();
+      ctx.rect(0, 0, Math.floor(pw / 2) * scale, canvas.height);
+      ctx.clip();
+      ctx.imageSmoothingEnabled = true;
+      ctx.drawImage(loadedImg, 0, 0, canvas.width, canvas.height);
+      ctx.restore();
 
-  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    const reader = new FileReader();
-    reader.onload = (event) => {
-      const src = event.target?.result as string;
-      if (src) {
-        setActiveImageSrc(src);
-        playClickChime(700);
-      }
-    };
-    reader.readAsDataURL(file);
-    e.target.value = "";
-  };
+      // Divider line
+      ctx.strokeStyle = activeTheme.accent;
+      ctx.lineWidth = 1.5;
+      ctx.beginPath();
+      ctx.moveTo(Math.floor(pw / 2) * scale, 0);
+      ctx.lineTo(Math.floor(pw / 2) * scale, canvas.height);
+      ctx.stroke();
+    }
+  }, [previewResult, loadedImg, previewMode, activeTheme]);
 
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-[1200] bg-black/75 backdrop-blur-md flex items-center justify-center p-3 sm:p-4 select-none font-mono">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 bg-black/60 backdrop-blur-sm select-none font-mono text-xs">
       <div
         style={{
           backgroundColor: activeTheme.windowBg,
           borderColor: activeTheme.cardBorder,
           color: activeTheme.textPrimary,
         }}
-        className="w-full max-w-3xl rounded-xl border shadow-2xl overflow-hidden flex flex-col max-h-[92vh] animate-in fade-in zoom-in-95 duration-150"
+        className="w-full max-w-3xl max-h-[90vh] rounded border shadow-2xl flex flex-col overflow-hidden animate-in fade-in zoom-in-95 duration-150"
       >
         {/* Header */}
         <div
           style={{
-            backgroundColor: activeTheme.cardBg,
-            borderColor: activeTheme.cardBorder,
+            backgroundColor: activeTheme.headerBg,
+            borderColor: activeTheme.headerBorder,
           }}
-          className="h-11 px-4 border-b flex items-center justify-between shrink-0"
+          className="h-10 border-b px-3 flex items-center justify-between"
         >
-          <div className="flex items-center gap-2 font-bold text-xs">
-            <div
-              className="w-5 h-5 rounded flex items-center justify-center"
-              style={{ backgroundColor: `${activeTheme.accent}25`, color: activeTheme.accent }}
-            >
-              <Sparkles className="w-3.5 h-3.5" />
-            </div>
-            <span>PIXEL ART CONVERTER & QUANTIZER</span>
-            <span
-              className="text-[9px] px-1.5 py-0.5 rounded border uppercase tracking-wider opacity-75 hidden sm:inline"
-              style={{ borderColor: activeTheme.cardBorder }}
-            >
-              r/place Engine
+          <div className="flex items-center gap-2">
+            <span className="font-serif italic text-sm text-stone-900 dark:text-zinc-100">
+              Image to Pixel Art Conversion Pipeline
             </span>
           </div>
-
-          <div className="flex items-center gap-2">
-            <button
-              type="button"
-              onClick={() => fileInputRef.current?.click()}
-              className="px-2 py-1 rounded text-[11px] font-bold border border-white/10 hover:bg-white/10 transition-colors flex items-center gap-1 cursor-pointer"
-            >
-              <Upload className="w-3 h-3 text-cyan-400" />
-              <span>Change Image</span>
-            </button>
-            <input
-              ref={fileInputRef}
-              type="file"
-              accept="image/*"
-              className="hidden"
-              onChange={handleFileUpload}
-            />
-
-            <button
-              type="button"
-              onClick={onClose}
-              className="p-1 rounded hover:bg-white/10 text-neutral-400 hover:text-white transition-colors cursor-pointer"
-            >
-              <X className="w-4 h-4" />
-            </button>
-          </div>
+          <button
+            type="button"
+            onClick={onClose}
+            className="p-1 rounded text-stone-500 dark:text-zinc-400 hover:text-stone-900 dark:hover:text-zinc-100 hover:bg-black/5 dark:hover:bg-white/5 transition-colors cursor-pointer"
+          >
+            <X className="w-4 h-4" />
+          </button>
         </div>
 
-        {/* Sample Sprites Quick-Picker */}
-        <div
-          style={{ borderColor: activeTheme.cardBorder }}
-          className="px-4 py-2 border-b bg-black/20 flex items-center justify-between gap-2 overflow-x-auto text-[11px]"
-        >
-          <span className="opacity-60 text-[10px] uppercase font-bold shrink-0 flex items-center gap-1">
-            <Feather className="w-3 h-3 text-amber-400" />
-            Try Iconic Sprites:
-          </span>
-          <div className="flex items-center gap-1.5 shrink-0">
-            {MASTERPIECE_PRESETS.map((preset) => (
-              <button
-                key={preset.id}
-                type="button"
-                onClick={() => {
-                  setActiveImageSrc(preset.dataUrl);
-                  playClickChime(650);
-                }}
-                className="px-2 py-1 rounded border border-white/10 hover:border-cyan-400 hover:bg-white/5 transition-all text-[10px] flex items-center gap-1 cursor-pointer"
-              >
-                <span>{preset.emoji}</span>
-                <span className="font-semibold">{preset.name.split(" ")[0]}</span>
-              </button>
-            ))}
-          </div>
-        </div>
-
-        {/* Modal Body */}
-        <div className="p-4 overflow-y-auto flex-1 flex flex-col md:flex-row gap-4">
-          {/* Left: Pixel Preview Stage */}
-          <div className="flex-1 flex flex-col items-center justify-center bg-black/40 rounded-lg p-3 border border-white/5 relative min-h-[300px]">
-            <canvas
-              ref={previewCanvasRef}
-              className="rounded shadow-lg border border-white/10 max-w-full max-h-[300px] object-contain"
-            />
-
-            {previewResult && (
-              <div className="mt-3 flex items-center justify-between w-full text-[10px] opacity-75 px-1 font-mono">
-                <span>
-                  Grid: {previewResult.width}×{previewResult.height}
-                </span>
-                <span className="font-bold text-emerald-400">
-                  {previewResult.pixelCount} Active Voxels
-                </span>
+        {/* Content Body */}
+        <div className="flex-1 overflow-y-auto p-4 flex flex-col md:flex-row gap-4 min-h-0">
+          {/* Left: Canvas Preview */}
+          <div className="flex-1 flex flex-col items-center justify-center bg-black/5 dark:bg-white/5 rounded border border-black/5 dark:border-white/5 p-3 min-h-[300px] relative">
+            {loadedImg ? (
+              <div className="flex flex-col items-center gap-2">
+                <canvas
+                  ref={previewCanvasRef}
+                  className="rounded shadow-md border border-black/10 dark:border-white/10"
+                  style={{ imageRendering: "pixelated" }}
+                />
+                <div className="flex items-center gap-1.5 text-[10px] opacity-70">
+                  <button
+                    type="button"
+                    onClick={() => setPreviewMode("split")}
+                    className={`px-2 py-0.5 rounded cursor-pointer ${
+                      previewMode === "split" ? "bg-black/10 dark:bg-white/10 font-bold" : ""
+                    }`}
+                  >
+                    Split Before/After
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setPreviewMode("pixel")}
+                    className={`px-2 py-0.5 rounded cursor-pointer ${
+                      previewMode === "pixel" ? "bg-black/10 dark:bg-white/10 font-bold" : ""
+                    }`}
+                  >
+                    Pixel Only
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setPreviewMode("original")}
+                    className={`px-2 py-0.5 rounded cursor-pointer ${
+                      previewMode === "original" ? "bg-black/10 dark:bg-white/10 font-bold" : ""
+                    }`}
+                  >
+                    Original Only
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <div className="flex flex-col items-center gap-2 text-stone-500 dark:text-zinc-400">
+                <Upload className="w-8 h-8 opacity-40" />
+                <span>Upload an image to start pixel pipeline</span>
+                <button
+                  type="button"
+                  onClick={() => fileInputRef.current?.click()}
+                  className="px-3 py-1 rounded border border-current text-[11px] hover:bg-black/5 dark:hover:bg-white/5 cursor-pointer mt-1"
+                >
+                  Choose File
+                </button>
               </div>
             )}
           </div>
 
-          {/* Right: Fine-Tuning Controls */}
-          <div className="w-full md:w-72 flex flex-col gap-3 text-xs">
-            {/* 1. Feature Anchor & Sobel Contour Sharpness */}
-            <div
-              style={{ backgroundColor: activeTheme.cardBg, borderColor: activeTheme.cardBorder }}
-              className="p-2.5 rounded-lg border space-y-1.5"
-            >
-              <div className="flex items-center justify-between text-[11px]">
-                <span className="font-bold flex items-center gap-1.5 text-amber-400">
-                  <Sparkles className="w-3.5 h-3.5" />
-                  Feature & Contour Anchor
-                </span>
-                <span className="text-[10px] font-bold text-amber-400">
-                  {outlineStrength === 0 ? "OFF" : `${Math.round(outlineStrength * 100)}%`}
-                </span>
+          {/* Right: Controls Strip */}
+          <div className="w-full md:w-72 flex flex-col gap-3 text-[11px]">
+            {/* Target Resolution */}
+            <div className="flex flex-col gap-1">
+              <span className="text-[10px] uppercase font-bold opacity-60">Target Grid</span>
+              <div className="grid grid-cols-2 gap-1">
+                {[
+                  { id: "char32", label: "Char 32×32" },
+                  { id: "char48", label: "Char 48×48" },
+                  { id: "scene160", label: "Scene 160×90" },
+                  { id: "canvas", label: "Current Canvas" },
+                ].map((item) => (
+                  <button
+                    key={item.id}
+                    type="button"
+                    onClick={() => setTargetPreset(item.id as any)}
+                    className={`px-2 py-1 rounded text-left border cursor-pointer transition-colors ${
+                      targetPreset === item.id
+                        ? "border-stone-900 dark:border-zinc-100 bg-black/5 dark:bg-white/10 font-bold"
+                        : "border-black/10 dark:border-white/10 opacity-70 hover:opacity-100"
+                    }`}
+                  >
+                    {item.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Named Palette */}
+            <div className="flex flex-col gap-1">
+              <span className="text-[10px] uppercase font-bold opacity-60">Quantize Palette</span>
+              <select
+                value={paletteName}
+                onChange={(e) => setPaletteName(e.target.value as any)}
+                className="w-full p-1.5 rounded border border-black/10 dark:border-white/10 bg-transparent cursor-pointer font-mono text-[11px]"
+              >
+                <option value="animeChibi" className="bg-stone-900 text-white">Anime Chibi (12 colors)</option>
+                <option value="editorial" className="bg-stone-900 text-white">Editorial Cream (12 colors)</option>
+                <option value="pico8" className="bg-stone-900 text-white">PICO-8 Classic (16 colors)</option>
+                <option value="tokyoDusk" className="bg-stone-900 text-white">Tokyo Dusk (16 colors)</option>
+              </select>
+            </div>
+
+            {/* Palette Colors Clamping */}
+            <div className="flex flex-col gap-1">
+              <div className="flex justify-between items-center text-[10px]">
+                <span className="uppercase font-bold opacity-60">Max Colors</span>
+                <span>{maxPaletteColors} colors</span>
               </div>
               <input
                 type="range"
-                min="0.0"
-                max="1.0"
-                step="0.05"
-                value={outlineStrength}
-                onChange={(e) => setOutlineStrength(Number(e.target.value))}
-                className="w-full h-1 bg-white/20 rounded accent-amber-400 cursor-pointer"
+                min="4"
+                max="24"
+                step="2"
+                value={maxPaletteColors}
+                onChange={(e) => setMaxPaletteColors(+e.target.value)}
+                className="w-full accent-stone-700 dark:accent-zinc-300 cursor-pointer"
               />
-              <div className="text-[9px] opacity-60 leading-tight">
-                Locks 1-pixel dark outlines around eyes, facial features & silhouette so they don&apos;t wash out.
-              </div>
             </div>
 
-            {/* 2. Background Cutout */}
-            <div
-              style={{ backgroundColor: activeTheme.cardBg, borderColor: activeTheme.cardBorder }}
-              className="p-2.5 rounded-lg border space-y-2"
-            >
-              <div className="flex items-center justify-between">
-                <span className="font-bold text-[11px] flex items-center gap-1.5">
-                  <Scissors className="w-3.5 h-3.5 text-emerald-400" />
-                  Auto Cutout Subject
-                </span>
-                <input
-                  type="checkbox"
-                  checked={removeBg}
-                  onChange={(e) => setRemoveBg(e.target.checked)}
-                  className="w-4 h-4 rounded accent-cyan-400 cursor-pointer"
-                />
-              </div>
-
-              {removeBg && (
-                <div className="space-y-1 pt-1">
-                  <div className="flex justify-between text-[10px] opacity-70">
-                    <span>Background Sensitivity</span>
-                    <span>{bgTolerance}</span>
-                  </div>
-                  <input
-                    type="range"
-                    min="15"
-                    max="75"
-                    step="1"
-                    value={bgTolerance}
-                    onChange={(e) => setBgTolerance(Number(e.target.value))}
-                    className="w-full h-1 bg-white/20 rounded accent-cyan-400 cursor-pointer"
-                  />
-                </div>
-              )}
-            </div>
-
-            {/* 3. Color Palette */}
-            <div
-              style={{ backgroundColor: activeTheme.cardBg, borderColor: activeTheme.cardBorder }}
-              className="p-2.5 rounded-lg border space-y-2"
-            >
-              <span className="font-bold text-[11px] flex items-center gap-1.5">
-                <Palette className="w-3.5 h-3.5 text-purple-400" />
-                Color Quantization (Oklab Perceptual)
-              </span>
-
-              <div className="grid grid-cols-2 gap-1.5">
-                {[
-                  { id: "rplace", label: "r/place 32", desc: "Crisp & Punchy" },
-                  { id: "tokyoDusk", label: "Tokyo Dusk", desc: "Cyberpunk 16" },
-                  { id: "pc98", label: "PC-98", desc: "Japanese 16" },
-                  { id: "pico8", label: "PICO-8", desc: "Retro 16-Color" },
-                  { id: "gameboy", label: "GameBoy", desc: "4-Tone Green" },
-                  { id: "original", label: "Original", desc: "TrueColor" },
-                ].map((p) => (
-                  <button
-                    key={p.id}
-                    type="button"
-                    onClick={() => setPaletteMode(p.id as any)}
-                    style={{
-                      borderColor: paletteMode === p.id ? activeTheme.accent : activeTheme.cardBorder,
-                      backgroundColor: paletteMode === p.id ? `${activeTheme.accent}20` : "transparent",
-                    }}
-                    className="p-1.5 rounded border text-left transition-all cursor-pointer group"
-                  >
-                    <div className="font-bold text-[10px] flex items-center justify-between">
-                      <span>{p.label}</span>
-                      {paletteMode === p.id && <Check className="w-2.5 h-2.5 text-emerald-400" />}
-                    </div>
-                    <div className="text-[8px] opacity-60">{p.desc}</div>
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            {/* 4. Dithering & Texture */}
-            <div
-              style={{ backgroundColor: activeTheme.cardBg, borderColor: activeTheme.cardBorder }}
-              className="p-2.5 rounded-lg border space-y-2"
-            >
-              <div className="flex items-center justify-between">
-                <span className="font-bold text-[11px] flex items-center gap-1.5">
-                  <Sliders className="w-3.5 h-3.5 text-cyan-400" />
-                  Dither & Texture Engine
-                </span>
-                <span className="text-[10px] font-bold text-cyan-400 uppercase">{ditherMode}</span>
-              </div>
-
-              <div className="grid grid-cols-3 gap-1">
-                {[
-                  { id: "bayer", label: "Bayer 4×4", desc: "Retro pattern" },
-                  { id: "atkinson", label: "Atkinson", desc: "Error diffusion" },
-                  { id: "none", label: "Flat / Solid", desc: "Sharp poster" },
-                ].map((d) => (
-                  <button
-                    key={d.id}
-                    type="button"
-                    onClick={() => setDitherMode(d.id as any)}
-                    style={{
-                      borderColor: ditherMode === d.id ? activeTheme.accent : activeTheme.cardBorder,
-                      backgroundColor: ditherMode === d.id ? `${activeTheme.accent}20` : "transparent",
-                    }}
-                    className="p-1.5 rounded border text-left transition-all cursor-pointer"
-                  >
-                    <div className="font-bold text-[10px]">{d.label}</div>
-                    <div className="text-[8px] opacity-60">{d.desc}</div>
-                  </button>
-                ))}
-              </div>
-
-              {ditherMode !== "none" && (
-                <div className="space-y-1 pt-1">
-                  <div className="flex justify-between text-[10px] opacity-70">
-                    <span>Dither Diffusion Strength</span>
-                    <span>{Math.round(ditherStrength * 100)}%</span>
-                  </div>
-                  <input
-                    type="range"
-                    min="0.1"
-                    max="1.0"
-                    step="0.05"
-                    value={ditherStrength}
-                    onChange={(e) => setDitherStrength(Number(e.target.value))}
-                    className="w-full h-1 bg-white/20 rounded accent-cyan-400 cursor-pointer"
-                  />
-                </div>
-              )}
-
-              <div className="flex items-center justify-between pt-1 border-t border-white/5">
-                <span className="text-[10px] opacity-80">Photographic noise filter</span>
-                <input
-                  type="checkbox"
-                  checked={smoothNoise}
-                  onChange={(e) => setSmoothNoise(e.target.checked)}
-                  className="w-3.5 h-3.5 rounded accent-cyan-400 cursor-pointer"
-                />
-              </div>
-            </div>
-
-            {/* 4. Detail & Density */}
-            <div
-              style={{ backgroundColor: activeTheme.cardBg, borderColor: activeTheme.cardBorder }}
-              className="p-2.5 rounded-lg border space-y-2"
-            >
-              <div className="flex items-center justify-between">
-                <span className="font-bold text-[11px] flex items-center gap-1.5">
-                  <Maximize2 className="w-3.5 h-3.5 text-cyan-400" />
-                  Target Density
-                </span>
-                <span className="text-[10px] font-bold text-cyan-400">{resolutionPreset}px</span>
-              </div>
-
-              <div className="grid grid-cols-4 gap-1">
-                {[28, 40, 52, 64].map((sz) => (
-                  <button
-                    key={sz}
-                    type="button"
-                    onClick={() => setResolutionPreset(sz)}
-                    style={{
-                      borderColor: resolutionPreset === sz ? activeTheme.accent : activeTheme.cardBorder,
-                      backgroundColor: resolutionPreset === sz ? `${activeTheme.accent}20` : "transparent",
-                    }}
-                    className="py-1 rounded border text-center font-bold text-[10px] transition-all cursor-pointer"
-                  >
-                    {sz}px
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            {/* 5. Contrast Boost */}
-            <div
-              style={{ backgroundColor: activeTheme.cardBg, borderColor: activeTheme.cardBorder }}
-              className="p-2.5 rounded-lg border space-y-1.5"
-            >
-              <div className="flex items-center justify-between text-[11px]">
-                <span className="font-bold flex items-center gap-1.5">
-                  <Sliders className="w-3.5 h-3.5 text-pink-400" />
-                  Contrast & Tone Boost
-                </span>
-                <span className="text-[10px] opacity-75">{contrast.toFixed(2)}x</span>
-              </div>
+            {/* Background Removal */}
+            <div className="flex items-center justify-between border-t border-black/5 dark:border-white/5 pt-2">
+              <span className="text-[10px] uppercase font-bold opacity-60">Isolate Subject</span>
               <input
-                type="range"
-                min="1.0"
-                max="2.0"
-                step="0.05"
-                value={contrast}
-                onChange={(e) => setContrast(Number(e.target.value))}
-                className="w-full h-1 bg-white/20 rounded accent-pink-400 cursor-pointer"
+                type="checkbox"
+                checked={removeBg}
+                onChange={(e) => setRemoveBg(e.target.checked)}
+                className="cursor-pointer"
               />
+            </div>
+
+            {/* Cleanup Passes (Toggleable) */}
+            <div className="flex flex-col gap-1.5 border-t border-black/5 dark:border-white/5 pt-2">
+              <span className="text-[10px] uppercase font-bold opacity-60">Cleanup Passes</span>
+
+              <label className="flex items-center justify-between text-[11px] cursor-pointer">
+                <span>Remove orphan single pixels</span>
+                <input
+                  type="checkbox"
+                  checked={passRemoveOrphans}
+                  onChange={(e) => setPassRemoveOrphans(e.target.checked)}
+                />
+              </label>
+
+              <label className="flex items-center justify-between text-[11px] cursor-pointer">
+                <span>1px dark-shade outline</span>
+                <input
+                  type="checkbox"
+                  checked={passDarkOutline}
+                  onChange={(e) => setPassDarkOutline(e.target.checked)}
+                />
+              </label>
+
+              <label className="flex items-center justify-between text-[11px] cursor-pointer">
+                <span>2-tone cel shading snap</span>
+                <input
+                  type="checkbox"
+                  checked={passSnapTwoTone}
+                  onChange={(e) => setPassSnapTwoTone(e.target.checked)}
+                />
+              </label>
+
+              <label className="flex items-center justify-between text-[11px] cursor-pointer">
+                <span>Dither gradients & skies only</span>
+                <input
+                  type="checkbox"
+                  checked={passGradientDitherOnly}
+                  onChange={(e) => setPassGradientDitherOnly(e.target.checked)}
+                />
+              </label>
             </div>
           </div>
         </div>
 
-        {/* Footer */}
+        {/* Hidden File Input */}
+        <input
+          type="file"
+          ref={fileInputRef}
+          onChange={(e) => {
+            const file = e.target.files?.[0];
+            if (file) {
+              const reader = new FileReader();
+              reader.onload = (ev) => setActiveImageSrc(ev.target?.result as string);
+              reader.readAsDataURL(file);
+            }
+          }}
+          accept="image/*"
+          className="hidden"
+        />
+
+        {/* Footer Actions */}
         <div
           style={{
-            backgroundColor: activeTheme.cardBg,
-            borderColor: activeTheme.cardBorder,
+            backgroundColor: activeTheme.headerBg,
+            borderColor: activeTheme.headerBorder,
           }}
-          className="h-12 px-4 border-t flex items-center justify-between shrink-0"
+          className="h-11 border-t px-4 flex items-center justify-between"
         >
           <button
             type="button"
-            onClick={onClose}
-            className="px-3 py-1.5 rounded border border-white/10 hover:bg-white/5 text-xs transition-colors cursor-pointer"
+            onClick={() => fileInputRef.current?.click()}
+            className="text-xs text-stone-600 dark:text-zinc-400 hover:text-stone-900 dark:hover:text-zinc-100 hover:underline cursor-pointer"
           >
-            Cancel
+            Change Image
           </button>
 
-          <button
-            type="button"
-            onClick={handleApply}
-            style={{
-              backgroundColor: activeTheme.accent,
-              color: activeTheme.isDark ? "#000" : "#fff",
-            }}
-            className="px-4 py-1.5 rounded font-bold text-xs flex items-center gap-1.5 hover:opacity-90 active:scale-95 transition-all shadow-md cursor-pointer"
-          >
-            <Check className="w-3.5 h-3.5 stroke-[3]" />
-            <span>DRAW TO GRID ({previewResult?.pixelCount || 0} PIXELS)</span>
-          </button>
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              onClick={onClose}
+              className="px-3 py-1 rounded text-stone-500 dark:text-zinc-400 hover:text-stone-900 dark:hover:text-zinc-100 cursor-pointer"
+            >
+              Cancel
+            </button>
+            <button
+              type="button"
+              disabled={!previewResult || previewResult.pixels.size === 0}
+              onClick={() => {
+                if (previewResult) {
+                  onApplyPixels(previewResult.pixels, previewResult.pixels.size);
+                  onClose();
+                }
+              }}
+              style={{
+                backgroundColor: activeTheme.accent,
+                color: activeTheme.isDark ? "#000" : "#FFF",
+              }}
+              className="px-4 py-1 rounded font-medium cursor-pointer disabled:opacity-50 transition-opacity"
+            >
+              Commit to Canvas
+            </button>
+          </div>
         </div>
       </div>
     </div>
