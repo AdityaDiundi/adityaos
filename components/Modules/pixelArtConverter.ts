@@ -890,6 +890,71 @@ function cleanupAlphaMask(
   return cleaned;
 }
 
+// Prune spurious 1D horizontal or vertical divider lines and baseline whiskers
+export function pruneThinDividerLines(mask: Uint8Array, w: number, h: number): Uint8Array {
+  const result = new Uint8Array(mask);
+
+  // 1. Horizontal thin line pruning (runs of 10+ pixels with <= 1px vertical body)
+  for (let y = 1; y < h - 1; y++) {
+    let runStart = -1;
+    for (let x = 0; x <= w; x++) {
+      const isPixel = x < w && result[y * w + x] === 1;
+      if (isPixel && runStart === -1) {
+        runStart = x;
+      } else if (!isPixel && runStart !== -1) {
+        const runLen = x - runStart;
+        if (runLen >= 10) {
+          let isolatedCount = 0;
+          for (let rx = runStart; rx < x; rx++) {
+            const above = result[(y - 1) * w + rx];
+            const below = result[(y + 1) * w + rx];
+            if (above === 0 && below === 0) {
+              isolatedCount++;
+            }
+          }
+          if (isolatedCount >= runLen * 0.65) {
+            for (let rx = runStart; rx < x; rx++) {
+              result[y * w + rx] = 0;
+            }
+          }
+        }
+        runStart = -1;
+      }
+    }
+  }
+
+  // 2. Vertical thin line pruning
+  for (let x = 1; x < w - 1; x++) {
+    let runStart = -1;
+    for (let y = 0; y <= h; y++) {
+      const isPixel = y < h && result[y * w + x] === 1;
+      if (isPixel && runStart === -1) {
+        runStart = y;
+      } else if (!isPixel && runStart !== -1) {
+        const runLen = y - runStart;
+        if (runLen >= 10) {
+          let isolatedCount = 0;
+          for (let ry = runStart; ry < y; ry++) {
+            const left = result[ry * w + (x - 1)];
+            const right = result[ry * w + (x + 1)];
+            if (left === 0 && right === 0) {
+              isolatedCount++;
+            }
+          }
+          if (isolatedCount >= runLen * 0.65) {
+            for (let ry = runStart; ry < y; ry++) {
+              result[ry * w + x] = 0;
+            }
+          }
+        }
+        runStart = -1;
+      }
+    }
+  }
+
+  return result;
+}
+
 // Despeckle: 4-Connected Component Fragment Removal on 2D Quantized Grid
 function despeckleQuantizedGrid(
   grid: string[][],
@@ -1104,20 +1169,22 @@ export function runPixelConversionPipeline(
   }
 
   // 5. Morphological Cleanup on Mask
-  const finalMask = cleanupAlphaMask(rawMask, gridW, gridH, isolateSubject);
+  let finalMask = cleanupAlphaMask(rawMask, gridW, gridH, isolateSubject);
 
-  // Optional: remove bottom floor line artifact if detected
-  if (removeFloorLine && gridH > 10) {
-    const lastRow = gridH - 1;
-    let filledCount = 0;
-    for (let gx = 0; gx < gridW; gx++) {
-      if (finalMask[lastRow * gridW + gx] === 1 && finalMask[(lastRow - 1) * gridW + gx] === 0) {
-        filledCount++;
-      }
-    }
-    if (filledCount > gridW * 0.45) {
-      for (let gx = 0; gx < gridW; gx++) {
-        finalMask[lastRow * gridW + gx] = 0;
+  // Prune spurious 1D horizontal or vertical divider lines and baseline whiskers
+  if (removeFloorLine) {
+    finalMask = pruneThinDividerLines(finalMask, gridW, gridH);
+
+    // Also strip border artifacts if whole rows/cols at the canvas perimeter are spurious
+    if (gridH > 10) {
+      for (const row of [0, gridH - 1]) {
+        let filledCount = 0;
+        for (let gx = 0; gx < gridW; gx++) {
+          if (finalMask[row * gridW + gx] === 1) filledCount++;
+        }
+        if (filledCount > gridW * 0.4) {
+          for (let gx = 0; gx < gridW; gx++) finalMask[row * gridW + gx] = 0;
+        }
       }
     }
   }

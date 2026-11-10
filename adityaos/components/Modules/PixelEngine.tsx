@@ -1334,6 +1334,53 @@ export const PixelEngine: React.FC = () => {
     setUndoToast(null);
   }, [redrawAll, saveStep, playPopSound]);
 
+  // Fit artwork to screen viewport
+  const handleFitToScreen = useCallback(() => {
+    if (pixelsRef.current.size === 0) return;
+    const canvas = artworkCanvasRef.current;
+    if (!canvas) return;
+
+    const physW = canvas.width;
+    const physH = canvas.height;
+
+    let minR = Infinity, maxR = -Infinity, minC = Infinity, maxC = -Infinity;
+    pixelsRef.current.forEach((_, key) => {
+      const idx = key.indexOf("_");
+      const r = +key.slice(0, idx);
+      const c = +key.slice(idx + 1);
+      if (r < minR) minR = r;
+      if (r > maxR) maxR = r;
+      if (c < minC) minC = c;
+      if (c > maxC) maxC = c;
+    });
+
+    const artW = isFinite(maxC - minC) ? maxC - minC + 1 : 0;
+    const artH = isFinite(maxR - minR) ? maxR - minR + 1 : 0;
+    if (artW <= 0 || artH <= 0) return;
+
+    const idealSize = Math.max(4, Math.min(32, Math.floor(Math.min((physW * 0.85) / artW, (physH * 0.85) / artH))));
+
+    const nextCols = Math.max(1, Math.floor(physW / idealSize));
+    const nextRows = Math.max(1, Math.floor(physH / idealSize));
+    const nextOffsetC = Math.max(0, Math.floor((nextCols - artW) / 2));
+    const nextOffsetR = Math.max(0, Math.floor((nextRows - artH) / 2));
+
+    const shifted = new Map<string, string>();
+    pixelsRef.current.forEach((hex, key) => {
+      const idx = key.indexOf("_");
+      const r = +key.slice(0, idx) - minR + nextOffsetR;
+      const c = +key.slice(idx + 1) - minC + nextOffsetC;
+      shifted.set(`${r}_${c}`, hex);
+    });
+
+    pixelsRef.current = shifted;
+    drawingBufferRef.current = new Map(shifted);
+    setPixelSize(idealSize);
+    redrawAll();
+    saveStep();
+    playPopSound(750);
+  }, [redrawAll, saveStep, playPopSound]);
+
   // Global Keyboard Shortcuts for Pixel Engine
   useEffect(() => {
     const handleGlobalKey = (e: KeyboardEvent) => {
@@ -1526,6 +1573,9 @@ export const PixelEngine: React.FC = () => {
       } else if (key === "3" && !isCmdOrCtrl) {
         setIs3D((prev) => !prev);
         playPopSound(700);
+      } else if ((e.shiftKey && key === "f") || key === "0") {
+        e.preventDefault();
+        handleFitToScreen();
       } else if (key === "delete" || key === "backspace") {
         handleClear();
       } else if (key === "1") {
@@ -1553,6 +1603,7 @@ export const PixelEngine: React.FC = () => {
     handleRedo,
     handleDownload,
     handleClear,
+    handleFitToScreen,
     switchMode,
     playPopSound,
   ]);
@@ -2575,8 +2626,9 @@ export const PixelEngine: React.FC = () => {
 
   const handleApplyImportPixels = useCallback(
     (newPixels: Map<string, string>, count: number) => {
-      const canvasWidth = artworkCanvasRef.current ? Math.floor(artworkCanvasRef.current.width / pixelSize) : 48;
-      const canvasHeight = artworkCanvasRef.current ? Math.floor(artworkCanvasRef.current.height / pixelSize) : 36;
+      const canvas = artworkCanvasRef.current;
+      const physW = canvas ? canvas.width : 1200;
+      const physH = canvas ? canvas.height : 800;
 
       let minR = Infinity, maxR = -Infinity, minC = Infinity, maxC = -Infinity;
       newPixels.forEach((_, key) => {
@@ -2591,6 +2643,22 @@ export const PixelEngine: React.FC = () => {
 
       const importW = isFinite(maxC - minC) ? maxC - minC + 1 : 0;
       const importH = isFinite(maxR - minR) ? maxR - minR + 1 : 0;
+
+      // Auto-Fit: Calculate ideal pixelSize so imported artwork fits inside the visible canvas with margin
+      let targetPixelSize = pixelSize;
+      if (importW > 0 && importH > 0) {
+        const idealW = Math.floor((physW * 0.88) / importW);
+        const idealH = Math.floor((physH * 0.88) / importH);
+        const computedIdeal = Math.max(4, Math.min(32, Math.min(idealW, idealH)));
+        if (computedIdeal < pixelSize || importW * pixelSize > physW * 0.9 || importH * pixelSize > physH * 0.9) {
+          targetPixelSize = computedIdeal;
+          setPixelSize(computedIdeal);
+        }
+      }
+
+      const canvasWidth = Math.max(1, Math.floor(physW / targetPixelSize));
+      const canvasHeight = Math.max(1, Math.floor(physH / targetPixelSize));
+
       const offsetC = Math.max(0, Math.floor((canvasWidth - importW) / 2));
       const offsetR = Math.max(0, Math.floor((canvasHeight - importH) / 2));
 
@@ -3078,18 +3146,29 @@ export const PixelEngine: React.FC = () => {
             <span className="hidden sm:inline opacity-70">Size</span>
             <input
               type="range"
-              min="8"
+              min="4"
               max="48"
               step="2"
               value={pixelSize}
               onChange={(e) => setPixelSize(Number(e.target.value))}
-              title={`Brush / Voxel footprint: ${pixelSize}px (8px - 48px)`}
+              title={`Brush / Voxel footprint: ${pixelSize}px (4px - 48px)`}
               className="w-14 sm:w-20 h-1 rounded appearance-none cursor-pointer accent-stone-700 dark:accent-zinc-300 bg-stone-300 dark:bg-stone-700"
             />
             <span className="min-w-[28px] text-right text-stone-800 dark:text-zinc-200">
               {pixelSize}px
             </span>
           </div>
+
+          {/* Fit Artwork to Viewport Button */}
+          <button
+            type="button"
+            onClick={handleFitToScreen}
+            title="Fit Artwork to Viewport (Shift+F or 0)"
+            className="px-1.5 py-0.5 rounded text-xs font-mono text-stone-500 dark:text-zinc-400 hover:text-stone-900 dark:hover:text-zinc-100 hover:bg-black/[0.04] dark:hover:bg-white/[0.04] transition-colors focus:outline-none focus-visible:ring-1 focus-visible:ring-stone-400 cursor-pointer flex items-center gap-1"
+          >
+            <Maximize2 className="w-3.5 h-3.5" />
+            <span className="hidden xl:inline">Fit</span>
+          </button>
 
           {/* Toggle Telemetry Sidebar (Overlay) */}
           <button
@@ -4343,6 +4422,10 @@ export const PixelEngine: React.FC = () => {
                   Canvas & View
                 </div>
                 <div className="grid grid-cols-2 gap-2">
+                  <div className="flex justify-between items-center bg-black/5 dark:bg-white/5 px-2.5 py-1.5 rounded">
+                    <span>Fit to Viewport</span>
+                    <kbd className="px-1.5 py-0.5 rounded bg-black/10 dark:bg-white/10 font-bold">Shift + F / 0</kbd>
+                  </div>
                   <div className="flex justify-between items-center bg-black/5 dark:bg-white/5 px-2.5 py-1.5 rounded">
                     <span>Toggle Grid</span>
                     <kbd className="px-1.5 py-0.5 rounded bg-black/10 dark:bg-white/10 font-bold">Shift + G</kbd>

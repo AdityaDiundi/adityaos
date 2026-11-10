@@ -25,6 +25,7 @@ import {
   snapToResolutionStep,
   extractKMeansPalette,
   runPixelConversionPipeline,
+  pruneThinDividerLines,
   RESOLUTION_STEPS,
   NAMED_PALETTES,
 } from "../components/Modules/pixelArtConverter.ts";
@@ -191,6 +192,45 @@ describe("Part 1: Image to Pixel Pipeline & Oklab Quantization", () => {
     assert.ok(res.stages.quantized.size > 0, "Quantized stage must be populated");
     assert.ok(res.stages.outlined.size > 0, "Outlined stage must be populated");
     assert.ok(res.paletteUsed.length > 0, "Palette used must contain colors");
+  });
+
+  test("pruneThinDividerLines eliminates spurious 1D horizontal baseline while keeping 2D subject", () => {
+    const w = 50, h = 50;
+    const mask = new Uint8Array(w * h);
+
+    // 1. 2D circular subject at center (radius 10)
+    for (let y = 15; y <= 35; y++) {
+      for (let x = 15; x <= 35; x++) {
+        const dx = x - 25;
+        const dy = y - 25;
+        if (dx * dx + dy * dy <= 100) {
+          mask[y * w + x] = 1;
+        }
+      }
+    }
+
+    // 2. 1D thin horizontal line at y = 40 spanning from x = 0 to 45
+    for (let x = 0; x <= 45; x++) {
+      mask[40 * w + x] = 1;
+    }
+
+    const pruned = pruneThinDividerLines(mask, w, h);
+
+    // The 1D line at y = 40 should be completely pruned
+    let linePixelCount = 0;
+    for (let x = 0; x <= 45; x++) {
+      if (pruned[40 * w + x] === 1) linePixelCount++;
+    }
+    assert.strictEqual(linePixelCount, 0, "1D baseline artifact must be pruned");
+
+    // The 2D subject at center must remain intact
+    let subjectPixelCount = 0;
+    for (let y = 15; y <= 35; y++) {
+      for (let x = 15; x <= 35; x++) {
+        if (pruned[y * w + x] === 1) subjectPixelCount++;
+      }
+    }
+    assert.ok(subjectPixelCount > 250, "2D subject mass must be preserved");
   });
 });
 

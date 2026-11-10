@@ -594,6 +594,24 @@ export const PixelArtImportModal: React.FC<PixelArtImportModalProps> = ({
               <p className="text-[10px] leading-tight opacity-70 italic text-stone-600 dark:text-zinc-400">
                 {resolutionAdvice}
               </p>
+
+              {/* Fit Current Canvas Viewport Shortcut */}
+              {canvasCols > 0 && canvasRows > 0 && (
+                <div className="flex items-center gap-1.5 pt-0.5">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const canvasMax = Math.max(canvasCols, canvasRows);
+                      handleResolutionChange(snapToResolutionStep(canvasMax));
+                      playClickChime?.();
+                    }}
+                    title={`Snap longest side to fit current canvas viewport (${canvasCols} × ${canvasRows}) without zooming`}
+                    className="px-2 py-0.5 rounded text-[10px] border border-black/10 dark:border-white/10 hover:border-current opacity-80 hover:opacity-100 cursor-pointer flex items-center gap-1"
+                  >
+                    <span>Fit Canvas Viewport ({canvasCols} × {canvasRows})</span>
+                  </button>
+                </div>
+              )}
             </div>
 
             {/* 3. Palette Reduction */}
