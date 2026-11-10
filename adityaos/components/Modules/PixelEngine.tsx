@@ -50,7 +50,7 @@ import {
   recordPixelPopped,
   GlobalCommunityStats,
 } from "@/lib/firebaseStats";
-import { createInitialPixelArt, INITIAL_PIXELS, SCENE_GENERATORS } from "./pixelArtPresets";
+import { createInitialPixelArt, INITIAL_PIXELS, SCENE_GENERATORS, SCENE_PRESETS } from "./pixelArtPresets";
 import { PixelArtImportModal } from "./PixelArtImportModal";
 
 // 5x5 and 5x3 Pixel Bitmap Font from homesec.tsx / pixel.tsx
@@ -1663,14 +1663,37 @@ export const PixelEngine: React.FC = () => {
 
   // Automated Bot Placement Engine (r/place bot simulation)
   const [isBotDrawing, setIsBotDrawing] = useState<boolean>(false);
+  const [activeBotScene, setActiveBotScene] = useState<string>("");
   const botTimerRef = useRef<NodeJS.Timeout | null>(null);
 
   const runBotPlacement = useCallback(() => {
     if (isBotDrawing) {
       if (botTimerRef.current) clearInterval(botTimerRef.current);
       setIsBotDrawing(false);
+      setActiveBotScene("");
       return;
     }
+
+    const sceneKeys = Object.keys(SCENE_PRESETS);
+    const randomKey = sceneKeys[Math.floor(Math.random() * sceneKeys.length)];
+    const chosenPreset = SCENE_PRESETS[randomKey] || SCENE_PRESETS.himalayanNight;
+    setActiveBotScene(chosenPreset.name);
+
+    const canvas = artworkCanvasRef.current;
+    const cols = canvas ? Math.floor(canvas.width / pixelSize) : 80;
+    const rows = canvas ? Math.floor(canvas.height / pixelSize) : 50;
+
+    const generatedMap = chosenPreset.generate(cols, rows);
+    const pixelEntries: [number, number, string][] = [];
+    generatedMap.forEach((color: string, key: string) => {
+      const idx = key.indexOf("_");
+      const r = +key.slice(0, idx);
+      const c = +key.slice(idx + 1);
+      pixelEntries.push([r, c, color]);
+    });
+
+    // Organic scanline ordering with slight horizontal jitter for realistic bot drawing
+    pixelEntries.sort((a, b) => a[0] - b[0] + (Math.sin(a[1] * 0.4) - Math.sin(b[1] * 0.4)) * 3);
 
     pixelsRef.current.clear();
     redrawAll();
@@ -1678,12 +1701,13 @@ export const PixelEngine: React.FC = () => {
     setIsBotDrawing(true);
 
     let idx = 0;
-    const batchSize = 8;
+    const batchSize = Math.max(12, Math.floor(pixelEntries.length / 100));
     botTimerRef.current = setInterval(() => {
-      const nextBatch = INITIAL_PIXELS.slice(idx, idx + batchSize);
+      const nextBatch = pixelEntries.slice(idx, idx + batchSize);
       if (nextBatch.length === 0) {
         if (botTimerRef.current) clearInterval(botTimerRef.current);
         setIsBotDrawing(false);
+        setActiveBotScene("");
         saveStep();
         playPopSound(880);
         return;
@@ -1695,11 +1719,11 @@ export const PixelEngine: React.FC = () => {
       idx += batchSize;
       redrawAll();
       setStats((prev) => ({ ...prev, drawn: idx, score: idx * 5 }));
-      if (idx % 24 === 0) {
-        playPopSound(340 + (idx % 440));
+      if (idx % (batchSize * 2) === 0) {
+        playPopSound(260 + (idx % 540));
       }
-    }, 20);
-  }, [isBotDrawing, redrawAll, saveStep, playPopSound]);
+    }, 16);
+  }, [isBotDrawing, pixelSize, redrawAll, saveStep, playPopSound]);
 
   useEffect(() => {
     return () => {
@@ -1967,12 +1991,13 @@ export const PixelEngine: React.FC = () => {
   );
 
   const loadProceduralScene = useCallback(
-    (sceneKey: keyof typeof SCENE_GENERATORS) => {
+    (sceneKey: string) => {
       const canvas = artworkCanvasRef.current;
       const cols = canvas ? Math.floor(canvas.width / pixelSize) : 80;
       const rows = canvas ? Math.floor(canvas.height / pixelSize) : 50;
 
-      const generator = SCENE_GENERATORS[sceneKey]?.generate || SCENE_GENERATORS.himalayanNight.generate;
+      const preset = SCENE_PRESETS[sceneKey] || SCENE_PRESETS.himalayanNight;
+      const generator = preset.generate || SCENE_PRESETS.himalayanNight.generate;
       const generatedPixels = generator(cols, rows);
 
       pixelsRef.current.clear();
@@ -2419,7 +2444,7 @@ export const PixelEngine: React.FC = () => {
           backgroundColor: `${activeTheme.cardBg}88`,
           borderColor: activeTheme.headerBorder,
         }}
-        className="h-8 border-b px-2 sm:px-3 flex items-center justify-between text-[11px] gap-2 overflow-x-auto flex-shrink-0 backdrop-blur-sm"
+        className="h-8 border-b px-2 sm:px-3 flex items-center justify-between text-[11px] gap-2 relative z-30 flex-shrink-0 backdrop-blur-sm"
       >
         {/* Left: Mode Selection Tabs with Clean Soft Wash */}
         <div className="flex items-center gap-1 flex-shrink-0">
@@ -2461,32 +2486,82 @@ export const PixelEngine: React.FC = () => {
                   className="text-stone-600 dark:text-zinc-400 hover:text-stone-950 dark:hover:text-zinc-100 hover:underline cursor-pointer focus:outline-none focus-visible:ring-1 focus-visible:ring-stone-400 flex items-center gap-1"
                 >
                   <span>Scenes</span>
-                  <span className="text-[10px] opacity-70">▾</span>
+                  <span className="text-[10px] opacity-70">{isSceneMenuOpen ? "▴" : "▾"}</span>
                 </button>
 
                 {isSceneMenuOpen && (
-                  <div
-                    style={{
-                      backgroundColor: activeTheme.windowBg,
-                      borderColor: activeTheme.cardBorder,
-                    }}
-                    className="absolute right-0 top-full mt-1.5 w-52 rounded border shadow-lg py-1 z-50 text-left font-mono text-[11px]"
-                  >
-                    <div className="px-2.5 py-1 text-[9px] uppercase tracking-wider opacity-50 font-bold border-b border-black/5 dark:border-white/5">
-                      Procedural Scenes
+                  <>
+                    <div
+                      className="fixed inset-0 z-40"
+                      onClick={() => setIsSceneMenuOpen(false)}
+                    />
+                    <div
+                      style={{
+                        backgroundColor: activeTheme.windowBg,
+                        borderColor: activeTheme.cardBorder,
+                      }}
+                      className="absolute right-0 top-full mt-1.5 w-72 max-h-[420px] overflow-y-auto rounded border shadow-2xl py-1 z-50 text-left font-mono text-[11px] animate-in fade-in zoom-in-95 duration-100"
+                    >
+                      <div className="px-2.5 py-1 text-[9px] uppercase tracking-wider opacity-50 font-bold border-b border-black/5 dark:border-white/5 flex justify-between items-center">
+                        <span>21 Iconic Scenes</span>
+                        <span>{Object.keys(SCENE_PRESETS).length} Presets</span>
+                      </div>
+
+                      {/* Group 1: Iconic Anime */}
+                      <div className="px-2.5 pt-2 pb-0.5 text-[9px] uppercase tracking-wider font-bold text-amber-600 dark:text-amber-400">
+                        Iconic Anime
+                      </div>
+                      {Object.values(SCENE_PRESETS)
+                        .filter((s) => s.category === "anime")
+                        .map((s) => (
+                          <button
+                            key={s.id}
+                            type="button"
+                            onClick={() => loadProceduralScene(s.id as any)}
+                            className="w-full text-left px-2.5 py-1 hover:bg-black/5 dark:hover:bg-white/10 transition-colors flex flex-col cursor-pointer"
+                          >
+                            <span className="font-semibold text-stone-900 dark:text-zinc-100">{s.name}</span>
+                            <span className="text-[9px] opacity-60 leading-tight truncate">{s.description}</span>
+                          </button>
+                        ))}
+
+                      {/* Group 2: Modern & Ghibli Masterpieces */}
+                      <div className="px-2.5 pt-2 pb-0.5 text-[9px] uppercase tracking-wider font-bold text-emerald-600 dark:text-emerald-400 border-t border-black/5 dark:border-white/5 mt-1">
+                        Ghibli & Masterpieces
+                      </div>
+                      {Object.values(SCENE_PRESETS)
+                        .filter((s) => s.category === "ghibli")
+                        .map((s) => (
+                          <button
+                            key={s.id}
+                            type="button"
+                            onClick={() => loadProceduralScene(s.id as any)}
+                            className="w-full text-left px-2.5 py-1 hover:bg-black/5 dark:hover:bg-white/10 transition-colors flex flex-col cursor-pointer"
+                          >
+                            <span className="font-semibold text-stone-900 dark:text-zinc-100">{s.name}</span>
+                            <span className="text-[9px] opacity-60 leading-tight truncate">{s.description}</span>
+                          </button>
+                        ))}
+
+                      {/* Group 3: Landscapes & Cyberpunk */}
+                      <div className="px-2.5 pt-2 pb-0.5 text-[9px] uppercase tracking-wider font-bold text-cyan-600 dark:text-cyan-400 border-t border-black/5 dark:border-white/5 mt-1">
+                        Landscapes & Cyberpunk
+                      </div>
+                      {Object.values(SCENE_PRESETS)
+                        .filter((s) => s.category === "landscape" || s.category === "cyberpunk")
+                        .map((s) => (
+                          <button
+                            key={s.id}
+                            type="button"
+                            onClick={() => loadProceduralScene(s.id as any)}
+                            className="w-full text-left px-2.5 py-1 hover:bg-black/5 dark:hover:bg-white/10 transition-colors flex flex-col cursor-pointer"
+                          >
+                            <span className="font-semibold text-stone-900 dark:text-zinc-100">{s.name}</span>
+                            <span className="text-[9px] opacity-60 leading-tight truncate">{s.description}</span>
+                          </button>
+                        ))}
                     </div>
-                    {Object.entries(SCENE_GENERATORS).map(([key, s]) => (
-                      <button
-                        key={key}
-                        type="button"
-                        onClick={() => loadProceduralScene(key as keyof typeof SCENE_GENERATORS)}
-                        className="w-full text-left px-2.5 py-1.5 hover:bg-black/5 dark:hover:bg-white/10 transition-colors flex flex-col cursor-pointer"
-                      >
-                        <span className="font-semibold text-stone-900 dark:text-zinc-100">{s.name}</span>
-                        <span className="text-[9px] opacity-60 leading-tight">{s.description}</span>
-                      </button>
-                    ))}
-                  </div>
+                  </>
                 )}
               </div>
 
@@ -2504,10 +2579,14 @@ export const PixelEngine: React.FC = () => {
               <button
                 type="button"
                 onClick={runBotPlacement}
-                title="Automated Bot Placement Playback"
-                className="text-stone-600 dark:text-zinc-400 hover:text-stone-950 dark:hover:text-zinc-100 hover:underline cursor-pointer focus:outline-none focus-visible:ring-1 focus-visible:ring-stone-400"
+                title={isBotDrawing ? "Stop automated bot drawing" : "Let automated bot paint a random anime or landscape scene"}
+                className={`text-xs font-mono transition-all cursor-pointer focus:outline-none focus-visible:ring-1 focus-visible:ring-stone-400 ${
+                  isBotDrawing
+                    ? "text-amber-500 font-bold animate-pulse hover:text-amber-400"
+                    : "text-stone-600 dark:text-zinc-400 hover:text-stone-950 dark:hover:text-zinc-100 hover:underline"
+                }`}
               >
-                <span>{isBotDrawing ? "Bot drawing..." : "Auto-bot"}</span>
+                <span>{isBotDrawing ? `■ Stop (${activeBotScene ? activeBotScene.split(" ")[0] : "Bot"})` : "Auto-bot"}</span>
               </button>
 
               {/* Hidden File Input */}

@@ -20,6 +20,7 @@ import { useOSStore } from "@/store/osStore";
 import { useThemeStore, OS_THEMES, OSThemeId } from "@/store/themeStore";
 import { useSoundStore } from "@/store/soundStore";
 import { WelcomeModal } from "@/components/System/WelcomeModal";
+import { PortfolioLoader } from "@/components/System/PortfolioLoader";
 import { PaperPixelWallpaper } from "@/components/System/PaperPixelWallpaper";
 import { DesktopObjects } from "@/components/System/DesktopObjects";
 import { EmptyDesktopDisplay } from "@/components/System/EmptyDesktopDisplay";
@@ -342,12 +343,15 @@ export function AdityaOSDesktop({
 
   if (viewMode === "portfolio") {
     return (
-      <PortfolioView
-        onLaunchOS={() => {
-          closeAllWindows();
-          setViewMode("os");
-        }}
-      />
+      <>
+        <PortfolioLoader />
+        <PortfolioView
+          onLaunchOS={() => {
+            closeAllWindows();
+            setViewMode("os");
+          }}
+        />
+      </>
     );
   }
 
@@ -362,6 +366,8 @@ export function AdityaOSDesktop({
       onWheel={(e) => playScrollNote(e.deltaY)}
       className="relative w-screen h-screen overflow-hidden select-none flex flex-col font-mono"
     >
+      {/* Initial Centered Profile Loader */}
+      <PortfolioLoader />
       {/* Dynamic Wallpaper Layer */}
       {wallpaperUrl ? (
         <>
