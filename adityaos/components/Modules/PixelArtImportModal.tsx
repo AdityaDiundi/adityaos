@@ -100,6 +100,9 @@ export const PixelArtImportModal: React.FC<PixelArtImportModalProps> = ({
   // 6. Debug Stage Inspector
   const [activeStage, setActiveStage] = useState<DebugStage>("split");
 
+  // Drag and drop state
+  const [isDragging, setIsDragging] = useState<boolean>(false);
+
   // Conversion result & debouncing
   const [conversionResult, setConversionResult] = useState<ConversionPipelineResult | null>(null);
   const [isProcessing, setIsProcessing] = useState<boolean>(false);
@@ -112,6 +115,18 @@ export const PixelArtImportModal: React.FC<PixelArtImportModalProps> = ({
   useEffect(() => {
     if (imageSrc) setActiveImageSrc(imageSrc);
   }, [imageSrc]);
+
+  // Handle Drag & Drop of Image File onto Preview Area
+  const handleDropFile = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragging(false);
+    const file = e.dataTransfer.files?.[0];
+    if (file && file.type.startsWith("image/")) {
+      const reader = new FileReader();
+      reader.onload = (ev) => setActiveImageSrc(ev.target?.result as string);
+      reader.readAsDataURL(file);
+    }
+  };
 
   // Decode activeImageSrc into cachedSourceData and analyze
   useEffect(() => {
@@ -147,6 +162,11 @@ export const PixelArtImportModal: React.FC<PixelArtImportModalProps> = ({
       setAnalysis(report);
       setSelectedSourceType(report.detectedType);
 
+      // Photos & landscapes are full scenes, do not isolate subject / remove bg by default
+      if (report.detectedType === "photo") {
+        setIsolateSubject(false);
+      }
+
       // Restore saved resolution for this source type or use suggested default
       const maxDim = Math.max(w, h);
       let initialRes = report.suggestedLongestSide;
@@ -169,6 +189,9 @@ export const PixelArtImportModal: React.FC<PixelArtImportModalProps> = ({
   // When source type is manually changed, restore that type's last-used resolution
   const handleSelectSourceType = (type: SourceType) => {
     setSelectedSourceType(type);
+    if (type === "photo") {
+      setIsolateSubject(false);
+    }
     if (!cachedSourceData) return;
     const maxDim = Math.max(cachedSourceData.width, cachedSourceData.height);
 
@@ -342,7 +365,8 @@ export const PixelArtImportModal: React.FC<PixelArtImportModalProps> = ({
 
     const pw = conversionResult.width;
     const ph = conversionResult.height;
-    const scale = Math.max(2, Math.min(10, Math.floor(320 / Math.max(pw, ph))));
+    // Comfortable integer pixel scale (up to 400px box) preserving integer grid clarity
+    const scale = Math.max(1, Math.min(8, Math.floor(400 / Math.max(pw, ph))));
 
     canvas.width = pw * scale;
     canvas.height = ph * scale;
@@ -368,6 +392,15 @@ export const PixelArtImportModal: React.FC<PixelArtImportModalProps> = ({
     else if (activeStage === "dithered") targetMap = conversionResult.stages.dithered;
     else if (activeStage === "cleaned") targetMap = conversionResult.stages.cleaned;
     else if (activeStage === "outlined") targetMap = conversionResult.stages.outlined;
+
+    if (targetMap.size === 0) {
+      ctx.fillStyle = activeTheme.isDark ? "#A1A1AA" : "#71717A";
+      ctx.font = "11px monospace";
+      ctx.textAlign = "center";
+      ctx.textBaseline = "middle";
+      ctx.fillText("No pixels isolated in this stage", canvas.width / 2, canvas.height / 2);
+      return;
+    }
 
     const splitCol = Math.floor(pw / 2);
 
@@ -412,14 +445,14 @@ export const PixelArtImportModal: React.FC<PixelArtImportModalProps> = ({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4 bg-black/70 backdrop-blur-sm select-none font-mono text-xs">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 pt-10 pb-10 bg-black/75 backdrop-blur-sm select-none font-mono text-xs">
       <div
         style={{
           backgroundColor: activeTheme.windowBg,
           borderColor: activeTheme.cardBorder,
           color: activeTheme.textPrimary,
         }}
-        className="w-full max-w-4xl max-h-[92vh] rounded border shadow-2xl flex flex-col overflow-hidden animate-in fade-in zoom-in-95 duration-150"
+        className="w-full max-w-4xl h-[84vh] max-h-[720px] rounded-lg border shadow-2xl flex flex-col overflow-hidden animate-in fade-in zoom-in-95 duration-150 my-auto"
       >
         {/* Header */}
         <div
@@ -427,33 +460,45 @@ export const PixelArtImportModal: React.FC<PixelArtImportModalProps> = ({
             backgroundColor: activeTheme.headerBg,
             borderColor: activeTheme.headerBorder,
           }}
-          className="h-10 border-b px-3.5 flex items-center justify-between"
+          className="h-11 shrink-0 border-b px-3.5 flex items-center justify-between"
         >
           <div className="flex items-center gap-2">
             <span className="font-serif italic text-sm text-stone-900 dark:text-zinc-100">
               High-Fidelity Image to Pixel Art Pipeline
             </span>
             {analysis && (
-              <span className="px-1.5 py-0.5 rounded text-[10px] bg-black/5 dark:bg-white/10 opacity-75">
+              <span className="px-1.5 py-0.5 rounded text-[10px] bg-black/5 dark:bg-white/10 opacity-75 hidden sm:inline-block">
                 Auto: {analysis.detectedType.toUpperCase()} ({Math.round(analysis.confidence * 100)}%)
               </span>
             )}
           </div>
-          <button
-            type="button"
-            onClick={onClose}
-            className="p-1 rounded text-stone-500 dark:text-zinc-400 hover:text-stone-900 dark:hover:text-zinc-100 hover:bg-black/5 dark:hover:bg-white/5 transition-colors cursor-pointer"
-          >
-            <X className="w-4 h-4" />
-          </button>
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              onClick={() => fileInputRef.current?.click()}
+              className="flex items-center gap-1.5 px-2.5 py-1 rounded border border-black/15 dark:border-white/15 hover:bg-black/5 dark:hover:bg-white/10 text-[11px] cursor-pointer transition-colors"
+              title="Upload a different image file"
+            >
+              <Upload className="w-3.5 h-3.5" />
+              <span>Change Image</span>
+            </button>
+            <button
+              type="button"
+              onClick={onClose}
+              className="p-1.5 rounded text-stone-500 dark:text-zinc-400 hover:text-stone-900 dark:hover:text-zinc-100 hover:bg-black/5 dark:hover:bg-white/5 transition-colors cursor-pointer"
+              title="Close modal"
+            >
+              <X className="w-4 h-4" />
+            </button>
+          </div>
         </div>
 
         {/* Content Body */}
-        <div className="flex-1 overflow-y-auto p-4 flex flex-col lg:flex-row gap-4 min-h-0">
+        <div className="flex-1 min-h-0 p-3 flex flex-col lg:flex-row gap-3 overflow-hidden">
           {/* Left: Interactive Canvas Preview & Stage Tabs */}
-          <div className="flex-1 flex flex-col items-center justify-between bg-black/5 dark:bg-white/5 rounded border border-black/5 dark:border-white/5 p-3 min-h-[360px] relative">
+          <div className="flex-1 min-h-0 flex flex-col items-center justify-between bg-black/5 dark:bg-white/5 rounded border border-black/5 dark:border-white/5 p-2.5 relative overflow-hidden">
             {/* Stage Inspector Tabs */}
-            <div className="w-full flex items-center justify-between gap-1 overflow-x-auto pb-1 text-[10px] border-b border-black/5 dark:border-white/5">
+            <div className="w-full shrink-0 flex items-center justify-between gap-1 overflow-x-auto pb-1.5 text-[10px] border-b border-black/5 dark:border-white/5">
               <span className="text-[9px] uppercase font-bold opacity-50 shrink-0">Stage:</span>
               <div className="flex items-center gap-1 overflow-x-auto">
                 {[
@@ -487,15 +532,42 @@ export const PixelArtImportModal: React.FC<PixelArtImportModalProps> = ({
             </div>
 
             {/* Canvas Container */}
-            <div className="flex-1 w-full flex items-center justify-center p-2 relative">
+            <div
+              onDragOver={(e) => {
+                e.preventDefault();
+                setIsDragging(true);
+              }}
+              onDragLeave={() => setIsDragging(false)}
+              onDrop={handleDropFile}
+              className="flex-1 min-h-0 w-full flex items-center justify-center p-1 relative overflow-hidden select-none"
+            >
+              {isDragging && (
+                <div className="absolute inset-0 z-30 flex flex-col items-center justify-center bg-black/75 backdrop-blur-xs text-white text-xs font-bold border-2 border-dashed border-white/60 rounded gap-1.5 animate-in fade-in">
+                  <Upload className="w-6 h-6 animate-bounce text-emerald-400" />
+                  <span>Drop image file here to replace</span>
+                </div>
+              )}
+
               {cachedSourceData ? (
-                <canvas
-                  ref={previewCanvasRef}
-                  className="rounded shadow-lg border border-black/10 dark:border-white/10 max-h-[320px] max-w-full"
-                  style={{ imageRendering: "pixelated" }}
-                />
+                <>
+                  <button
+                    type="button"
+                    onClick={() => fileInputRef.current?.click()}
+                    className="absolute top-2 left-2 z-10 px-2 py-0.5 rounded bg-black/60 hover:bg-black/85 text-white text-[10px] flex items-center gap-1 backdrop-blur-xs transition-colors cursor-pointer border border-white/20 shadow-xs"
+                    title="Choose a different image"
+                  >
+                    <Upload className="w-3 h-3" />
+                    <span>Replace</span>
+                  </button>
+
+                  <canvas
+                    ref={previewCanvasRef}
+                    className="rounded shadow-md border border-black/10 dark:border-white/10 max-h-full max-w-full object-contain"
+                    style={{ imageRendering: "pixelated" }}
+                  />
+                </>
               ) : (
-                <div className="flex flex-col items-center gap-2 text-stone-500 dark:text-zinc-400">
+                <div className="flex flex-col items-center gap-2 text-stone-500 dark:text-zinc-400 p-4 text-center">
                   <Upload className="w-8 h-8 opacity-40" />
                   <span>Upload an image to start high-fidelity pixel conversion</span>
                   <button
@@ -509,7 +581,7 @@ export const PixelArtImportModal: React.FC<PixelArtImportModalProps> = ({
               )}
 
               {isProcessing && (
-                <div className="absolute top-2 right-2 px-2 py-0.5 rounded bg-black/60 text-white text-[10px] animate-pulse">
+                <div className="absolute top-2 right-2 px-2 py-0.5 rounded bg-black/70 text-white text-[10px] animate-pulse">
                   Rendering...
                 </div>
               )}
@@ -517,7 +589,7 @@ export const PixelArtImportModal: React.FC<PixelArtImportModalProps> = ({
 
             {/* Canvas Meta Info Footer */}
             {conversionResult && (
-              <div className="w-full flex items-center justify-between text-[10px] opacity-75 pt-1 border-t border-black/5 dark:border-white/5">
+              <div className="w-full shrink-0 flex items-center justify-between text-[10px] opacity-75 pt-1.5 border-t border-black/5 dark:border-white/5">
                 <span>
                   Grid: <b>{conversionResult.width} × {conversionResult.height}</b> ({conversionResult.pixels.size} px)
                 </span>
@@ -529,7 +601,7 @@ export const PixelArtImportModal: React.FC<PixelArtImportModalProps> = ({
           </div>
 
           {/* Right: Controls Strip */}
-          <div className="w-full lg:w-80 flex flex-col gap-3.5 text-[11px] overflow-y-auto pr-1">
+          <div className="w-full lg:w-80 h-full overflow-y-auto flex flex-col gap-3 text-[11px] pr-2 shrink-0">
             {/* 1. Source Type Selector */}
             <div className="flex flex-col gap-1.5">
               <div className="flex items-center justify-between">
@@ -826,6 +898,7 @@ export const PixelArtImportModal: React.FC<PixelArtImportModalProps> = ({
               reader.onload = (ev) => setActiveImageSrc(ev.target?.result as string);
               reader.readAsDataURL(file);
             }
+            e.target.value = "";
           }}
           accept="image/*"
           className="hidden"
@@ -837,6 +910,7 @@ export const PixelArtImportModal: React.FC<PixelArtImportModalProps> = ({
           onChange={(e) => {
             const file = e.target.files?.[0];
             if (file) handleReferenceImageUpload(file);
+            e.target.value = "";
           }}
           accept="image/*"
           className="hidden"
@@ -848,14 +922,15 @@ export const PixelArtImportModal: React.FC<PixelArtImportModalProps> = ({
             backgroundColor: activeTheme.headerBg,
             borderColor: activeTheme.headerBorder,
           }}
-          className="h-11 border-t px-4 flex items-center justify-between"
+          className="h-11 shrink-0 border-t px-4 flex items-center justify-between"
         >
           <button
             type="button"
             onClick={() => fileInputRef.current?.click()}
-            className="text-xs text-stone-600 dark:text-zinc-400 hover:text-stone-900 dark:hover:text-zinc-100 hover:underline cursor-pointer"
+            className="flex items-center gap-1.5 text-xs text-stone-600 dark:text-zinc-400 hover:text-stone-900 dark:hover:text-zinc-100 hover:underline cursor-pointer"
           >
-            Change Image
+            <Upload className="w-3.5 h-3.5" />
+            <span>Change Image</span>
           </button>
 
           <div className="flex items-center gap-2">

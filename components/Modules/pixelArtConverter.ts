@@ -1171,9 +1171,29 @@ export function runPixelConversionPipeline(
   // 5. Morphological Cleanup on Mask
   let finalMask = cleanupAlphaMask(rawMask, gridW, gridH, isolateSubject);
 
+  // Safety fallback: If subject isolation / bg removal cleared all pixels (or < 8 pixels),
+  // automatically fall back to preserving all non-transparent pixels so canvas is never blank.
+  let validMaskCount = 0;
+  for (let i = 0; i < gridW * gridH; i++) {
+    if (finalMask[i] === 1) validMaskCount++;
+  }
+  if (validMaskCount < 8) {
+    for (let i = 0; i < gridW * gridH; i++) {
+      finalMask[i] = downscaled.a[i] >= 30 ? 1 : 0;
+    }
+  }
+
   // Prune spurious 1D horizontal or vertical divider lines and baseline whiskers
   if (removeFloorLine) {
-    finalMask = pruneThinDividerLines(finalMask, gridW, gridH);
+    const pruned = pruneThinDividerLines(finalMask, gridW, gridH);
+    let countPruned = 0;
+    for (let i = 0; i < gridW * gridH; i++) {
+      if (pruned[i] === 1) countPruned++;
+    }
+    // Only apply pruning if it preserved subject pixels
+    if (countPruned >= 8) {
+      finalMask = pruned;
+    }
 
     // Also strip border artifacts if whole rows/cols at the canvas perimeter are spurious
     if (gridH > 10) {
@@ -1182,7 +1202,7 @@ export function runPixelConversionPipeline(
         for (let gx = 0; gx < gridW; gx++) {
           if (finalMask[row * gridW + gx] === 1) filledCount++;
         }
-        if (filledCount > gridW * 0.4) {
+        if (filledCount > gridW * 0.4 && filledCount < gridW) {
           for (let gx = 0; gx < gridW; gx++) finalMask[row * gridW + gx] = 0;
         }
       }
@@ -1356,7 +1376,12 @@ export function runPixelConversionPipeline(
         if (isBorder) {
           const idx = gy * gridW + gx;
           const darkHex = getDarkerShade(downscaled.r[idx], downscaled.g[idx], downscaled.b[idx]);
-          gridOutlined[gy][gx] = darkHex;
+          // Snap dark outline to the active palette so it respects the color budget
+          const dr = parseInt(darkHex.slice(1, 3), 16);
+          const dg = parseInt(darkHex.slice(3, 5), 16);
+          const db = parseInt(darkHex.slice(5, 7), 16);
+          const snappedDark = snapToPaletteOklab(dr, dg, db, activePalette);
+          gridOutlined[gy][gx] = snappedDark.hex;
         }
       }
     }
