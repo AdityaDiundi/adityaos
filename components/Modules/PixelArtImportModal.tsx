@@ -445,14 +445,14 @@ export const PixelArtImportModal: React.FC<PixelArtImportModalProps> = ({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 pt-10 pb-10 bg-black/75 backdrop-blur-sm select-none font-mono text-xs">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 pt-8 pb-8 bg-black/75 backdrop-blur-sm select-none font-mono text-xs">
       <div
         style={{
           backgroundColor: activeTheme.windowBg,
           borderColor: activeTheme.cardBorder,
           color: activeTheme.textPrimary,
         }}
-        className="w-full max-w-4xl h-[84vh] max-h-[720px] rounded-lg border shadow-2xl flex flex-col overflow-hidden animate-in fade-in zoom-in-95 duration-150 my-auto"
+        className="w-full max-w-4xl h-[82vh] max-h-[660px] rounded-lg border shadow-2xl flex flex-col overflow-hidden animate-in fade-in zoom-in-95 duration-150 my-auto"
       >
         {/* Header */}
         <div
@@ -496,7 +496,7 @@ export const PixelArtImportModal: React.FC<PixelArtImportModalProps> = ({
         {/* Content Body */}
         <div className="flex-1 min-h-0 p-3 flex flex-col lg:flex-row gap-3 overflow-hidden">
           {/* Left: Interactive Canvas Preview & Stage Tabs */}
-          <div className="flex-1 min-h-0 flex flex-col items-center justify-between bg-black/5 dark:bg-white/5 rounded border border-black/5 dark:border-white/5 p-2.5 relative overflow-hidden">
+          <div className="flex-1 min-h-0 h-full max-h-full flex flex-col items-center justify-between bg-black/5 dark:bg-white/5 rounded border border-black/5 dark:border-white/5 p-2.5 relative overflow-hidden">
             {/* Stage Inspector Tabs */}
             <div className="w-full shrink-0 flex items-center justify-between gap-1 overflow-x-auto pb-1.5 text-[10px] border-b border-black/5 dark:border-white/5">
               <span className="text-[9px] uppercase font-bold opacity-50 shrink-0">Stage:</span>
@@ -601,7 +601,7 @@ export const PixelArtImportModal: React.FC<PixelArtImportModalProps> = ({
           </div>
 
           {/* Right: Controls Strip */}
-          <div className="w-full lg:w-80 h-full overflow-y-auto flex flex-col gap-3 text-[11px] pr-2 shrink-0">
+          <div className="w-full lg:w-80 h-full max-h-full min-h-0 overflow-y-auto flex flex-col gap-3 text-[11px] pr-2 shrink-0">
             {/* 1. Source Type Selector */}
             <div className="flex flex-col gap-1.5">
               <div className="flex items-center justify-between">
