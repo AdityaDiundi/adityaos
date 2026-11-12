@@ -36,3 +36,4 @@ next-env.d.ts
 # scratch / test outputs
 lighthouse-*.json
 temp_raw_*
+/scratch/

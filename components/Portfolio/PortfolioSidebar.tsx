@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, useRef, useCallback } from "react";
 import Image from "next/image";
+import Link from "next/link";
 import { useThemeStore, OSThemeId } from "@/store/themeStore";
 import { WRITING_LINES } from "./poetryData";
 import { SHIPPED_PROJECTS } from "./projectsData";
@@ -456,6 +457,23 @@ export function PortfolioSidebar({
             <span>Resume</span>
             <span className="opacity-50 text-xs">↗</span>
           </a>
+
+          {/* 3D Story Journey Link */}
+          <Link
+            href="/story"
+            title="Traverse 3D Story Journey"
+            className={`w-full h-9 -mx-2.5 px-2.5 rounded-md flex items-center justify-between font-mono text-[13px] tracking-tight transition-all duration-150 cursor-pointer focus:outline-none focus-visible:ring-1 focus-visible:ring-stone-400 dark:focus-visible:ring-zinc-500 ${
+              isDark
+                ? "text-zinc-400 hover:text-zinc-100 hover:bg-white/[0.04]"
+                : "text-stone-600 hover:text-[#1A1814] hover:bg-black/[0.035]"
+            }`}
+          >
+            <span className="flex items-center gap-2">
+              <span className="w-1.5 h-1.5 rounded-full bg-sky-500 animate-pulse" />
+              <span>Story Journey</span>
+            </span>
+            <span className="opacity-50 text-xs">3D ↗</span>
+          </Link>
 
           {/* Contact Links: Plain muted text, separated by spacing instead of slashes, no per-link arrows */}
           <div className="flex items-center gap-4 text-xs font-mono text-stone-500 dark:text-zinc-400 mt-2.5 whitespace-nowrap">

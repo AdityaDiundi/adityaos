@@ -24,83 +24,36 @@ interface BreakTheGridShowcaseProps {
 }
 
 /* ========================================================================= */
-/* 1. Sleek Minimalist Browser Window Frame */
+/* 1. Sleek Frameless Desktop Asset Viewport */
 /* ========================================================================= */
 function BrowserFrame({
-  url,
   children,
   aspectClass = "aspect-[16/10]",
 }: {
-  url: string;
+  url?: string;
   children: React.ReactNode;
   aspectClass?: string;
 }) {
-  const { activeTheme } = useThemeStore();
-  const isDark = activeTheme.isDark;
-
   return (
     <div
-      className={`w-full rounded-xl overflow-hidden border shadow-[0_20px_50px_rgba(0,0,0,0.08)] dark:shadow-[0_20px_50px_rgba(0,0,0,0.35)] transition-all duration-300 hover:shadow-xl hover:-translate-y-0.5 ${
-        isDark
-          ? "bg-[#111318] border-zinc-800"
-          : "bg-white border-stone-200/90"
-      }`}
+      className={`relative w-full overflow-hidden rounded-xl shadow-[0_12px_40px_rgba(0,0,0,0.08)] dark:shadow-[0_12px_40px_rgba(0,0,0,0.35)] transition-all duration-300 hover:shadow-2xl hover:-translate-y-0.5 ${aspectClass}`}
     >
-      {/* Top Browser Bar */}
-      <div
-        className={`px-3 py-1.5 border-b flex items-center justify-between gap-3 text-xs font-mono select-none ${
-          isDark
-            ? "bg-[#14171f] border-zinc-800 text-zinc-400"
-            : "bg-stone-50 border-stone-200 text-stone-500"
-        }`}
-      >
-        <div className="flex items-center gap-1.5 shrink-0 opacity-60">
-          <span className="w-2 h-2 rounded-full bg-current" />
-          <span className="w-2 h-2 rounded-full bg-current" />
-          <span className="w-2 h-2 rounded-full bg-current" />
-        </div>
-
-        {/* Minimalist Address Pill */}
-        <div
-          className={`px-2.5 py-0.5 rounded text-[10px] flex items-center justify-center gap-1.5 truncate border ${
-            isDark
-              ? "bg-[#0d0e12] border-zinc-800 text-zinc-300"
-              : "bg-white border-stone-200 text-stone-700"
-          }`}
-        >
-          <span className="opacity-50 text-[9px]">🔒</span>
-          <span className="truncate">{url}</span>
-        </div>
-
-        <div className="w-6 shrink-0" />
-      </div>
-
-      {/* Frame Body */}
-      <div className={`relative overflow-hidden bg-stone-900/5 dark:bg-black/30 ${aspectClass}`}>
-        {children}
-      </div>
+      {children}
     </div>
   );
 }
 
 /* ========================================================================= */
-/* 2. Minimal Border-Contained Mobile Viewport */
+/* 2. Sleek Frameless Mobile Asset Viewport */
 /* ========================================================================= */
 function MobileDeviceFrame({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const { activeTheme } = useThemeStore();
-  const isDark = activeTheme.isDark;
-
   return (
     <div
-      className={`w-full max-w-[210px] sm:max-w-[240px] mx-auto rounded-[24px] overflow-hidden border shadow-[0_20px_45px_rgba(0,0,0,0.1)] dark:shadow-[0_20px_45px_rgba(0,0,0,0.45)] transition-all duration-300 hover:shadow-2xl hover:-translate-y-1 ${
-        isDark
-          ? "bg-[#0f1117] border-zinc-800"
-          : "bg-stone-100 border-stone-200/90"
-      }`}
+      className="w-full max-w-[210px] sm:max-w-[240px] mx-auto rounded-xl overflow-hidden shadow-[0_12px_36px_rgba(0,0,0,0.08)] dark:shadow-[0_12px_36px_rgba(0,0,0,0.35)] transition-all duration-300 hover:shadow-2xl hover:-translate-y-0.5"
     >
       <div className="relative overflow-hidden aspect-[9/18] w-full">
         {children}
@@ -234,10 +187,10 @@ export function BreakTheGridShowcase({ onLaunchOS }: BreakTheGridShowcaseProps) 
               </div>
             </div>
 
-            {/* Right: Mockup ~60% width bleeding off right edge, soft shadow, no extra card border */}
+            {/* Right: Asset Viewport */}
             <div className="lg:col-span-7 -mr-6 sm:-mr-8 lg:-mr-12 overflow-visible">
               <div
-                className="rounded-xl overflow-hidden shadow-[0_20px_50px_rgba(0,0,0,0.08)] dark:shadow-[0_20px_50px_rgba(0,0,0,0.35)] cursor-pointer"
+                className="cursor-pointer"
                 onClick={() =>
                   setModalData({
                     title: "JANEVAL — Human-Centered AI Benchmark",
@@ -254,13 +207,12 @@ export function BreakTheGridShowcase({ onLaunchOS }: BreakTheGridShowcaseProps) 
                   })
                 }
               >
-                <BrowserFrame url="janeval.org/arena">
+                <BrowserFrame aspectClass="aspect-[16/10]">
                   <Image
                     src="/case-studies/janeval_live.png"
                     alt="JANEVAL AI Healthcare Evaluation Arena"
-                    width={1200}
-                    height={800}
-                    className="w-full h-auto object-cover object-top"
+                    fill
+                    className="object-cover object-top"
                     priority
                   />
                 </BrowserFrame>
@@ -353,7 +305,7 @@ export function BreakTheGridShowcase({ onLaunchOS }: BreakTheGridShowcaseProps) 
               </div>
             </div>
 
-            {/* Right: Pixel Studio Browser Frame (Clean without extra outer box) */}
+            {/* Right: Pixel Studio Asset Frame */}
             <div className="lg:col-span-7 -mr-6 sm:-mr-8 lg:-mr-12 overflow-visible">
               <div
                 className="cursor-pointer"
@@ -364,17 +316,18 @@ export function BreakTheGridShowcase({ onLaunchOS }: BreakTheGridShowcaseProps) 
                     category: "Canvas Architecture & Cellular Automata",
                     isPixelEngine: true,
                     onLaunchOS: onLaunchOS,
-                    primaryImage: "/case-studies/adityaos_pixel_engine_studio.png",
+                    primaryImage: "/case-studies/pixel_engine_portfolio.png",
                     primaryLabel: "Pixel Studio Viewport",
                     defaultMode: "pixel",
                   })
                 }
               >
-                <BrowserFrame url="diundi.space/pixel" aspectClass="aspect-[1418/782]">
+                <BrowserFrame aspectClass="aspect-[1721/1026]">
                   <Image
-                    src="/case-studies/adityaos_pixel_engine_studio.png"
+                    src="/case-studies/pixel_engine_portfolio.png"
                     alt="AdityaOS Pixel Engine Canvas Interface"
                     fill
+                    priority
                     className="object-cover object-top"
                   />
                 </BrowserFrame>
@@ -485,7 +438,7 @@ export function BreakTheGridShowcase({ onLaunchOS }: BreakTheGridShowcaseProps) 
                   })
                 }
               >
-                <BrowserFrame url="mfine.co/admin/bhel/contacts" aspectClass="aspect-[1366/768]">
+                <BrowserFrame aspectClass="aspect-[1366/768]">
                   <Image
                     src="/case-studies/mfine_bhel_admin_contacts.png"
                     alt="MFine Corporate B2B Admin Console"
@@ -501,120 +454,16 @@ export function BreakTheGridShowcase({ onLaunchOS }: BreakTheGridShowcaseProps) 
         </motion.article>
 
         {/* ========================================================================= */}
-        {/* ROW: 2-COLUMN MINIFIED MOBILE PRODUCTS (DIGIACCEL + MOSAIC) */}
+        {/* ROW: 3-COLUMN MINIFIED MOBILE PRODUCTS (MOSAIC + KETTO + TUTEDUDE) */}
         {/* ========================================================================= */}
         <div
-          className={`border-b border-stone-200/60 dark:border-zinc-800/60 grid grid-cols-1 md:grid-cols-2 divide-y md:divide-y-0 md:divide-x divide-stone-200/60 dark:divide-zinc-800/60 relative ${
+          className={`border-b border-stone-200/60 dark:border-zinc-800/60 grid grid-cols-1 md:grid-cols-3 divide-y md:divide-y-0 md:divide-x divide-stone-200/60 dark:divide-zinc-800/60 relative ${
             isDark
               ? "border-zinc-800/80 divide-zinc-800/80"
               : "border-stone-200/80 divide-stone-200/80"
           }`}
         >
-          {/* 04: Digiaccel UPI Clarity */}
-          <motion.article
-            id="project-digiaccel"
-            data-project-id="digiaccel"
-            initial={{ opacity: 1, y: 0 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.4 }}
-            className={`p-6 sm:p-8 lg:p-10 flex flex-col justify-between space-y-6 transition-colors ${
-              isDark
-                ? "bg-[#0E1015]"
-                : "bg-[#FAF7F2]"
-            }`}
-          >
-            <div className="space-y-4">
-              {/* Top Meta Line: Clean unboxed metadata */}
-              <div className="flex items-center justify-between text-xs font-mono">
-                <span className={isDark ? "text-zinc-400" : "text-stone-600"}>
-                  Digiaccel · 2023
-                </span>
-                <span className="text-cyan-600 dark:text-cyan-400 font-medium">
-                  -38% Drop-Offs
-                </span>
-              </div>
-
-              {/* Designed Smartphone Mockup (Clean without outer box) */}
-              <div
-                className="cursor-pointer py-2 flex justify-center"
-                onClick={() =>
-                  setModalData({
-                    title: "UPI Limit Clarity & Spend Runway",
-                    client: "Digiaccel",
-                    category: "Fintech Payments & Error Recovery",
-                    figmaUrl:
-                      "https://www.figma.com/design/zCmxQ3KwFy0mhlFbtlApua/UPI-Limit-Clarity---digiaccel-Assignment?node-id=0-1",
-                    primaryImage: "/case-studies/upi_phone_clean.png",
-                    primaryLabel: "UPI Limit Meter Interface",
-                    defaultMode: "screens",
-                  })
-                }
-              >
-                <MobileDeviceFrame>
-                  <div className="relative w-full h-full bg-[#121214]">
-                    <Image
-                      src="/case-studies/upi_phone_clean.png"
-                      alt="Digiaccel UPI Limit Meter Screen"
-                      fill
-                      className="object-cover object-top"
-                    />
-                  </div>
-                </MobileDeviceFrame>
-              </div>
-
-              <div className="space-y-2 max-w-[54ch]">
-                <h4
-                  className={`text-lg font-semibold font-sans tracking-tight leading-snug ${
-                    isDark ? "text-white" : "text-stone-900"
-                  }`}
-                >
-                  Ambient UPI spend runway & proactive error recovery.
-                </h4>
-                <p
-                  className={`text-xs sm:text-sm font-sans leading-relaxed ${
-                    isDark ? "text-zinc-400" : "text-stone-600"
-                  }`}
-                >
-                  Designed real-time bank limit meters and 1-tap split-payment failovers, eliminating cryptic checkout errors for high-intent fintech checkouts.
-                </p>
-                <div
-                  className={`text-[11px] font-mono pt-1 ${
-                    isDark ? "text-zinc-500" : "text-stone-500"
-                  }`}
-                >
-                  Fintech UX · UPI Payments · Ambient Feedback · Error Recovery
-                </div>
-              </div>
-            </div>
-
-            <div className="pt-2 flex flex-wrap items-center gap-4 font-mono text-xs">
-              <Link
-                href="/work/digiaccel"
-                className={`px-3.5 py-1.5 rounded-lg font-semibold flex items-center gap-1.5 transition-all cursor-pointer shadow-sm ${
-                  isDark
-                    ? "bg-white text-zinc-950 hover:bg-zinc-200"
-                    : "bg-stone-900 text-white hover:bg-black"
-                }`}
-              >
-                <span>Case Study</span>
-                <ArrowRight className="w-3.5 h-3.5" />
-              </Link>
-
-              <a
-                href="https://www.figma.com/design/zCmxQ3KwFy0mhlFbtlApua/UPI-Limit-Clarity---digiaccel-Assignment?node-id=0-1"
-                target="_blank"
-                rel="noopener noreferrer"
-                className={`flex items-center gap-1 transition-colors cursor-pointer hover:underline ${
-                  isDark ? "text-zinc-400 hover:text-white" : "text-stone-600 hover:text-black"
-                }`}
-              >
-                <span>Figma Specs</span>
-                <ArrowUpRight className="w-3 h-3 opacity-60" />
-              </a>
-            </div>
-          </motion.article>
-
-          {/* 05: Mosaic Wellness / ManMatters */}
+          {/* 04: Mosaic Wellness / ManMatters */}
           <motion.article
             id="project-mosaic"
             data-project-id="mosaic"
@@ -748,18 +597,7 @@ export function BreakTheGridShowcase({ onLaunchOS }: BreakTheGridShowcaseProps) 
               </a>
             </div>
           </motion.article>
-        </div>
 
-        {/* ========================================================================= */}
-        {/* ROW: 2-COLUMN MINIFIED MOBILE PRODUCTS (KETTO + TUTEDUDE) */}
-        {/* ========================================================================= */}
-        <div
-          className={`border-b border-stone-200/60 dark:border-zinc-800/60 grid grid-cols-1 md:grid-cols-2 divide-y md:divide-y-0 md:divide-x divide-stone-200/60 dark:divide-zinc-800/60 relative ${
-            isDark
-              ? "border-zinc-800/80 divide-zinc-800/80"
-              : "border-stone-200/80 divide-stone-200/80"
-          }`}
-        >
           {/* 06: Ketto Crowdfunding */}
           <motion.article
             id="project-ketto"
@@ -801,36 +639,13 @@ export function BreakTheGridShowcase({ onLaunchOS }: BreakTheGridShowcaseProps) 
                 }
               >
                 <MobileDeviceFrame>
-                  <div className="w-full h-full bg-[#1e1b2e] p-3 flex flex-col justify-between text-white font-sans text-xs">
-                    <div className="border-b border-purple-900/50 pb-2">
-                      <div className="flex items-center justify-between text-[10px] font-mono text-pink-400">
-                        <span>KETTO+ SPONSOR</span>
-                        <span className="font-semibold text-emerald-400">Monthly</span>
-                      </div>
-                      <div className="font-semibold text-sm text-zinc-100 pt-0.5">
-                        Start Giving, Start Healing
-                      </div>
-                    </div>
-
-                    <div className="space-y-2 py-1">
-                      <div className="bg-purple-950/60 p-2 rounded-lg border border-purple-800/40 text-[11px]">
-                        <div className="flex items-center justify-between text-pink-300 font-medium">
-                          <span>Pediatric Oncology Fund</span>
-                          <span className="text-emerald-400 font-mono">₹750/mo</span>
-                        </div>
-                        <div className="text-[9px] text-purple-300/80">Funds ongoing chemotherapy cycles</div>
-                      </div>
-
-                      <div className="bg-purple-950/40 p-2 rounded-lg border border-purple-900/40 text-[10px] text-zinc-300">
-                        <div className="font-medium text-pink-200">Patient Recovery Timeline</div>
-                        <div className="text-[9px] text-purple-400">Cycle 3 of 6 completed this week</div>
-                      </div>
-                    </div>
-
-                    <div className="pt-2 border-t border-purple-900/50 flex items-center justify-between text-[9px] font-mono text-purple-400">
-                      <span>UPI Autopay: Active</span>
-                      <span className="text-pink-300">2.3x Repeat Lift</span>
-                    </div>
+                  <div className="relative w-full h-full bg-[#1e1b2e]">
+                    <Image
+                      src="/case-studies/ketto_phone_clean.png"
+                      alt="Ketto Mobile Donation Flow Screen"
+                      fill
+                      className="object-cover object-top"
+                    />
                   </div>
                 </MobileDeviceFrame>
               </div>

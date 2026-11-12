@@ -1168,6 +1168,17 @@ export function AdityaOSDesktop({
               </span>
               <kbd className="px-1 py-0.2 rounded bg-white/10 text-[9px] opacity-60">Alt+8</kbd>
             </button>
+
+            <a
+              href="/story"
+              className="w-full flex items-center justify-between px-2.5 py-1 rounded text-left hover:bg-white/10 transition-colors cursor-pointer"
+            >
+              <span className="flex items-center gap-2">
+                <Sparkles className="w-3.5 h-3.5 text-sky-400" />
+                <span>3D Story Journey</span>
+              </span>
+              <kbd className="px-1 py-0.2 rounded bg-white/10 text-[9px] opacity-60">3D</kbd>
+            </a>
           </div>
 
           {/* Section 3: Window Management */}
